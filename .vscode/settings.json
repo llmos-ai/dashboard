@@ -1,0 +1,52 @@
+{
+  "files.exclude": {
+    ".eslintcache": true,
+    ".nuxt*": true,
+    "yarn-error.log": true,
+    "pkg/**/.shell": true,
+    "pkg/**/node_modules": true
+  },
+  "eslint.format.enable": true,
+  "eslint.run": "onSave",
+  "eslint.packageManager": "yarn",
+  "eslint.validate": ["vue","html","javascript","typescript"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.workingDirectories": ["./", "./pkg/rancher-components/"],
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "cSpell.words": [
+    "apiserver",
+    "autoscroll",
+    "cacerts",
+    "CAPI",
+    "chainable",
+    "clusterroletemplatebindings",
+    "Codecov",
+    "createapp",
+    "kube",
+    "kubeconfig",
+    "kubectl",
+    "Kubernetes",
+    "kubevirt",
+    "mgmt",
+    "nuxt",
+    "overcommit",
+    "Persistentvolumeclaim",
+    "prefs",
+    "prepending",
+    "protip",
+    "PSPS",
+    "PVC",
+    "pvcs",
+    "shortkey",
+    "storageclass",
+    "testid",
+    "tolerations",
+    "userpreferences",
+    "virtualmachine",
+    "vuex",
+    "whatsnew"
+  ]
+}

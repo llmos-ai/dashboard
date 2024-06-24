@@ -1,0 +1,62 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+      - 'release-*'
+  workflow_dispatch:
+    environment:
+      description: 'Build resources for a specific environment'
+      type: environment
+      required: true
+
+jobs:
+  hosted-master:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Build
+        run: ./scripts/build-hosted
+      - uses: shallwefootball/s3-upload-action@master
+        name: Upload S3
+        id: S3
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          source_dir: 'dist'
+          destination_dir: ${{ variables.DESTINATION_DIR || 'dashboard' }}
+
+  embedded-master:
+    runs-on: ubuntu-latest
+    env:
+      TARBALL: latest.tar.gz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Build Embedded
+        run: ./scripts/build-embedded
+
+      - uses: shallwefootball/s3-upload-action@master
+        name: Upload S3
+        id: S3
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          source_dir: 'dist'
+          destination_dir: ${{ variables.DESTINATION_DIR || 'dashboard' }}

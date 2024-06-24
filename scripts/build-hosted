@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+BUILD_DEBUG="${BUILD_DEBUG:-}"
+if [[ -n "${BUILD_DEBUG}" ]]; then
+    set -x
+    env
+fi
+
+cd $(dirname $0)/..
+
+echo "Bootstrapping..."
+yarn --pure-lockfile install
+
+source scripts/version
+echo "BRANCH: ${COMMIT_BRANCH:-<none>}"
+echo "TAG: ${GIT_TAG:-<none>}"
+DIR=${GIT_TAG:-$COMMIT_BRANCH}
+
+if [[ "${DIR}" == "main" ]]; then
+  DIR="latest"
+fi
+
+BASE=${BASE:-https://releases.1block.ai/dashboard/${DIR}}
+
+echo "Building for ${BASE}..."
+
+COMMIT=${COMMIT} VERSION=${VERSION} OUTPUT_DIR=dist/${DIR} ROUTER_BASE="/dashboard/" RESOURCE_BASE="${BASE}" LLMOS_ENV=llmos yarn run build
