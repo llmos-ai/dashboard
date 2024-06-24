@@ -222,12 +222,9 @@ product:
   clusterManagement: 集群管理
   monitoring: 监控
   mcapps: 全局配置
-  neuvector: NeuVector
-  harvesterManager: 虚拟化管理
+  llm: LLM 管理
   rancher: Rancher
   legacy: 旧版
-  uiplugins: 扩展
-  elemental: OS 管理
   plugins: 插件
 
 suffix:

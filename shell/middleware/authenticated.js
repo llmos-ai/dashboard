@@ -319,27 +319,6 @@ export default async function({
         return redirected();
       }
     }
-
-    if (!clusterId) {
-      clusterId = store.getters['defaultClusterId']; // This needs the cluster list, so no parallel
-      const isSingleProduct = store.getters['isSingleProduct'];
-
-      if (isSingleProduct?.afterLoginRoute) {
-        const value = {
-          name:   'c-cluster-product',
-          ...isSingleProduct.afterLoginRoute,
-          params: {
-            cluster: clusterId,
-            ...isSingleProduct.afterLoginRoute?.params
-          },
-        };
-
-        await store.dispatch('prefs/set', {
-          key: AFTER_LOGIN_ROUTE,
-          value,
-        });
-      }
-    }
   } catch (e) {
     if ( e.name === ClusterNotFoundError.name ) {
       return redirect(302, '/home');

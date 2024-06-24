@@ -7,6 +7,7 @@ export default {
       type:     Object,
       required: true,
     },
+    llm: false,
   },
   computed: {
     isEnabled() {
@@ -19,6 +20,9 @@ export default {
       const color = this.cluster.badge?.color;
 
       return color ? `4px solid ${ color }` : '';
+    },
+    showLLMIcon() {
+      return this.llm;
     }
   },
   methods: {
@@ -52,11 +56,20 @@ export default {
       >
         {{ smallIdentifier(cluster.label) }}
       </span>
+      <div v-if="showLLMIcon">
       <img
-          v-if="showLocalIcon"
+          class="cluster-local-logo"
+          :src="cluster.llmNavLogo"
+      >
+      </div>
+      <div
+        v-else-if="showLocalIcon"
+      >
+      <img
           class="cluster-local-logo"
           :src="cluster.providerNavLogo"
       >
+      </div>
     </div>
     <i
       v-if="cluster.pinned"

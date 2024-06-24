@@ -61,7 +61,7 @@ export default {
 
   computed: {
     ...mapGetters(['clusterReady', 'isExplorer', 'isMgmt', 'currentCluster',
-      'currentProduct', 'backToRancherLink', 'backToRancherGlobalLink', 'pageActions', 'isSingleProduct', 'showTopLevelMenu']),
+      'currentProduct', 'backToRancherLink', 'backToRancherGlobalLink', 'pageActions', 'showTopLevelMenu']),
     ...mapGetters('type-map', ['activeProducts']),
 
     appName() {
@@ -102,10 +102,9 @@ export default {
     },
 
     showAccountAndApiKeyLink() {
-      // Keep this simple for the moment and only check if the user can see tokens... plus the usual isMgmt/isSingleProduct
+      // Keep this simple for the moment and only check if the user can see tokens... plus the usual isMgmt
       // const canSeeTokens = this.$store.getters['rancher/schemaFor'](NORMAN.TOKEN, false, false);
-
-      return (this.isMgmt || this.isSingleProduct);
+      return (this.isMgmt);
     },
 
     showPageActions() {
@@ -157,19 +156,6 @@ export default {
         delay:   400,
       };
     },
-
-    singleProductLogoRoute() {
-      const cluster = this.$store.getters.defaultClusterId;
-
-      return {
-        ...this.isSingleProduct.logoRoute,
-        params: {
-          cluster,
-          ...this.isSingleProduct.logoRoute.params,
-        }
-      };
-    },
-
   },
 
   watch: {
@@ -338,23 +324,11 @@ export default {
     ref="header"
     data-testid="header"
   >
+    <!-- side menu -->
     <div>
       <TopLevelMenu v-if="showTopLevelMenu" />
     </div>
-    <div
-      class="menu-spacer"
-      :class="{'isSingleProduct': isSingleProduct }"
-    >
-      <n-link
-        v-if="isSingleProduct"
-        :to="singleProductLogoRoute"
-      >
-        <img
-          class="side-menu-logo"
-          :src="isSingleProduct.logo"
-        >
-      </n-link>
-    </div>
+
     <div
       v-if="!simple"
       ref="product"
@@ -365,13 +339,7 @@ export default {
         v-clean-tooltip="nameTooltip"
         class="cluster cluster-clipped"
       >
-        <div
-          v-if="isSingleProduct"
-          class="product-name"
-        >
-           {{ t(isSingleProduct.productNameKey) }}
-        </div>
-        <template v-else>
+        <template>
           <ClusterProviderIcon
             v-if="currentCluster"
             :cluster="currentCluster"
@@ -400,6 +368,7 @@ export default {
           </div>
         </template>
       </div>
+
       <div
         v-if="currentProduct && !currentProduct.showClusterSwitcher"
         class="cluster"
@@ -416,19 +385,12 @@ export default {
         </div>
       </div>
     </div>
+
     <div
       v-else
       class="simple-title"
     >
       <div
-        v-if="isSingleProduct"
-        class="product-name"
-      >
-        {{ t(isSingleProduct.productNameKey) }}
-      </div>
-
-      <div
-        v-else
         class="side-menu-logo"
       >
         <BrandImage
@@ -716,16 +678,6 @@ export default {
 
     > .menu-spacer {
       flex: 0 0 15px;
-
-      &.isSingleProduct  {
-        display: flex;
-        justify-content: center;
-
-        // Align the icon with the side nav menu items ($side-menu-group-padding-left)
-        .side-menu-logo {
-          margin-left: $side-menu-group-padding-left;
-        }
-      }
     }
 
     .title {
@@ -790,6 +742,7 @@ export default {
       align-items: center;
       position: relative;
       display: flex;
+      padding-left: 10px;
 
       .logo {
         height: 30px;
@@ -813,14 +766,14 @@ export default {
       display: flex;
       margin-right: 8px;
       height: 55px;
-      margin-left: 5px;
+      margin-left: 10px;
       max-width: 200px;
       padding: 12px 0;
     }
 
     .side-menu-logo-img {
       object-fit: contain;
-      height: 21px;
+      height: 25px;
       max-width: 30px;
     }
 

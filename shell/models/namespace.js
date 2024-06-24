@@ -36,7 +36,7 @@ export default class Namespace extends SteveModel {
     const out = super._availableActions;
 
     insertAt(out, 0, { divider: true });
-    if (this.$rootGetters['isMgmt'] && !this.$rootGetters['isSingleProduct']) {
+    if (this.$rootGetters['isMgmt']) {
       insertAt(out, 0, {
         action:     'move',
         label:      this.t('namespace.move'),

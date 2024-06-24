@@ -12,11 +12,10 @@ export default {
   } ) {
     const seenWhatsNew = store.getters['prefs/get'](SEEN_WHATS_NEW);
     const versionInfo = getVersionInfo(store);
-    const isSingleProduct = store.getters['isSingleProduct'];
     const dashboardHome = { name: 'home' };
 
     // If this is a new version, then take the user to the home page to view the release notes
-    if (versionInfo.fullVersion !== seenWhatsNew && !isSingleProduct) {
+    if (versionInfo.fullVersion !== seenWhatsNew) {
       return redirect(dashboardHome);
     }
 
@@ -33,10 +32,6 @@ export default {
     if (validRoute(afterLoginRouteObject, app.router)) {
       // Take the user to the configured login route
       return redirect(afterLoginRouteObject);
-    }
-
-    if (validRoute(isSingleProduct?.afterLoginRoute, app.router)) {
-      return redirect(isSingleProduct.afterLoginRoute);
     }
 
     return redirect(dashboardHome);

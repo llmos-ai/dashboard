@@ -166,10 +166,11 @@ const graphConfigMap = {};
 const FIELD_REGEX = /^\$\.metadata\.fields\[([0-9]*)\]/;
 
 export const IF_HAVE = {
-  PROJECT:                  'project',
-  NO_PROJECT:               'no-project',
-  MULTI_CLUSTER:            'multi-cluster',
-  ADMIN:                    'admin-user',
+  PROJECT:         'project',
+  NO_PROJECT:      'no-project',
+  MULTI_CLUSTER:   'multi-cluster',
+  ADMIN:           'admin-user',
+  LLMOS_NAMESPACE: 'llmos-system',
 };
 
 export function DSL(store, product, module = 'type-map') {

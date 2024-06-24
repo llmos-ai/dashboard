@@ -14,6 +14,7 @@ import { ucFirst } from '@shell/utils/string';
 import { SCHEMA, COUNT } from '@shell/config/types';
 import { LLMOS_NAME as HARVESTER } from '@shell/config/features';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
+import { NAME as LLM } from '@shell/config/product/llm';
 import { BASIC, FAVORITE, USED } from '@shell/store/type-map';
 import { NAME as NAVLINKS } from '@shell/config/product/navlinks';
 import Group from '@shell/components/nav/Group';
@@ -113,7 +114,7 @@ export default {
 
   computed: {
     ...mapState(['managementReady', 'clusterReady']),
-    ...mapGetters(['productId', 'clusterId', 'currentProduct', 'isSingleProduct', 'namespaceMode', 'isExplorer']),
+    ...mapGetters(['productId', 'clusterId', 'currentProduct', 'namespaceMode', 'isExplorer']),
     ...mapGetters({ locale: 'i18n/selectedLocaleLabel', availableLocales: 'i18n/availableLocales' }),
     ...mapGetters('type-map', ['activeProducts']),
 
@@ -130,16 +131,9 @@ export default {
     },
 
     displayVersion() {
-      if (this.isSingleProduct?.getVersionInfo) {
-        return this.isSingleProduct?.getVersionInfo(this.$store);
-      }
       const { displayVersion } = getVersionInfo(this.$store);
 
       return displayVersion;
-    },
-
-    singleProductAbout() {
-      return this.isSingleProduct?.aboutPage;
     },
 
     showProductFooter() {
@@ -234,7 +228,7 @@ export default {
 
       if ( this.isExplorer ) {
         for ( const product of this.activeProducts ) {
-          if ( product.inStore === 'cluster' ) {
+          if ( product.inStore === 'cluster' && product.name !== LLM) {
             addObject(loadProducts, product.name);
           }
         }
@@ -449,50 +443,12 @@ export default {
         {{ displayVersion }}
       </span>
 
-      <!-- locale selector -->
-      <span v-if="isSingleProduct">
-        <v-popover
-          popover-class="localeSelector"
-          placement="top"
-          trigger="click"
-        >
-          <a
-            data-testid="locale-selector"
-            class="locale-chooser"
-          >
-            {{ locale }}
-          </a>
-
-          <template slot="popover">
-            <ul
-              class="list-unstyled dropdown"
-              style="margin: -1px;"
-            >
-              <li
-                v-for="(label, name) in availableLocales"
-                :key="name"
-                class="hand"
-                @click="switchLocale(name)"
-              >
-                {{ label }}
-              </li>
-            </ul>
-          </template>
-        </v-popover>
-      </span>
     </div>
     <!-- SideNav footer alternative -->
     <div
-      v-else
       class="version text-muted flex"
     >
-      <nuxt-link
-        v-if="singleProductAbout"
-        :to="singleProductAbout"
-      >
-        {{ displayVersion }}
-      </nuxt-link>
-      <template v-else>
+      <template>
         <span>{{ displayVersion }}</span>
       </template>
     </div>

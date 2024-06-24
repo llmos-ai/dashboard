@@ -71,7 +71,7 @@ export default {
     },
 
     llmIcon() {
-      return  require(`~shell/assets/images/pl/ai.svg`);
+      return  require(`~shell/assets/images/providers/llm.svg`);
     }
   },
 
@@ -102,11 +102,13 @@ export default {
             v-if="canAccessModelFiles"
             :cluster="clusterDetail.id"
             resource="ml.llmos.ai.modelfile"
+            product="llm"
         />
         <ResourceSummary
             v-if="canAccessChats"
             :cluster="clusterDetail.id"
             resource="chat"
+            product="llm"
         />
       </div>
     </div>
