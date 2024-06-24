@@ -88,6 +88,7 @@ export default {
           ready:           x.isReady,
           osLogo:          x.providerOsLogo,
           providerNavLogo: x.providerMenuLogo,
+          llmNavLogo:      x.llmNavLogo,
           badge:           x.badge,
           isLocal:         x.isLocal,
           pinned:          x.pinned,
@@ -405,6 +406,29 @@ export default {
                   :data-testid="`top-level-menu-cluster-${index}`"
                   @click="hide()"
                 >
+                  <!-- Clusters LLM entry -->
+                  <nuxt-link
+                      v-if="c.ready"
+                      :data-testid="`menu-cluster-${ c.id }`"
+                      class="cluster selector option"
+                      :to="{ name: 'c-cluster-llm', params: { cluster: c.id } }"
+                  >
+                    <ClusterIconMenu
+                        v-tooltip="getTooltipConfig(t('product.llm'))"
+                        :cluster="c"
+                        :llm="true"
+                        class="rancher-provider-icon"
+                    />
+                    <div class="cluster-name">
+                      {{ t('product.llm') }}
+                    </div>
+                    <Pinned
+                        :class="{'showPin': c.pinned}"
+                        :cluster="c"
+                    />
+                  </nuxt-link>
+
+                  <!-- Clusters k8s entry -->
                   <nuxt-link
                     v-if="c.ready"
                     :data-testid="`menu-cluster-${ c.id }`"
@@ -417,7 +441,7 @@ export default {
                       class="rancher-provider-icon"
                     />
                     <div class="cluster-name">
-                      {{ c.label }}
+                      {{ t('product.clusterManagement') }}
                     </div>
                     <Pinned
                       :class="{'showPin': c.pinned}"

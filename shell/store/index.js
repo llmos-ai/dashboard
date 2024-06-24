@@ -230,7 +230,6 @@ export const state = () => {
     pageActions:             [],
     serverVersion:           null,
     systemNamespaces:        [],
-    isSingleProduct:         undefined,
     targetRoute:             null
   };
 };
@@ -291,6 +290,7 @@ export const getters = {
       out = active[0];
     }
 
+    console.log('currentProduct', out);
     return out;
   },
 
@@ -323,7 +323,7 @@ export const getters = {
       return false;
     }
 
-    return product.name === EXPLORER || product.inStore === 'cluster';
+    return product.name === EXPLORER;
   },
 
   defaultClusterId(state, getters) {
@@ -532,16 +532,8 @@ export const getters = {
     return '/';
   },
 
-  isSingleProduct(state) {
-    if (state.isSingleProduct !== undefined) {
-      return state.isSingleProduct;
-    }
-
-    return false;
-  },
-
   showTopLevelMenu(getters) {
-    return getters['isMultiCluster'] || !getters['isSingleProduct'];
+    return getters['isMgmt'];
   },
 
   targetRoute(state) {
@@ -618,6 +610,7 @@ export const mutations = {
   },
 
   setProduct(state, neu) {
+    console.log('setProduct', neu);
     state.productId = neu;
   },
 
@@ -646,9 +639,9 @@ export const mutations = {
     state.systemNamespaces = namespaces;
   },
 
-  setIsSingleProduct(state, isSingleProduct) {
-    state.isSingleProduct = isSingleProduct;
-  },
+  // setIsSingleProduct(state, isSingleProduct) {
+  //   state.isSingleProduct = isSingleProduct;
+  // },
 
   targetRoute(state, route) {
     state.targetRoute = route;
@@ -679,11 +672,10 @@ export const actions = {
       }),
     };
 
-    const isMgmt = !!getters['management/schemaFor'](MANAGEMENT.PROJECT);
+    const isMgmt = !!getters['management/schemaFor'](MANAGEMENT.SETTING);
 
     if ( isMgmt ) {
       promises['prefs'] = dispatch('prefs/loadServer');
-      promises['rancherSubscribe'] = dispatch('rancher/subscribe');
     }
 
     if ( getters['management/schemaFor'](COUNT) ) {
@@ -1067,9 +1059,9 @@ export const actions = {
     }
   },
 
-  setIsSingleProduct({ commit }, isSingleProduct) {
-    commit(`setIsSingleProduct`, isSingleProduct);
-  },
+  // setIsSingleProduct({ commit }, isSingleProduct) {
+  //   commit(`setIsSingleProduct`, isSingleProduct);
+  // },
 
   unsubscribe( { state, dispatch }) {
     // It would be nice to grab all vuex module stores that we've registered, apparently this is only possible via the

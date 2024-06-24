@@ -32,7 +32,7 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           source_dir: 'dist'
-          destination_dir: ${{ variables.DESTINATION_DIR || 'dashboard' }}
+          destination_dir: ${{ vars.DESTINATION_DIR || 'dashboard' }}
 
   embedded-master:
     runs-on: ubuntu-latest
@@ -59,4 +59,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           source_dir: 'dist'
-          destination_dir: ${{ variables.DESTINATION_DIR || 'dashboard' }}
+          destination_dir: ${{ vars.DESTINATION_DIR || 'dashboard' }}

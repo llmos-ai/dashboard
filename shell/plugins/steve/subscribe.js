@@ -314,11 +314,6 @@ const sharedActions = {
     } = ctx;
 
     // ToDo: need to keep the worker up to date on CSRF cookie
-
-    if (rootGetters['isSingleProduct']?.disableSteveSockets) {
-      return;
-    }
-
     let socket = state.socket;
 
     commit('setWantSocket', true);

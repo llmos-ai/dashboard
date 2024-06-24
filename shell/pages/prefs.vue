@@ -38,7 +38,6 @@ export default {
     pluginDeveloper:   mapPref(PLUGIN_DEVELOPER),
     scalingDownPrompt: mapPref(SCALE_POOL_PROMPT),
 
-    ...mapGetters(['isSingleProduct']),
 
     theme: {
       get() {
@@ -197,7 +196,6 @@ export default {
     </div>
     <!-- Login landing page -->
     <div
-      v-if="!isSingleProduct"
       class="mt-10 mb-10"
     >
       <hr>
@@ -284,7 +282,6 @@ export default {
       />
       <br>
       <Checkbox
-        v-if="!isSingleProduct"
         v-model="hideDescriptions"
         data-testid="prefs__hideDescriptions"
         :label="t('prefs.hideDesc.label')"

@@ -24,13 +24,8 @@ export default {
 
   computed: {
     ...mapState(['error']),
-    ...mapGetters(['isSingleProduct']),
 
     home() {
-      if (this.isSingleProduct?.afterLoginRoute) {
-        return this.$router.resolve(this.isSingleProduct.afterLoginRoute).href;
-      }
-
       return this.$router.resolve({ name: 'home' }).href;
     },
 

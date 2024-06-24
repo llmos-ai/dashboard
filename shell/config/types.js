@@ -82,11 +82,13 @@ export const MANAGEMENT = {
   CLUSTER:   'management.cattle.io.cluster',
   SETTING:   'management.llmos.ai.setting',
   USER:      'management.llmos.ai.user',
+
+  // ML related resources
   MODELFILE: 'ml.llmos.ai.modelfile',
   CHAT:      'chat',
+
   //TODO, add project
   PROJECT: 'management.llmos.io.project',
-  // ML related resources
 };
 
 export const VIRTUAL_TYPES = {

@@ -232,16 +232,16 @@ export function init(store) {
     group:            'cluster',
     icon:             'globe',
     namespaced:       false,
-    ifMgmtCluster: false,
+    ifMgmtCluster:    false,
     name:             VIRTUAL_TYPES.NAMESPACES,
     weight:           98,
     route:            { name: 'c-cluster-product-namespaces' },
     exact:            true,
   });
 
-  // Ignore these types as they are managed through the settings product
-  ignoreType(MANAGEMENT.SETTING);
+  // Ignore these types as they are managed through the auth\settings product
+  ignoreGroup(/^(.*\.)?management\.llmos\.ai$/);
 
   // Ignore these types as they are managed through the auth product
-  ignoreType(MANAGEMENT.USER);
+  ignoreGroup(/^(.*\.)?llmos\.ai$/);
 }

@@ -232,6 +232,7 @@ product:
   uiplugins: Extensions
   elemental: OS Management
   plugins: Plugins
+  llm: LLM Management
 
 suffix:
   percent: "%"

@@ -267,6 +267,14 @@ export default class MgmtCluster extends HybridModel {
     return icon;
   }
 
+  get llmLogo() {
+    return require(`~shell/assets/images/providers/llm.svg`);
+  }
+
+  get llmNavLogo() {
+    return this.llmLogo;
+  }
+
   get providerMenuLogo() {
     return this.providerLogo;
   }

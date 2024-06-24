@@ -57,6 +57,8 @@ export default {
       type:    String,
       default: null,
     },
+
+    product: String,
   },
 
   computed: {
@@ -73,10 +75,12 @@ export default {
         return this.spoofedCounts.location;
       }
 
+      const product = this.product || this.$store.getters['currentProduct'].name;
+
       const route = {
         name:   'c-cluster-product-resource',
         params: {
-          product:  this.$store.getters['currentProduct'].name,
+          product:  product,
           resource: this.resource,
         }
       };
