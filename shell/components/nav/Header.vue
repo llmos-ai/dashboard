@@ -765,7 +765,7 @@ export default {
       align-items: center;
       display: flex;
       margin-right: 8px;
-      height: 55px;
+      height: 60px;
       margin-left: 10px;
       max-width: 200px;
       padding: 12px 0;
@@ -773,8 +773,8 @@ export default {
 
     .side-menu-logo-img {
       object-fit: contain;
-      height: 25px;
-      max-width: 30px;
+      height: 30px;
+      max-width: 60px;
     }
 
     > * {

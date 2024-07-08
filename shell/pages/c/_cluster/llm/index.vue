@@ -11,7 +11,7 @@ export default {
       params: {
         ...route.params,
         product:  LLM,
-        resource: MANAGEMENT.CHAT,
+        resource: MANAGEMENT.MODELFILE,
       }
     });
   }
