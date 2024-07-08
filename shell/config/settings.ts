@@ -49,7 +49,6 @@ export const SETTING = {
   PL:                                   'ui-pl',
   BANNERS:                              'ui-banners',
   ISSUES:                               'ui-issues',
-  BRAND:                                'ui-brand',
   LOGO_LIGHT:                           'ui-logo-light',
   LOGO_DARK:                            'ui-logo-dark',
   PRIMARY_COLOR:                        'ui-primary-color',

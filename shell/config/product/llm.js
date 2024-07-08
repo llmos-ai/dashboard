@@ -12,7 +12,7 @@ export function init(store) {
   } = DSL(store, NAME);
 
   product({
-    ifHaveGroup:         /^(.*\.)*llmos\.ai$/,
+    ifHaveGroup:         /^ml(.*\.)*llmos\.ai$/,
     icon:                NAME,
     showNamespaceFilter: true,
     hideKubeShell:       true,
@@ -36,22 +36,36 @@ export function init(store) {
     weight: 99,
   });
 
-
   virtualType({
-    label:      'Chats',
+    label:      'Notebooks',
     group:      'Root',
-    name:       MANAGEMENT.CHAT,
+    name:       MANAGEMENT.NOTEBOOK,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: MANAGEMENT.CHAT }
+      params: { resource: MANAGEMENT.NOTEBOOK }
     },
     exact: false,
-    weight: 100,
+    weight: 99,
   });
+
+
+  // virtualType({
+  //   label:      'Chats',
+  //   group:      'Root',
+  //   name:       MANAGEMENT.CHAT,
+  //   namespaced: true,
+  //   route:      {
+  //     name:   `c-cluster-product-resource`,
+  //     params: { resource: MANAGEMENT.CHAT }
+  //   },
+  //   exact: false,
+  //   weight: 100,
+  // });
 
   basicType([
     MANAGEMENT.MODELFILE,
-    MANAGEMENT.CHAT
+    MANAGEMENT.NOTEBOOK,
+    // MANAGEMENT.CHAT
   ]);
 }

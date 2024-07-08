@@ -105,11 +105,17 @@ export default {
             product="llm"
         />
         <ResourceSummary
-            v-if="canAccessChats"
+            v-if="canAccessModelFiles"
             :cluster="clusterDetail.id"
-            resource="chat"
+            resource="ml.llmos.ai.notebook"
             product="llm"
         />
+<!--        <ResourceSummary-->
+<!--            v-if="canAccessChats"-->
+<!--            :cluster="clusterDetail.id"-->
+<!--            resource="chat"-->
+<!--            product="llm"-->
+<!--        />-->
       </div>
     </div>
 

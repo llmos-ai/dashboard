@@ -85,6 +85,7 @@ export const MANAGEMENT = {
 
   // ML related resources
   MODELFILE: 'ml.llmos.ai.modelfile',
+  NOTEBOOK:  'ml.llmos.ai.notebook',
   CHAT:      'chat',
 
   //TODO, add project

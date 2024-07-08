@@ -9,18 +9,10 @@ export function haveSetFavIcon() {
 
 export function setFavIcon(store) {
   const res = store.getters['management/byId'](MANAGEMENT.SETTING, SETTING.FAVICON);
-  const brandSetting = store.getters['management/byId'](MANAGEMENT.SETTING, SETTING.BRAND);
   const link = findIconLink(document.head.getElementsByTagName('link'));
 
   if (link) {
     let brandImage;
-
-    // if (brandSetting?.value === 'suse') {
-    //   brandImage = require('~shell/assets/brand/suse/favicon.png');
-    // } else if (brandSetting?.value === 'csp') {
-    //   brandImage = require('~shell/assets/brand/csp/favicon.png');
-    // }
-
     link.href = res?.value || brandImage || defaultFavIcon;
     favIconSet = true;
   }
