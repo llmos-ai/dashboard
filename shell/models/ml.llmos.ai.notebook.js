@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { set } from '@shell/utils/object';
-import {MANAGEMENT, NODE, SERVICE} from '@shell/config/types';
-import {SETTING} from "@shell/config/settings";
+import { MANAGEMENT, SERVICE } from '@shell/config/types';
+import { SETTING } from "@shell/config/settings";
 
 export default class NoteBook extends SteveModel {
   applyDefaults() {
@@ -19,17 +19,14 @@ export default class NoteBook extends SteveModel {
           spec: {
             containers: [
               {
-                image:     'oneblockai/jupyter-scipy:latest',
-                name:      '',
+                image:     '',
+                name:      'notebook',
                 resources: {
                   requests: {
                     cpu:    '2',
                     memory: '4Gi'
                   },
-                  limits: {
-                    cpu:    '',
-                    memory: ''
-                  }
+                  limits: {}
                 },
                 volumeMounts: [
                   {
@@ -126,14 +123,20 @@ export default class NoteBook extends SteveModel {
   }
 
   get cpusRequest() {
-    const requests = this.spec.template.spec.containers[0].resources.requests;
+    const requests = this.spec.template.spec.containers[0].resources?.requests;
 
+    if (requests == null || requests.cpu == null) {
+      return 0
+    }
     return requests.cpu;
   }
 
   get memoryRequest() {
-    const requests = this.spec.template.spec.containers[0].resources.requests;
+    const requests = this.spec.template.spec.containers[0].resources?.requests;
 
+    if (requests == null || requests.memory == null) {
+      return 0
+    }
     return requests.memory;
   }
 }

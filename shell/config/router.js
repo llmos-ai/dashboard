@@ -119,6 +119,10 @@ export const routerOptions = {
     component: () => interopDefault(import('../pages/c/_cluster/_product/_resource/_id.vue' /* webpackChunkName: "pages/c/_cluster/_product/_resource/_id" */)),
     name:      'c-cluster-product-resource-id'
   }, {
+    path:      `/c/:cluster/:product/:resource/:namespace/:id/rayDashboard`,
+    component: () => interopDefault(import('../pages/c/_cluster/rayDashboard/index.vue' /* webpackChunkName: "pages/c/_cluster/rayDashboard/index" */)),
+    name:      `c-cluster-product-resource-namespace-id-rayDashboard`,
+  }, {
     path:      '/c/:cluster/:product/:resource/:namespace/:id?',
     component: () => interopDefault(import('../pages/c/_cluster/_product/_resource/_namespace/_id.vue' /* webpackChunkName: "pages/c/_cluster/_product/_resource/_namespace/_id" */)),
     name:      'c-cluster-product-resource-namespace-id'

@@ -35,6 +35,7 @@ export const CSI_DRIVER = 'storage.k8s.io.csidriver';
 export const NETWORK_ATTACHMENT = 'k8s.cni.cncf.io.networkattachmentdefinition';
 export const USER = 'user';
 export const GROUP = 'group';
+export const RUNTIME_CLASS= 'node.k8s.io.runtimeclass'
 
 export const RBAC = {
   ROLE:                 'rbac.authorization.k8s.io.role',
@@ -83,14 +84,17 @@ export const MANAGEMENT = {
   SETTING:   'management.llmos.ai.setting',
   USER:      'management.llmos.ai.user',
 
-  // ML related resources
-  MODELFILE: 'ml.llmos.ai.modelfile',
-  NOTEBOOK:  'ml.llmos.ai.notebook',
-  CHAT:      'chat',
-
   //TODO, add project
   PROJECT: 'management.llmos.io.project',
 };
+
+export const CLUSTER = {
+  // ML related resources
+  RAY_CLUSTER: 'ray.io.raycluster',
+  MODEL_FILE: 'ml.llmos.ai.modelfile',
+  NOTEBOOK:  'ml.llmos.ai.notebook',
+  CHAT:      'chat',
+}
 
 export const VIRTUAL_TYPES = {
   NAMESPACES:         'namespaces'

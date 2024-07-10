@@ -10,12 +10,14 @@ import { allHash } from '@shell/utils/promise';
 import PersistentVolumeClaim from '@shell/components/PersistentVolumeClaim';
 import InfoBox from '@shell/components/InfoBox';
 import CreateEditView from '@shell/mixins/create-edit-view';
-import {MANAGEMENT} from "@shell/config/types";
+import { MANAGEMENT, CLUSTER } from "@shell/config/types";
+import AdvancedSection from "@shell/components/AdvancedSection.vue";
 
 export default {
   name: 'NotebookEdit',
 
   components: {
+    AdvancedSection,
     Tab,
     UnitInput,
     CruResource,
@@ -32,13 +34,14 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     allHash({
-      notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.NOTEBOOK }),
+      notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: CLUSTER.NOTEBOOK }),
       settings:  this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING })
     });
   },
 
   data() {
     const container = this.value.spec.template.spec.containers[0];
+    const requests = container.resources?.requests || { cpu: '', memory: '' };
     const limits = container.resources?.limits || { cpu: '', memory: '' };
     const pvc = this.value.spec.volumes[0];
 
@@ -46,6 +49,7 @@ export default {
 
     return {
       container,
+      requests,
       limits,
       pvc,
       savePvcHookName: 'savePvcHook',
@@ -101,19 +105,43 @@ export default {
 
   methods: {
     willSave() {
+      this.errors = [];
       this.update();
+
+      if (this.container.image === '') {
+        this.errors.push(this.t('validation.required', { key: 'Image' }, true));
+      }
+
+      if (this.requests.cpu === '' || this.requests.memory === '') {
+        this.errors.push(this.t('validation.required', { key: 'CPU or Memory' }, true));
+      }
+
+      if (this.errors.length > 0) {
+        return Promise.reject(this.errors);
+      }
     },
 
     removePvcForm(hookName) {
       this.$emit('removePvcForm', hookName);
     },
 
-    update() {
+    setDefaultSvc() {
       if (this.type === 'jupyter') {
         this.value.spec.serviceType = 'NodePort';
       } else {
         delete this.value.spec.serviceType;
       }
+    },
+
+    resetImage() {
+      if (this.type !== this.value.labels['ml.llmos.ai/notebook-type']) {
+        this.container.image = ""
+      }
+    },
+
+    update() {
+      this.setDefaultSvc()
+      this.resetImage()
 
       if (this.type) {
         const labels = {
@@ -124,13 +152,14 @@ export default {
         this.value.setLabels(labels);
       }
 
-      console.log("debug 123", this.container.resources?.limits)
+      // set resources
+      this.$set(this.container.resources, 'requests', this.requests);
+
       if (this.container.resources?.limits === undefined ) {
         this.$set(this.container.resources, 'limits', {});
       }
 
       if (this.limits.cpu) {
-        console.log("debug 123", this.limits.cpu, this.container.resources);
         this.$set(this.container.resources?.limits, 'cpu', this.limits.cpu);
       } else {
         delete this.container.resources?.limits?.cpu;
@@ -223,8 +252,8 @@ export default {
         <div class="row">
           <div class="col span-6">
             <UnitInput
-              v-model="container.resources.requests.cpu"
-              label="Request CPU"
+              v-model="requests.cpu"
+              label="CPU"
               suffix="C"
               required
               :output-modifier="true"
@@ -236,43 +265,14 @@ export default {
 
           <div class="col span-6">
             <UnitInput
-              v-model="container.resources.requests.memory"
-              label="Request Memory"
+              v-model="requests.memory"
+              label="Memory"
               :input-exponent="3"
               :output-modifier="true"
               :increment="1024"
               :mode="mode"
               suffix="Gi"
               required
-              class="mb-20"
-              @input="update"
-            />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col span-6">
-            <UnitInput
-              v-model="limits.cpu"
-              label="Limits CPU"
-              suffix="C"
-              :delay="0"
-              positive
-              :mode="mode"
-              class="mb-20"
-              @input="update"
-            />
-          </div>
-
-          <div class="col span-6">
-            <UnitInput
-              v-model="limits.memory"
-              label="Limits Memory"
-              :input-exponent="3"
-              :output-modifier="true"
-              :increment="1024"
-              :mode="mode"
-              suffix="Gi"
               class="mb-20"
               @input="update"
             />
@@ -287,6 +287,40 @@ export default {
             @removePvcForm="removePvcForm"
           />
         </InfoBox>
+
+        <AdvancedSection
+            class="col span-12 advanced"
+            :mode="mode"
+        >
+          <div class="row">
+            <div class="col span-6">
+              <UnitInput
+                  v-model="limits.cpu"
+                  label="CPU Limit"
+                  suffix="C"
+                  :delay="0"
+                  positive
+                  :mode="mode"
+                  class="mb-20"
+                  @input="update"
+              />
+            </div>
+
+            <div class="col span-6">
+              <UnitInput
+                  v-model="limits.memory"
+                  label="Memory Limit"
+                  :input-exponent="3"
+                  :output-modifier="true"
+                  :increment="1024"
+                  :mode="mode"
+                  suffix="Gi"
+                  class="mb-20"
+                  @input="update"
+              />
+            </div>
+          </div>
+        </AdvancedSection>
       </Tab>
     </ResourceTabs>
   </CruResource>

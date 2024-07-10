@@ -105,6 +105,7 @@ export const READ_WHATS_NEW = create('read-whatsnew', '', { parseJSON });
 export const AFTER_LOGIN_ROUTE = create('after-login-route', 'home', { parseJSON } );
 export const HIDE_HOME_PAGE_CARDS = create('home-page-cards', {}, { parseJSON } );
 export const PLUGIN_DEVELOPER = create('plugin-developer', false, { parseJSON, inheritFrom: DEV }); // Is the user a plugin developer?
+export const VIEW_CONTAINER_DASHBOARD = create('view-container-dashboard', false, { parseJSON, inheritFrom: DEV });
 
 export const _RKE1 = 'rke1';
 export const _RKE2 = 'rke2';

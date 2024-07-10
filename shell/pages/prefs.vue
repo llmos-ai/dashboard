@@ -10,7 +10,7 @@ import LandingPagePreference from '@shell/components/LandingPagePreference';
 import {
   mapPref, THEME, KEYMAP, DATE_FORMAT, TIME_FORMAT, ROWS_PER_PAGE, HIDE_DESC, VIEW_IN_API,
   ALL_NAMESPACES, THEME_SHORTCUT, PLUGIN_DEVELOPER, SCALE_POOL_PROMPT
-  , MENU_MAX_CLUSTERS
+  , MENU_MAX_CLUSTERS, VIEW_CONTAINER_DASHBOARD
 } from '@shell/store/prefs';
 
 import LabeledSelect from '@shell/components/form/LabeledSelect';
@@ -37,6 +37,7 @@ export default {
     hideDesc:          mapPref(HIDE_DESC),
     pluginDeveloper:   mapPref(PLUGIN_DEVELOPER),
     scalingDownPrompt: mapPref(SCALE_POOL_PROMPT),
+    viewContainerDashboard: mapPref(VIEW_CONTAINER_DASHBOARD),
 
 
     theme: {
@@ -290,8 +291,8 @@ export default {
       <template v-if="admin">
         <br>
         <Checkbox
-          v-model="pluginDeveloper"
-          :label="t('prefs.advFeatures.pluginDeveloper', {}, true)"
+          v-model="viewContainerDashboard"
+          :label="t('prefs.advFeatures.viewContainerDashboard', {}, true)"
           class="mt-20"
         />
       </template>

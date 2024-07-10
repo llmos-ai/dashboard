@@ -5,20 +5,18 @@ import IconOrSvg from '../IconOrSvg';
 import { BLANK_CLUSTER } from '@shell/store/store-types.js';
 import { mapGetters } from 'vuex';
 import { MANAGEMENT } from '@shell/config/types';
-import { MENU_MAX_CLUSTERS } from '@shell/store/prefs';
+import {MENU_MAX_CLUSTERS, VIEW_CONTAINER_DASHBOARD} from '@shell/store/prefs';
 import { sortBy } from '@shell/utils/sort';
 import { ucFirst } from '@shell/utils/string';
 import { KEY } from '@shell/utils/platform';
 import { getVersionInfo } from '@shell/utils/version';
 import { SETTING } from '@shell/config/settings';
-import Pinned from '@shell/components/nav/Pinned';
 
 export default {
   components: {
     BrandImage,
     ClusterIconMenu,
     IconOrSvg,
-    Pinned
   },
 
   data() {
@@ -33,10 +31,13 @@ export default {
       emptyCluster:      BLANK_CLUSTER,
       showPinClusters:   false,
       searchActive:      false,
+      viewContainerDashboard: false,
     };
   },
 
-  fetch() {},
+  async fetch() {
+    this.viewContainerDashboard = this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD);
+  },
 
   computed: {
     ...mapGetters(['clusterId']),
@@ -347,57 +348,6 @@ export default {
               class="clusters"
               :style="pinnedClustersHeight"
             >
-              <!-- Pinned Clusters -->
-              <div
-                v-if="showPinClusters && pinFiltered.length"
-                class="clustersPinned"
-              >
-                <div
-                  v-for="c in pinFiltered"
-                  :key="c.id"
-                  @click="hide()"
-                >
-                  <nuxt-link
-                    v-if="c.ready"
-                    :data-testid="`menu-cluster-${ c.id }`"
-                    class="cluster selector option"
-                    :to="{ name: 'c-cluster-explorer', params: { cluster: c.id } }"
-                  >
-                    <ClusterIconMenu
-                      v-tooltip="getTooltipConfig(c.label)"
-                      :cluster="c"
-                      class="rancher-provider-icon"
-                    />
-                    <div class="cluster-name">
-                      {{ c.label }}
-                    </div>
-                    <Pinned
-                      :cluster="c"
-                    />
-                  </nuxt-link>
-                  <span
-                    v-else
-                    class="option cluster selector disabled"
-                  >
-                    <ClusterIconMenu
-                      v-tooltip="getTooltipConfig(c.label)"
-                      :cluster="c"
-                      class="rancher-provider-icon"
-                    />
-                    <div class="cluster-name">{{ c.label }}</div>
-                    <Pinned
-                      :cluster="c"
-                    />
-                  </span>
-                </div>
-                <div
-                  v-if="clustersFiltered.length > 0"
-                  class="category-title"
-                >
-                  <hr>
-                </div>
-              </div>
-
               <!-- Clusters Search result -->
               <div class="clustersList">
                 <div
@@ -422,47 +372,37 @@ export default {
                     <div class="cluster-name">
                       {{ t('product.llm') }}
                     </div>
-                    <Pinned
-                        :class="{'showPin': c.pinned}"
-                        :cluster="c"
-                    />
                   </nuxt-link>
 
                   <!-- Clusters k8s entry -->
-                  <nuxt-link
-                    v-if="c.ready"
-                    :data-testid="`menu-cluster-${ c.id }`"
-                    class="cluster selector option"
-                    :to="{ name: 'c-cluster-explorer', params: { cluster: c.id } }"
-                  >
+                  <div v-if="viewContainerDashboard">
+                    <nuxt-link
+                        v-if="c.ready"
+                        :data-testid="`menu-cluster-${ c.id }`"
+                        class="cluster selector option"
+                        :to="{ name: 'c-cluster-explorer', params: { cluster: c.id } }"
+                    >
+                      <ClusterIconMenu
+                          v-tooltip="getTooltipConfig(c.label)"
+                          :cluster="c"
+                          class="rancher-provider-icon"
+                      />
+                      <div class="cluster-name">
+                        {{ t('product.clusterManagement') }}
+                      </div>
+                    </nuxt-link>
+                    <span
+                        v-else
+                        class="option cluster selector disabled"
+                    >
                     <ClusterIconMenu
-                      v-tooltip="getTooltipConfig(c.label)"
-                      :cluster="c"
-                      class="rancher-provider-icon"
-                    />
-                    <div class="cluster-name">
-                      {{ t('product.clusterManagement') }}
-                    </div>
-                    <Pinned
-                      :class="{'showPin': c.pinned}"
-                      :cluster="c"
-                    />
-                  </nuxt-link>
-                  <span
-                    v-else
-                    class="option cluster selector disabled"
-                  >
-                    <ClusterIconMenu
-                      v-tooltip="getTooltipConfig(c.label)"
-                      :cluster="c"
-                      class="rancher-provider-icon"
+                        v-tooltip="getTooltipConfig(c.label)"
+                        :cluster="c"
+                        class="rancher-provider-icon"
                     />
                     <div class="cluster-name">{{ c.label }}</div>
-                    <Pinned
-                      :class="{'showPin': c.pinned}"
-                      :cluster="c"
-                    />
                   </span>
+                  </div>
                 </div>
               </div>
 
@@ -869,24 +809,6 @@ export default {
         padding: 8px
       }
 
-      .clustersPinned {
-        .category {
-          &-title {
-            margin: 8px 0;
-            margin-left: 16px;
-            hr {
-              margin: 0;
-              width: 94%;
-              transition: all 0.5s ease-in-out;
-              max-width: 100%;
-            }
-          }
-        }
-        .pin {
-          display: block;
-        }
-      }
-
       .category {
         display: flex;
         flex-direction: column;
@@ -945,16 +867,6 @@ export default {
         span {
           i {
             display: none;
-          }
-        }
-      }
-
-      .clustersPinned {
-        .category {
-          &-title {
-            hr {
-              width: 40px;
-            }
           }
         }
       }

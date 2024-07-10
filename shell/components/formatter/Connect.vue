@@ -25,16 +25,17 @@ export default {
     <div
       v-if="value"
     >
-      <span class="icon icon-endpoints_connected icon-lg pull-left"></span>
       <a
         target="_blank"
         :href="value"
         class="connect-success"
       >
-        Connect
+        Visit <i class="icon icon-external-link" />
       </a>
     </div>
-    <span v-else>Connect</span>
+    <span v-else>
+      Visit <i class="icon icon-external-link" />
+    </span>
   </div>
 </template>
 
@@ -46,5 +47,8 @@ export default {
 img {
   margin-left: 5px;
   height: 18px;
+}
+.icon-external-link {
+  padding-left: 5px;
 }
 </style>

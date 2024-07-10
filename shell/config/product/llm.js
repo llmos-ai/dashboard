@@ -1,5 +1,5 @@
 import { DSL } from '@shell/store/type-map';
-import { MANAGEMENT } from '@shell/config/types';
+import { CLUSTER } from '@shell/config/types';
 
 export const NAME = 'llm';
 
@@ -24,13 +24,26 @@ export function init(store) {
   });
 
   virtualType({
-    label:      'Model Files',
+    label:      'ML Clusters',
     group:      'Root',
-    name:       MANAGEMENT.MODELFILE,
+    name:       CLUSTER.RAY_CLUSTER,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: MANAGEMENT.MODELFILE }
+      params: { resource: CLUSTER.RAY_CLUSTER }
+    },
+    exact: false,
+    weight: 100,
+  });
+
+  virtualType({
+    label:      'Model Files',
+    group:      'Root',
+    name:       CLUSTER.MODEL_FILE,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: CLUSTER.MODEL_FILE }
     },
     exact: false,
     weight: 99,
@@ -39,14 +52,14 @@ export function init(store) {
   virtualType({
     label:      'Notebooks',
     group:      'Root',
-    name:       MANAGEMENT.NOTEBOOK,
+    name:       CLUSTER.NOTEBOOK,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: MANAGEMENT.NOTEBOOK }
+      params: { resource: CLUSTER.NOTEBOOK }
     },
     exact: false,
-    weight: 99,
+    weight: 98,
   });
 
 
@@ -64,8 +77,9 @@ export function init(store) {
   // });
 
   basicType([
-    MANAGEMENT.MODELFILE,
-    MANAGEMENT.NOTEBOOK,
+    CLUSTER.RAY_CLUSTER,
+    CLUSTER.MODEL_FILE,
+    CLUSTER.NOTEBOOK,
     // MANAGEMENT.CHAT
   ]);
 }
