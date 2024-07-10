@@ -1,8 +1,9 @@
 <script>
 import ClusterProviderIcon from '@shell/components/ClusterProviderIcon';
 import ResourceSummary, { resourceCounts } from '@shell/components/ResourceSummary';
-import { NAMESPACE, MANAGEMENT, NODE, COUNT } from '@shell/config/types';
+import { NAMESPACE, MANAGEMENT, NODE, COUNT, CLUSTER } from '@shell/config/types';
 import { RESOURCES } from '@shell/pages/c/_cluster/explorer/index';
+import { VIEW_CONTAINER_DASHBOARD } from "@shell/store/prefs";
 
 export default {
   components: {
@@ -15,13 +16,15 @@ export default {
       type: MANAGEMENT.CLUSTER,
       opt:  { url: MANAGEMENT.CLUSTER }
     });
+    this.viewContainerDashboard = this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD);
   },
 
   data() {
     return {
       clusters:      [],
       clusterDetail: null,
-      clusterCounts: {}
+      clusterCounts: {},
+      viewContainerDashboard: false,
     };
   },
 
@@ -63,11 +66,11 @@ export default {
     },
 
     canAccessModelFiles() {
-      return !!this.clusterCounts?.[0]?.counts?.[MANAGEMENT.MODELFILE];
+      return !!this.clusterCounts?.[0]?.counts?.[CLUSTER.MODEL_FILE];
     },
 
     canAccessChats() {
-      return !!this.clusterCounts?.[0]?.counts?.[MANAGEMENT.CHAT];
+      return !!this.clusterCounts?.[0]?.counts?.[CLUSTER.CHAT];
     },
 
     llmIcon() {
@@ -87,94 +90,92 @@ export default {
 
 <template>
   <div v-if="clusterDetail">
-    <div class="single-cluster-header">
-      <img
-          class="cluster-llm-logo"
-          :src="llmIcon"
-          alt="LLM ICON"
-      >
-      <h1>{{ t('glance.clusterLLMInfo') }}</h1>
-    </div>
+    <!-- LLM info -->
+    <div>
+      <div class="single-cluster-header">
+        <img
+            class="cluster-llm-logo"
+            :src="llmIcon"
+            alt="LLM ICON"
+        >
+        <h1>{{ t('glance.clusterLLMInfo') }}</h1>
+      </div>
 
-    <div class="single-cluster-info">
-      <div class="cluster-counts">
-        <ResourceSummary
-            v-if="canAccessModelFiles"
-            :cluster="clusterDetail.id"
-            resource="ml.llmos.ai.modelfile"
-            product="llm"
-        />
-        <ResourceSummary
-            v-if="canAccessModelFiles"
-            :cluster="clusterDetail.id"
-            resource="ml.llmos.ai.notebook"
-            product="llm"
-        />
-<!--        <ResourceSummary-->
-<!--            v-if="canAccessChats"-->
-<!--            :cluster="clusterDetail.id"-->
-<!--            resource="chat"-->
-<!--            product="llm"-->
-<!--        />-->
+      <div class="single-cluster-info">
+        <div class="cluster-counts">
+          <ResourceSummary
+              v-if="canAccessModelFiles"
+              :cluster="clusterDetail.id"
+              resource="ray.io.raycluster"
+              product="llm"
+          />
+          <ResourceSummary
+              v-if="canAccessModelFiles"
+              :cluster="clusterDetail.id"
+              resource="ml.llmos.ai.modelfile"
+              product="llm"
+          />
+          <ResourceSummary
+              v-if="canAccessModelFiles"
+              :cluster="clusterDetail.id"
+              resource="ml.llmos.ai.notebook"
+              product="llm"
+          />
+        </div>
       </div>
     </div>
 
-    <div class="single-cluster-header">
-      <ClusterProviderIcon
-        :cluster="clusterDetail"
-        class="provider-icon"
-        width="32"
-      />
-      <h1>{{ t('glance.clusterInfo') }}</h1>
+    <!-- container cluster info -->
+    <div v-if="viewContainerDashboard">
+      <div class="single-cluster-header">
+        <ClusterProviderIcon
+            :cluster="clusterDetail"
+            class="provider-icon"
+            width="32"
+        />
+        <h1>{{ t('glance.clusterInfo') }}</h1>
+      </div>
+
+      <div class="single-cluster-info">
+        <div class="cluster-counts">
+          <ResourceSummary :spoofed-counts="totalCountGaugeInput" />
+          <ResourceSummary
+              v-if="canAccessNodes"
+              :cluster="clusterDetail.id"
+              resource="node"
+          />
+          <ResourceSummary
+              v-if="canAccessNamespaces"
+              :cluster="clusterDetail.id"
+              resource="namespace"
+          />
+        </div>
+      </div>
     </div>
 
     <div class="single-cluster-info">
-      <div class="cluster-counts">
-        <ResourceSummary :spoofed-counts="totalCountGaugeInput" />
-        <ResourceSummary
-            v-if="canAccessNodes"
-            :cluster="clusterDetail.id"
-            resource="node"
-        />
-        <ResourceSummary
-            v-if="canAccessNamespaces"
-            :cluster="clusterDetail.id"
-            resource="namespace"
-        />
-      </div>
       <div class="glance-item">
         <label>{{ t('glance.provider') }}: </label>
         <span>{{ t(`cluster.provider.${ clusterDetail.status.provider || 'other' }`) }}</span>
       </div>
       <div
-        v-if="clusterDetail.kubernetesVersionRaw"
-        class="glance-item"
+          v-if="clusterDetail.kubernetesVersionRaw"
+          class="glance-item"
       >
         <label>{{ t('glance.version') }}: </label>
         <span>{{ clusterDetail.kubernetesVersionBase }}</span>
         <span
-          v-if="clusterDetail.kubernetesVersionExtension"
-          style="font-size: 0.75em"
+            v-if="clusterDetail.kubernetesVersionExtension"
+            style="font-size: 0.75em"
         >{{ clusterDetail.kubernetesVersionExtension }}</span>
       </div>
       <div class="glance-item">
         <label>{{ t('glance.created') }}: </label>
         <span><LiveDate
-          :value="clusterDetail.metadata.creationTimestamp"
-          :add-suffix="true"
-          :show-tooltip="true"
+            :value="clusterDetail.metadata.creationTimestamp"
+            :add-suffix="true"
+            :show-tooltip="true"
         /></span>
-      </div>
-      <div class="section">
-        {{ t('generic.links') }}
-      </div>
-      <div class="glance-item">
-        <nuxt-link
-          :to="exploreLink"
-          class="cluster-link"
-        >
-          {{ t('nav.categories.explore') }}
-        </nuxt-link>
       </div>
     </div>
   </div>

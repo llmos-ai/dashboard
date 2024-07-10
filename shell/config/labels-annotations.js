@@ -79,3 +79,9 @@ export const SYSTEM_LABELS = [
   'egress.rke2.io',
   'llmos.ai'
 ];
+
+
+export const ANNOTATIONS = {
+  VOLUME_CLAIM_TEMPLATE: 'llmos.ai/volumeClaimTemplates',
+  RAY_CLUSTER_FT_ENABLED: 'ray.io/ft-enabled',
+};

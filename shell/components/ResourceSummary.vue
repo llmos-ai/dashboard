@@ -59,6 +59,7 @@ export default {
     },
 
     product: String,
+    overwriteName: String,
   },
 
   computed: {
@@ -95,6 +96,9 @@ export default {
     name() {
       if (this.spoofedCounts) {
         return this.spoofedCounts.name;
+      }
+      if (this.overwriteName) {
+        return this.overwriteName;
       }
       const inStore = this.$store.getters['currentStore'](this.resource);
       const schema = this.$store.getters[`${ inStore }/schemaFor`](this.resource);

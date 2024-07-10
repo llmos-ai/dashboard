@@ -3437,6 +3437,7 @@ prefs:
     allNamespaces: Show system Namespaces managed by LLMOS (not intended for editing or deletion)
     themeShortcut: Enable Dark/Light Theme keyboard shortcut toggle (shift+T)
     pluginDeveloper: Enable Extension developer features
+    viewContainerDashboard: Enable Container Dashboard View
   hideDesc:
     label: Hide All Type Descriptions
   helm:
@@ -6105,6 +6106,11 @@ typeLabel:
       one { Cluster Registration Token }
       other { Cluster Registration Tokens }
     }
+  ray.io.raycluster: |-
+    {count, plural,
+      one { ML Cluster }
+      other { ML Clusters }
+    }
 
 action:
   clone: Clone
@@ -6549,3 +6555,8 @@ gitPicker:
 networkAttachmentDefinition:
   tabs:
     config: Config
+
+ray:
+  cluster:
+    allowScheduling: Allow Scheduling on the Head Node
+    enableGCS: Enable Global Control Service(GCS) fault tolerance

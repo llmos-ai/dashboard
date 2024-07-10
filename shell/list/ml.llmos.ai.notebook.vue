@@ -3,7 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import Loading from '@shell/components/Loading';
 import { allHash } from '@shell/utils/promise';
 import { STATE, NAME, AGE } from '@shell/config/table-headers';
-import {MANAGEMENT, SERVICE} from '@shell/config/types';
+import { MANAGEMENT, SERVICE, CLUSTER } from '@shell/config/types';
 
 export default {
   name: 'NoteBooksList',
@@ -13,7 +13,7 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
     const hash = {
-      notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.NOTEBOOK }),
+      notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: CLUSTER.NOTEBOOK }),
       services:  this.$store.dispatch(`${ inStore }/findAll`, { type: SERVICE })
     };
 

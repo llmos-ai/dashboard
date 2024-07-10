@@ -353,6 +353,7 @@ export default {
     },
 
     displayName() {
+      console.log("display name", this.value)
       let displayName = this.value.nameDisplay;
 
       return this.shouldHifenize ? ` - ${ displayName }` : displayName;
@@ -411,9 +412,7 @@ export default {
               {{ parent.displayName }}:
             </nuxt-link>
             <span v-else>{{ parent.displayName }}:</span>
-            <span v-if="value.detailPageHeaderActionOverride && value.detailPageHeaderActionOverride(realMode)">{{ value.detailPageHeaderActionOverride(realMode) }}</span>
             <t
-              v-else
               :k="'resourceDetail.header.' + realMode"
               :subtype="resourceSubtype"
               :name="displayName"

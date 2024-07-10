@@ -1,10 +1,9 @@
-import HybridModel, { cleanHybridResources } from '@shell/plugins/steve/hybrid-class';
+import HybridModel from '@shell/plugins/steve/hybrid-class';
 import {MANAGEMENT} from "@shell/config/types";
 
 export default class User extends HybridModel {
   // Preserve description
   constructor(data, ctx, rehydrateNamespace = null, setClone = false) {
-    console.log('User constructor', data);
     const _description = data.spec?.description;
 
     super(data, ctx, rehydrateNamespace, setClone);
@@ -21,7 +20,7 @@ export default class User extends HybridModel {
   }
 
   get nameDisplay() {
-    return this.displayName || this.username || this.id;
+    return this.spec?.displayName || this.username || this.id;
   }
 
   get labelForSelect() {
@@ -62,9 +61,10 @@ export default class User extends HybridModel {
   // Ensure when we clone that we preserve the description
   toJSON() {
     const data = super.toJSON();
-
-    data.spec.description = this._description;
-    delete data._description;
+    if (data.spec) {
+      data.spec.description = this._description;
+      delete data._description;
+    }
 
     return data;
   }
