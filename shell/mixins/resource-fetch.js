@@ -1,6 +1,6 @@
 import { mapGetters } from 'vuex';
-import { COUNT, MANAGEMENT } from '@shell/config/types';
-import { SETTING, DEFAULT_PERF_SETTING } from '@shell/config/settings';
+import { COUNT } from '@shell/config/types';
+import { DEFAULT_PERF_SETTING } from '@shell/config/settings';
 import ResourceFetchNamespaced from '@shell/mixins/resource-fetch-namespaced';
 
 // Number of pages to fetch when loading incrementally
@@ -11,7 +11,7 @@ export default {
   mixins: [ResourceFetchNamespaced],
 
   data() {
-    let perfConfig = DEFAULT_PERF_SETTING;
+    const perfConfig = DEFAULT_PERF_SETTING;
 
     return {
       perfConfig,

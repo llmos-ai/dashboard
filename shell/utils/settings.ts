@@ -1,6 +1,6 @@
 import { MANAGEMENT } from '@shell/config/types';
 import { Store } from 'vuex';
-import { DEFAULT_PERF_SETTING, PerfSettings, SETTING } from '@shell/config/settings';
+import { DEFAULT_PERF_SETTING, PerfSettings } from '@shell/config/settings';
 
 export const fetchOrCreateSetting = async(store: Store<any>, id: string, val: string, save = true): Promise<any> => {
   let setting;
@@ -44,7 +44,7 @@ export const setSetting = async(store: Store<any>, id: string, val: string): Pro
 };
 
 export const getPerformanceSetting = (rootGetters: Record<string, (arg0: string, arg1: string) => any>): PerfSettings => {
-  let perfSetting = {};
+  const perfSetting = {};
 
   // Start with the default and overwrite the values from the setting - ensures we have defaults for newly added options
   return Object.assign(DEFAULT_PERF_SETTING, perfSetting || {});

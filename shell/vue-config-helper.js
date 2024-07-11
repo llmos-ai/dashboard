@@ -62,6 +62,7 @@ function proxyPrimeOpts(target) {
 
       try {
         const out = JSON.parse(body);
+
         output = JSON.stringify(out);
       } catch (err) {}
 

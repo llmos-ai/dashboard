@@ -2,7 +2,7 @@ import Vue from 'vue';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { set } from '@shell/utils/object';
 import { MANAGEMENT, SERVICE } from '@shell/config/types';
-import { SETTING } from "@shell/config/settings";
+import { SETTING } from '@shell/config/settings';
 
 export default class NoteBook extends SteveModel {
   applyDefaults() {
@@ -10,9 +10,9 @@ export default class NoteBook extends SteveModel {
       apiVersion: 'ml.llmos.ai/v1',
       kind:       'Notebook',
       metadata:   {
-        name:        '',
-        namespace:   '',
-        labels:      { 'ml.llmos.ai/notebook-type': 'jupyter' },
+        name:      '',
+        namespace: '',
+        labels:    { 'ml.llmos.ai/notebook-type': 'jupyter' },
       },
       spec: {
         template: {
@@ -56,12 +56,8 @@ export default class NoteBook extends SteveModel {
           {
             name: '',
             spec: {
-              accessModes: ["ReadWriteOnce"],
-              resources: {
-                requests:{
-                  storage: "5Gi",
-                }
-              },
+              accessModes: ['ReadWriteOnce'],
+              resources:   { requests: { storage: '5Gi' } },
             },
           },
         ]
@@ -76,13 +72,14 @@ export default class NoteBook extends SteveModel {
     return this.metadata.labels['ml.llmos.ai/notebook-type'];
   }
 
-  getServerUrl(){
+  getServerUrl() {
     const serverUrl = this.$getters['byId'](MANAGEMENT.SETTING, SETTING.SERVER_URL);
-    if (serverUrl.value !== "") {
-      return serverUrl.value
+
+    if (serverUrl.value !== '') {
+      return serverUrl.value;
     }
 
-    return serverUrl.default
+    return serverUrl.default;
   }
 
   get connectUrl() {
@@ -94,13 +91,12 @@ export default class NoteBook extends SteveModel {
       return ownerReferences.find((o) => o.uid === uid);
     });
 
-    console.log('service', service)
-    //TODO: use server url for nodePort access
+    // TODO: use server url for nodePort access
     if (service && this.status?.state?.running) {
       const ports = (service.spec.ports || []).find((p) => p.name === `http-${ this.metadata.name }`);
 
       if (this.spec.serviceType === 'NodePort') {
-        const serverUrl = this.getServerUrl()
+        const serverUrl = this.getServerUrl();
         // const serverUrl = ""
         const port = ports.nodePort;
 
@@ -115,8 +111,9 @@ export default class NoteBook extends SteveModel {
 
   get gpus() {
     const limit = this.spec.template.spec.containers[0].resources.limit;
-    if (limit != null && limit["nvidia.com/gpu"] != null) {
-      return limit["nvidia.com/gpu"];
+
+    if (limit !== null && limit['nvidia.com/gpu'] !== null) {
+      return limit['nvidia.com/gpu'];
     }
 
     return 0;
@@ -125,18 +122,20 @@ export default class NoteBook extends SteveModel {
   get cpusRequest() {
     const requests = this.spec.template.spec.containers[0].resources?.requests;
 
-    if (requests == null || requests.cpu == null) {
-      return 0
+    if (requests === null || requests.cpu === null) {
+      return 0;
     }
+
     return requests.cpu;
   }
 
   get memoryRequest() {
     const requests = this.spec.template.spec.containers[0].resources?.requests;
 
-    if (requests == null || requests.memory == null) {
-      return 0
+    if (requests === null || requests.memory === null) {
+      return 0;
     }
+
     return requests.memory;
   }
 }

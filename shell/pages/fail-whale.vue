@@ -1,6 +1,6 @@
 <script>
 import BrandImage from '@shell/components/BrandImage';
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 import { stringify } from '@shell/utils/error';
 
 export default {

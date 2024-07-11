@@ -455,7 +455,6 @@ export default {
 
     out = getters.byId(type, id);
 
-
     return out;
   },
 

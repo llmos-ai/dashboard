@@ -3,7 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import { CLUSTER } from '@shell/config/types';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 export default {
-  name:       'modelfiles',
+  name:       'Modelfiles',
   components: { ResourceTable },
   mixins:     [ResourceFetch],
 
@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     filteredRows() {
-      return this.rows
+      return this.rows;
     }
   },
   // override with relevant info for the loading indicator since this doesn't use it's own masthead

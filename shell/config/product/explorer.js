@@ -13,11 +13,11 @@ import {
   STATE, NAME as NAME_COL, NAMESPACE as NAMESPACE_COL, AGE, KEYS,
   INGRESS_DEFAULT_BACKEND, INGRESS_TARGET, INGRESS_CLASS,
   SPEC_TYPE, TARGET_PORT, SELECTOR, NODE as NODE_COL, TYPE, WORKLOAD_IMAGES, POD_IMAGES,
-  USER_ID, USERNAME, USER_DISPLAY_NAME, USER_PROVIDER, WORKLOAD_ENDPOINTS, STORAGE_CLASS_DEFAULT,
+  USER_ID, USERNAME, USER_DISPLAY_NAME, WORKLOAD_ENDPOINTS, STORAGE_CLASS_DEFAULT,
   STORAGE_CLASS_PROVISIONER, PERSISTENT_VOLUME_SOURCE,
   HPA_REFERENCE, MIN_REPLICA, MAX_REPLICA, CURRENT_REPLICA,
-  DESCRIPTION, SUB_TYPE, PERSISTENT_VOLUME_CLAIM, RECLAIM_POLICY, PV_REASON, WORKLOAD_HEALTH_SCALE, POD_RESTARTS,
-  DURATION, MESSAGE, REASON, LAST_SEEN_TIME, EVENT_TYPE, OBJECT, ROLE,
+  SUB_TYPE, PERSISTENT_VOLUME_CLAIM, RECLAIM_POLICY, PV_REASON, WORKLOAD_HEALTH_SCALE, POD_RESTARTS,
+  DURATION, MESSAGE, REASON, LAST_SEEN_TIME, EVENT_TYPE, OBJECT
 } from '@shell/config/table-headers';
 
 import { DSL } from '@shell/store/type-map';
@@ -228,15 +228,15 @@ export function init(store) {
   });
 
   virtualType({
-    label:            store.getters['i18n/t'](`typeLabel.${ NAMESPACE }`, { count: 2 }),
-    group:            'cluster',
-    icon:             'globe',
-    namespaced:       false,
-    ifMgmtCluster:    false,
-    name:             VIRTUAL_TYPES.NAMESPACES,
-    weight:           98,
-    route:            { name: 'c-cluster-product-namespaces' },
-    exact:            true,
+    label:         store.getters['i18n/t'](`typeLabel.${ NAMESPACE }`, { count: 2 }),
+    group:         'cluster',
+    icon:          'globe',
+    namespaced:    false,
+    ifMgmtCluster: false,
+    name:          VIRTUAL_TYPES.NAMESPACES,
+    weight:        98,
+    route:         { name: 'c-cluster-product-namespaces' },
+    exact:         true,
   });
 
   // Ignore these types as they are managed through the auth\settings product

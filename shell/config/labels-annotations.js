@@ -80,8 +80,7 @@ export const SYSTEM_LABELS = [
   'llmos.ai'
 ];
 
-
 export const ANNOTATIONS = {
-  VOLUME_CLAIM_TEMPLATE: 'llmos.ai/volumeClaimTemplates',
+  VOLUME_CLAIM_TEMPLATE:  'llmos.ai/volumeClaimTemplates',
   RAY_CLUSTER_FT_ENABLED: 'ray.io/ft-enabled',
 };

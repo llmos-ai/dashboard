@@ -359,16 +359,16 @@ export const state = function() {
     hideBulkActions:         {},
     schemaGeneration:        1,
     cache:                   {
-      typeMove:           {},
-      groupLabel:         {},
-      ignore:             {},
-      list:               {},
-      chart:              {},
-      detail:             {},
-      edit:               {},
-      componentFor:       {},
-      promptRemove:       {},
-      windowComponents:   {},
+      typeMove:         {},
+      groupLabel:       {},
+      ignore:           {},
+      list:             {},
+      chart:            {},
+      detail:           {},
+      edit:             {},
+      componentFor:     {},
+      promptRemove:     {},
+      windowComponents: {},
     },
   };
 };
@@ -1739,7 +1739,8 @@ function ifHave(getters, option) {
 // Could list a larger set of resources that typically only an admin user would have
 export function isAdminUser(getters) {
   const canEditSettings = (getters['management/schemaFor'](MANAGEMENT.SETTING)?.resourceMethods || []).includes('PUT');
-  return canEditSettings
+
+  return canEditSettings;
 }
 
 function _findColumnByName(schema, colName) {
@@ -1763,13 +1764,6 @@ function _rowValueGetter(col) {
   }
 
   return value;
-}
-
-// Is V1 Istio installed?
-function isV1Istio(getters) {
-  const cluster = getters['currentCluster'];
-
-  return !!cluster?.status?.istioEnabled;
 }
 
 function ifHaveVerb(rootGetters, module, verb, haveIds) {

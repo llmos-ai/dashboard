@@ -31,12 +31,12 @@ const dev = (process.env.NODE_ENV !== 'production');
 const devPorts = dev || process.env.DEV_PORTS === 'true';
 
 const proxy = {
-  '/api':            proxyWsOpts(api), // Management k8s API
-  '/apis':           proxyWsOpts(api), // Management k8s API
-  '/v1':             proxyWsOpts(api), // Management Steve API
-  '/api-ui':         proxyOpts(api), // Browser API UI
-  '/meta':           proxyMetaOpts(api), // Browser API UI
-  '/v1-*':           proxyOpts(api), // auth, etc
+  '/api':    proxyWsOpts(api), // Management k8s API
+  '/apis':   proxyWsOpts(api), // Management k8s API
+  '/v1':     proxyWsOpts(api), // Management Steve API
+  '/api-ui': proxyOpts(api), // Browser API UI
+  '/meta':   proxyMetaOpts(api), // Browser API UI
+  '/v1-*':   proxyOpts(api), // auth, etc
 };
 
 const proxies = {};

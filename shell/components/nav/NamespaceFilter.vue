@@ -18,7 +18,6 @@ import {
 } from '@shell/utils/namespace-filter';
 import { KEY } from '@shell/utils/platform';
 import pAndNFiltering from '@shell/utils/projectAndNamespaceFiltering.utils';
-import { SETTING } from '@shell/config/settings';
 
 const forcedNamespaceValidTypes = [NAMESPACE_FILTER_KINDS.DIVIDER, NAMESPACE_FILTER_KINDS.PROJECT, NAMESPACE_FILTER_KINDS.NAMESPACE];
 

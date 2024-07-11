@@ -889,7 +889,7 @@ const defaultActions = {
 
   'ws.resource.create'(ctx, msg) {
     ctx.state.debugSocket && console.info(`Resource Create [${ ctx.getters.storeName }]`, msg.resourceType, msg); // eslint-disable-line no-console
-    console.log(`Resource Create [${ ctx.getters.storeName }]`, msg.resourceType, msg)
+    console.debug(`Resource Create [${ ctx.getters.storeName }]`, msg.resourceType, msg); // eslint-disable-line no-console
     queueChange(ctx, msg, true, 'Create');
   },
 

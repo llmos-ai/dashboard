@@ -3,7 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import Loading from '@shell/components/Loading';
 import { allHash } from '@shell/utils/promise';
 import { STATE, NAME, AGE } from '@shell/config/table-headers';
-import { MANAGEMENT, SERVICE, CLUSTER } from '@shell/config/types';
+import { SERVICE, CLUSTER } from '@shell/config/types';
 
 export default {
   name: 'NoteBooksList',

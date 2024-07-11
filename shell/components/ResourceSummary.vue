@@ -58,8 +58,15 @@ export default {
       default: null,
     },
 
-    product: String,
-    overwriteName: String,
+    product: {
+      type:    String,
+      default: null,
+    },
+
+    overwriteName: {
+      type:    String,
+      default: null,
+    }
   },
 
   computed: {
@@ -81,7 +88,7 @@ export default {
       const route = {
         name:   'c-cluster-product-resource',
         params: {
-          product:  product,
+          product,
           resource: this.resource,
         }
       };

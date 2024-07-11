@@ -1,5 +1,3 @@
-import { SETTING } from './settings';
-
 export const ANY = 0;
 export const STANDARD = 1;
 export const CUSTOM = 2;

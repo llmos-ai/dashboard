@@ -1,9 +1,11 @@
 <script>
 import ClusterProviderIcon from '@shell/components/ClusterProviderIcon';
 import ResourceSummary, { resourceCounts } from '@shell/components/ResourceSummary';
-import { NAMESPACE, MANAGEMENT, NODE, COUNT, CLUSTER } from '@shell/config/types';
+import {
+  NAMESPACE, MANAGEMENT, NODE, COUNT, CLUSTER
+} from '@shell/config/types';
 import { RESOURCES } from '@shell/pages/c/_cluster/explorer/index';
-import { VIEW_CONTAINER_DASHBOARD } from "@shell/store/prefs";
+import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
 
 export default {
   components: {
@@ -21,9 +23,9 @@ export default {
 
   data() {
     return {
-      clusters:      [],
-      clusterDetail: null,
-      clusterCounts: {},
+      clusters:               [],
+      clusterDetail:          null,
+      clusterCounts:          {},
       viewContainerDashboard: false,
     };
   },
@@ -74,7 +76,7 @@ export default {
     },
 
     llmIcon() {
-      return  require(`~shell/assets/images/providers/llm.svg`);
+      return require(`~shell/assets/images/providers/llm.svg`);
     }
   },
 
@@ -90,13 +92,12 @@ export default {
 
 <template>
   <div v-if="clusterDetail">
-    <!-- LLM info -->
     <div>
       <div class="single-cluster-header">
         <img
-            class="cluster-llm-logo"
-            :src="llmIcon"
-            alt="LLM ICON"
+          class="cluster-llm-logo"
+          :src="llmIcon"
+          alt="LLM ICON"
         >
         <h1>{{ t('glance.clusterLLMInfo') }}</h1>
       </div>
@@ -104,22 +105,22 @@ export default {
       <div class="single-cluster-info">
         <div class="cluster-counts">
           <ResourceSummary
-              v-if="canAccessModelFiles"
-              :cluster="clusterDetail.id"
-              resource="ray.io.raycluster"
-              product="llm"
+            v-if="canAccessModelFiles"
+            :cluster="clusterDetail.id"
+            resource="ray.io.raycluster"
+            product="llm"
           />
           <ResourceSummary
-              v-if="canAccessModelFiles"
-              :cluster="clusterDetail.id"
-              resource="ml.llmos.ai.modelfile"
-              product="llm"
+            v-if="canAccessModelFiles"
+            :cluster="clusterDetail.id"
+            resource="ml.llmos.ai.modelfile"
+            product="llm"
           />
           <ResourceSummary
-              v-if="canAccessModelFiles"
-              :cluster="clusterDetail.id"
-              resource="ml.llmos.ai.notebook"
-              product="llm"
+            v-if="canAccessModelFiles"
+            :cluster="clusterDetail.id"
+            resource="ml.llmos.ai.notebook"
+            product="llm"
           />
         </div>
       </div>
@@ -129,9 +130,9 @@ export default {
     <div v-if="viewContainerDashboard">
       <div class="single-cluster-header">
         <ClusterProviderIcon
-            :cluster="clusterDetail"
-            class="provider-icon"
-            width="32"
+          :cluster="clusterDetail"
+          class="provider-icon"
+          width="32"
         />
         <h1>{{ t('glance.clusterInfo') }}</h1>
       </div>
@@ -140,14 +141,14 @@ export default {
         <div class="cluster-counts">
           <ResourceSummary :spoofed-counts="totalCountGaugeInput" />
           <ResourceSummary
-              v-if="canAccessNodes"
-              :cluster="clusterDetail.id"
-              resource="node"
+            v-if="canAccessNodes"
+            :cluster="clusterDetail.id"
+            resource="node"
           />
           <ResourceSummary
-              v-if="canAccessNamespaces"
-              :cluster="clusterDetail.id"
-              resource="namespace"
+            v-if="canAccessNamespaces"
+            :cluster="clusterDetail.id"
+            resource="namespace"
           />
         </div>
       </div>
@@ -159,76 +160,77 @@ export default {
         <span>{{ t(`cluster.provider.${ clusterDetail.status.provider || 'other' }`) }}</span>
       </div>
       <div
-          v-if="clusterDetail.kubernetesVersionRaw"
-          class="glance-item"
+        v-if="clusterDetail.kubernetesVersionRaw"
+        class="glance-item"
       >
         <label>{{ t('glance.version') }}: </label>
         <span>{{ clusterDetail.kubernetesVersionBase }}</span>
         <span
-            v-if="clusterDetail.kubernetesVersionExtension"
-            style="font-size: 0.75em"
+          v-if="clusterDetail.kubernetesVersionExtension"
+          style="font-size: 0.75em"
         >{{ clusterDetail.kubernetesVersionExtension }}</span>
       </div>
       <div class="glance-item">
         <label>{{ t('glance.created') }}: </label>
         <span><LiveDate
-            :value="clusterDetail.metadata.creationTimestamp"
-            :add-suffix="true"
-            :show-tooltip="true"
+          :value="clusterDetail.metadata.creationTimestamp"
+          :add-suffix="true"
+          :show-tooltip="true"
         /></span>
       </div>
     </div>
   </div>
 </template>
+
 <style lang="scss" scoped>
-  .single-cluster-header {
-    align-items: center;
+.single-cluster-header {
+  align-items: center;
+  display: flex;
+
+  .provider-icon {
+    margin-right: 10px;
+  }
+
+  h1 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .cluster-llm-logo {
+    margin-right: 10px;
+    width: 30px;
+    height: 30px;
+  }
+}
+.single-cluster-info {
+  margin-top: 20px;
+
+  .section {
+    margin: 15px 0 5px 0;
+    font-weight: bold;
+  }
+
+  .cluster-counts {
     display: flex;
-
-    .provider-icon {
-      margin-right: 10px;
-    }
-
-    h1 {
-      font-size: 20px;
-      margin: 0;
-    }
-
-    .cluster-llm-logo {
-      margin-right: 10px;
-      width: 30px;
-      height: 30px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+    > * {
+      flex: 1 0 21%;
+      margin: 5px;
+      height: 100px;
+      //&:not(:last-child) {
+      //  margin-right: 20px;
+      //}
     }
   }
-  .single-cluster-info {
-    margin-top: 20px;
 
-    .section {
-      margin: 15px 0 5px 0;
-      font-weight: bold;
-    }
+  .glance-item {
+    font-size: 14px;
+    padding: 5px 0;
 
-    .cluster-counts {
-      display: flex;
-      flex-wrap: wrap;
-      margin: 10px 0;
-      > * {
-        flex: 1 0 21%;
-        margin: 5px;
-        height: 100px;
-        //&:not(:last-child) {
-        //  margin-right: 20px;
-        //}
-      }
-    }
-
-    .glance-item {
+    .cluster-link {
       font-size: 14px;
-      padding: 5px 0;
-
-      .cluster-link {
-        font-size: 14px;
-      }
     }
   }
+}
 </style>

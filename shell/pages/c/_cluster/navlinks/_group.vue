@@ -1,6 +1,4 @@
 <script>
-// import { UI } from '@shell/config/types';
-import { filterBy } from '@shell/utils/array';
 import SelectIconGrid from '@shell/components/SelectIconGrid';
 
 export default {
@@ -9,12 +7,6 @@ export default {
   computed: {
     groupSlug() {
       return this.$route.params.group;
-    },
-
-    entries() {
-      // const all = this.$store.getters['cluster/all'](UI.NAV_LINK);
-
-      // return filterBy(all, 'normalizedGroup', this.groupSlug);
     },
 
     groupName() {

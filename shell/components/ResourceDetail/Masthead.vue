@@ -156,17 +156,17 @@ export default {
 
     isWorkspace() {
       // return this.$store.getters['productId'] === FLEET_NAME && !!this.value?.metadata?.namespace;
-      return true
+      return true;
     },
 
     workspaceLocation() {
       return {
         name:   'c-cluster-product-resource-id',
         params: {
-          cluster:  this.$route.params.cluster,
-          product:  this.$store.getters['productId'],
+          cluster: this.$route.params.cluster,
+          product: this.$store.getters['productId'],
           // resource: FLEET.WORKSPACE,
-          id:       this.$route.params.namespace
+          id:      this.$route.params.namespace
         }
       };
     },
@@ -353,8 +353,7 @@ export default {
     },
 
     displayName() {
-      console.log("display name", this.value)
-      let displayName = this.value.nameDisplay;
+      const displayName = this.value.nameDisplay;
 
       return this.shouldHifenize ? ` - ${ displayName }` : displayName;
     },

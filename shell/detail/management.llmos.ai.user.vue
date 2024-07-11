@@ -18,7 +18,7 @@ export default {
     CreateEditView
   ],
   async fetch() {
-    await this.$store.dispatch('management/find', { type: MANAGEMENT.USER, id: this.value.id })
+    await this.$store.dispatch('management/find', { type: MANAGEMENT.USER, id: this.value.id });
   },
   data() {
     const role = {
@@ -93,7 +93,7 @@ export default {
     };
   },
   computed: {},
-  methods: {}
+  methods:  {}
 
 };
 </script>

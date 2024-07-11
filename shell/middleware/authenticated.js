@@ -1,7 +1,5 @@
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
-import {
-  TIMED_OUT, UPGRADED, _FLAGGED, _UNFLAG
-} from '@shell/config/query-params';
+import { TIMED_OUT, UPGRADED, _FLAGGED, _UNFLAG } from '@shell/config/query-params';
 import { MANAGEMENT } from '@shell/config/types';
 import { _ALL_IF_AUTHED } from '@shell/plugins/dashboard-store/actions';
 import { applyProducts } from '@shell/store/type-map';
@@ -9,7 +7,6 @@ import { ClusterNotFoundError, RedirectToError } from '@shell/utils/error';
 import { get } from '@shell/utils/object';
 import { setFavIcon, haveSetFavIcon } from '@shell/utils/favicon';
 import dynamicPluginLoader from '@shell/pkg/dynamic-plugin-loader';
-import { AFTER_LOGIN_ROUTE } from '@shell/store/prefs';
 import { BACK_TO } from '@shell/config/local-storage';
 import { canViewResource } from '@shell/utils/auth';
 
@@ -144,10 +141,10 @@ export default async function({
   const upgraded = route.query[UPGRADED] === _FLAGGED;
 
   if (upgraded) {
-    app.router.applyQuery({[UPGRADED]: _UNFLAG});
+    app.router.applyQuery({ [UPGRADED]: _UNFLAG });
 
     store.dispatch('growl/success', {
-      title: store.getters['i18n/t']('serverUpgrade.title'),
+      title:   store.getters['i18n/t']('serverUpgrade.title'),
       message: store.getters['i18n/t']('serverUpgrade.message'),
       timeout: 0,
     });
@@ -157,8 +154,8 @@ export default async function({
     // Load settings, which will either be just the public ones if not logged in, or all if you are
     await store.dispatch('management/findAll', {
       type: MANAGEMENT.SETTING,
-      opt: {
-        load: _ALL_IF_AUTHED, url: `/v1/${MANAGEMENT.SETTING}`, redirectUnauthorized: false
+      opt:  {
+        load: _ALL_IF_AUTHED, url: `/v1/${ MANAGEMENT.SETTING }`, redirectUnauthorized: false
       }
     });
 
@@ -167,7 +164,7 @@ export default async function({
       setFavIcon(store);
     }
   } catch (e) {
-    console.error('Error loading authenticated settings', e);
+    console.error('Error loading authenticated settings', e); // eslint-disable-line no-console
   }
 
   // Make sure you're actually logged in
@@ -196,9 +193,11 @@ export default async function({
 
     try {
       const me = await findMe(store);
+
       isLoggedIn(me);
     } catch (e) {
       const status = e?._status;
+
       if ( status === 404 ) {
         noAuth();
       } else {
@@ -207,6 +206,7 @@ export default async function({
         } else {
           store.commit('setError', { error: e, locationError: new Error('Auth Middleware') });
         }
+
         return;
       }
     }
@@ -334,5 +334,5 @@ export default async function({
 }
 
 async function findMe(store) {
-  return store.getters['auth/user']
+  return store.getters['auth/user'];
 }

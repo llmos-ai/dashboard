@@ -43,7 +43,7 @@ export const CUSTOM_LINKS_VERSION = 'v1';
 
 // Fetch the settings required for the links, taking into account legacy settings if we have not migrated
 export async function fetchLinks(store, hasSupport, isSupportPage, t) {
-  let uiLinks = {};
+  const uiLinks = {};
 
   // If uiLinks is set and has the correct version, then we are okay, otherwise we need to migrate from the old settings
   if (uiLinks?.version === CUSTOM_LINKS_VERSION) {
@@ -118,8 +118,6 @@ export function ensureSupportLink(links, hasSupport, isSupportPage, t, store) {
       links.defaults.push(SUPPORT_LINK);
     }
   }
-
-  const selectedLocaleLabel = store.getters['i18n/selectedLocaleLabel'];
 
   // Localise the default links
   links.defaults = links.defaults.map((link) => {

@@ -8,7 +8,6 @@ export function init(store) {
     product,
     basicType,
     virtualType,
-    configureType,
   } = DSL(store, NAME);
 
   product({
@@ -32,7 +31,7 @@ export function init(store) {
       name:   `c-cluster-product-resource`,
       params: { resource: CLUSTER.RAY_CLUSTER }
     },
-    exact: false,
+    exact:  false,
     weight: 100,
   });
 
@@ -45,7 +44,7 @@ export function init(store) {
       name:   `c-cluster-product-resource`,
       params: { resource: CLUSTER.MODEL_FILE }
     },
-    exact: false,
+    exact:  false,
     weight: 99,
   });
 
@@ -58,28 +57,13 @@ export function init(store) {
       name:   `c-cluster-product-resource`,
       params: { resource: CLUSTER.NOTEBOOK }
     },
-    exact: false,
+    exact:  false,
     weight: 98,
   });
-
-
-  // virtualType({
-  //   label:      'Chats',
-  //   group:      'Root',
-  //   name:       MANAGEMENT.CHAT,
-  //   namespaced: true,
-  //   route:      {
-  //     name:   `c-cluster-product-resource`,
-  //     params: { resource: MANAGEMENT.CHAT }
-  //   },
-  //   exact: false,
-  //   weight: 100,
-  // });
 
   basicType([
     CLUSTER.RAY_CLUSTER,
     CLUSTER.MODEL_FILE,
     CLUSTER.NOTEBOOK,
-    // MANAGEMENT.CHAT
   ]);
 }

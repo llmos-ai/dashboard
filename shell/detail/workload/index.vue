@@ -2,7 +2,7 @@
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { NAMESPACE as NAMESPACE_COL } from '@shell/config/table-headers';
 import {
-  POD, WORKLOAD_TYPES, SCALABLE_WORKLOAD_TYPES, SERVICE, INGRESS, NODE, NAMESPACE,
+  POD, WORKLOAD_TYPES, SCALABLE_WORKLOAD_TYPES, SERVICE, INGRESS, NODE,
 } from '@shell/config/types';
 import ResourceTable from '@shell/components/ResourceTable';
 import Tab from '@shell/components/Tabbed/Tab';
@@ -10,7 +10,6 @@ import Loading from '@shell/components/Loading';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import CountGauge from '@shell/components/CountGauge';
 import { allHash } from '@shell/utils/promise';
-import DashboardMetrics from '@shell/components/DashboardMetrics';
 import { mapGetters } from 'vuex';
 import PlusMinus from '@shell/components/form/PlusMinus';
 import { matches } from '@shell/utils/selector';
@@ -28,16 +27,15 @@ export const WORKLOAD_TYPE_TO_KIND_MAPPING = {
   [WORKLOAD_TYPES.REPLICATION_CONTROLLER]: 'ReplicationController',
 };
 
-const METRICS_SUPPORTED_KINDS = [
-  WORKLOAD_TYPES.DAEMON_SET,
-  WORKLOAD_TYPES.REPLICA_SET,
-  WORKLOAD_TYPES.STATEFUL_SET,
-  WORKLOAD_TYPES.DEPLOYMENT
-];
+// const METRICS_SUPPORTED_KINDS = [
+//   WORKLOAD_TYPES.DAEMON_SET,
+//   WORKLOAD_TYPES.REPLICA_SET,
+//   WORKLOAD_TYPES.STATEFUL_SET,
+//   WORKLOAD_TYPES.DEPLOYMENT
+// ];
 
 export default {
   components: {
-    DashboardMetrics,
     Tab,
     Loading,
     ResourceTabs,
@@ -78,22 +76,21 @@ export default {
       this[k] = res[k];
     }
 
-    const isMetricsSupportedKind = METRICS_SUPPORTED_KINDS.includes(this.value.type);
     this.findMatchingServices();
     this.findMatchingIngresses();
   },
 
   data() {
     return {
-      allPods:                         [],
-      allServices:                     [],
-      allIngresses:                    [],
-      matchingServices:                [],
-      matchingIngresses:               [],
-      allJobs:                         [],
-      allNodes:                        [],
-      showMetrics:                     false,
-      showProjectMetrics:              false,
+      allPods:            [],
+      allServices:        [],
+      allIngresses:       [],
+      matchingServices:   [],
+      matchingIngresses:  [],
+      allJobs:            [],
+      allNodes:           [],
+      showMetrics:        false,
+      showProjectMetrics: false,
     };
   },
 
@@ -402,8 +399,7 @@ export default {
         :label="t('workload.container.titles.metrics')"
         name="workload-metrics"
         :weight="3"
-      >
-      </Tab>
+      />
       <Tab
         v-if="!isJob && !isCronJob"
         name="services"

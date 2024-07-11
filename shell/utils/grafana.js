@@ -45,10 +45,7 @@ export async function dashboardExists(monitoringVersion, store, clusterId, embed
 }
 
 export async function allDashboardsExist(store, clusterId, embeddedUrls, storeName = 'cluster', projectId = null) {
-  let res;
-
-  let monitoringVersion = '';
-
+  const monitoringVersion = '';
   const existPromises = embeddedUrls.map((url) => dashboardExists(monitoringVersion, store, clusterId, url, storeName, projectId));
 
   return (await Promise.all(existPromises)).every((exists) => exists);

@@ -1,20 +1,18 @@
 <script>
 import { SECRET_TYPES as TYPES } from '@shell/config/secret';
-import { MANAGEMENT, NAMESPACE, DEFAULT_WORKSPACE } from '@shell/config/types';
+import { NAMESPACE } from '@shell/config/types';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import CruResource from '@shell/components/CruResource';
-import {
-  CLOUD_CREDENTIAL, _CLONE, _CREATE, _EDIT, _FLAGGED
-} from '@shell/config/query-params';
+import { _CREATE } from '@shell/config/query-params';
 import Loading from '@shell/components/Loading';
 import Tabbed from '@shell/components/Tabbed';
 import Tab from '@shell/components/Tabbed/Tab';
 import Labels from '@shell/components/form/Labels';
 import { HIDE_SENSITIVE } from '@shell/store/prefs';
-import { clear, uniq } from '@shell/utils/array';
+import { clear } from '@shell/utils/array';
 import SelectIconGrid from '@shell/components/SelectIconGrid';
 import { sortBy } from '@shell/utils/sort';
 import { ucFirst } from '@shell/utils/string';
@@ -99,6 +97,7 @@ export default {
     // array of id, label, description, initials for type selection step
     secretSubTypes() {
       const out = [];
+
       // Other kinds
       for ( const id of creatableTypes ) {
         out.push({
@@ -150,7 +149,7 @@ export default {
       // if ( this.$store.getters['currentProduct'].name === MANAGER ) {
       //   return 'c-cluster-manager-secret';
       // } else {
-        return 'c-cluster-product-resource';
+      return 'c-cluster-product-resource';
       // }
     },
   },
@@ -160,6 +159,7 @@ export default {
       if ( this.errors ) {
         clear(this.errors);
       }
+
       return this.save(btnCb);
     },
 
@@ -175,6 +175,7 @@ export default {
 
     typeDisplay(type, driver) {
       const fallback = type.replace(/^kubernetes.io\//, '');
+
       return this.$store.getters['i18n/withFallback'](`secret.types."${ type }"`, null, fallback);
     },
 

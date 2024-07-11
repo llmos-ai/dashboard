@@ -22,13 +22,9 @@ export default {
         username:    this.value.spec?.username,
         description: this.value.spec?.description,
         displayName: this.value.spec?.displayName,
-        password:    {
-          password: '',
-        }
+        password:    { password: '' }
       },
-      validation: {
-        password: false,
-      },
+      validation: { password: false },
     };
   },
 
@@ -89,7 +85,7 @@ export default {
       this.errors = [];
       try {
         if (this.isCreate) {
-          const user = await this.createUser();
+          await this.createUser();
         } else {
           await this.editUser();
         }
@@ -111,11 +107,9 @@ export default {
       }
 
       const user = await this.$store.dispatch('management/create', {
-        type: MANAGEMENT.USER,
-        metadata: {
-          generateName: 'user-',
-        },
-        spec: {
+        type:     MANAGEMENT.USER,
+        metadata: { generateName: 'user-' },
+        spec:     {
           username:    this.form.username,
           password:    this.form.password.password,
           displayName: this.form.displayName,

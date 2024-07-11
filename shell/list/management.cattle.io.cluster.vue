@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     filteredRows() {
-      return this.rows
+      return this.rows;
     }
   },
   // override with relevant info for the loading indicator since this doesn't use it's own masthead

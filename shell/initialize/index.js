@@ -240,9 +240,9 @@ async function createApp(config = {}) {
     await codeMirror(app.context, inject);
   }
 
-  if (typeof version === 'function') {
-    await version(app.context, inject);
-  }
+  // if (typeof version === 'function') {
+  //   await version(app.context, inject);
+  // }
 
   if (typeof steveCreateWorker === 'function') {
     await steveCreateWorker(app.context, inject);

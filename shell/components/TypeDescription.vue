@@ -19,7 +19,7 @@ export default {
     hideDescriptions: mapPref(HIDE_DESC),
 
     typeDescriptionKey() {
-      let key = `typeDescription."${ this.resource }"`;
+      const key = `typeDescription."${ this.resource }"`;
 
       if ( this.hideDescriptions.includes(this.resource) || this.hideDescriptions.includes('ALL') ) {
         return false;

@@ -238,9 +238,7 @@ export default {
       try {
         const inStore = this.$store.getters['currentStore'](POD);
 
-        const hash = {
-          pods: this.$store.dispatch(`${ inStore }/findAll`, { type: POD }),
-        };
+        const hash = { pods: this.$store.dispatch(`${ inStore }/findAll`, { type: POD }) };
 
         const res = await allHash(hash);
 

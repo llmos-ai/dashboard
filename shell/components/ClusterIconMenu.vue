@@ -7,7 +7,10 @@ export default {
       type:     Object,
       required: true,
     },
-    llm: false,
+    llm: {
+      type:    Boolean,
+      default: false,
+    },
   },
   computed: {
     isEnabled() {
@@ -57,18 +60,18 @@ export default {
         {{ smallIdentifier(cluster.label) }}
       </span>
       <div v-if="showLLMIcon">
-      <img
+        <img
           class="cluster-local-logo"
           :src="cluster.llmNavLogo"
-      >
+        >
       </div>
       <div
         v-else-if="showLocalIcon"
       >
-      <img
+        <img
           class="cluster-local-logo"
           :src="cluster.providerNavLogo"
-      >
+        >
       </div>
     </div>
     <i

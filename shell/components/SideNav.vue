@@ -442,7 +442,6 @@ export default {
       >
         {{ displayVersion }}
       </span>
-
     </div>
     <!-- SideNav footer alternative -->
     <div

@@ -73,8 +73,9 @@ export default {
     },
 
     loggedInUser() {
-      let user = this.$store.getters['auth/user'] || {};
-      return user
+      const user = this.$store.getters['auth/user'] || {};
+
+      return user;
     },
 
     kubeConfigEnabled() {

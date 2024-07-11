@@ -252,12 +252,12 @@ module.exports = function(dir, _appConfig) {
   console.log(`API: '${ api }'. Env: '${ productEnv }'`); // eslint-disable-line no-console
   const proxy = {
     ...appConfig.proxies,
-    '/api':            configHelper.proxyWsOpts(api), // Management k8s API
-    '/apis':           configHelper.proxyWsOpts(api), // Management k8s API
-    '/v1':             configHelper.proxyWsOpts(api), // Management Steve API
-    '/api-ui':         configHelper.proxyOpts(api), // Browser API UI
-    '/meta':           configHelper.proxyMetaOpts(api), // Browser API UI
-    '/v1-*':           configHelper.proxyOpts(api), // SAML, KDM, etc
+    '/api':    configHelper.proxyWsOpts(api), // Management k8s API
+    '/apis':   configHelper.proxyWsOpts(api), // Management k8s API
+    '/v1':     configHelper.proxyWsOpts(api), // Management Steve API
+    '/api-ui': configHelper.proxyOpts(api), // Browser API UI
+    '/meta':   configHelper.proxyMetaOpts(api), // Browser API UI
+    '/v1-*':   configHelper.proxyOpts(api), // SAML, KDM, etc
   };
 
   // HAR File support - load network responses from the specified .har file and use those rather than communicating to the Rancher server
