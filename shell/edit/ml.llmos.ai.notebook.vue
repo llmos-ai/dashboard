@@ -10,8 +10,8 @@ import { allHash } from '@shell/utils/promise';
 import PersistentVolumeClaim from '@shell/components/PersistentVolumeClaim';
 import InfoBox from '@shell/components/InfoBox';
 import CreateEditView from '@shell/mixins/create-edit-view';
-import { MANAGEMENT, CLUSTER } from "@shell/config/types";
-import AdvancedSection from "@shell/components/AdvancedSection.vue";
+import { MANAGEMENT, CLUSTER } from '@shell/config/types';
+import AdvancedSection from '@shell/components/AdvancedSection.vue';
 
 export default {
   name: 'NotebookEdit',
@@ -135,13 +135,13 @@ export default {
 
     resetImage() {
       if (this.type !== this.value.labels['ml.llmos.ai/notebook-type']) {
-        this.container.image = ""
+        this.container.image = '';
       }
     },
 
     update() {
-      this.setDefaultSvc()
-      this.resetImage()
+      this.setDefaultSvc();
+      this.resetImage();
 
       if (this.type) {
         const labels = {
@@ -178,14 +178,12 @@ export default {
       this.$set(this.value.spec.template.spec, 'containers', _containers);
 
       if (!this.pvc.name) {
-        this.pvc.name = `nb-${this.value.metadata.name}-${this.value.metadata.namespace}`;
+        this.pvc.name = `nb-${ this.value.metadata.name }-${ this.value.metadata.namespace }`;
       }
 
       this.value.spec.template.spec.volumes[0].persistentVolumeClaim.claimName = this.pvc.name;
 
-      const annotations = {
-        ...this.value.metadata.annotations,
-      };
+      const annotations = { ...this.value.metadata.annotations };
 
       this.value.setAnnotations(annotations);
     },
@@ -289,34 +287,34 @@ export default {
         </InfoBox>
 
         <AdvancedSection
-            class="col span-12 advanced"
-            :mode="mode"
+          class="col span-12 advanced"
+          :mode="mode"
         >
           <div class="row">
             <div class="col span-6">
               <UnitInput
-                  v-model="limits.cpu"
-                  label="CPU Limit"
-                  suffix="C"
-                  :delay="0"
-                  positive
-                  :mode="mode"
-                  class="mb-20"
-                  @input="update"
+                v-model="limits.cpu"
+                label="CPU Limit"
+                suffix="C"
+                :delay="0"
+                positive
+                :mode="mode"
+                class="mb-20"
+                @input="update"
               />
             </div>
 
             <div class="col span-6">
               <UnitInput
-                  v-model="limits.memory"
-                  label="Memory Limit"
-                  :input-exponent="3"
-                  :output-modifier="true"
-                  :increment="1024"
-                  :mode="mode"
-                  suffix="Gi"
-                  class="mb-20"
-                  @input="update"
+                v-model="limits.memory"
+                label="Memory Limit"
+                :input-exponent="3"
+                :output-modifier="true"
+                :increment="1024"
+                :mode="mode"
+                suffix="Gi"
+                class="mb-20"
+                @input="update"
               />
             </div>
           </div>

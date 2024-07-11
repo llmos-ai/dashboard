@@ -1,7 +1,5 @@
 import SYSTEM_NAMESPACES from '@shell/config/system-namespaces';
-import {
-  PROJECT, SYSTEM_NAMESPACE, ISTIO as ISTIO_LABELS, RESOURCE_QUOTA
-} from '@shell/config/labels-annotations';
+import { PROJECT, SYSTEM_NAMESPACE, ISTIO as ISTIO_LABELS, RESOURCE_QUOTA } from '@shell/config/labels-annotations';
 import { MANAGEMENT } from '@shell/config/types';
 
 import { set } from '@shell/utils/object';

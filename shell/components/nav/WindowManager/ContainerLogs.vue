@@ -12,7 +12,6 @@ import VirtualList from 'vue-virtual-scroll-list';
 import LogItem from '@shell/components/LogItem';
 
 import { escapeRegex } from '@shell/utils/string';
-import { LLMOS_NAME as VIRTUAL } from '@shell/config/features';
 
 import Socket, {
   EVENT_CONNECTED,

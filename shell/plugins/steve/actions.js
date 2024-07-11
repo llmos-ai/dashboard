@@ -1,5 +1,5 @@
 import https from 'https';
-import { addParam, parse as parseUrl, stringify as unParseUrl } from '@shell/utils/url';
+import { addParam } from '@shell/utils/url';
 import { handleSpoofedRequest, loadSchemas } from '@shell/plugins/dashboard-store/actions';
 import { set } from '@shell/utils/object';
 import { deferred } from '@shell/utils/promise';
@@ -131,6 +131,7 @@ export default {
 
     function responseObject(res) {
       let out = res.data;
+
       if ( res.status === 204 || out === null ) {
         out = {};
       }

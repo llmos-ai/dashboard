@@ -246,7 +246,6 @@ export const mutations = {
   },
 
   reset(state) {
-    console.log('### Mutation reset');
     for (const key in state.definitions) {
       if ( state.definitions[key]?.asCookie ) {
         continue;

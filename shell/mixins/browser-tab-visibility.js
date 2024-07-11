@@ -1,7 +1,8 @@
 export default {
-  methods:  {
+  methods: {
     setTabVisibilityListener(isAdd) {
       const method = isAdd ? 'addEventListener' : 'removeEventListener';
+
       document[method]('visibilitychange', this.visibilityChange, true);
     },
   },

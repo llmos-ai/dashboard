@@ -16,9 +16,9 @@ export const STEVE_MODEL_TYPES = {
 };
 
 const GC_IGNORE_TYPES = {
-  [COUNT]:       true,
-  [NAMESPACE]:   true,
-  [SCHEMA]:      true,
+  [COUNT]:     true,
+  [NAMESPACE]: true,
+  [SCHEMA]:    true,
 };
 
 // Include calls to /v1 AND /k8s/clusters/<cluster id>/v1

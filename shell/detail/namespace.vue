@@ -225,11 +225,6 @@ export default {
   <div v-else>
     <div class="mb-20">
       <h3>{{ t('namespace.resources') }}</h3>
-<!--      <ResourcesSummary-->
-<!--        state-key="namespace.resourceStates"-->
-<!--        :value="accumulatedStateCounts"-->
-<!--        :required-states="summaryStates"-->
-<!--      />-->
     </div>
     <ResourceTabs
       v-model="value"

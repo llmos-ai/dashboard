@@ -42,5 +42,5 @@ export function init(store) {
   basicType([
     'config',
     USERS_VIRTUAL_TYPE,
-  ])
+  ]);
 }

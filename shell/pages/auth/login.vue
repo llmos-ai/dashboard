@@ -3,9 +3,6 @@ import { USERNAME } from '@shell/config/cookies';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import LocaleSelector from '@shell/components/LocaleSelector';
-import BrandImage from '@shell/components/BrandImage';
-import InfoBox from '@shell/components/InfoBox';
-import CopyCode from '@shell/components/CopyCode';
 import { Banner } from '@components/Banner';
 import { LOCAL, LOGGED_OUT, TIMED_OUT, _FLAGGED } from '@shell/config/query-params';
 import { Checkbox } from '@components/Form/Checkbox';
@@ -18,16 +15,15 @@ import {
   getVendor,
   getProduct,
 } from '@shell/config/private-label';
-import {_ALL_IF_AUTHED} from "@shell/plugins/dashboard-store/actions";
 
 export default {
   name:       'Login',
   layout:     'unauthenticated',
   components: {
-    LabeledInput, AsyncButton, Checkbox, BrandImage, Banner, InfoBox, CopyCode, Password, LocaleSelector
+    AsyncButton, Checkbox, Banner, Password, LocaleSelector, LabeledInput
   },
 
-  async asyncData({ route, redirect, store }) {
+  async asyncData() {
     return {
       vendor:             getVendor(),
       hasLocal:           true,
@@ -39,6 +35,7 @@ export default {
 
   data({ $cookies }) {
     const username = $cookies.get(USERNAME, { parseJSON: false }) || '';
+
     return {
       product: getProduct(),
 
@@ -50,7 +47,7 @@ export default {
       loggedOut: this.$route.query[LOGGED_OUT] === _FLAGGED,
       err:       this.$route.query.err,
 
-      customLoginError:   {}
+      customLoginError: {}
     };
   },
 
@@ -150,7 +147,7 @@ export default {
 
         const user = await this.$store.dispatch('management/findAll', {
           type: MANAGEMENT.USER,
-          opt:  { url: `/v1/${MANAGEMENT.USER}?me=true` }
+          opt:  { url: `/v1/${ MANAGEMENT.USER }?me=true` }
         });
 
         if (!!user?.[0]) {

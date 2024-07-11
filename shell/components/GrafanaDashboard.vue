@@ -38,7 +38,7 @@ export default {
     }
   },
   async fetch() {
-    const inStore = this.$store.getters['currentProduct'].inStore;
+    // const inStore = this.$store.getters['currentProduct'].inStore;
   },
   data() {
     return {

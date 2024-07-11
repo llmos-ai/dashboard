@@ -14,7 +14,6 @@ import ResourceTabs from '@shell/components/form/ResourceTabs';
 import { METRIC, POD } from '@shell/config/types';
 import createEditView from '@shell/mixins/create-edit-view';
 import { formatSi, exponentNeeded, UNITS } from '@shell/utils/units';
-import DashboardMetrics from '@shell/components/DashboardMetrics';
 import { mapGetters } from 'vuex';
 import Loading from '@shell/components/Loading';
 import metricPoller from '@shell/mixins/metric-poller';
@@ -25,7 +24,6 @@ export default {
   components: {
     Alert,
     ConsumptionGauge,
-    DashboardMetrics,
     Loading,
     ResourceTabs,
     Tab,
@@ -230,8 +228,7 @@ export default {
         :label="t('node.detail.tab.metrics')"
         name="node-metrics"
         :weight="3"
-      >
-      </Tab>
+      />
       <Tab
         name="info"
         :label="t('node.detail.tab.info.label')"

@@ -5,8 +5,6 @@ import CommunityLinks from '@shell/components/CommunityLinks';
 import { MANAGEMENT } from '@shell/config/types';
 import { getVendor } from '@shell/config/private-label';
 import { SETTING } from '@shell/config/settings';
-import { addParam } from '@shell/utils/url';
-import { hasCspAdapter } from 'mixins/brand';
 
 export default {
   layout: 'home',

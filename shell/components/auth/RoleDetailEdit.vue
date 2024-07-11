@@ -5,7 +5,6 @@ import CruResource from '@shell/components/CruResource';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 import Error from '@shell/components/form/Error';
-import { RadioGroup } from '@components/Form/Radio';
 import Select from '@shell/components/form/Select';
 import ArrayList from '@shell/components/form/ArrayList';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
@@ -15,8 +14,17 @@ import { ucFirst } from '@shell/utils/string';
 import SortableTable from '@shell/components/SortableTable';
 import { _CLONE, _DETAIL } from '@shell/config/query-params';
 import { SCOPED_RESOURCES } from '@shell/config/roles';
-import { Banner } from '@components/Banner';
 import Loading from '@shell/components/Loading';
+
+export const VERBS = [
+  'create',
+  'delete',
+  'get',
+  'list',
+  'patch',
+  'update',
+  'watch',
+];
 
 /**
  * Handles the View, Create and Edit of
@@ -48,7 +56,6 @@ export default {
   components: {
     ArrayList,
     CruResource,
-    RadioGroup,
     Select,
     NameNsDescription,
     Tab,
@@ -56,11 +63,9 @@ export default {
     SortableTable,
     Loading,
     Error,
-    Banner
   },
 
   mixins: [CreateEditView, FormValidation],
-
   async fetch() {
     // We don't want to get all schemas from the cluster because there are
     // two problems with that:
@@ -75,17 +80,6 @@ export default {
     // Therefore we use a hardcoded list that is essentially intended
     // to be in-app documentation for convenience only, while allowing
     // users to freely type in resources that are not shown in the list.
-
-    if (this.value.subtype === CLUSTER || this.value.subtype === NAMESPACE) {
-      (await this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.ROLE_TEMPLATE })).forEach((template) => {
-        // Ensure we have quick access to a specific template. This allows unselected drop downs to show the correct value
-        this.keyedTemplateOptions[template.id] = {
-          label: template.nameDisplay,
-          value: template.id
-        };
-      });
-      this.templateOptions = Object.values(this.keyedTemplateOptions);
-    }
     if (this.realMode === _CLONE) {
       this.value.displayName = '';
       this.value.builtin = false;
@@ -130,21 +124,21 @@ export default {
     }
 
     // Set the default value for the mapped subtype
-    this.defaultValue = !!this.value[SUBTYPE_MAPPING[this.value.subtype].defaultKey];
+    // this.defaultValue = !!this.value[SUBTYPE_MAPPING[this.value.subtype].defaultKey];
 
-    switch (this.value.subtype) {
-    case CLUSTER:
-    case NAMESPACE:
-      this.$set(this.value, 'roleTemplateNames', this.value.roleTemplateNames || []);
-      this.$set(this.value, 'locked', !!this.value.locked);
-      break;
-    }
+    // switch (this.value.subtype) {
+    // case CLUSTER:
+    // case NAMESPACE:
+    //   this.$set(this.value, 'roleTemplateNames', this.value.roleTemplateNames || []);
+    //   this.$set(this.value, 'locked', !!this.value.locked);
+    //   break;
+    // }
 
     // On save hook request
     if (this.registerBeforeHook) {
       this.registerBeforeHook(() => {
         // Map default value back to its own key for given subtype
-        this.value[SUBTYPE_MAPPING[this.value.subtype].defaultKey] = !!this.defaultValue;
+        // this.value[SUBTYPE_MAPPING[this.value.subtype].defaultKey] = !!this.defaultValue;
       });
     }
 
@@ -159,10 +153,6 @@ export default {
 
   computed: {
     ...mapGetters(['releaseNotesUrl']),
-
-    showRestrictedAdminDeprecationBanner() {
-      return this.value.subtype === GLOBAL && this.value.id === 'restricted-admin';
-    },
 
     label() {
       return this.t(`rbac.roletemplate.subtypes.${ this.value.subtype }.label`);
@@ -193,7 +183,7 @@ export default {
           // skip adding the global-scoped resources.
           return;
         }
-        if (scope === 'clusterScopedApiGroups' && (this.value.type === RBAC.ROLE || this.value.subtype === NAMESPACE)) {
+        if (scope === 'clusterScopedApiGroups' && (this.value.type === RBAC.ROLE)) {
           // If we are in a project/namespace role creation form,
           // additionally skip adding the cluster-scoped resources.
           return;
@@ -304,15 +294,6 @@ export default {
           label: this.t('rbac.roletemplate.newUserDefault.no')
         }
       ];
-    },
-    isMgmtRoleTemplate() {
-      return this.value.subtype === CLUSTER || this.value.subtype === NAMESPACE;
-    },
-    isNamespaced() {
-      return this.value.subtype === RBAC_ROLE;
-    },
-    isMgmtType() {
-      return this.value.subtype === GLOBAL || this.value.subtype === CLUSTER || this.value.subtype === NAMESPACE;
     },
     isDetail() {
       return this.as === _DETAIL;
@@ -543,13 +524,6 @@ export default {
     @finish="save"
     @cancel="cancel"
   >
-    <Banner
-      v-if="showRestrictedAdminDeprecationBanner"
-      color="warning"
-      class="mb-20"
-    >
-      <span v-clean-html="t('rbac.globalRoles.role.restricted-admin.deprecation', { releaseNotesUrl }, true)" />
-    </Banner>
     <template v-if="isDetail">
       <SortableTable
         key-field="index"
@@ -590,36 +564,6 @@ export default {
         label="Name"
         :rules="{ name: fvGetAndReportPathRules('displayName') }"
       />
-      <div
-        v-if="isMgmtType"
-        class="row"
-      >
-        <div class="col span-6">
-          <RadioGroup
-            v-model="defaultValue"
-            name="storageSource"
-            :label="defaultLabel"
-            class="mb-10"
-            data-testid="roletemplate-creator-default-options"
-            :options="newUserDefaultOptions"
-            :mode="mode"
-          />
-        </div>
-        <div
-          v-if="isMgmtRoleTemplate"
-          class="col span-6"
-        >
-          <RadioGroup
-            v-model="value.locked"
-            name="storageSource"
-            :label="t('rbac.roletemplate.locked.label')"
-            class="mb-10"
-            data-testid="roletemplate-locked-options"
-            :options="lockedOptions"
-            :mode="mode"
-          />
-        </div>
-      </div>
       <div class="spacer" />
       <Tabbed :side-tabs="true">
         <Tab
@@ -725,42 +669,6 @@ export default {
                     :data-testid="`grant-resources-non-resource-urls${props.i}`"
                     @input="setRule('nonResourceURLs', props.row.value, $event.target.value)"
                   >
-                </div>
-              </div>
-            </template>
-          </ArrayList>
-        </Tab>
-        <Tab
-          v-if="isMgmtRoleTemplate"
-          name="inherit-from"
-          label="Inherit From"
-          :weight="0"
-        >
-          <ArrayList
-            v-model="value.roleTemplateNames"
-            :disabled="isBuiltin"
-            :remove-allowed="!isBuiltin"
-            :add-allowed="!isBuiltin"
-            label="Resources"
-            add-label="Add Resource"
-            :mode="mode"
-          >
-            <template #columns="props">
-              <div class="columns row mr-20">
-                <div class="col span-12">
-                  <Select
-                    v-model="props.row.value"
-                    class="lg"
-                    :taggable="false"
-                    :disabled="isBuiltin"
-                    :searchable="true"
-                    :options="selectFocused === props.i ? templateOptions : [keyedTemplateOptions[props.row.value]]"
-                    option-key="value"
-                    option-label="label"
-                    :mode="mode"
-                    @on-focus="selectFocused = props.i"
-                    @on-blur="selectFocused = null"
-                  />
                 </div>
               </div>
             </template>

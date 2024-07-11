@@ -68,7 +68,7 @@ export default {
     routeDropdownOptions() {
       // Drop-down shows list of clusters that can ber set as login landing page
       const out = [];
-      const kubeClusters = this.clusters
+      const kubeClusters = this.clusters;
 
       kubeClusters.forEach((c) => {
         if (c.isReady) {

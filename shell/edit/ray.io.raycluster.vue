@@ -12,10 +12,7 @@ import InfoBox from '@shell/components/InfoBox';
 import { allHash } from '@shell/utils/promise';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { ANNOTATIONS } from '@shell/config/labels-annotations';
-import {CLUSTER, RUNTIME_CLASS} from '@shell/config/types';
-import Select from '@shell/components/form/Select';
-
-import { ToggleSwitch } from '@components/Form/ToggleSwitch';
+import { CLUSTER, RUNTIME_CLASS } from '@shell/config/types';
 import { Checkbox } from '@components/Form/Checkbox';
 
 export default {
@@ -33,8 +30,6 @@ export default {
     InfoBox,
     PersistentVolumeClaim,
     NameNsDescription,
-    ToggleSwitch,
-    Select
   },
 
   mixins: [CreateEditView],
@@ -43,9 +38,9 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const hash = await allHash({
-      clusters:      this.$store.dispatch(`${ inStore }/findAll`, { type: CLUSTER.RAY_CLUSTER }),
+      clusters:       this.$store.dispatch(`${ inStore }/findAll`, { type: CLUSTER.RAY_CLUSTER }),
       runtimeClasses: this.$store.dispatch(`${ inStore }/findAll`, { type: RUNTIME_CLASS }),
-      defaultConfig: this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' })
+      defaultConfig:  this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' })
     });
 
     this.defaultConfig = hash.defaultConfig;
@@ -60,15 +55,14 @@ export default {
     const headGroupSpec = this.value?.spec?.headGroupSpec;
     const headGroupContainer = headGroupSpec?.template?.spec?.containers[0];
     const headGroupSpecResource = headGroupSpec?.template?.spec.containers[0]?.resources;
-    const scheduleOnHeadNode = headGroupSpec?.rayStartParams["num-cpus"] !== '0';
-
+    const scheduleOnHeadNode = headGroupSpec?.rayStartParams['num-cpus'] !== '0';
 
     const workerGroupSpecs = this.value?.spec?.workerGroupSpecs || [];
     const workerGroupSpecsResource = workerGroupSpecs[0]?.template?.spec.containers[0]?.resources;
     const gpu = workerGroupSpecsResource?.requests?.['nvidia.com/gpu'] || 0;
 
     const autoscalerOptions = this.value?.spec?.autoscalerOptions;
-    const enableWorkerGPU = workerGroupSpecs[0].template.spec.runtimeClassName === 'nvidia'
+    const enableWorkerGPU = workerGroupSpecs[0].template.spec.runtimeClassName === 'nvidia';
 
     return {
       defaultConfig:   {},
@@ -104,14 +98,16 @@ export default {
       }];
     },
     runtimeClassOptions() {
-      const opts = []
+      const opts = [];
+
       this.runtimeClasses.filter((runtimeClass) => {
         opts.push({
           label: runtimeClass.metadata.name,
           value: runtimeClass.metadata.name,
-        })
-      })
-      return opts
+        });
+      });
+
+      return opts;
     }
   },
 
@@ -152,23 +148,24 @@ export default {
       // set head-node pvc config
       if (!this.pvcAnnotation?.metadata?.name && this.value.name !== undefined) {
         const pvcName = `${ this.value.name }-log`;
-        this.pvcAnnotation.metadata.name = pvcName
-        this.headGroupSpec.template.spec.volumes[0].persistentVolumeClaim.claimName = pvcName
+
+        this.pvcAnnotation.metadata.name = pvcName;
+        this.headGroupSpec.template.spec.volumes[0].persistentVolumeClaim.claimName = pvcName;
       }
 
       const annotations = {
         ...this.value.metadata.annotations,
         [ANNOTATIONS.RAY_CLUSTER_FT_ENABLED]: this.enableGCSFaultTolerance.toString(),
-        'llmos.ai/volumeClaimTemplates':   JSON.stringify([this.pvcAnnotation])
+        'llmos.ai/volumeClaimTemplates':      JSON.stringify([this.pvcAnnotation])
       };
 
       if (this.enableWorkerGPU) {
-        if(this.gpu === 0) {
-          this.gpu = 1
+        if (this.gpu === 0) {
+          this.gpu = 1;
         }
         this.workerGroupSpecs.runtimeClassName = this.runtimeClasses[0]?.name;
       } else {
-        this.gpu = 0
+        this.gpu = 0;
         delete this.workerGroupSpecs.runtimeClassName;
       }
 
@@ -182,12 +179,10 @@ export default {
       }
 
       if (this.value.spec.enableInTreeAutoscaling) {
-        this.value.spec.autoscalerOptions = this.autoscalerOptions
+        this.value.spec.autoscalerOptions = this.autoscalerOptions;
       }
 
       this.value.setAnnotations(annotations);
-      console.log("update ray cluster", this.value.spec)
-      return
     },
   },
 };
@@ -220,19 +215,18 @@ export default {
         name="headGroup"
         label="Head Group"
         class="bordered-table"
-        :weight=100
+        :weight="100"
       >
-
         <div class="row mb-20">
           <div class="col span-6">
             <UnitInput
-                v-model="headGroupSpecResource.requests.cpu"
-                label="CPU"
-                suffix="C"
-                required
-                :output-modifier="true"
-                :mode="mode"
-                @input="update"
+              v-model="headGroupSpecResource.requests.cpu"
+              label="CPU"
+              suffix="C"
+              required
+              :output-modifier="true"
+              :mode="mode"
+              @input="update"
             />
           </div>
 
@@ -280,10 +274,10 @@ export default {
 
             <div class="col span-6">
               <Checkbox
-                  v-model="scheduleOnHeadNode"
-                  :mode="mode"
-                  :label="t('ray.cluster.allowScheduling')"
-                  @input="update"
+                v-model="scheduleOnHeadNode"
+                :mode="mode"
+                :label="t('ray.cluster.allowScheduling')"
+                @input="update"
               />
             </div>
           </div>
@@ -294,7 +288,7 @@ export default {
         name="workerGroup"
         label="Worker Group"
         class="bordered-table"
-        :weight=99
+        :weight="99"
       >
         <div class="row mb-20">
           <div class="col span-6">
@@ -310,7 +304,7 @@ export default {
           <div class="col span-6">
             <UnitInput
               v-model="workerGroupSpecs[0].replicas"
-              :hide-unit=true
+              :hide-unit="true"
               label="Replicas"
               required
               :mode="mode"
@@ -323,7 +317,7 @@ export default {
             <UnitInput
               v-model="workerGroupSpecs[0].minReplicas"
               label="Min Replicas"
-              :hide-unit=true
+              :hide-unit="true"
               required
               :mode="mode"
               @input="update"
@@ -334,7 +328,7 @@ export default {
             <UnitInput
               v-model="workerGroupSpecs[0].maxReplicas"
               label="Max Replicas"
-              :hide-unit=true
+              :hide-unit="true"
               required
               :mode="mode"
               @input="update"
@@ -374,31 +368,34 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <Checkbox
-                v-model="enableWorkerGPU"
-                :mode="mode"
-                label="Enable GPU"
-                @input="update"
+              v-model="enableWorkerGPU"
+              :mode="mode"
+              label="Enable GPU"
+              @input="update"
             />
           </div>
         </div>
-        <div class="row" v-if="enableWorkerGPU">
+        <div
+          v-if="enableWorkerGPU"
+          class="row"
+        >
           <div class="col span-6">
             <LabeledInput
-                v-model="gpu"
-                v-int-number
-                label="GPU"
-                :mode="mode"
-                @input="update"
+              v-model="gpu"
+              v-int-number
+              label="GPU"
+              :mode="mode"
+              @input="update"
             />
           </div>
           <div class="col span-6">
             <LabeledSelect
-                v-model="workerGroupSpecs[0].template.spec.runtimeClassName"
-                label="Runtime Class"
-                :options="runtimeClassOptions"
-                required
-                :mode="mode"
-                @input="update"
+              v-model="workerGroupSpecs[0].template.spec.runtimeClassName"
+              label="Runtime Class"
+              :options="runtimeClassOptions"
+              required
+              :mode="mode"
+              @input="update"
             />
           </div>
         </div>
@@ -408,16 +405,16 @@ export default {
         name="AdvancedConfigs"
         label="Advanced Configs"
         class="bordered-table"
-        :weight=98
+        :weight="98"
       >
         <div class="row mb-20">
           <div class="col span-6">
             <LabeledInput
-                v-model="value.spec.rayVersion"
-                label="Ray Version"
-                required
-                :mode="mode"
-                @input="update"
+              v-model="value.spec.rayVersion"
+              label="Ray Version"
+              required
+              :mode="mode"
+              @input="update"
             />
           </div>
         </div>
@@ -426,14 +423,17 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <Checkbox
-                v-model="value.spec.enableInTreeAutoscaling"
-                :mode="mode"
-                label="Enabling Autoscaling"
-                @input="update"
+              v-model="value.spec.enableInTreeAutoscaling"
+              :mode="mode"
+              label="Enabling Autoscaling"
+              @input="update"
             />
           </div>
         </div>
-        <div class="row mb-20" v-if="value.spec.enableInTreeAutoscaling">
+        <div
+          v-if="value.spec.enableInTreeAutoscaling"
+          class="row mb-20"
+        >
           <div class="col span-6">
             <LabeledSelect
               v-if="autoscalerOptions"

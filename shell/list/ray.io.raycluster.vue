@@ -1,15 +1,17 @@
 <script>
 import ResourceTable from '@shell/components/ResourceTable';
 import Loading from '@shell/components/Loading';
-import {CLUSTER, POD, WORKLOAD_TYPES} from '@shell/config/types';
+import { CLUSTER } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
 import { STATE, NAME, AGE } from '@shell/config/table-headers';
-import Masthead from "@shell/components/ResourceList/Masthead.vue";
 
 export default {
   name: 'MLClusterList',
 
-  components: {Masthead, ResourceTable, Loading },
+  components: {
+    ResourceTable,
+    Loading,
+  },
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
@@ -104,9 +106,11 @@ export default {
 
     <template #col:access="{row}">
       <td>
-        <n-link class="icon "
+        <n-link
+          class="icon "
           :to="{ name: 'c-cluster-product-resource-namespace-id-rayDashboard', params: { clusterName: row.name, resource: row.type, namespace: row.namespace, id: row.metadata?.name }}"
-        > Manage <i class="icon icon-external-link" />
+        >
+          Manage <i class="icon icon-external-link" />
         </n-link>
       </td>
     </template>

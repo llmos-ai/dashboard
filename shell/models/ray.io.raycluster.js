@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { set } from '@shell/utils/object';
-import {colorForState, STATES_ENUM} from "@shell/plugins/dashboard-store/resource-class";
-import {ucFirst} from "@shell/utils/string";
+import { colorForState, STATES_ENUM } from '@shell/plugins/dashboard-store/resource-class';
 
 export default class RayCluster extends SteveModel {
   applyDefaults() {
@@ -10,15 +9,15 @@ export default class RayCluster extends SteveModel {
       apiVersion: 'ray.io/v1',
       kind:       'RayCluster',
       metadata:   {
-        name:      '',
-        namespace: '',
+        name:        '',
+        namespace:   '',
         annotations: {
           'llmos.ai/volumeClaimTemplates': '[{"metadata":{"name":""},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"2Gi"}}}}]',
-          "ray.io/ft-enabled": "true",
+          'ray.io/ft-enabled':             'true',
         }
       },
       spec: {
-        rayVersion:       '2.31.0',
+        rayVersion:        '2.31.0',
         autoscalerOptions: {
           idleTimeoutSeconds: 60,
           resources:          {
@@ -44,7 +43,7 @@ export default class RayCluster extends SteveModel {
             spec:     {
               containers: [
                 {
-                  image: '',
+                  image:     '',
                   lifecycle: {
                     preStop: {
                       exec: {
@@ -133,7 +132,7 @@ export default class RayCluster extends SteveModel {
                         }
                       }
                     },
-                    name:      'ray-worker',
+                    name:         'ray-worker',
                     volumeMounts: [
                       {
                         mountPath: '/tmp/ray',
@@ -153,10 +152,10 @@ export default class RayCluster extends SteveModel {
                   }
                 ],
                 volumes: [
-                    {
-                      name:     'ray-logs',
-                      emptyDir: {},
-                    }
+                  {
+                    name:     'ray-logs',
+                    emptyDir: {},
+                  }
                 ],
               }
             }
@@ -171,23 +170,25 @@ export default class RayCluster extends SteveModel {
 
   get stateDisplay() {
     if (this.status?.state === 'failed') {
-      return STATES_ENUM.ERROR
+      return STATES_ENUM.ERROR;
     }
 
     if (this.metadata?.deletionTimestamp) {
       return STATES_ENUM.REMOVING;
     }
+
     return this.stateDescription ? STATES_ENUM.PENDING : super.stateDisplay;
   }
 
   get stateBackground() {
     const color = colorForState(this.stateDisplay);
+
     return color.replace('text-', 'bg-');
   }
 
   get stateDescription() {
     if (this.status?.state === 'failed') {
-      return this.status?.reason
+      return this.status?.reason;
     }
 
     const relationships = this.metadata.relationships || [];
@@ -195,25 +196,28 @@ export default class RayCluster extends SteveModel {
       if (r.error === true || r.transitioning === true) {
         return r;
       }
-    })
+    });
 
     if (hasIssue) {
       return hasIssue.message;
     }
-    return false
+
+    return false;
   }
 
   get rayVersion() {
     const version = this.spec?.rayVersion;
+
     if (version) {
-      return version
+      return version;
     }
 
-    const image = this.spec.headGroupSpec?.template?.spec?.containers?.[0]?.image
+    const image = this.spec.headGroupSpec?.template?.spec?.containers?.[0]?.image;
+
     if (image) {
-      return image.split(':')[1]
+      return image.split(':')[1];
     }
 
-    return "N/A"
+    return 'N/A';
   }
 }

@@ -2,21 +2,21 @@ import { filterBy, isArray } from '@shell/utils/array';
 
 export const state = function() {
   return {
-    show:              false,
-    resources:         [],
-    elem:              null,
-    event:             null,
-    showPromptMove:    false,
-    showPromptRemove:  false,
-    showAssignTo:      false,
-    showPromptUpdate:  false,
-    showModal:         false,
-    toMove:            [],
-    toRemove:          [],
-    toRestore:         [],
-    toAssign:          [],
-    toUpdate:          [],
-    modalData:         {},
+    show:             false,
+    resources:        [],
+    elem:             null,
+    event:            null,
+    showPromptMove:   false,
+    showPromptRemove: false,
+    showAssignTo:     false,
+    showPromptUpdate: false,
+    showModal:        false,
+    toMove:           [],
+    toRemove:         [],
+    toRestore:        [],
+    toAssign:         [],
+    toUpdate:         [],
+    modalData:        {},
   };
 };
 

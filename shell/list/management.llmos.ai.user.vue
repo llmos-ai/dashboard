@@ -1,5 +1,4 @@
 <script>
-import AsyncButton from '@shell/components/AsyncButton';
 import { MANAGEMENT } from '@shell/config/types';
 import ResourceTable from '@shell/components/ResourceTable';
 import Masthead from '@shell/components/ResourceList/Masthead';
@@ -7,7 +6,6 @@ import ResourceFetch from '@shell/mixins/resource-fetch';
 
 export default {
   components: {
-    AsyncButton,
     ResourceTable,
     Masthead
   },
@@ -46,9 +44,7 @@ export default {
 
     const schema = getters[`management/schemaFor`](this.resource);
 
-    return {
-      schema,
-    };
+    return { schema };
   },
 
   $loadingResources() {
@@ -66,7 +62,7 @@ export default {
     },
 
     users() {
-      return this.rows
+      return this.rows;
     }
   },
 };
@@ -80,8 +76,7 @@ export default {
       :show-incremental-loading-indicator="incrementalLoadingIndicator"
       :load-resources="loadResources"
       :load-indeterminate="loadIndeterminate"
-    >
-    </Masthead>
+    />
 
     <ResourceTable
       :schema="schema"

@@ -1,8 +1,6 @@
 <script>
-import IconOrSvg from '@shell/components/IconOrSvg';
 export default {
-  components: { IconOrSvg },
-  props:      {
+  props: {
     row: {
       type:     Object,
       required: true

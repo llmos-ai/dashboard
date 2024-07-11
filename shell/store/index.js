@@ -290,7 +290,6 @@ export const getters = {
       out = active[0];
     }
 
-    console.log('currentProduct', out);
     return out;
   },
 
@@ -610,7 +609,6 @@ export const mutations = {
   },
 
   setProduct(state, neu) {
-    console.log('setProduct', neu);
     state.productId = neu;
   },
 
@@ -660,8 +658,8 @@ export const actions = {
     console.log('Loading management...'); // eslint-disable-line no-console
 
     let res = await allHashSettled({
-      mgmtSubscribe:  dispatch('management/subscribe'),
-      mgmtSchemas:    dispatch('management/loadSchemas', true),
+      mgmtSubscribe: dispatch('management/subscribe'),
+      mgmtSchemas:   dispatch('management/loadSchemas', true),
     });
 
     const promises = {
@@ -693,10 +691,6 @@ export const actions = {
     res = await allHash(promises);
     dispatch('i18n/init');
     const isMultiCluster = getters['isMultiCluster'];
-
-    // If the local cluster is a Harvester cluster and 'rancher-manager-support' is true, it means that the embedded Rancher is being used.
-    const localCluster = res.clusters?.find((c) => c.id === 'local');
-
     const pl = res.settings?.find((x) => x.id === 'ui-pl')?.value;
     const brand = res.settings?.find((x) => x.id === SETTING.BRAND)?.value;
     const systemNamespaces = res.settings?.find((x) => x.id === SETTING.SYSTEM_NAMESPACES);
@@ -843,7 +837,7 @@ export const actions = {
 
     // TODO: This is a workaround for the fact that we don't have a way to get the cluster base URL from the API.
     // const clusterBase = `/k8s/clusters/${ encodeURI(id) }/v1`;
-    const clusterBase = '/v1'
+    const clusterBase = '/v1';
 
     // Update the Steve client URLs
     commit('cluster/applyConfig',

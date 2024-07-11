@@ -135,7 +135,6 @@ export default function({
 
         // Load all of the types etc from the plugin
         this.applyPlugin(plugin);
-
       } catch (e) {
         console.error(`Error loading plugin ${ plugin.name }`); // eslint-disable-line no-console
         console.error(e); // eslint-disable-line no-console

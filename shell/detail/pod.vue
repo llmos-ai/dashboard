@@ -6,25 +6,18 @@ import SortableTable from '@shell/components/SortableTable';
 import { STATE, SIMPLE_NAME, IMAGE_NAME } from '@shell/config/table-headers';
 import { sortableNumericSuffix } from '@shell/utils/sort';
 import { findBy } from '@shell/utils/array';
-import DashboardMetrics from '@shell/components/DashboardMetrics';
 import { mapGetters } from 'vuex';
-import { allDashboardsExist } from '@shell/utils/grafana';
-import LabeledSelect from '@shell/components/form/LabeledSelect';
 import day from 'dayjs';
 import { DATE_FORMAT, TIME_FORMAT } from '@shell/store/prefs';
 import { escapeHtml } from '@shell/utils/string';
-import { NAMESPACE } from '@shell/config/types';
-import { PROJECT } from '@shell/config/labels-annotations';
 
 export default {
   name: 'PodDetail',
 
   components: {
-    DashboardMetrics,
     ResourceTabs,
     Tab,
     SortableTable,
-    LabeledSelect,
   },
 
   mixins: [CreateEditView],
@@ -40,10 +33,10 @@ export default {
 
     return {
       POD_OPTION,
-      showMetrics:                     false,
-      showProjectMetrics:              false,
-      selection:                       POD_OPTION,
-      metricsID:                       null,
+      showMetrics:        false,
+      showProjectMetrics: false,
+      selection:          POD_OPTION,
+      metricsID:          null,
     };
   },
 

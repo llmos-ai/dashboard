@@ -27,9 +27,7 @@ export default {
   async fetch() {
     if (this.isChange) {
       // Fetch the username for hidden input fields. The value itself is not needed if create or changing another user's password
-      const users = await this.$store.dispatch('management/findAll', {
-        type: MANAGEMENT.USER,
-      });
+      const users = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.USER });
       const user = users?.[0];
 
       this.username = user?.username;
@@ -272,12 +270,6 @@ export default {
           label-key="changePassword.deleteKeys.label"
           class="mt-10"
         />
-<!--        <Checkbox-->
-<!--          v-if="isCreateEdit"-->
-<!--          v-model="userChangeOnLogin"-->
-<!--          label-key="changePassword.changeOnLogin.label"-->
-<!--          class="mt-10 type"-->
-<!--        />-->
         <Checkbox
           v-if="isCreateEdit"
           v-model="isRandomGenerated"
@@ -418,5 +410,4 @@ export default {
       height: 53px;
     }
   }
-
 </style>

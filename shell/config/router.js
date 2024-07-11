@@ -152,6 +152,7 @@ export function createRouter(config) {
     if (typeof to === 'string') {
       to = normalizeURL(to);
     }
+
     return resolve(to, current, append);
   };
 

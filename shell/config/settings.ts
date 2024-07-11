@@ -44,23 +44,23 @@ export const SETTING = {
   PASSWORD_MIN_LENGTH:                  'password-min-length', // L_PASSWORD_MIN_LENGTH
   UI_OFFLINE_PREFERRED:                 'ui-offline-preferred',
 
-  UI_INDEX:                             'ui-index',
-  UI_ISSUES:                            'ui-issues',
-  PL:                                   'ui-pl',
-  BANNERS:                              'ui-banners',
-  ISSUES:                               'ui-issues',
-  LOGO_LIGHT:                           'ui-logo-light',
-  LOGO_DARK:                            'ui-logo-dark',
-  PRIMARY_COLOR:                        'ui-primary-color',
-  LINK_COLOR:                           'ui-link-color',
-  COMMUNITY_LINKS:                      'ui-community-links',
-  FAVICON:                              'ui-favicon',
+  UI_INDEX:          'ui-index',
+  UI_ISSUES:         'ui-issues',
+  PL:                'ui-pl',
+  BANNERS:           'ui-banners',
+  ISSUES:            'ui-issues',
+  LOGO_LIGHT:        'ui-logo-light',
+  LOGO_DARK:         'ui-logo-dark',
+  PRIMARY_COLOR:     'ui-primary-color',
+  LINK_COLOR:        'ui-link-color',
+  COMMUNITY_LINKS:   'ui-community-links',
+  FAVICON:           'ui-favicon',
   /**
    * Allow the backend to force a light/dark theme. Used in non-rancher world and results in the theme used
    * both pre and post log in. If not present defaults to the usual process
    */
-  THEME:                                'ui-theme',
-  SYSTEM_NAMESPACES:                    'system-namespaces',
+  THEME:             'ui-theme',
+  SYSTEM_NAMESPACES: 'system-namespaces',
 };
 
 // These are the settings that are allowed to be edited via the UI
@@ -97,7 +97,7 @@ export const ALLOWED_SETTINGS: GlobalSetting = {
     kind:    'enum',
     options: ['dynamic', 'true', 'false']
   },
-  [SETTING.BRAND]:                        { canReset: true },
+  [SETTING.BRAND]: { canReset: true },
 };
 
 /**
@@ -155,7 +155,7 @@ export const DEFAULT_PERF_SETTING: PerfSettings = {
   },
 
   disableWebsocketNotification: true,
-  garbageCollection: {
+  garbageCollection:            {
     enabled: false,
 
     // When GC Runs
@@ -167,9 +167,9 @@ export const DEFAULT_PERF_SETTING: PerfSettings = {
     ageThreshold:   1 * 60 * 2,
     countThreshold: 500,
   },
-  forceNsFilterV2:              { enabled: false },
-  advancedWorker:               { enabled: false },
-  kubeAPI:                      {
+  forceNsFilterV2: { enabled: false },
+  advancedWorker:  { enabled: false },
+  kubeAPI:         {
     /**
      * Settings related to the response header `warnings` value
      */
@@ -187,4 +187,3 @@ export const DEFAULT_PERF_SETTING: PerfSettings = {
     }
   }
 };
-

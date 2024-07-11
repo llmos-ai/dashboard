@@ -3,8 +3,6 @@ import Loading from '@shell/components/Loading';
 import AsyncButton from '@shell/components/AsyncButton';
 import Banner from '@components/Banner/Banner.vue';
 import { MANAGEMENT } from '@shell/config/types';
-import { fetchOrCreateSetting } from '@shell/utils/settings';
-import { SETTING } from '@shell/config/settings';
 import { _EDIT, _VIEW } from '@shell/config/query-params';
 import KeyValue from '@shell/components/form/KeyValue';
 import { mapGetters } from 'vuex';
@@ -27,7 +25,7 @@ export default {
   data() {
     return {
       defaultsDisabled: true,
-      hasSupport: false,
+      hasSupport:       false,
       uiCustomLinks:    {},
       bannerVal:        {},
       value:            [],

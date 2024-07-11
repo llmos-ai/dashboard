@@ -1,5 +1,5 @@
 import HybridModel from '@shell/plugins/steve/hybrid-class';
-import {MANAGEMENT} from "@shell/config/types";
+import { MANAGEMENT } from '@shell/config/types';
 
 export default class User extends HybridModel {
   // Preserve description
@@ -12,6 +12,7 @@ export default class User extends HybridModel {
 
   get isSystem() {
     const p = this.$rootGetters['auth/principalId'];
+
     return p.startsWith('system://');
   }
 
@@ -61,6 +62,7 @@ export default class User extends HybridModel {
   // Ensure when we clone that we preserve the description
   toJSON() {
     const data = super.toJSON();
+
     if (data.spec) {
       data.spec.description = this._description;
       delete data._description;

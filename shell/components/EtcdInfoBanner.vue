@@ -7,7 +7,7 @@ import { hasLeader, leaderChanges, failedProposals } from '@shell/utils/grafana'
 export default {
   components: { Banner, Loading },
   async fetch() {
-    let monitoringVersion = '';
+    const monitoringVersion = '';
     const leader = await hasLeader(monitoringVersion, this.$store.dispatch, this.currentCluster.id);
 
     this.hasLeader = leader ? 'Yes' : 'No';

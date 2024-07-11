@@ -1,5 +1,4 @@
 <script>
-import { mapGetters } from 'vuex';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
@@ -61,7 +60,7 @@ export default {
       containerResourceLimits: this.value.annotations?.[CONTAINER_DEFAULT_RESOURCE_LIMIT] || this.getDefaultContainerResourceLimits(projectName),
       rerenderNums:            randomStr(4),
       projectName,
-      K8S_TYPES: K8S_TYPES,
+      K8S_TYPES,
     };
   },
 

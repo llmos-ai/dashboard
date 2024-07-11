@@ -3,8 +3,7 @@ import ModalWithCard from '@shell/components/ModalWithCard';
 import { Banner } from '@components/Banner';
 import PercentageBar from '@shell/components/PercentageBar.vue';
 import throttle from 'lodash/throttle';
-import { MANAGEMENT } from '@shell/config/types';
-import { DEFAULT_PERF_SETTING, SETTING } from '@shell/config/settings';
+import { DEFAULT_PERF_SETTING } from '@shell/config/settings';
 
 let globalId;
 
@@ -29,7 +28,7 @@ export default {
   },
   async mounted() {
     // Info: normally, this is done in the fetch hook but for some reasons while awaiting for things that will take a while, it won't be ready by the time mounted() is called, pending for investigation.
-    let settings = DEFAULT_PERF_SETTING;
+    const settings = DEFAULT_PERF_SETTING;
 
     if (!settings || !settings?.inactivity || !settings?.inactivity.enabled) {
       return;

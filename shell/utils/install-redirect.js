@@ -3,7 +3,6 @@ import { REPO_TYPE, REPO, CHART, VERSION } from '@shell/config/query-params';
 export default function(product, chartName, defaultResourceOrRoute, aa, install = true) {
   return async function middleware({ redirect, store } ) {
     const cluster = store.getters['currentCluster']?.id || 'local';
-    console.log("auth middleware", cluster)
 
     if ( store.getters['type-map/isProductActive'](product) ) {
       // If the product is installed and there's a default resource, redirect there

@@ -1,8 +1,7 @@
 import { randomStr } from '@shell/utils/string';
-import {MANAGEMENT} from "@shell/config/types";
+import { MANAGEMENT } from '@shell/config/types';
 
 const KEY = 'rc_nonce';
-const ERR_NONCE = 'nonce';
 
 export const LOGIN_ERRORS = {
   CLIENT:              'client',
@@ -14,7 +13,7 @@ export const state = function() {
   return {
     hasAuth:     null,
     loggedIn:    false,
-    user: null,
+    user:        null,
     principalId: null,
   };
 };
@@ -70,14 +69,12 @@ export const actions = {
     try {
       const user = await dispatch('management/findAll', {
         type: MANAGEMENT.USER,
-        opt:  {
-          url:    `/v1/${MANAGEMENT.USER}?me=true`,
-        }
+        opt:  { url: `/v1/${ MANAGEMENT.USER }?me=true` }
       }, { root: true });
 
       commit('gotUser', user?.[0]);
     } catch (err) {
-      console.error('Error getting user', err);
+      console.error('Error getting user', err); // eslint-disable-line no-console
     }
   },
 
@@ -111,6 +108,7 @@ export const actions = {
         headers:              { 'Content-Type': 'application/json' },
         redirectUnauthorized: false,
       }, { root: true, redirectUnauthorized: false });
+
       return;
     } catch (err) {
       if (err._status === 401) {

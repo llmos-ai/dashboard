@@ -13,6 +13,7 @@ export function setFavIcon(store) {
 
   if (link) {
     let brandImage;
+
     link.href = res?.value || brandImage || defaultFavIcon;
     favIconSet = true;
   }

@@ -11,14 +11,14 @@ import { diffFrom } from '@shell/utils/time';
 import day from 'dayjs';
 
 export const TYPES = {
-  OPAQUE:           'Opaque',
-  SERVICE_ACCT:     'kubernetes.io/service-account-token',
-  DOCKER:           'kubernetes.io/dockercfg',
-  DOCKER_JSON:      'kubernetes.io/dockerconfigjson',
-  BASIC:            'kubernetes.io/basic-auth',
-  SSH:              'kubernetes.io/ssh-auth',
-  TLS:              'kubernetes.io/tls',
-  BOOTSTRAP:        'bootstrap.kubernetes.io/token',
+  OPAQUE:       'Opaque',
+  SERVICE_ACCT: 'kubernetes.io/service-account-token',
+  DOCKER:       'kubernetes.io/dockercfg',
+  DOCKER_JSON:  'kubernetes.io/dockerconfigjson',
+  BASIC:        'kubernetes.io/basic-auth',
+  SSH:          'kubernetes.io/ssh-auth',
+  TLS:          'kubernetes.io/tls',
+  BOOTSTRAP:    'bootstrap.kubernetes.io/token',
 };
 
 /** Class a cert as expiring if in eight days */
@@ -383,7 +383,7 @@ export default class Secret extends SteveModel {
     // if ( this.$rootGetters['currentProduct'].name === MANAGER ) {
     //   return 'c-cluster-manager-secret';
     // } else {
-      return 'c-cluster-product-resource';
+    return 'c-cluster-product-resource';
     // }
   }
 

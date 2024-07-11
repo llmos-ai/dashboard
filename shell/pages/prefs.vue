@@ -1,6 +1,5 @@
 <script>
 import day from 'dayjs';
-import { mapGetters } from 'vuex';
 import { isAdminUser } from '@shell/store/type-map';
 import BackLink from '@shell/components/BackLink';
 import BackRoute from '@shell/mixins/back-link';
@@ -27,18 +26,17 @@ export default {
     return { admin: isAdminUser(this.$store.getters) };
   },
   computed: {
-    keymap:            mapPref(KEYMAP),
-    viewInApi:         mapPref(VIEW_IN_API),
-    allNamespaces:     mapPref(ALL_NAMESPACES),
-    themeShortcut:     mapPref(THEME_SHORTCUT),
-    dateFormat:        mapPref(DATE_FORMAT),
-    timeFormat:        mapPref(TIME_FORMAT),
-    perPage:           mapPref(ROWS_PER_PAGE),
-    hideDesc:          mapPref(HIDE_DESC),
-    pluginDeveloper:   mapPref(PLUGIN_DEVELOPER),
-    scalingDownPrompt: mapPref(SCALE_POOL_PROMPT),
+    keymap:                 mapPref(KEYMAP),
+    viewInApi:              mapPref(VIEW_IN_API),
+    allNamespaces:          mapPref(ALL_NAMESPACES),
+    themeShortcut:          mapPref(THEME_SHORTCUT),
+    dateFormat:             mapPref(DATE_FORMAT),
+    timeFormat:             mapPref(TIME_FORMAT),
+    perPage:                mapPref(ROWS_PER_PAGE),
+    hideDesc:               mapPref(HIDE_DESC),
+    pluginDeveloper:        mapPref(PLUGIN_DEVELOPER),
+    scalingDownPrompt:      mapPref(SCALE_POOL_PROMPT),
     viewContainerDashboard: mapPref(VIEW_CONTAINER_DASHBOARD),
-
 
     theme: {
       get() {

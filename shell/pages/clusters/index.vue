@@ -9,9 +9,7 @@ export default {
     } else {
       redirect({
         name:   'c-cluster-product',
-        params: {
-          cluster: 'local',
-        }
+        params: { cluster: 'local' }
       });
     }
   }
