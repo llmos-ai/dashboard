@@ -1,6 +1,6 @@
 <script>
 import { NAME as LLM } from '@shell/config/product/llm';
-import { CLUSTER } from '@shell/config/types';
+import { NODE } from '@shell/config/types';
 
 export default {
   layout: 'plain',
@@ -11,7 +11,7 @@ export default {
       params: {
         ...route.params,
         product:  LLM,
-        resource: CLUSTER.RAY_CLUSTER,
+        resource: NODE,
       }
     });
   }

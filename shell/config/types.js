@@ -88,12 +88,16 @@ export const MANAGEMENT = {
   PROJECT: 'management.llmos.io.project',
 };
 
-export const CLUSTER = {
+export const ML_CLUSTER = {
   // ML related resources
   RAY_CLUSTER: 'ray.io.raycluster',
   MODEL_FILE:  'ml.llmos.ai.modelfile',
   NOTEBOOK:    'ml.llmos.ai.notebook',
   CHAT:        'chat',
+
+  // nvidia CRDs
+  CLUSTER_POLICY: 'nvidia.com.clusterpolicy',
+  NVIDIA_DRIVER:  'nvidia.com.nvidiadriver',
 };
 
 export const VIRTUAL_TYPES = { NAMESPACES: 'namespaces' };

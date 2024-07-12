@@ -5756,11 +5756,6 @@ typeLabel:
       one { Cluster }
       other { Clusters }
     }
-  management.cattle.io.user: |-
-    {count, plural,
-      one { User }
-      other { Users}
-    }
   namespace: |-
     {count, plural,
       one { Namespace }
@@ -5843,8 +5838,8 @@ typeLabel:
     }
   persistentvolumeclaim: |-
     {count, plural,
-      one { PersistentVolumeClaim }
-      other { PersistentVolumeClaims }
+      one { Volume }
+      other { Volumes }
     }
   secret: |-
     {count, plural,
@@ -5916,16 +5911,6 @@ typeLabel:
       one { Workload }
       other { Workloads }
     }
-  harvesterhci.io.management.cluster: |-
-    {count, plural,
-      one { Harvester Cluster }
-      other { Harvester Clusters }
-    }
-  harvesterhci.io.cloudtemplate: |-
-    {count, plural,
-      one { Cloud Config Template }
-      other { Cloud Config Templates }
-    }
   fleet.cattle.io.content: |-
     {count, plural,
       one { Content }
@@ -5971,45 +5956,10 @@ typeLabel:
       one { GlobalRoleBinding }
       other { GlobalRoleBindings }
     }
-  management.cattle.io.kontainerdriver: |-
-    {count, plural,
-      one { KontainerDriver }
-      other { KontainerDrivers }
-    }
-  management.cattle.io.nodedriver: |-
-    {count, plural,
-      one { NodeDriver }
-      other { NodeDrivers }
-    }
-  management.cattle.io.podsecuritypolicytemplate: |-
-    {count, plural,
-      one { PodSecurityPolicyTemplate }
-      other { PodSecurityPolicyTemplates }
-    }
   management.cattle.io.userattribute: |-
     {count, plural,
       one { UserAttribute }
       other { UserAttributes }
-    }
-  management.cattle.io.catalogtemplate: |-
-    {count, plural,
-      one { CatalogTemplate }
-      other { CatalogTemplates }
-    }
-  management.cattle.io.catalogtemplateversion: |-
-    {count, plural,
-      one { CatalogTemplateVersion }
-      other { CatalogTemplateVersions }
-    }
-  management.cattle.io.cisbenchmarkversion: |-
-    {count, plural,
-      one { CisBenchmarkVersion }
-      other { CisBenchmarkVersions }
-    }
-  management.cattle.io.cisconfig: |-
-    {count, plural,
-      one { CisConfig }
-      other { CisConfigs }
     }
   management.cattle.io.clusteralertgroup: |-
     {count, plural,
@@ -6110,6 +6060,16 @@ typeLabel:
     {count, plural,
       one { ML Cluster }
       other { ML Clusters }
+    }
+  nvidia.com.clusterpolicy: |-
+    {count, plural,
+      one { Nvidia Cluster Policy }
+      other { Nvidia Cluster Policies }
+    }
+  nvidia.com.nvidiadriver: |-
+    {count, plural,
+      one { Nvidia Driver }
+      other { Nvidia Drivers }
     }
 
 action:
