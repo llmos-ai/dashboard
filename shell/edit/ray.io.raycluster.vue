@@ -12,7 +12,7 @@ import InfoBox from '@shell/components/InfoBox';
 import { allHash } from '@shell/utils/promise';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { ANNOTATIONS } from '@shell/config/labels-annotations';
-import { CLUSTER, RUNTIME_CLASS } from '@shell/config/types';
+import { ML_CLUSTER, RUNTIME_CLASS } from '@shell/config/types';
 import { Checkbox } from '@components/Form/Checkbox';
 
 export default {
@@ -38,7 +38,7 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const hash = await allHash({
-      clusters:       this.$store.dispatch(`${ inStore }/findAll`, { type: CLUSTER.RAY_CLUSTER }),
+      clusters:       this.$store.dispatch(`${ inStore }/findAll`, { type: ML_CLUSTER.RAY_CLUSTER }),
       runtimeClasses: this.$store.dispatch(`${ inStore }/findAll`, { type: RUNTIME_CLASS }),
       defaultConfig:  this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' })
     });

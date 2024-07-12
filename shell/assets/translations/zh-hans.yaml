@@ -5644,8 +5644,8 @@ typeLabel:
     }
   persistentvolumeclaim: |-
     {count, plural,
-      one { PersistentVolumeClaim }
-      other { PersistentVolumeClaim }
+      one { 存储卷 }
+      other { 存储卷 }
     }
   secret: |-
     {count, plural,
@@ -5911,6 +5911,16 @@ typeLabel:
     {count, plural,
       one { ML 集群 }
       other { ML 集群 }
+    }
+  nvidia.com.clusterpolicy: |-
+    {count, plural,
+      one { Nvidia Cluster Policy }
+      other { Nvidia Cluster Policies }
+    }
+  nvidia.com.nvidiadriver: |-
+    {count, plural,
+      one { Nvidia 驱动 }
+      other { Nvidia 驱动 }
     }
 
 action:

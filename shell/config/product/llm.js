@@ -1,5 +1,7 @@
 import { DSL } from '@shell/store/type-map';
-import { CLUSTER } from '@shell/config/types';
+import {
+  ML_CLUSTER, NAMESPACE, NODE, VIRTUAL_TYPES, PVC, STORAGE_CLASS,
+} from '@shell/config/types';
 
 export const NAME = 'llm';
 
@@ -8,6 +10,7 @@ export function init(store) {
     product,
     basicType,
     virtualType,
+    weightGroup,
   } = DSL(store, NAME);
 
   product({
@@ -23,13 +26,39 @@ export function init(store) {
   });
 
   virtualType({
-    label:      'ML Clusters',
+    ifHaveType: NODE,
+    label:      'Nodes',
     group:      'Root',
-    name:       CLUSTER.RAY_CLUSTER,
+    name:       NODE,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: CLUSTER.RAY_CLUSTER }
+      params: { resource: NODE }
+    },
+    exact:  false,
+    weight: 110,
+  });
+
+  virtualType({
+    label:         store.getters['i18n/t'](`typeLabel.${ NAMESPACE }`, { count: 2 }),
+    group:         'Root',
+    icon:          'globe',
+    namespaced:    false,
+    ifMgmtCluster: false,
+    name:          VIRTUAL_TYPES.NAMESPACES,
+    weight:        101,
+    route:         { name: 'c-cluster-product-namespaces' },
+    exact:         true,
+  });
+
+  virtualType({
+    label:      'ML Clusters',
+    group:      'Root',
+    name:       ML_CLUSTER.RAY_CLUSTER,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: ML_CLUSTER.RAY_CLUSTER }
     },
     exact:  false,
     weight: 100,
@@ -38,11 +67,11 @@ export function init(store) {
   virtualType({
     label:      'Model Files',
     group:      'Root',
-    name:       CLUSTER.MODEL_FILE,
+    name:       ML_CLUSTER.MODEL_FILE,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: CLUSTER.MODEL_FILE }
+      params: { resource: ML_CLUSTER.MODEL_FILE }
     },
     exact:  false,
     weight: 99,
@@ -51,19 +80,84 @@ export function init(store) {
   virtualType({
     label:      'Notebooks',
     group:      'Root',
-    name:       CLUSTER.NOTEBOOK,
+    name:       ML_CLUSTER.NOTEBOOK,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: CLUSTER.NOTEBOOK }
+      params: { resource: ML_CLUSTER.NOTEBOOK }
     },
     exact:  false,
     weight: 98,
   });
 
   basicType([
-    CLUSTER.RAY_CLUSTER,
-    CLUSTER.MODEL_FILE,
-    CLUSTER.NOTEBOOK,
+    ML_CLUSTER.RAY_CLUSTER,
+    ML_CLUSTER.MODEL_FILE,
+    ML_CLUSTER.NOTEBOOK,
+    NODE,
   ]);
+
+  virtualType({
+    ifHaveType: ML_CLUSTER.CLUSTER_POLICY,
+    label:      'Cluster Policy',
+    group:      'GPU Management',
+    name:       ML_CLUSTER.CLUSTER_POLICY,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: ML_CLUSTER.CLUSTER_POLICY }
+    },
+    exact:  false,
+    weight: 200,
+  });
+
+  // nvidia pages
+  basicType(
+    [
+      ML_CLUSTER.CLUSTER_POLICY,
+      ML_CLUSTER.NVIDIA_DRIVER,
+    ],
+    'GPU Management'
+  );
+
+  virtualType({
+    ifHaveType: NAMESPACE,
+    label:      'Namespaces',
+    group:      'Root',
+    name:       NAMESPACE,
+    namespaced: false,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: NAMESPACE }
+    },
+    exact:  false,
+    weight: 300,
+  });
+
+  virtualType({
+    ifHaveType: PVC,
+    label:      'Volumes',
+    group:      'Root',
+    name:       PVC,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: PVC }
+    },
+    exact:  false,
+    weight: 301,
+  });
+
+  // advanced pages
+  basicType(
+    [
+      NAMESPACE,
+      PVC,
+      STORAGE_CLASS,
+    ],
+    'advanced',
+  );
+
+  weightGroup('gpu management', 99, true);
+  weightGroup('advanced', 98, true);
 }

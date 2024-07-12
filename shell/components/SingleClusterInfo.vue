@@ -2,7 +2,7 @@
 import ClusterProviderIcon from '@shell/components/ClusterProviderIcon';
 import ResourceSummary, { resourceCounts } from '@shell/components/ResourceSummary';
 import {
-  NAMESPACE, MANAGEMENT, NODE, COUNT, CLUSTER
+  NAMESPACE, MANAGEMENT, NODE, COUNT, ML_CLUSTER
 } from '@shell/config/types';
 import { RESOURCES } from '@shell/pages/c/_cluster/explorer/index';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
@@ -68,11 +68,11 @@ export default {
     },
 
     canAccessModelFiles() {
-      return !!this.clusterCounts?.[0]?.counts?.[CLUSTER.MODEL_FILE];
+      return !!this.clusterCounts?.[0]?.counts?.[ML_CLUSTER.MODEL_FILE];
     },
 
     canAccessChats() {
-      return !!this.clusterCounts?.[0]?.counts?.[CLUSTER.CHAT];
+      return !!this.clusterCounts?.[0]?.counts?.[ML_CLUSTER.CHAT];
     },
 
     llmIcon() {
@@ -103,6 +103,25 @@ export default {
       </div>
 
       <div class="single-cluster-info">
+        <div class="cluster-counts">
+          <ResourceSummary
+            :cluster="clusterDetail.id"
+            resource="node"
+            overwrite-name="Nodes"
+            product="llm"
+          />
+          <ResourceSummary
+            :cluster="clusterDetail.id"
+            resource="persistentvolumeclaim"
+            overwrite-name="Volumes"
+            product="llm"
+          />
+          <ResourceSummary
+            :cluster="clusterDetail.id"
+            resource="namespace"
+            product="llm"
+          />
+        </div>
         <div class="cluster-counts">
           <ResourceSummary
             v-if="canAccessModelFiles"
@@ -152,31 +171,30 @@ export default {
           />
         </div>
       </div>
-    </div>
-
-    <div class="single-cluster-info">
-      <div class="glance-item">
-        <label>{{ t('glance.provider') }}: </label>
-        <span>{{ t(`cluster.provider.${ clusterDetail.status.provider || 'other' }`) }}</span>
-      </div>
-      <div
-        v-if="clusterDetail.kubernetesVersionRaw"
-        class="glance-item"
-      >
-        <label>{{ t('glance.version') }}: </label>
-        <span>{{ clusterDetail.kubernetesVersionBase }}</span>
-        <span
-          v-if="clusterDetail.kubernetesVersionExtension"
-          style="font-size: 0.75em"
-        >{{ clusterDetail.kubernetesVersionExtension }}</span>
-      </div>
-      <div class="glance-item">
-        <label>{{ t('glance.created') }}: </label>
-        <span><LiveDate
-          :value="clusterDetail.metadata.creationTimestamp"
-          :add-suffix="true"
-          :show-tooltip="true"
-        /></span>
+      <div class="single-cluster-info">
+        <div class="glance-item">
+          <label>{{ t('glance.provider') }}: </label>
+          <span>{{ t(`cluster.provider.${ clusterDetail.status.provider || 'other' }`) }}</span>
+        </div>
+        <div
+          v-if="clusterDetail.kubernetesVersionRaw"
+          class="glance-item"
+        >
+          <label>{{ t('glance.version') }}: </label>
+          <span>{{ clusterDetail.kubernetesVersionBase }}</span>
+          <span
+            v-if="clusterDetail.kubernetesVersionExtension"
+            style="font-size: 0.75em"
+          >{{ clusterDetail.kubernetesVersionExtension }}</span>
+        </div>
+        <div class="glance-item">
+          <label>{{ t('glance.created') }}: </label>
+          <span><LiveDate
+            :value="clusterDetail.metadata.creationTimestamp"
+            :add-suffix="true"
+            :show-tooltip="true"
+          /></span>
+        </div>
       </div>
     </div>
   </div>
