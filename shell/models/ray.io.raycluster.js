@@ -12,8 +12,8 @@ export default class RayCluster extends SteveModel {
         name:        '',
         namespace:   '',
         annotations: {
-          'llmos.ai/volumeClaimTemplates': '[{"metadata":{"name":""},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"2Gi"}}}}]',
-          'ray.io/ft-enabled':             'true',
+          'llmos.ai/volume-claim-templates': '[]',
+          'ray.io/ft-enabled':               'true',
         }
       },
       spec: {
@@ -55,7 +55,13 @@ export default class RayCluster extends SteveModel {
                       }
                     }
                   },
-                  name:  'ray-head',
+                  name: 'ray-head',
+                  env:  [
+                    {
+                      name:  'RAY_enable_autoscaler_v2',
+                      value: '1'
+                    }
+                  ],
                   ports: [
                     {
                       containerPort: 6379,
@@ -80,9 +86,10 @@ export default class RayCluster extends SteveModel {
                   ],
                   resources: {
                     requests: {
-                      cpu:    '1',
-                      memory: '2Gi'
+                      cpu:    '2',
+                      memory: '4Gi'
                     },
+                    limits: { memory: '4Gi' },
                   },
                   volumeMounts: [
                     {
@@ -94,8 +101,8 @@ export default class RayCluster extends SteveModel {
               ],
               volumes: [
                 {
-                  name:                  'ray-logs',
-                  persistentVolumeClaim: { claimName: '' }
+                  name:     'ray-logs',
+                  emptyDir: {},
                 }
               ]
             }

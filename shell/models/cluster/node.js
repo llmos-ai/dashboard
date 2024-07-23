@@ -177,7 +177,7 @@ export default class ClusterNode extends SteveModel {
       With EKS nodes that have been migrated from norman,
       cpu/memory usage is by the annotation `management.cattle.io/pod-requests`
     */
-    if ( this.isFromNorman && this.provider === 'eks' ) {
+    if ( this.provider === 'eks' ) {
       return parseSi(this.podRequests.cpu || '0');
     }
 

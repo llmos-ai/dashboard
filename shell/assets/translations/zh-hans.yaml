@@ -222,7 +222,7 @@ product:
   clusterManagement: 集群管理
   monitoring: 监控
   mcapps: 全局配置
-  llm: LLM 管理
+  llm: ML 管理
   rancher: Rancher
   legacy: 旧版
   plugins: 插件
@@ -257,6 +257,8 @@ suffix:
 ##############################
 # Components & Pages
 ##############################
+home:
+  title: LLMOS 概览
 about:
   title: 简介
   versions:
@@ -1434,6 +1436,7 @@ clusterIndexPage:
       etcd: Etcd
       scheduler: 调度器
       controller-manager: Controller Manager
+      storage: 存储
 
 configmap:
   tabs:
@@ -1539,7 +1542,6 @@ glance:
   installMonitoring: 安装 Monitoring
   v1MonitoringInstalled: 已安装 Monitoring V1
   clusterInfo: 集群信息
-  clusterLLMInfo: LLM 信息
   eventsTable: 完整事件列表
 
 clusterBadge:
