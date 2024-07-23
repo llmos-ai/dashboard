@@ -1,17 +1,21 @@
 <script>
-import ClusterProviderIcon from '@shell/components/ClusterProviderIcon';
-import ResourceSummary, { resourceCounts } from '@shell/components/ResourceSummary';
+import ResourceSummary from '@shell/components/ResourceSummary';
 import {
   NAMESPACE, MANAGEMENT, NODE, COUNT, ML_CLUSTER
 } from '@shell/config/types';
 import { RESOURCES } from '@shell/pages/c/_cluster/explorer/index';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
+import { mapGetters } from 'vuex';
+
+const COMPONENT_STATUS = [
+  'etcd',
+  'scheduler',
+  'controller-manager',
+  'storage',
+];
 
 export default {
-  components: {
-    ClusterProviderIcon,
-    ResourceSummary
-  },
+  components: { ResourceSummary },
 
   async fetch() {
     this.clusters = await this.$store.dispatch('management/findAll', {
@@ -31,6 +35,8 @@ export default {
   },
 
   computed: {
+    ...mapGetters(['currentCluster']),
+
     exploreLink() {
       return { name: 'c-cluster', params: { cluster: this.clusterDetail.id } };
     },
@@ -39,24 +45,18 @@ export default {
       return RESOURCES.filter((resource) => this.$store.getters['cluster/schemaFor'](resource));
     },
 
-    totalCountGaugeInput() {
-      const totalInput = {
-        name:         this.t('clusterIndexPage.resourceGauge.totalResources'),
-        total:        0,
-        useful:       0,
-        warningCount: 0,
-        errorCount:   0
-      };
+    componentServices() {
+      const status = [];
 
-      this.accessibleResources.forEach((resource) => {
-        const counts = resourceCounts(this.$store, resource);
-
-        Object.entries(counts).forEach((entry) => {
-          totalInput[entry[0]] += entry[1];
+      COMPONENT_STATUS.forEach((cs) => {
+        status.push({
+          name:     cs,
+          healthy:  this.isComponentStatusHealthy(cs),
+          labelKey: `clusterIndexPage.sections.componentStatus.${ cs }`,
         });
       });
 
-      return totalInput;
+      return status;
     },
 
     canAccessNodes() {
@@ -71,8 +71,8 @@ export default {
       return !!this.clusterCounts?.[0]?.counts?.[ML_CLUSTER.MODEL_FILE];
     },
 
-    canAccessChats() {
-      return !!this.clusterCounts?.[0]?.counts?.[ML_CLUSTER.CHAT];
+    hasDescription() {
+      return !!this.currentCluster?.spec?.description;
     },
 
     llmIcon() {
@@ -86,39 +86,87 @@ export default {
       await this.$store.dispatch('loadCluster', { id: this.clusterDetail.id });
       this.clusterCounts = this.$store.getters[`cluster/all`](COUNT);
     }
+  },
+
+  methods: {
+    isComponentStatusHealthy(field) {
+      const matching = (this.currentCluster?.status?.componentStatuses || []).filter((s) => s.name.startsWith(field));
+
+      // If there's no matching component status, it's "healthy"
+      if ( !matching.length ) {
+        return true;
+      }
+
+      const count = matching.reduce((acc, status) => {
+        const conditions = status.conditions.find((c) => c.status !== 'True');
+
+        return !conditions ? acc : acc + 1;
+      }, 0);
+
+      return count === 0;
+    },
   }
 };
 </script>
 
 <template>
   <div v-if="clusterDetail">
-    <div>
-      <div class="single-cluster-header">
-        <img
-          class="cluster-llm-logo"
-          :src="llmIcon"
-          alt="LLM ICON"
-        >
-        <h1>{{ t('glance.clusterLLMInfo') }}</h1>
+    <header class="single-cluster-header">
+      <img
+        class="cluster-llm-logo"
+        :src="llmIcon"
+        alt="LLM ICON"
+      >
+      <h1>
+        <t k="home.title" />
+      </h1>
+      <div>
+        <span v-if="hasDescription">{{ currentCluster.spec.description }}</span>
       </div>
+    </header>
 
+    <div class="home-overview-glance">
+      <div
+        v-if="clusterDetail.kubernetesVersionRaw"
+      >
+        <label>{{ t('glance.version') }}: </label>
+        <span>{{ clusterDetail.kubernetesVersionBase }}</span>
+        <span
+          v-if="clusterDetail.kubernetesVersionExtension"
+          style="font-size: 0.75em"
+        >{{ clusterDetail.kubernetesVersionExtension }}</span>
+      </div>
+      <div>
+        <label>{{ t('glance.created') }}: </label>
+        <span><LiveDate
+          :value="clusterDetail.metadata.creationTimestamp"
+          :add-suffix="true"
+          :show-tooltip="true"
+        /></span>
+      </div>
+      <div :style="{'flex':1}" />
+    </div>
+
+    <div>
       <div class="single-cluster-info">
         <div class="cluster-counts">
           <ResourceSummary
+            v-if="canAccessNodes"
             :cluster="clusterDetail.id"
             resource="node"
             overwrite-name="Nodes"
             product="llm"
           />
           <ResourceSummary
+            v-if="canAccessNamespaces"
             :cluster="clusterDetail.id"
-            resource="persistentvolumeclaim"
-            overwrite-name="Volumes"
+            resource="namespace"
             product="llm"
           />
           <ResourceSummary
             :cluster="clusterDetail.id"
-            resource="namespace"
+            resource="persistentvolumeclaim"
+            overwrite-name="Volumes"
             product="llm"
           />
         </div>
@@ -145,56 +193,22 @@ export default {
       </div>
     </div>
 
-    <!-- container cluster info -->
-    <div v-if="viewContainerDashboard">
-      <div class="single-cluster-header">
-        <ClusterProviderIcon
-          :cluster="clusterDetail"
-          class="provider-icon"
-          width="32"
+    <div v-if="componentServices">
+      <div
+        v-for="status in componentServices"
+        :key="status.name"
+        class="home-component-status"
+        :class="{'home-component-status-healthy': status.healthy, 'home-component-status-unhealthy': !status.healthy}"
+      >
+        <i
+          v-if="status.healthy"
+          class="icon icon-checkmark"
         />
-        <h1>{{ t('glance.clusterInfo') }}</h1>
-      </div>
-
-      <div class="single-cluster-info">
-        <div class="cluster-counts">
-          <ResourceSummary :spoofed-counts="totalCountGaugeInput" />
-          <ResourceSummary
-            v-if="canAccessNodes"
-            :cluster="clusterDetail.id"
-            resource="node"
-          />
-          <ResourceSummary
-            v-if="canAccessNamespaces"
-            :cluster="clusterDetail.id"
-            resource="namespace"
-          />
-        </div>
-      </div>
-      <div class="single-cluster-info">
-        <div class="glance-item">
-          <label>{{ t('glance.provider') }}: </label>
-          <span>{{ t(`cluster.provider.${ clusterDetail.status.provider || 'other' }`) }}</span>
-        </div>
-        <div
-          v-if="clusterDetail.kubernetesVersionRaw"
-          class="glance-item"
-        >
-          <label>{{ t('glance.version') }}: </label>
-          <span>{{ clusterDetail.kubernetesVersionBase }}</span>
-          <span
-            v-if="clusterDetail.kubernetesVersionExtension"
-            style="font-size: 0.75em"
-          >{{ clusterDetail.kubernetesVersionExtension }}</span>
-        </div>
-        <div class="glance-item">
-          <label>{{ t('glance.created') }}: </label>
-          <span><LiveDate
-            :value="clusterDetail.metadata.creationTimestamp"
-            :add-suffix="true"
-            :show-tooltip="true"
-          /></span>
-        </div>
+        <i
+          v-else
+          class="icon icon-warning"
+        />
+        <div>{{ t(status.labelKey) }}</div>
       </div>
     </div>
   </div>
@@ -248,6 +262,63 @@ export default {
 
     .cluster-link {
       font-size: 14px;
+    }
+  }
+}
+
+.home-overview-glance {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0px;
+  display: flex;
+
+  &>*:not(:nth-last-child(-n+2)) {
+    margin-right: 40px;
+
+    & SPAN {
+      font-weight: bold
+    }
+  }
+}
+
+.title h1 {
+  margin: 0;
+}
+
+.home-component-status {
+  align-items: center;
+  display: inline-flex;
+  border: 1px solid;
+  border-radius: 3px;
+  margin-top: 20px;
+
+  &:not(:last-child) {
+    margin-right: 20px;
+  }
+
+  > div {
+    padding: 5px 20px;
+  }
+
+  > I {
+    text-align: center;
+    padding: 5px 10px;
+    border-right: 1px solid var(--border);
+  }
+
+  &.home-component-status-unhealthy {
+    border-color: var(--error-border);
+
+    > I {
+      color: var(--error)
+    }
+  }
+
+  &.home-component-status-healthy {
+    border-color: var(--border);
+
+    > I {
+      color: var(--success)
     }
   }
 }

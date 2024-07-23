@@ -91,6 +91,7 @@ export default {
   box-shadow: 0px 0px 10px var(--simple-box-shadow);
   border: 1px solid var(--simple-box-border);
   padding: $padding;
+  border-radius: 2px;
 
   .top {
     line-height: 24px;

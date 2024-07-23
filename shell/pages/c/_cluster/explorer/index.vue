@@ -350,6 +350,7 @@ export default {
         </div>
       </div>
     </header>
+
     <div
       class="cluster-dashboard-glance"
     >

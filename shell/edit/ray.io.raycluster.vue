@@ -6,9 +6,7 @@ import LabeledInput from '@components/Form/LabeledInput/LabeledInput.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
-import PersistentVolumeClaim from '@shell/components/PersistentVolumeClaim';
 import AdvancedSection from '@shell/components/AdvancedSection.vue';
-import InfoBox from '@shell/components/InfoBox';
 import { allHash } from '@shell/utils/promise';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { ANNOTATIONS } from '@shell/config/labels-annotations';
@@ -27,8 +25,6 @@ export default {
     LabeledInput,
     LabeledSelect,
     AdvancedSection,
-    InfoBox,
-    PersistentVolumeClaim,
     NameNsDescription,
   },
 
@@ -50,8 +46,6 @@ export default {
   data() {
     const annotations = this.value?.annotations || {};
     const enableGCSFaultTolerance = annotations[ANNOTATIONS.RAY_CLUSTER_FT_ENABLED] === 'true';
-    const pvcAnnotation = JSON.parse(this.value.metadata.annotations['llmos.ai/volumeClaimTemplates'])[0];
-
     const headGroupSpec = this.value?.spec?.headGroupSpec;
     const headGroupContainer = headGroupSpec?.template?.spec?.containers[0];
     const headGroupSpecResource = headGroupSpec?.template?.spec.containers[0]?.resources;
@@ -73,7 +67,6 @@ export default {
       headGroupSpecResource,
       headGroupContainer,
       headGroupSpec,
-      pvcAnnotation,
       savePvcHookName: 'savePvcHook',
       workerGroupSpecs,
       workerGroupSpecsResource,
@@ -145,18 +138,9 @@ export default {
         this.headGroupSpec.rayStartParams['num-cpus'] = '0';
       }
 
-      // set head-node pvc config
-      if (!this.pvcAnnotation?.metadata?.name && this.value.name !== undefined) {
-        const pvcName = `${ this.value.name }-log`;
-
-        this.pvcAnnotation.metadata.name = pvcName;
-        this.headGroupSpec.template.spec.volumes[0].persistentVolumeClaim.claimName = pvcName;
-      }
-
       const annotations = {
         ...this.value.metadata.annotations,
         [ANNOTATIONS.RAY_CLUSTER_FT_ENABLED]: this.enableGCSFaultTolerance.toString(),
-        'llmos.ai/volumeClaimTemplates':      JSON.stringify([this.pvcAnnotation])
       };
 
       if (this.enableWorkerGPU) {
@@ -243,19 +227,6 @@ export default {
               @input="update"
             />
           </div>
-        </div>
-
-        <div class="row">
-          <InfoBox class="mb-0">
-            <h3>Log Volume</h3>
-            <PersistentVolumeClaim
-              v-model="pvcAnnotation"
-              :mode="mode"
-              :register-before-hook="registerBeforeHook"
-              :save-pvc-hook-name="savePvcHookName"
-              @removePvcForm="removePvcForm"
-            />
-          </InfoBox>
         </div>
 
         <AdvancedSection

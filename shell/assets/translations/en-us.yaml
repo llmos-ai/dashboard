@@ -232,7 +232,7 @@ product:
   uiplugins: Extensions
   elemental: OS Management
   plugins: Plugins
-  llm: LLM Management
+  llm: ML Management
 
 suffix:
   percent: "%"
@@ -263,6 +263,8 @@ suffix:
 ##############################
 # Components & Pages
 ##############################
+home:
+  title: LLMOS Overview
 about:
   title: About
   versions:
@@ -1620,6 +1622,7 @@ clusterIndexPage:
       etcd: Etcd
       scheduler: Scheduler
       controller-manager: Controller Manager
+      storage: Storage
     certs:
       label: Certificates
 
@@ -1722,7 +1725,6 @@ glance:
   installMonitoring: Install Monitoring
   v1MonitoringInstalled: V1 Monitoring Installed
   clusterInfo: Cluster Information
-  clusterLLMInfo: LLM Information
   eventsTable: Full events list
   secretsTable: Full secrets list
 

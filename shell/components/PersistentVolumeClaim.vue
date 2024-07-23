@@ -154,18 +154,18 @@ export default {
 
 <template>
   <div>
-    <!-- <div class="row mb-10">
-      <div class="col span-6">
-        <LabeledInput
-          v-model="value.metadata.name"
-          :mode="mode"
-          :label="t('persistentVolumeClaim.name')"
-          :required="true"
-          :disabled="mode === 'edit'"
-          @input="$emit('input', value)"
-        />
-      </div>
-    </div> -->
+    <!--    <div class="row mb-10">-->
+    <!--      <div class="col span-6">-->
+    <!--        <LabeledInput-->
+    <!--          v-model="value.metadata.name"-->
+    <!--          :mode="mode"-->
+    <!--          :label="t('persistentVolumeClaim.name')"-->
+    <!--          :required="true"-->
+    <!--          :disabled="mode === 'edit'"-->
+    <!--          @input="$emit('input', value)"-->
+    <!--        />-->
+    <!--      </div>-->
+    <!--    </div>-->
     <div class="row mb-10">
       <div class="col span-6">
         <RadioGroup
