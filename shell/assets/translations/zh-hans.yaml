@@ -259,6 +259,9 @@ suffix:
 ##############################
 home:
   title: LLMOS 概览
+  glance:
+    version: 版本
+    created: 创建时间
 about:
   title: 简介
   versions:

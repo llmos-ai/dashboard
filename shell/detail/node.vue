@@ -11,7 +11,7 @@ import {
   VALUE
 } from '@shell/config/table-headers';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
-import { METRIC, POD } from '@shell/config/types';
+import { METRIC, NODE, POD } from '@shell/config/types';
 import createEditView from '@shell/mixins/create-edit-view';
 import { formatSi, exponentNeeded, UNITS } from '@shell/utils/units';
 import { mapGetters } from 'vuex';
@@ -43,11 +43,17 @@ export default {
     return this.$store.dispatch('cluster/findAll', { type: POD });
   },
 
+  beforeDestroy() {
+    // Stop watching pods, nodes and node metrics
+    this.$store.dispatch('cluster/forgetType', POD);
+    this.$store.dispatch('cluster/forgetType', NODE);
+    this.$store.dispatch('cluster/forgetType', METRIC.NODE);
+  },
+
   data() {
     const podSchema = this.$store.getters['cluster/schemaFor'](POD);
 
     return {
-      v3Nodes:          null,
       metrics:          { cpu: 0, memory: 0 },
       infoTableHeaders: [
         {
@@ -147,7 +153,10 @@ export default {
         await this.$store.dispatch('cluster/find', {
           type: METRIC.NODE,
           id:   this.value.id,
-          opt:  { force: true }
+          opt:  {
+            force: true,
+            watch: false,
+          }
         });
 
         this.$forceUpdate();

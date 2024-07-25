@@ -12,4 +12,7 @@ export default [
   'linkerd',
   'security-scan',
   'tekton-pipelines',
+  'ceph-system',
+  'llmos-system',
+  'system-upgrade',
 ];

@@ -80,7 +80,7 @@ export const METRIC = {
 // Management API (via Steve)
 // Base: /v1
 export const MANAGEMENT = {
-  CLUSTER: 'management.cattle.io.cluster',
+  CLUSTER: 'management.oneblock.ai.cluster',
   SETTING: 'management.llmos.ai.setting',
   USER:    'management.llmos.ai.user',
 
@@ -98,6 +98,11 @@ export const ML_CLUSTER = {
   // nvidia CRDs
   CLUSTER_POLICY: 'nvidia.com.clusterpolicy',
   NVIDIA_DRIVER:  'nvidia.com.nvidiadriver',
+
+  // rook ceph CRDs
+  CEPH_CLUSTER:    'ceph.rook.io.cephcluster',
+  CEPH_FILESYSTEM: 'ceph.rook.io.cephfilesystem',
+  CEPH_BLOCK_POOL: 'ceph.rook.io.cephblockpool',
 };
 
 export const VIRTUAL_TYPES = { NAMESPACES: 'namespaces' };

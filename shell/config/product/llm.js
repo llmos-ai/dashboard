@@ -120,20 +120,7 @@ export function init(store) {
     'GPU Management'
   );
 
-  virtualType({
-    ifHaveType: NAMESPACE,
-    label:      'Namespaces',
-    group:      'Root',
-    name:       NAMESPACE,
-    namespaced: false,
-    route:      {
-      name:   `c-cluster-product-resource`,
-      params: { resource: NAMESPACE }
-    },
-    exact:  false,
-    weight: 300,
-  });
-
+  // volume management tab
   virtualType({
     ifHaveType: PVC,
     label:      'Volumes',
@@ -148,16 +135,40 @@ export function init(store) {
     weight: 301,
   });
 
-  // advanced pages
+  basicType(
+    [
+      PVC,
+      STORAGE_CLASS,
+      ML_CLUSTER.CEPH_CLUSTER,
+      ML_CLUSTER.CEPH_BLOCK_POOL,
+      ML_CLUSTER.CEPH_FILESYSTEM,
+    ],
+    'Storage',
+  );
+
+  // advanced tab
+  virtualType({
+    ifHaveType: NAMESPACE,
+    label:      'Namespaces',
+    group:      'Root',
+    name:       NAMESPACE,
+    namespaced: false,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: NAMESPACE }
+    },
+    exact:  false,
+    weight: 300,
+  });
+
   basicType(
     [
       NAMESPACE,
-      PVC,
-      STORAGE_CLASS,
     ],
     'advanced',
   );
 
+  weightGroup('storage', 100, true);
   weightGroup('gpu management', 99, true);
   weightGroup('advanced', 98, true);
 }
