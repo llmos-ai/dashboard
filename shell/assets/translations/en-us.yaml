@@ -265,6 +265,9 @@ suffix:
 ##############################
 home:
   title: LLMOS Overview
+  glance:
+    version: Version
+    created: Created
 about:
   title: About
   versions:

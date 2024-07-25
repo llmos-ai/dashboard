@@ -1,6 +1,6 @@
 import { formatPercent } from '@shell/utils/string';
 import { NODE_ROLES, RKE, SYSTEM_LABELS } from '@shell/config/labels-annotations.js';
-import { MANAGEMENT, METRIC, POD } from '@shell/config/types';
+import { METRIC, POD } from '@shell/config/types';
 import { parseSi } from '@shell/utils/units';
 import findLast from 'lodash/findLast';
 
@@ -9,11 +9,11 @@ import { LOCAL } from '@shell/config/query-params';
 
 export default class ClusterNode extends SteveModel {
   get _availableActions() {
-    const normanAction = this.norman?.actions || {};
+    const actions = this.actions || {};
 
     const cordon = {
       action:   'cordon',
-      enabled:  !!normanAction.cordon,
+      enabled:  !!actions.cordon,
       icon:     'icon icon-fw icon-pause',
       label:    'Cordon',
       total:    1,
@@ -22,7 +22,7 @@ export default class ClusterNode extends SteveModel {
 
     const uncordon = {
       action:   'uncordon',
-      enabled:  !!normanAction.uncordon,
+      enabled:  !!actions.uncordon,
       icon:     'icon icon-fw icon-play',
       label:    'Uncordon',
       total:    1,
@@ -31,7 +31,7 @@ export default class ClusterNode extends SteveModel {
 
     const drain = {
       action:     'drain',
-      enabled:    !!normanAction.drain,
+      enabled:    !!actions.drain,
       icon:       'icon icon-fw icon-dot-open',
       label:      this.t('drainNode.action'),
       bulkable:   true,
@@ -40,7 +40,7 @@ export default class ClusterNode extends SteveModel {
 
     const stopDrain = {
       action:   'stopDrain',
-      enabled:  !!normanAction.stopDrain,
+      enabled:  !!actions.stopDrain,
       icon:     'icon icon-fw icon-x',
       label:    this.t('drainNode.actionStop'),
       bulkable: true,
@@ -69,7 +69,7 @@ export default class ClusterNode extends SteveModel {
       drain,
       stopDrain,
       { divider: true },
-      ...super._availableActions
+      ...super._availableActions,
     ];
   }
 
@@ -113,6 +113,18 @@ export default class ClusterNode extends SteveModel {
     return this.customLabels.length;
   }
 
+  get filteredSystemLabels() {
+    return Object.entries(this.labels).reduce((res, [key, value]) => {
+      const [prefix] = key.split('/');
+
+      if ( !SYSTEM_LABELS.includes(prefix) ) {
+        res[key] = value;
+      }
+
+      return res;
+    }, {});
+  }
+
   get customLabels() {
     const parsedLabels = [];
 
@@ -150,6 +162,10 @@ export default class ClusterNode extends SteveModel {
     return this.managementNode ? this.managementNode.isEtcd : `${ this.labels[NODE_ROLES.ETCD] }` === 'true';
   }
 
+  get isStorage() {
+    return `${ this.labels[NODE_ROLES.STORAGE] }` === 'true';
+  }
+
   get hasARole() {
     const roleLabelKeys = Object.values(NODE_ROLES);
 
@@ -163,9 +179,11 @@ export default class ClusterNode extends SteveModel {
   }
 
   get roles() {
-    const { isControlPlane, isWorker, isEtcd } = this;
+    const {
+      isControlPlane, isWorker, isEtcd, isStorage
+    } = this;
 
-    return listNodeRoles(isControlPlane, isWorker, isEtcd, this.t('generic.all'));
+    return listNodeRoles(isControlPlane, isWorker, isEtcd, isStorage, this.t('generic.all'));
   }
 
   get version() {
@@ -289,7 +307,7 @@ export default class ClusterNode extends SteveModel {
     const safeResources = Array.isArray(resources) ? resources : [this];
 
     await Promise.all(safeResources.map((node) => {
-      return node.norman?.doAction('cordon');
+      return node.doAction('cordon');
     }));
   }
 
@@ -297,7 +315,7 @@ export default class ClusterNode extends SteveModel {
     const safeResources = Array.isArray(resources) ? resources : [this];
 
     await Promise.all(safeResources.map((node) => {
-      return node.norman?.doAction('uncordon');
+      return node.doAction('uncordon');
     }));
   }
 
@@ -317,35 +335,10 @@ export default class ClusterNode extends SteveModel {
     return LOCAL;
   }
 
-  get normanNodeId() {
-    const managementNode = (this.$rootGetters['management/all'](MANAGEMENT.NODE) || []).find((n) => {
-      return n.id.startsWith(this.clusterId) && n.status.nodeName === this.name;
-    });
-
-    if (managementNode) {
-      return managementNode.id.replace('/', ':');
-    }
-
-    return null;
-  }
-
-  // get norman() {
-  //   return this.$rootGetters['rancher/byId'](NORMAN.NODE, this.normanNodeId);
-  // }
-
-  // get managementNode() {
-  //   return this.$rootGetters['management/all'](MANAGEMENT.NODE).find((mNode) => {
-  //     return mNode.id.startsWith(this.clusterId) && mNode.status.nodeName === this.id;
-  //   });
-  // }
-
   drain(resources) {
     this.$dispatch('promptModal', {
       component:      'DrainNode',
-      componentProps: {
-        kubeNodes:    resources || [this],
-        normanNodeId: this.normanNodeId
-      }
+      componentProps: { kubeNodes: resources || [this] }
     });
   }
 
@@ -353,7 +346,7 @@ export default class ClusterNode extends SteveModel {
     const safeResources = Array.isArray(resources) ? resources : [this];
 
     await Promise.all(safeResources.map((node) => {
-      return node.norman?.doAction('stopDrain');
+      return node.doAction('stopDrain');
     }));
   }
 
@@ -429,10 +422,6 @@ export default class ClusterNode extends SteveModel {
     return !cloudProviders.includes(this.provider);
   }
 
-  get isFromNorman() {
-    return (this.$rootGetters['currentCluster'].metadata.labels || {})['cattle.io/creator'] === 'norman';
-  }
-
   get provider() {
     return this.$rootGetters['currentCluster'].provisioner.toLowerCase();
   }
@@ -446,7 +435,7 @@ function calculatePercentage(allocatable, capacity) {
   return formatPercent(percent);
 }
 
-export function listNodeRoles(isControlPlane, isWorker, isEtcd, allString) {
+export function listNodeRoles(isControlPlane, isWorker, isEtcd, isStorage, allString) {
   const res = [];
 
   if (isControlPlane) {
@@ -461,7 +450,11 @@ export function listNodeRoles(isControlPlane, isWorker, isEtcd, allString) {
     res.push('Etcd');
   }
 
-  if (res.length === 3 || res.length === 0) {
+  if (isStorage) {
+    res.push('Storage');
+  }
+
+  if (res.length === 4 || res.length === 0) {
     return allString;
   }
 

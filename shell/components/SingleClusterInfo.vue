@@ -23,14 +23,28 @@ export default {
       opt:  { url: MANAGEMENT.CLUSTER }
     });
     this.viewContainerDashboard = this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD);
+
+    if (this.$store.getters['management/schemaFor'](ML_CLUSTER.CEPH_CLUSTER)) {
+      this.cephCluster = await this.$store.dispatch('management/find',
+        { type: ML_CLUSTER.CEPH_CLUSTER, id: 'ceph-system/llmos-ceph' });
+    }
+
+    if (this.$store.getters['management/schemaFor'](MANAGEMENT.SETTING)) {
+      this.settings = await this.$store.dispatch('management/findAll', {
+        type: MANAGEMENT.SETTING,
+        opt:  { url: MANAGEMENT.SETTING }
+      });
+    }
   },
 
   data() {
     return {
       clusters:               [],
+      cephCluster:            {},
       clusterDetail:          null,
       clusterCounts:          {},
       viewContainerDashboard: false,
+      settings:               [],
     };
   },
 
@@ -77,7 +91,23 @@ export default {
 
     llmIcon() {
       return require(`~shell/assets/images/providers/llm.svg`);
-    }
+    },
+
+    getServerVersion() {
+      if ( this.settings === [] ) {
+        return 'unknown';
+      }
+
+      // loop setting and find the server-version
+      for ( let i = 0; i < this.settings.length; i++ ) {
+        if ( this.settings[i].id === 'server-version' ) {
+          return this.settings[i].value;
+        }
+      }
+
+      return 'N/A';
+    },
+
   },
 
   watch: {
@@ -90,6 +120,10 @@ export default {
 
   methods: {
     isComponentStatusHealthy(field) {
+      if (field === 'storage') {
+        return this.cephCluster?.status?.phase === 'Ready';
+      }
+
       const matching = (this.currentCluster?.status?.componentStatuses || []).filter((s) => s.name.startsWith(field));
 
       // If there's no matching component status, it's "healthy"
@@ -129,15 +163,11 @@ export default {
       <div
         v-if="clusterDetail.kubernetesVersionRaw"
       >
-        <label>{{ t('glance.version') }}: </label>
-        <span>{{ clusterDetail.kubernetesVersionBase }}</span>
-        <span
-          v-if="clusterDetail.kubernetesVersionExtension"
-          style="font-size: 0.75em"
-        >{{ clusterDetail.kubernetesVersionExtension }}</span>
+        <label>{{ t('home.glance.version') }}: </label>
+        <span>{{ getServerVersion }}</span>
       </div>
       <div>
-        <label>{{ t('glance.created') }}: </label>
+        <label>{{ t('home.glance.created') }}: </label>
         <span><LiveDate
           :value="clusterDetail.metadata.creationTimestamp"
           :add-suffix="true"
