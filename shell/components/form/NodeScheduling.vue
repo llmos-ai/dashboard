@@ -21,12 +21,10 @@ export default {
         return {};
       }
     },
-
     nodes: {
       type:    Array,
       default: () => []
     },
-
     mode: {
       type:    String,
       default: 'create'
@@ -35,6 +33,10 @@ export default {
       default: false,
       type:    Boolean
     },
+    prefix: {
+      type:    String,
+      default: ''
+    }
   },
 
   data() {
@@ -73,17 +75,21 @@ export default {
     },
 
     selectNodeOptions() {
-      const prefix = 'workload';
+      let prefix = this.prefix;
+
+      if (prefix !== '') {
+        prefix = `${ prefix }.`;
+      }
       const out = [{
-        label: this.t(`${ prefix }.scheduling.affinity.anyNode`),
+        label: this.t(`${ prefix }scheduling.affinity.anyNode`),
         value: null
       },
       {
-        label: this.t(`${ prefix }.scheduling.affinity.specificNode`),
+        label: this.t(`${ prefix }scheduling.affinity.specificNode`),
         value: 'nodeSelector'
       },
       {
-        label: this.t(`${ prefix }.scheduling.affinity.schedulingRules`),
+        label: this.t(`${ prefix }scheduling.affinity.schedulingRules`),
         value: 'affinity'
       }];
 

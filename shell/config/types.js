@@ -88,12 +88,13 @@ export const MANAGEMENT = {
   PROJECT: 'management.llmos.io.project',
 };
 
-export const ML_CLUSTER = {
+export const LLMOS = {
   // ML related resources
-  RAY_CLUSTER: 'ray.io.raycluster',
-  MODEL_FILE:  'ml.llmos.ai.modelfile',
-  NOTEBOOK:    'ml.llmos.ai.notebook',
-  CHAT:        'chat',
+  RAY_CLUSTER:   'ray.io.raycluster',
+  MODEL_FILE:    'ml.llmos.ai.modelfile',
+  MODEL_SERVICE: 'ml.llmos.ai.modelservice',
+  NOTEBOOK:      'ml.llmos.ai.notebook',
+  CHAT:          'chat',
 
   // nvidia CRDs
   CLUSTER_POLICY: 'nvidia.com.clusterpolicy',

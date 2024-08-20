@@ -10,7 +10,7 @@ import { allHash } from '@shell/utils/promise';
 import PersistentVolumeClaim from '@shell/components/PersistentVolumeClaim';
 import InfoBox from '@shell/components/InfoBox';
 import CreateEditView from '@shell/mixins/create-edit-view';
-import { MANAGEMENT, ML_CLUSTER } from '@shell/config/types';
+import { MANAGEMENT, LLMOS } from '@shell/config/types';
 import AdvancedSection from '@shell/components/AdvancedSection.vue';
 
 export default {
@@ -34,7 +34,7 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     allHash({
-      notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: ML_CLUSTER.NOTEBOOK }),
+      notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.NOTEBOOK }),
       settings:  this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING })
     });
   },
