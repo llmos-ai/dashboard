@@ -39,6 +39,10 @@ export default {
       default: false,
       type:    Boolean
     },
+    defaultType: {
+      type:    String,
+      default: ''
+    },
   },
 
   data() {
@@ -54,8 +58,14 @@ export default {
 
     const resourceKeyOpts = ['limits.cpu', 'limits.ephemeral-storage', 'limits.memory', 'requests.cpu', 'requests.ephemeral-storage', 'requests.memory'];
     let type;
+    let hasDefaultType = false;
+    let rowClass = 'var-row';
 
-    if (this.value.secretRef) {
+    if (this.defaultType) {
+      type = this.defaultType;
+      hasDefaultType = true;
+      rowClass = 'var-row default-row';
+    } else if (this.value.secretRef) {
       type = 'secretRef';
     } else if (this.value.configMapRef) {
       type = 'configMapRef';
@@ -117,7 +127,19 @@ export default {
     }
 
     return {
-      typeOpts, type, refName, referenced: refName, secrets: this.allSecrets, keys, key, fieldPath, name, resourceKeyOpts, valStr
+      referenced: refName,
+      secrets:    this.allSecrets,
+      typeOpts,
+      type,
+      refName,
+      keys,
+      key,
+      fieldPath,
+      name,
+      resourceKeyOpts,
+      valStr,
+      hasDefaultType,
+      rowClass,
     };
   },
   computed: {
@@ -211,6 +233,31 @@ export default {
   },
 
   methods: {
+    reset() {
+      const out = { name: this.name || this.refName };
+      const type = this.type || this.defaultType;
+
+      switch (type) {
+      case 'configMapKeyRef':
+      case 'secretKeyRef':
+        this.value.valueFrom[type].key = '';
+        this.value.valueFrom[type].name = '';
+        this.referenced = '';
+        this.key = '';
+        out.valueFrom = {
+          [this.type]: {
+            key: '', name: '', optional: false
+          }
+        };
+        break;
+      default:
+        this.value = '';
+        out.name = '';
+        out.prefix = '';
+        out[this.type] = { name: '', optional: false };
+      }
+      this.$emit('input', out);
+    },
     updateRow() {
       if (!this.name?.length && !this.refName?.length) {
         if (this.type !== 'fieldRef') {
@@ -259,8 +306,11 @@ export default {
 </script>
 
 <template>
-  <div class="var-row">
-    <div class="type">
+  <div :class="rowClass">
+    <div
+      v-if="!hasDefaultType"
+      class="type"
+    >
       <LabeledSelect
         v-model="type"
         :mode="mode"
@@ -274,7 +324,10 @@ export default {
       />
     </div>
 
-    <div class="name">
+    <div
+      v-if="!hasDefaultType"
+      class="name"
+    >
       <LabeledInput
         v-model="name"
         :label="nameLabel"
@@ -360,14 +413,26 @@ export default {
       </div>
     </template>
     <div class="remove">
-      <button
-        v-if="!isView"
-        type="button"
-        class="btn role-link"
-        @click.stop="$emit('remove')"
-      >
-        {{ t('generic.remove') }}
-      </button>
+      <div v-if="!hasDefaultType">
+        <button
+          v-if="!isView"
+          type="button"
+          class="btn role-link"
+          @click.stop="$emit('remove')"
+        >
+          {{ t('generic.remove') }}
+        </button>
+      </div>
+      <div v-else>
+        <button
+          v-if="!isView"
+          type="button"
+          class="btn role-link"
+          @click="reset"
+        >
+          {{ t('generic.reset') }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -375,7 +440,7 @@ export default {
 <style lang='scss' scoped>
 .var-row{
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 100px;
+  grid-template-columns: 1fr 1fr 1fr 1fr 80px;
   grid-column-gap: 20px;
   margin-bottom: 10px;
   align-items: center;
@@ -387,6 +452,10 @@ export default {
   .remove BUTTON {
     padding: 0px;
   }
+}
+
+.default-row{
+  grid-template-columns: 1fr 1fr !important;
 }
 
 </style>

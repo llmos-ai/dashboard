@@ -1,6 +1,6 @@
 import { DSL } from '@shell/store/type-map';
 import {
-  ML_CLUSTER, NAMESPACE, NODE, VIRTUAL_TYPES, PVC, STORAGE_CLASS,
+  LLMOS, NAMESPACE, NODE, VIRTUAL_TYPES, PVC, STORAGE_CLASS
 } from '@shell/config/types';
 
 export const NAME = 'llm';
@@ -27,7 +27,7 @@ export function init(store) {
 
   virtualType({
     ifHaveType: NODE,
-    label:      'Nodes',
+    labelKey:   'typeLabel."node"',
     group:      'Root',
     name:       NODE,
     namespaced: true,
@@ -41,7 +41,6 @@ export function init(store) {
 
   virtualType({
     label:         store.getters['i18n/t'](`typeLabel.${ NAMESPACE }`, { count: 2 }),
-    group:         'Root',
     icon:          'globe',
     namespaced:    false,
     ifMgmtCluster: false,
@@ -52,60 +51,60 @@ export function init(store) {
   });
 
   virtualType({
-    label:      'ML Clusters',
+    labelKey:   'typeLabel."ray.io.raycluster"',
     group:      'Root',
-    name:       ML_CLUSTER.RAY_CLUSTER,
+    name:       LLMOS.RAY_CLUSTER,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: ML_CLUSTER.RAY_CLUSTER }
+      params: { resource: LLMOS.RAY_CLUSTER }
     },
     exact:  false,
     weight: 100,
   });
 
   virtualType({
-    label:      'Model Files',
+    label:      'Notebooks',
     group:      'Root',
-    name:       ML_CLUSTER.MODEL_FILE,
+    name:       LLMOS.NOTEBOOK,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: ML_CLUSTER.MODEL_FILE }
+      params: { resource: LLMOS.NOTEBOOK }
     },
     exact:  false,
     weight: 99,
   });
 
   virtualType({
-    label:      'Notebooks',
+    labelKey:   'typeLabel."ml.llmos.ai.modelservice"',
     group:      'Root',
-    name:       ML_CLUSTER.NOTEBOOK,
+    name:       LLMOS.MODEL_SERVICE,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: ML_CLUSTER.NOTEBOOK }
+      params: { resource: LLMOS.MODEL_SERVICE }
     },
     exact:  false,
     weight: 98,
   });
 
   basicType([
-    ML_CLUSTER.RAY_CLUSTER,
-    ML_CLUSTER.MODEL_FILE,
-    ML_CLUSTER.NOTEBOOK,
+    LLMOS.RAY_CLUSTER,
+    LLMOS.NOTEBOOK,
+    LLMOS.MODEL_SERVICE,
     NODE,
   ]);
 
   virtualType({
-    ifHaveType: ML_CLUSTER.CLUSTER_POLICY,
-    label:      'Cluster Policy',
+    ifHaveType: LLMOS.CLUSTER_POLICY,
+    labelKey:   'typeLabel."nvidia.com.clusterpolicy"',
     group:      'GPU Management',
-    name:       ML_CLUSTER.CLUSTER_POLICY,
+    name:       LLMOS.CLUSTER_POLICY,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: ML_CLUSTER.CLUSTER_POLICY }
+      params: { resource: LLMOS.CLUSTER_POLICY }
     },
     exact:  false,
     weight: 200,
@@ -114,8 +113,8 @@ export function init(store) {
   // nvidia pages
   basicType(
     [
-      ML_CLUSTER.CLUSTER_POLICY,
-      ML_CLUSTER.NVIDIA_DRIVER,
+      LLMOS.CLUSTER_POLICY,
+      LLMOS.NVIDIA_DRIVER,
     ],
     'GPU Management'
   );
@@ -123,6 +122,7 @@ export function init(store) {
   // volume management tab
   virtualType({
     ifHaveType: PVC,
+    labelKey:   'typeLabel."persistentvolumeclaim"',
     label:      'Volumes',
     group:      'Root',
     name:       PVC,
@@ -139,9 +139,9 @@ export function init(store) {
     [
       PVC,
       STORAGE_CLASS,
-      ML_CLUSTER.CEPH_CLUSTER,
-      ML_CLUSTER.CEPH_BLOCK_POOL,
-      ML_CLUSTER.CEPH_FILESYSTEM,
+      LLMOS.CEPH_CLUSTER,
+      LLMOS.CEPH_BLOCK_POOL,
+      LLMOS.CEPH_FILESYSTEM,
     ],
     'Storage',
   );

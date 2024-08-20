@@ -55,6 +55,7 @@ generic:
   readFromFolder: 从文件夹读取
   reload: 重新加载
   register: 注册
+  reset: 重置
   remove: 移除
   addCatalog: 添加应用商店
   resource: |-
@@ -222,7 +223,7 @@ product:
   clusterManagement: 集群管理
   monitoring: 监控
   mcapps: 全局配置
-  llm: ML 管理
+  llm: LLM 管理
   rancher: Rancher
   legacy: 旧版
   plugins: 插件
@@ -5347,7 +5348,6 @@ typeDescription:
   cis.cattle.io.clusterscanprofile: 配置文件指定 CIS 扫描的配置，也就是要使用的 Benchmark 版本和该 Benchmark 中要跳过的特定测试。
   cis.cattle.io.clusterscan: 扫描是用来根据定义的配置文件，在集群上触发 CIS 扫描的。扫描完成后会创建一份报告。
   cis.cattle.io.clusterscanreport: 报告是集群 CIS 扫描的结果。
-  management.cattle.io.feature: 功能开关用于打开或关闭某些 {vendor} 功能。默认关闭的功能是实验功能。
   cluster.x-k8s.io.machine: 一个 Machine 封装一个 Kubernetes 节点的配置。你可以使用此视图来查看更新集群后的情况。
   cluster.x-k8s.io.machinedeployment: Machine Deployment 通过使用模板，在一组 Machine Set（与 Deployment 类似）上编排部署。你可以使用此视图来查看更新集群后的情况。
   cluster.x-k8s.io.machineset: Machine Set 确保所需数量的 Machine 始终启动并运行（与 ReplicaSet 类似）。你可以使用此视图来查看更新集群后的情况。
@@ -5371,11 +5371,6 @@ typeDescription:
   group.principal: 为组分配全局角色的操作，仅适用于支持组的外部验证提供程序。本地授权不支持组。
 
 typeLabel:
-  management.cattle.io.token: |-
-    {count, plural,
-      one { API 密钥 }
-      other { API 密钥 }
-    }
   cis.cattle.io.clusterscan: |-
     {count, plural,
       one { 扫描 }
@@ -5431,55 +5426,10 @@ typeLabel:
       one { 端点 }
       other { 端点 }
     }
-  fleet.cattle.io.cluster: |-
-    {count, plural,
-      =1 { 集群 }
-      other { 集群 }
-    }
-  fleet.cattle.io.clustergroup: |-
-    {count, plural,
-      one { 集群组 }
-      other { 集群组 }
-    }
-  fleet.cattle.io.gitrepo: |-
-    {count, plural,
-      one { Git 仓库 }
-      other {Git 仓库 }
-    }
-  management.cattle.io.authconfig: |-
-    {count, plural,
-      one { 认证 }
-      other { 认证 }
-    }
-  management.cattle.io.clusterroletemplatebinding: |-
-    {count, plural,
-      one { 集群成员 }
-      other { 集群成员 }
-    }
   projectroletemplatebinding: |-
     {count, plural,
       one { 项目成员 }
       other { 项目成员 }
-    }
-  management.cattle.io.feature: |-
-    {count, plural,
-      one { 功能开关 }
-      other { 功能开关 }
-    }
-  management.llmos.ai.setting: |-
-    {count, plural,
-      one { 设置 }
-      other { 设置 }
-    }
-  management.cattle.io.fleetworkspace: |-
-    {count, plural,
-      one { 工作空间 }
-      other { 工作空间 }
-    }
-  management.cattle.io.podsecurityadmissionconfigurationtemplate: |-
-    {count, plural,
-      one { Pod 安全准入 }
-      other { Pod 安全准入 }
     }
   policy.poddisruptionbudget: |-
     {count, plural,
@@ -5547,25 +5497,10 @@ typeLabel:
       one { 路由 }
       other { 路由 }
     }
-  'management.cattle.io.cluster': |-
-    {count, plural,
-      one { 管理集群 }
-      other { 管理集群 }
-    }
   'cluster.x-k8s.io.cluster': |-
     {count, plural,
       one { CAPI 集群 }
       other { CAPI 集群 }
-    }
-  'provisioning.cattle.io.cluster': |-
-    {count, plural,
-      one { 集群 }
-      other { 集群 }
-    }
-  management.cattle.io.user: |-
-    {count, plural,
-      one { 用户 }
-      other { 用户 }
     }
   namespace: |-
     {count, plural,
@@ -5722,16 +5657,6 @@ typeLabel:
       one { 工作负载 }
       other { 工作负载 }
     }
-  harvesterhci.io.management.cluster: |-
-    {count, plural,
-      one { Harvester 集群 }
-      other { Harvester 集群 }
-    }
-  harvesterhci.io.cloudtemplate: |-
-    {count, plural,
-      one { Cloud Config 模板 }
-      other { Cloud Config 模板 }
-    }
   fleet.cattle.io.content: |-
     {count, plural,
       one { Content }
@@ -5751,116 +5676,6 @@ typeLabel:
     {count, plural,
       one { 插件 }
       other { 插件 }
-    }
-  management.cattle.io.apiservice: |-
-    {count, plural,
-      one { APIService }
-      other { APIService }
-    }
-  management.cattle.io.catalog: |-
-    {count, plural,
-      one { 应用商店 }
-      other { 应用商店 }
-    }
-  fleet.cattle.io.clusterregistration: |-
-    {count, plural,
-      one { ClusterRegistration }
-      other { ClusterRegistration }
-    }
-  management.cattle.io.dynamicschema: |-
-    {count, plural,
-      one { DynamicSchema }
-      other { DynamicSchema }
-    }
-  management.cattle.io.globalrolebinding: |-
-    {count, plural,
-      one { GlobalRoleBinding }
-      other { GlobalRoleBinding }
-    }
-  management.cattle.io.kontainerdriver: |-
-    {count, plural,
-      one { KontainerDriver }
-      other { KontainerDriver }
-    }
-  management.cattle.io.nodedriver: |-
-    {count, plural,
-      one { NodeDriver }
-      other { NodeDriver }
-    }
-  management.cattle.io.podsecuritypolicytemplate: |-
-    {count, plural,
-      one { PodSecurityPolicyTemplate }
-      other { PodSecurityPolicyTemplate }
-    }
-  management.cattle.io.userattribute: |-
-    {count, plural,
-      one { UserAttribute }
-      other { UserAttribute }
-    }
-  management.cattle.io.catalogtemplate: |-
-    {count, plural,
-      one { CatalogTemplate }
-      other { CatalogTemplate }
-    }
-  management.cattle.io.catalogtemplateversion: |-
-    {count, plural,
-      one { CatalogTemplateVersion }
-      other { CatalogTemplateVersion }
-    }
-  management.cattle.io.cisbenchmarkversion: |-
-    {count, plural,
-      one { CisBenchmarkVersion }
-      other { CisBenchmarkVersion }
-    }
-  management.cattle.io.cisconfig: |-
-    {count, plural,
-      one { CisConfig }
-      other { CisConfig }
-    }
-  management.cattle.io.clusteralertgroup: |-
-    {count, plural,
-      one { ClusterAlertGroup }
-      other { ClusterAlertGroup }
-    }
-  management.cattle.io.clusteralertrule: |-
-    {count, plural,
-      one { ClusterAlertRule }
-      other { ClusterAlertRule }
-    }
-  management.cattle.io.clusterregistrationtoken: |-
-    {count, plural,
-      one { ClusterRegistrationToken }
-      other { ClusterRegistrationToken }
-    }
-  management.cattle.io.node: |-
-    {count, plural,
-      one { 节点 }
-      other { 节点 }
-    }
-  management.cattle.io.projectalertgroup: |-
-    {count, plural,
-      one { ProjectAlertGroup }
-      other { ProjectAlertGroup }
-    }
-  management.cattle.io.projectalertrule: |-
-    {count, plural,
-      one { ProjectAlertRule }
-      other { ProjectAlertRule }
-    }
-  management.cattle.io.rkeaddon: |-
-    {count, plural,
-      one { RkeAddon }
-      other { RkeAddon }
-    }
-  management.cattle.io.rkek8sserviceoption: |-
-    {count, plural,
-      one { RkeK8sServiceOption }
-      other { RkeK8sServiceOption }
-    }
-  management.cattle.io.rkek8ssystemimage: |-
-    {count, plural,
-      one { RkeK8sSystemImage }
-      other { RkeK8sSystemImage }
     }
   rbac.authorization.k8s.io.clusterrolebinding: |-
     {count, plural,
@@ -5907,15 +5722,10 @@ typeLabel:
       one { Machine }
       other { Machine }
     }
-  fleet.cattle.io.clusterregistrationtoken: |-
-    {count, plural,
-      one { 集群注册 Token }
-      other { 集群注册 Token }
-    }
   ray.io.raycluster: |-
     {count, plural,
-      one { ML 集群 }
-      other { ML 集群 }
+      one { 机器学习集群 }
+      other { 机器学习集群 }
     }
   nvidia.com.clusterpolicy: |-
     {count, plural,
@@ -5926,6 +5736,17 @@ typeLabel:
     {count, plural,
       one { Nvidia 驱动 }
       other { Nvidia 驱动 }
+    }
+  # LLMOS types label
+  management.llmos.ai.setting: |-
+    {count, plural,
+      one { 设置 }
+      other { 设置 }
+    }
+  ml.llmos.ai.modelservice: |-
+    {count, plural,
+      one { 模型部署 }
+      other { 模型部署 }
     }
 
 action:
@@ -6369,3 +6190,33 @@ gitPicker:
 networkAttachmentDefinition:
   tabs:
     config: 配置
+
+modelservice:
+  model: Name
+  modelTooltip: Name or path of the huggingface model
+  modelPlaceholder: e.g., facebook/opt-125m
+  modelName: Served Model Name
+  modelNamePlaceholder: The model name to use in the API
+  image: Image
+  volumes: Volumes
+  hf:
+    endpoint: Hugging Face Mirror Endpoint
+
+volume:
+  add:
+    label: Add Volume
+  persistentVolumeClaim:
+    name: Volume Name
+  volumeClaimTemplates:
+    title: Persistent Volume
+  subtypes:
+    persistentVolumeClaim: Use Existing Volume
+    createPVC: Create New Volume
+    emptyDir: Empty Dir
+    addVolumeClaimTemplate: Create New Volume
+
+scheduling:
+  affinity:
+    anyNode: Run on any available node
+    schedulingRules: Run on node(s) matching scheduling rules
+    specificNode: Run on specific node(s)

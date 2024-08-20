@@ -1,6 +1,6 @@
 <script>
 import ResourceTable from '@shell/components/ResourceTable';
-import { ML_CLUSTER } from '@shell/config/types';
+import { LLMOS } from '@shell/config/types';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 export default {
   name:       'Modelfiles',
@@ -33,7 +33,7 @@ export default {
   // override with relevant info for the loading indicator since this doesn't use it's own masthead
   $loadingResources() {
     return {
-      loadResources:     [ML_CLUSTER.MODEL_FILE],
+      loadResources:     [LLMOS.MODEL_FILE],
       loadIndeterminate: true, // results are filtered so we wouldn't get the correct count on indicator...
     };
   },

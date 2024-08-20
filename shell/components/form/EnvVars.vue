@@ -35,13 +35,19 @@ export default {
       default: () => {
         return {};
       }
+    },
+    excludes: {
+      type:    Array,
+      default: () => []
     }
   },
 
   data() {
     const { env = [], envFrom = [] } = this.value;
 
-    const allEnv = [...env, ...envFrom].map((row) => {
+    const allEnv = [...env, ...envFrom].filter((row) => {
+      return !this.excludes.includes(row.name);
+    }).map((row) => {
       return { value: row, id: randomStr(4) };
     });
 

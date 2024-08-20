@@ -4,9 +4,10 @@ import UnitInput from '@shell/components/form/UnitInput';
 import { CONTAINER_DEFAULT_RESOURCE_LIMIT } from '@shell/config/labels-annotations';
 import { cleanUp } from '@shell/utils/object';
 import { _VIEW } from '@shell/config/query-params';
+import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 
 export default {
-  components: { UnitInput },
+  components: { LabeledSelect, UnitInput },
 
   props: {
     mode: {
@@ -20,6 +21,18 @@ export default {
     },
 
     value: {
+      type:    Object,
+      default: () => {
+        return {};
+      }
+    },
+    runtimeClasses: {
+      type:    Array,
+      default: () => {
+        return [];
+      }
+    },
+    podSpec: {
       type:    Object,
       default: () => {
         return {};
@@ -75,6 +88,19 @@ export default {
         },
       ];
     },
+
+    runtimeClassOptions() {
+      const opts = [];
+
+      this.runtimeClasses.filter((runtimeClass) => {
+        opts.push({
+          label: runtimeClass.metadata.name,
+          value: runtimeClass.metadata.name,
+        });
+      });
+
+      return opts;
+    }
   },
 
   created() {
@@ -245,6 +271,19 @@ export default {
           :base-unit="t('suffix.gpus')"
           data-testid="gpu-limit"
           @input="updateLimits"
+        />
+      </span>
+      <span
+        v-if="runtimeClassOptions.length > 0"
+        class="col span-6"
+      >
+        <LabeledSelect
+          v-model="podSpec.runtimeClassName"
+          label="Runtime Class"
+          :options="runtimeClassOptions"
+          :mode="mode"
+          :clearable="true"
+          @input="updateBeforeSave"
         />
       </span>
     </div>

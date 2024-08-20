@@ -54,6 +54,7 @@ generic:
   readFromFile: Read from File
   readFromFolder: Read from Folder
   reload: Reload
+  reset: Reset
   register: Register
   remove: Remove
   addCatalog: Add Catalog
@@ -232,7 +233,7 @@ product:
   uiplugins: Extensions
   elemental: OS Management
   plugins: Plugins
-  llm: ML Management
+  llm: LLM Management
 
 suffix:
   percent: "%"
@@ -5546,7 +5547,6 @@ typeDescription:
   cis.cattle.io.clusterscanprofile: A profile is the configuration for the CIS scan, which is the benchmark versions to use and any specific tests to skip in that benchmark.
   cis.cattle.io.clusterscan: A scan is created to trigger a CIS scan on the cluster based on the defined profile. A report is created after the scan is completed.
   cis.cattle.io.clusterscanreport: A report is the result of a CIS scan of the cluster.
-  management.cattle.io.feature: Feature Flags allow certain {vendor} features to be toggled on and off.  Features that are off by default should be considered experimental functionality.
   cluster.x-k8s.io.machine: A Machine encapsulates the configuration of a Kubernetes Node. Use this view to see what happens after updating a cluster.
   cluster.x-k8s.io.machinedeployment: A Machine Deployment orchestrates deployments via templates over a collection of Machine Sets (similar to a Deployment). Use this view to see what happens after updating a cluster.
   cluster.x-k8s.io.machineset: A Machine Set ensures the desired number of Machine resources are up and running at all times (similar to a ReplicaSet). Use this view to see what happens after updating a cluster.
@@ -5570,11 +5570,6 @@ typeDescription:
   group.principal: Assigning global roles to a group only works with external auth providers that support groups. Local authorization does not support groups.
 
 typeLabel:
-  management.cattle.io.token: |-
-    {count, plural,
-      one { API Key }
-      other { API Keys }
-    }
   cis.cattle.io.clusterscan: |-
     {count, plural,
       one { Scan }
@@ -5630,55 +5625,15 @@ typeLabel:
       one { Endpoint }
       other { Endpoints }
     }
-  fleet.cattle.io.cluster: |-
-    {count, plural,
-      =1 { Cluster }
-      other {Clusters }
-    }
-  fleet.cattle.io.clustergroup: |-
-    {count, plural,
-      one { Cluster Group }
-      other {Cluster Groups }
-    }
-  fleet.cattle.io.gitrepo: |-
-    {count, plural,
-      one { Git Repo }
-      other {Git Repos }
-    }
-  management.cattle.io.authconfig: |-
-    {count, plural,
-      one { Authentication Provider }
-      other { Authentication Providers }
-    }
-  management.cattle.io.clusterroletemplatebinding: |-
-    {count, plural,
-      one { Cluster Membership }
-      other { Cluster Memberships }
-    }
   projectroletemplatebinding: |-
     {count, plural,
       one { Project Membership }
       other { Project Memberships }
     }
-  management.cattle.io.feature: |-
-    {count, plural,
-      one { Feature Flag }
-      other { Feature Flags }
-    }
   management.llmos.ai.setting: |-
     {count, plural,
       one { Setting }
       other { Settings }
-    }
-  management.cattle.io.fleetworkspace: |-
-    {count, plural,
-      one { Workspace }
-      other { Workspaces }
-    }
-  management.cattle.io.podsecurityadmissionconfigurationtemplate: |-
-    {count, plural,
-      one { Pod Security Admission }
-      other { Pod Security Admissions }
     }
   policy.poddisruptionbudget: |-
     {count, plural,
@@ -5745,11 +5700,6 @@ typeLabel:
     {count, plural,
       one { Route }
       other { Routes }
-    }
-  'management.cattle.io.cluster': |-
-    {count, plural,
-      one { Mgmt Cluster }
-      other { Mgmt Clusters }
     }
   'cluster.x-k8s.io.cluster': |-
     {count, plural,
@@ -5936,81 +5886,6 @@ typeLabel:
       one { Addon }
       other { Addons }
     }
-  management.cattle.io.apiservice: |-
-    {count, plural,
-      one { APIService }
-      other { APIServices }
-    }
-  management.cattle.io.catalog: |-
-    {count, plural,
-      one { Catalog }
-      other { Catalogs }
-    }
-  fleet.cattle.io.clusterregistration: |-
-    {count, plural,
-      one { ClusterRegistration }
-      other { ClusterRegistrations }
-    }
-  management.cattle.io.dynamicschema: |-
-    {count, plural,
-      one { DynamicSchema }
-      other { DynamicSchemas }
-    }
-  management.cattle.io.globalrolebinding: |-
-    {count, plural,
-      one { GlobalRoleBinding }
-      other { GlobalRoleBindings }
-    }
-  management.cattle.io.userattribute: |-
-    {count, plural,
-      one { UserAttribute }
-      other { UserAttributes }
-    }
-  management.cattle.io.clusteralertgroup: |-
-    {count, plural,
-      one { ClusterAlertGroup }
-      other { ClusterAlertGroups }
-    }
-  management.cattle.io.clusteralertrule: |-
-    {count, plural,
-      one { ClusterAlertRule }
-      other { ClusterAlertRules }
-    }
-  management.cattle.io.clusterregistrationtoken: |-
-    {count, plural,
-      one { ClusterRegistrationToken }
-      other { ClusterRegistrationTokens }
-    }
-  management.cattle.io.node: |-
-    {count, plural,
-      one { Node }
-      other { Nodes }
-    }
-  management.cattle.io.projectalertgroup: |-
-    {count, plural,
-      one { ProjectAlertGroup }
-      other { ProjectAlertGroups }
-    }
-  management.cattle.io.projectalertrule: |-
-    {count, plural,
-      one { ProjectAlertRule }
-      other { ProjectAlertRules }
-    }
-  management.cattle.io.rkeaddon: |-
-    {count, plural,
-      one { RkeAddon }
-      other { RkeAddons }
-    }
-  management.cattle.io.rkek8sserviceoption: |-
-    {count, plural,
-      one { RkeK8sServiceOption }
-      other { RkeK8sServiceOptions }
-    }
-  management.cattle.io.rkek8ssystemimage: |-
-    {count, plural,
-      one { RkeK8sSystemImage }
-      other { RkeK8sSystemImages }
-    }
   rbac.authorization.k8s.io.clusterrolebinding: |-
     {count, plural,
       one { ClusterRoleBinding }
@@ -6056,15 +5931,15 @@ typeLabel:
       one { Machine }
       other { Machines }
     }
-  fleet.cattle.io.clusterregistrationtoken: |-
+  ml.llmos.ai.modelservice: |-
     {count, plural,
-      one { Cluster Registration Token }
-      other { Cluster Registration Tokens }
+      one { Model Service }
+      other { Model Services }
     }
   ray.io.raycluster: |-
     {count, plural,
-      one { ML Cluster }
-      other { ML Clusters }
+      one { Machine Learning Cluster }
+      other { Machine Learning Clusters }
     }
   nvidia.com.clusterpolicy: |-
     {count, plural,
@@ -6525,3 +6400,33 @@ ray:
   cluster:
     allowScheduling: Allow Scheduling on the Head Node
     enableGCS: Enable Global Control Service(GCS) fault tolerance
+
+modelservice:
+  model: Model Name
+  modelTooltip: Name or path of the huggingface model
+  modelPlaceholder: e.g., facebook/opt-125m
+  modelName: Served Model Name
+  modelNamePlaceholder: The model name to use in the API
+  image: Image
+  volumes: Volumes
+  hf:
+    endpoint: Hugging Face Mirror Endpoint
+
+volume:
+  add:
+    label: Add Volume
+  persistentVolumeClaim:
+    name: Volume Name
+  volumeClaimTemplates:
+    title: Persistent Volume
+  subtypes:
+    persistentVolumeClaim: Use Existing Volume
+    createPVC: Create New Volume
+    emptyDir: Empty Dir
+    addVolumeClaimTemplate: Create New Volume
+
+scheduling:
+  affinity:
+    anyNode: Run on any available node
+    schedulingRules: Run on node(s) matching scheduling rules
+    specificNode: Run on specific node(s)

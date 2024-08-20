@@ -1,7 +1,7 @@
 <script>
 import ResourceTable from '@shell/components/ResourceTable';
 import Loading from '@shell/components/Loading';
-import { ML_CLUSTER } from '@shell/config/types';
+import { LLMOS } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
 import { STATE, NAME, AGE } from '@shell/config/table-headers';
 
@@ -15,7 +15,7 @@ export default {
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
-    const hash = { cluster: this.$store.dispatch(`${ inStore }/findAll`, { type: ML_CLUSTER.RAY_CLUSTER }) };
+    const hash = { cluster: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.RAY_CLUSTER }) };
 
     const res = await allHash(hash);
 

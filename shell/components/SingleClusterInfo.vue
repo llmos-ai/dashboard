@@ -1,7 +1,7 @@
 <script>
 import ResourceSummary from '@shell/components/ResourceSummary';
 import {
-  NAMESPACE, MANAGEMENT, NODE, COUNT, ML_CLUSTER
+  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS
 } from '@shell/config/types';
 import { RESOURCES } from '@shell/pages/c/_cluster/explorer/index';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
@@ -24,9 +24,9 @@ export default {
     });
     this.viewContainerDashboard = this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD);
 
-    if (this.$store.getters['management/schemaFor'](ML_CLUSTER.CEPH_CLUSTER)) {
+    if (this.$store.getters['management/schemaFor'](LLMOS.CEPH_CLUSTER)) {
       this.cephCluster = await this.$store.dispatch('management/find',
-        { type: ML_CLUSTER.CEPH_CLUSTER, id: 'ceph-system/llmos-ceph' });
+        { type: LLMOS.CEPH_CLUSTER, id: 'ceph-system/llmos-ceph' });
     }
 
     if (this.$store.getters['management/schemaFor'](MANAGEMENT.SETTING)) {
@@ -81,8 +81,16 @@ export default {
       return !!this.clusterCounts?.[0]?.counts?.[NAMESPACE];
     },
 
-    canAccessModelFiles() {
-      return !!this.clusterCounts?.[0]?.counts?.[ML_CLUSTER.MODEL_FILE];
+    canAccessMLCluster() {
+      return !!this.clusterCounts?.[0]?.counts?.[LLMOS.RAY_CLUSTER];
+    },
+
+    canAccessModelServices() {
+      return !!this.clusterCounts?.[0]?.counts?.[LLMOS.MODEL_SERVICE];
+    },
+
+    canAccessNotebooks() {
+      return !!this.clusterCounts?.[0]?.counts?.[LLMOS.NOTEBOOK];
     },
 
     hasDescription() {
@@ -184,7 +192,6 @@ export default {
             v-if="canAccessNodes"
             :cluster="clusterDetail.id"
             resource="node"
-            overwrite-name="Nodes"
             product="llm"
           />
           <ResourceSummary
@@ -196,25 +203,24 @@ export default {
           <ResourceSummary
             :cluster="clusterDetail.id"
             resource="persistentvolumeclaim"
-            overwrite-name="Volumes"
             product="llm"
           />
         </div>
         <div class="cluster-counts">
           <ResourceSummary
-            v-if="canAccessModelFiles"
+            v-if="canAccessMLCluster"
             :cluster="clusterDetail.id"
             resource="ray.io.raycluster"
             product="llm"
           />
           <ResourceSummary
-            v-if="canAccessModelFiles"
+            v-if="canAccessModelServices"
             :cluster="clusterDetail.id"
-            resource="ml.llmos.ai.modelfile"
+            resource="ml.llmos.ai.modelservice"
             product="llm"
           />
           <ResourceSummary
-            v-if="canAccessModelFiles"
+            v-if="canAccessNotebooks"
             :cluster="clusterDetail.id"
             resource="ml.llmos.ai.notebook"
             product="llm"
