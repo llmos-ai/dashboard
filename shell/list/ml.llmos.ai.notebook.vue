@@ -36,12 +36,13 @@ export default {
         formatter: 'ProductTypeIcon',
       };
 
-      // const GPUs = {
-      //   name:  'gpus',
-      //   label: 'GPU',
-      //   sort:  ['gpus'],
-      //   value: 'gpus'
-      // };
+      const CONNECT = {
+        name:      'connect',
+        label:     'Connect',
+        sort:      ['connect'],
+        formatter: 'Connect',
+        value:     'connectUrl'
+      };
 
       const CPUS_LIMIT = {
         name:  'cpusRequest',
@@ -57,22 +58,13 @@ export default {
         value: 'memoryRequest'
       };
 
-      const CONNECT = {
-        name:      'connect',
-        label:     'Connect',
-        sort:      ['connect'],
-        formatter: 'Connect',
-        value:     'connectUrl'
-      };
-
       const headers = [
         STATE,
         NAME,
+        CONNECT,
         TYPE,
         CPUS_LIMIT,
         MEMORY_LIMIT,
-        // GPUs,
-        CONNECT,
         AGE
       ];
 
