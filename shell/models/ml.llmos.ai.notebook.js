@@ -92,12 +92,11 @@ export default class NoteBook extends SteveModel {
     });
 
     // TODO: use server url for nodePort access
-    if (service && this.status?.state?.running) {
-      const ports = (service.spec.ports || []).find((p) => p.name === `http-${ this.metadata.name }`);
+    if (service && this.status?.state === 'Running') {
+      const ports = (service.spec.ports || []).find((p) => p.name === 'http');
 
       if (this.spec.serviceType === 'NodePort') {
         const serverUrl = this.getServerUrl();
-        // const serverUrl = ""
         const port = ports.nodePort;
 
         return `http://${ serverUrl }:${ port }`;
@@ -112,7 +111,11 @@ export default class NoteBook extends SteveModel {
   get gpus() {
     const limit = this.spec.template.spec.containers[0].resources.limit;
 
-    if (limit !== null && limit['nvidia.com/gpu'] !== null) {
+    if (limit === null || limit === undefined) {
+      return 0;
+    }
+
+    if (limit['nvidia.com/gpu']) {
       return limit['nvidia.com/gpu'];
     }
 
