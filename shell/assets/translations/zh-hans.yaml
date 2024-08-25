@@ -112,6 +112,11 @@ generic:
           =1 {匹配 {total, number} 个中的 1 个："{sample}"}
           other {匹配 {total, number} 中的 {matched, number} 个，包括 "{sample}"}
         }
+  volume:
+    title: 卷
+    volume: 卷
+    addVolume: 添加卷
+    storageClass: 存储类
 
 locale:
   en-us: English

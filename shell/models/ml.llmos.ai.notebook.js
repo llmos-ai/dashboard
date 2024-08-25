@@ -23,15 +23,18 @@ export default class NoteBook extends SteveModel {
                 name:      'notebook',
                 resources: {
                   requests: {
+                    cpu:    '1',
+                    memory: '2Gi'
+                  },
+                  limits: {
                     cpu:    '2',
                     memory: '4Gi'
-                  },
-                  limits: {}
+                  }
                 },
                 volumeMounts: [
                   {
                     mountPath: '/home/jovyan',
-                    name:      'data-storage'
+                    name:      'home-dir'
                   },
                   {
                     mountPath: '/dev/shm',
@@ -42,20 +45,16 @@ export default class NoteBook extends SteveModel {
             ],
             volumes: [
               {
-                name:                  'data-storage',
-                persistentVolumeClaim: { claimName: '' }
-              },
-              {
                 emptyDir: { medium: 'Memory' },
                 name:     'dshm'
               }
             ]
           }
         },
-        volumes: [
+        volumeClaimTemplates: [
           {
-            name: '',
-            spec: {
+            metadata: { name: 'home-dir' },
+            spec:     {
               accessModes: ['ReadWriteOnce'],
               resources:   { requests: { storage: '5Gi' } },
             },
@@ -85,26 +84,28 @@ export default class NoteBook extends SteveModel {
   get connectUrl() {
     const uid = this.metadata.uid;
     const services = this.$rootGetters['cluster/all'](SERVICE) || [];
-    const service = services.find((s) => {
+    const svc = services.find((s) => {
       const ownerReferences = s.metadata.ownerReferences || [];
 
       return ownerReferences.find((o) => o.uid === uid);
     });
 
-    // TODO: use server url for nodePort access
-    if (service && this.status?.state === 'Running') {
-      const ports = (service.spec.ports || []).find((p) => p.name === 'http');
-
-      if (this.spec.serviceType === 'NodePort') {
-        const serverUrl = this.getServerUrl();
-        const port = ports.nodePort;
-
-        return `http://${ serverUrl }:${ port }`;
-      } else {
-        return `https://${ window.location.hostname }:${ window.location.port }/api/v1/namespaces/${ this.metadata.namespace }/services/http:${ service.metadata.name }:${ ports.name }/proxy/`;
-      }
-    } else {
+    if (!svc || this.status?.state !== 'Running') {
       return '';
+    }
+
+    const serverURL = this.getServerUrl() || window.location.origin;
+    const url = new URL(serverURL);
+
+    const port = svc.spec.ports[0];
+
+    switch (svc.spec.type) {
+    case 'NodePort':
+      return `http://${ url.hostname }:${ port.nodePort }/`;
+    case 'LoadBalancer':
+      return `http://${ url.hostname }:${ port.port }/`;
+    default:
+      return `${ window.location.origin }/api/v1/namespaces/${ svc.namespace }/services/${ svc.name }:${ port.name }/proxy/`;
     }
   }
 

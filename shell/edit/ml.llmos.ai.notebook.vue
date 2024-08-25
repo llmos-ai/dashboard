@@ -1,60 +1,41 @@
 <script>
-import Tab from '@shell/components/Tabbed/Tab';
-import CruResource from '@shell/components/CruResource';
-import UnitInput from '@shell/components/form/UnitInput';
-import ResourceTabs from '@shell/components/form/ResourceTabs';
-import LabeledSelect from '@shell/components/form/LabeledSelect';
-import NameNsDescription from '@shell/components/form/NameNsDescription';
-
-import { allHash } from '@shell/utils/promise';
-import PersistentVolumeClaim from '@shell/components/PersistentVolumeClaim';
-import InfoBox from '@shell/components/InfoBox';
 import CreateEditView from '@shell/mixins/create-edit-view';
+import FormValidation from '@shell/mixins/form-validation';
+import LLMOSWorkloadMixin from '@shell/mixins/llmos-workload';
 import { MANAGEMENT, LLMOS } from '@shell/config/types';
-import AdvancedSection from '@shell/components/AdvancedSection.vue';
+import { allHash } from '@shell/utils/promise';
 
 export default {
-  name: 'NotebookEdit',
+  name:   'Notebook',
+  mixins: [CreateEditView, FormValidation, LLMOSWorkloadMixin],
+  props:  {
+    value: {
+      type:     Object,
+      required: true,
+    },
 
-  components: {
-    AdvancedSection,
-    Tab,
-    UnitInput,
-    CruResource,
-    InfoBox,
-    ResourceTabs,
-    PersistentVolumeClaim,
-    LabeledSelect,
-    NameNsDescription,
+    mode: {
+      type:    String,
+      default: 'create',
+    },
   },
-
-  mixins: [CreateEditView],
-
+  components: {},
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    allHash({
+    await allHash({
       notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.NOTEBOOK }),
       settings:  this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING })
     });
+
+    // don't block UI for these resources
+    this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
   },
 
   data() {
-    const container = this.value.spec.template.spec.containers[0];
-    const requests = container.resources?.requests || { cpu: '', memory: '' };
-    const limits = container.resources?.limits || { cpu: '', memory: '' };
-    const pvc = this.value.spec.volumes[0];
+    const notebookType = this.value.metadata.labels['ml.llmos.ai/notebook-type'];
 
-    const type = this.value.metadata.labels['ml.llmos.ai/notebook-type'];
-
-    return {
-      container,
-      requests,
-      limits,
-      pvc,
-      savePvcHookName: 'savePvcHook',
-      type,
-    };
+    return { notebookType };
   },
 
   created() {
@@ -62,7 +43,7 @@ export default {
   },
 
   computed: {
-    typeOption() {
+    notebookTypeOptions() {
       return [{
         label: 'Jupyter Notebook',
         value: 'jupyter',
@@ -75,12 +56,12 @@ export default {
       }];
     },
 
-    images() {
+    notebookImages() {
       const imagesString = this.$store.getters['management/all'](MANAGEMENT.SETTING).find((setting) => setting.id === 'default-notebook-images').default;
       let images = JSON.parse(imagesString);
 
-      if (this.type) {
-        return images[this.type].map((image) => {
+      if (this.notebookType) {
+        return images[this.notebookType].map((image) => {
           return {
             label: image.containerImage,
             value: image.containerImage
@@ -112,7 +93,7 @@ export default {
         this.errors.push(this.t('validation.required', { key: 'Image' }, true));
       }
 
-      if (this.requests.cpu === '' || this.requests.memory === '') {
+      if (this.flatResources.requestsCpu === '' || this.flatResources.requestsMemory === '') {
         this.errors.push(this.t('validation.required', { key: 'CPU or Memory' }, true));
       }
 
@@ -121,20 +102,20 @@ export default {
       }
     },
 
-    removePvcForm(hookName) {
-      this.$emit('removePvcForm', hookName);
-    },
-
     setDefaultSvc() {
-      if (this.type === 'jupyter') {
+      if (this.value.spec.serviceType) {
+        return;
+      }
+
+      if (this.notebookType === 'jupyter') {
         this.value.spec.serviceType = 'NodePort';
       } else {
-        delete this.value.spec.serviceType;
+        this.value.spec.serviceType = 'ClusterIP';
       }
     },
 
     resetImage() {
-      if (this.type !== this.value.labels['ml.llmos.ai/notebook-type']) {
+      if (this.notebookType !== this.value.labels['ml.llmos.ai/notebook-type']) {
         this.container.image = '';
       }
     },
@@ -143,31 +124,13 @@ export default {
       this.setDefaultSvc();
       this.resetImage();
 
-      if (this.type) {
+      if (this.notebookType) {
         const labels = {
           ...this.value.metadata.labels,
-          'ml.llmos.ai/notebook-type': this.type
+          'ml.llmos.ai/notebook-type': this.notebookType
         };
 
         this.value.setLabels(labels);
-      }
-
-      // set resources
-      this.$set(this.container.resources, 'requests', this.requests);
-
-      if (this.container.resources?.limits === undefined ) {
-        this.$set(this.container.resources, 'limits', {});
-      }
-
-      if (this.limits.cpu) {
-        this.$set(this.container.resources?.limits, 'cpu', this.limits.cpu);
-      } else {
-        delete this.container.resources?.limits?.cpu;
-      }
-      if (this.limits.memory) {
-        this.$set(this.container.resources?.limits, 'memory', this.limits.memory);
-      } else {
-        delete this.container.resources?.limits?.memory;
       }
 
       const _containers = [{
@@ -176,150 +139,132 @@ export default {
       }];
 
       this.$set(this.value.spec.template.spec, 'containers', _containers);
-
-      if (!this.pvc.name) {
-        this.pvc.name = `nb-${ this.value.metadata.name }-${ this.value.metadata.namespace }`;
-      }
-
-      this.value.spec.template.spec.volumes[0].persistentVolumeClaim.claimName = this.pvc.name;
-
-      const annotations = { ...this.value.metadata.annotations };
-
-      this.value.setAnnotations(annotations);
     },
   }
 };
 </script>
 
 <template>
-  <CruResource
-    :done-route="doneRoute"
-    :resource="value"
-    :mode="mode"
-    :errors="errors"
-    :apply-hooks="applyHooks"
-    @finish="save"
+  <Loading v-if="$fetchState.pending" />
+  <form
+    v-else
+    class="filled-height"
   >
-    <NameNsDescription
-      :value="value"
-      :namespaced="true"
+    <CruResource
+      :done-route="doneRoute"
+      :resource="value"
       :mode="mode"
-    />
-
-    <ResourceTabs
-      v-model="value"
-      class="mt-15"
-      :need-conditions="false"
-      :need-related="false"
-      :side-tabs="true"
-      :mode="mode"
+      :errors="errors"
+      :apply-hooks="applyHooks"
+      @finish="save"
     >
-      <Tab
-        name="basic"
-        label="Basics"
-        :weight="3"
-        class="bordered-table"
+      <NameNsDescription
+        :value="value"
+        :namespaced="true"
+        :mode="mode"
+      />
+
+      <ResourceTabs
+        v-model="value"
+        class="mt-15"
+        :need-conditions="false"
+        :need-related="false"
+        :side-tabs="true"
+        :mode="mode"
       >
-        <div class="row">
-          <div class="col span-6">
-            <LabeledSelect
-              v-model="type"
-              label="Type"
-              :options="typeOption"
-              :disabled="!isCreate"
-              required
-              :mode="mode"
-              class="mb-20"
-              @input="update"
-            />
-          </div>
-
-          <div class="col span-6">
-            <LabeledSelect
-              v-model="container.image"
-              label="Image"
-              :options="images"
-              required
-              :mode="mode"
-              class="mb-20"
-              @input="update"
-            />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col span-6">
-            <UnitInput
-              v-model="requests.cpu"
-              label="CPU"
-              suffix="C"
-              required
-              :output-modifier="true"
-              :mode="mode"
-              class="mb-20"
-              @input="update"
-            />
-          </div>
-
-          <div class="col span-6">
-            <UnitInput
-              v-model="requests.memory"
-              label="Memory"
-              :input-exponent="3"
-              :output-modifier="true"
-              :increment="1024"
-              :mode="mode"
-              suffix="Gi"
-              required
-              class="mb-20"
-              @input="update"
-            />
-          </div>
-        </div>
-        <InfoBox>
-          <PersistentVolumeClaim
-            v-model="pvc"
-            :mode="mode"
-            :register-before-hook="registerBeforeHook"
-            :save-pvc-hook-name="savePvcHookName"
-            @removePvcForm="removePvcForm"
-          />
-        </InfoBox>
-
-        <AdvancedSection
-          class="col span-12 advanced"
-          :mode="mode"
+        <Tab
+          name="general"
+          label="General"
+          class="bordered-table"
+          :weight="tabWeightMap.general"
         >
           <div class="row">
-            <div class="col span-6">
-              <UnitInput
-                v-model="limits.cpu"
-                label="CPU Limit"
-                suffix="C"
-                :delay="0"
-                positive
+            <div class="col span-6 mb-10">
+              <LabeledSelect
+                v-model="notebookType"
+                label="Type"
+                :options="notebookTypeOptions"
+                :disabled="!isCreate"
+                required
                 :mode="mode"
-                class="mb-20"
                 @input="update"
               />
             </div>
 
             <div class="col span-6">
-              <UnitInput
-                v-model="limits.memory"
-                label="Memory Limit"
-                :input-exponent="3"
-                :output-modifier="true"
-                :increment="1024"
+              <LabeledSelect
+                v-model="container.image"
+                label="Image"
+                :options="notebookImages"
+                required
                 :mode="mode"
-                suffix="Gi"
-                class="mb-20"
                 @input="update"
               />
             </div>
           </div>
-        </AdvancedSection>
-      </Tab>
-    </ResourceTabs>
-  </CruResource>
+
+          <AdvancedSection
+            class="col span-12 advanced"
+            :mode="mode"
+          >
+            <div class="col span-6">
+              <LabeledSelect
+                v-model="spec.serviceType"
+                :mode="mode"
+                :options="svcOptions"
+                :label="t('workload.networking.networkMode.label')"
+                :placeholder="t('workload.networking.networkMode.placeholder')"
+                @input="update"
+              />
+            </div>
+          </AdvancedSection>
+        </Tab>
+
+        <Tab
+          :label="t('workload.container.titles.resources')"
+          name="resources"
+          :weight="tabWeightMap['resources']"
+        >
+          <!-- Resources and Limitations -->
+          <ContainerResourceLimit
+            v-model="flatResources"
+            :mode="mode"
+            :runtime-classes="runtimeClasses"
+            :pod-spec="podTemplateSpec"
+            :show-tip="false"
+          />
+        </Tab>
+
+        <Tab
+          :label="t('generic.volume.title')"
+          name="volumes"
+          :weight="tabWeightMap['volumes']"
+        >
+          <Volume
+            v-model="spec"
+            :namespace="value.metadata.namespace"
+            :register-before-hook="registerBeforeHook"
+            :mode="mode"
+            :save-pvc-hook-name="savePvcHookName"
+            :loading="isLoadingSecondaryResources"
+            :namespaced-pvcs="pvcs"
+            @removePvcForm="clearPvcFormState"
+          />
+        </Tab>
+
+        <Tab
+          :label="t('workload.container.titles.nodeScheduling')"
+          name="nodeScheduling"
+          :weight="tabWeightMap['nodeScheduling']"
+        >
+          <NodeScheduling
+            :mode="mode"
+            :value="podTemplateSpec"
+            :nodes="allNodes"
+            :loading="isLoadingSecondaryResources"
+          />
+        </Tab>
+      </ResourceTabs>
+    </CruResource>
+  </form>
 </template>
