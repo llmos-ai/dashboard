@@ -39,18 +39,18 @@ const GPU_KEY = 'nvidia.com/gpu';
 export default {
   name:       'ModelService',
   components: {
-    NodeScheduling,
-    ShellInput,
-    ValueFromResource,
-    EnvVars,
-    ContainerResourceLimit,
     AdvancedSection,
-    Tab,
+    ContainerResourceLimit,
     CruResource,
-    ResourceTabs,
-    NameNsDescription,
-    LabeledInput,
     Checkbox,
+    EnvVars,
+    LabeledInput,
+    NameNsDescription,
+    NodeScheduling,
+    ResourceTabs,
+    ShellInput,
+    Tab,
+    ValueFromResource,
     Volume,
   },
 
@@ -479,7 +479,7 @@ export default {
       </Tab>
 
       <Tab
-        :label="t('modelservice.volumes')"
+        :label="t('generic.volume.title')"
         name="volumes"
         :weight="tabWeightMap['volumes']"
       >

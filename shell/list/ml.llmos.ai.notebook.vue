@@ -2,7 +2,7 @@
 import ResourceTable from '@shell/components/ResourceTable';
 import Loading from '@shell/components/Loading';
 import { allHash } from '@shell/utils/promise';
-import { STATE, NAME, AGE } from '@shell/config/table-headers';
+import { STATE, NAME, NAMESPACE, AGE } from '@shell/config/table-headers';
 import { SERVICE, LLMOS } from '@shell/config/types';
 
 export default {
@@ -61,6 +61,7 @@ export default {
       const headers = [
         STATE,
         NAME,
+        NAMESPACE,
         CONNECT,
         TYPE,
         CPUS_LIMIT,
