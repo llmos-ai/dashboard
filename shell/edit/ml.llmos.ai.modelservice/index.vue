@@ -1,62 +1,14 @@
 <script>
-import Tab from '@shell/components/Tabbed/Tab.vue';
-import CruResource from '@shell/components/CruResource.vue';
-import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
-import NameNsDescription from '@shell/components/form/NameNsDescription.vue';
-import AdvancedSection from '@shell/components/AdvancedSection.vue';
-import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
-import EnvVars from '@shell/components/form/EnvVars.vue';
-import ValueFromResource from '@shell/components/form/ValueFromResource.vue';
-import ShellInput from '@shell/components/form/ShellInput.vue';
-import NodeScheduling from '@shell/components/form/NodeScheduling.vue';
-
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
-import ResourceManager from '@shell/mixins/resource-manager';
-import { BEFORE_SAVE_HOOKS } from '@shell/mixins/child-hook';
-import {
-  CONFIG_MAP,
-  LLMOS,
-  NODE,
-  PVC, RUNTIME_CLASS,
-  SECRET,
-} from '@shell/config/types';
+import LLMOSWorkload from '@shell/mixins/llmos-workload';
+import { EVENT } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
-import { cleanUp } from '@shell/utils/object';
-import { TYPES as SECRET_TYPES } from '@shell/models/secret';
-import Volume from '@shell/edit/volume/index.vue';
-import { LabeledInput } from '@components/Form/LabeledInput';
-import { Checkbox } from '@components/Form/Checkbox';
-
-const TAB_WEIGHT_MAP = {
-  general:        99,
-  resources:      98,
-  volumes:        97,
-  nodeScheduling: 96,
-};
-const GPU_KEY = 'nvidia.com/gpu';
 
 export default {
-  name:       'ModelService',
-  components: {
-    AdvancedSection,
-    ContainerResourceLimit,
-    CruResource,
-    Checkbox,
-    EnvVars,
-    LabeledInput,
-    NameNsDescription,
-    NodeScheduling,
-    ResourceTabs,
-    ShellInput,
-    Tab,
-    ValueFromResource,
-    Volume,
-  },
-
-  mixins: [CreateEditView, FormValidation, ResourceManager],
-
-  props: {
+  name:   'ModelService',
+  mixins: [CreateEditView, FormValidation, LLMOSWorkload],
+  props:  {
     value: {
       type:     Object,
       required: true,
@@ -78,16 +30,7 @@ export default {
   },
 
   async fetch() {
-    const inStore = this.$store.getters['currentProduct'].inStore;
-
-    // User might not have access to required resources - so check before trying to fetch
-    const hash = await allHash({
-      mss:            this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.MODEL_SERVICE }),
-      runtimeClasses: this.$store.dispatch(`${ inStore }/findAll`, { type: RUNTIME_CLASS }),
-    });
-
-    this.runtimeClasses = hash.runtimeClasses;
-
+    await allHash({ events: this.$store.dispatch('cluster/findAll', { type: EVENT }) });
     // loading secondary resources without UI blocking
     this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
   },
@@ -99,11 +42,7 @@ export default {
     ];
 
     this.initializeModelService();
-    const namespace = this.value.metadata.namespace;
-    const spec = this.value.spec;
-    const podTemplateSpec = this.value.spec.template.spec;
-    const container = podTemplateSpec.containers[0];
-
+    const container = this.value.spec?.template?.spec?.containers[0];
     let hfToken = container.env.find((env) => env.name === 'HUGGING_FACE_HUB_TOKEN');
 
     if (!hfToken) {
@@ -120,24 +59,33 @@ export default {
     }
 
     return {
-      secondaryResourceData: this.secondaryResourceDataConfig(),
-      namespacedConfigMaps:  [],
-      allNodes:              null,
-      pvcs:                  [],
-      namespacedSecrets:     [],
-      runtimeClasses:        [],
-      savePvcHookName:       'savePvcHook',
-      tabWeightMap:          TAB_WEIGHT_MAP,
-      isNamespaceNew:        false,
-      useNodeSharedMemory:   false,
-      hfToken,
-      hfEndpoint,
-      namespace,
-      spec,
-      container,
-      podTemplateSpec,
-      excludeEnvs,
+      hfToken, hfEndpoint, excludeEnvs
     };
+  },
+
+  computed: {
+    eventOverride() {
+      const events = this.$store.getters[`cluster/all`](EVENT);
+
+      return events.filter((event) => {
+        if (event.involvedObject?.uid === this.value?.metadata?.uid) {
+          return true;
+        }
+
+        if (event.involvedObject?.name.includes(`modelservice-${ this.value.metadata?.name }`)) {
+          return true;
+        }
+
+        return false;
+      }).map((event) => {
+        return {
+          reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),
+          message:   event.message || this.t('generic.unknown'),
+          date:      event.lastTimestamp || event.firstTimestamp || event.metadata.creationTimestamp,
+          eventType: event.eventType
+        };
+      });
+    },
   },
 
   watch: {
@@ -149,8 +97,6 @@ export default {
       this.secondaryResourceData.namespace = neu;
       // Fetch resources that are namespace specific, we don't need to re-fetch non-namespaced resources on namespace change
       this.resourceManagerFetchSecondaryResources(this.secondaryResourceData, true);
-
-      // this.servicesOwned = await this.value.getServicesOwned();
     },
 
     isNamespaceNew(neu, old) {
@@ -165,83 +111,7 @@ export default {
     this.registerBeforeHook(this.willSave, 'willSave');
   },
 
-  computed: {
-    flatResources: {
-      get() {
-        const { limits = {}, requests = {} } = this.container.resources || {};
-        const {
-          cpu: limitsCpu,
-          memory: limitsMemory,
-          [GPU_KEY]: limitsGpu,
-        } = limits;
-        const { cpu: requestsCpu, memory: requestsMemory } = requests;
-
-        return {
-          limitsCpu,
-          limitsMemory,
-          requestsCpu,
-          requestsMemory,
-          limitsGpu,
-        };
-      },
-      set(neu) {
-        const {
-          limitsCpu,
-          limitsMemory,
-          requestsCpu,
-          requestsMemory,
-          limitsGpu,
-        } = neu;
-
-        const out = {
-          requests: {
-            cpu:    requestsCpu,
-            memory: requestsMemory,
-          },
-          limits: {
-            cpu:       limitsCpu,
-            memory:    limitsMemory,
-            [GPU_KEY]: limitsGpu,
-          },
-        };
-
-        this.$set(this.container, 'resources', cleanUp(out));
-      },
-    },
-  },
-
   methods: {
-    secondaryResourceDataConfig() {
-      return {
-        namespace: this.value?.metadata?.namespace || null,
-        data:      {
-          [NODE]: {
-            applyTo: [
-              {
-                var:         'allNodes',
-                parsingFunc: (data) => {
-                  return data.map((node) => node.id);
-                }
-              }
-            ]
-          },
-          [CONFIG_MAP]: { applyTo: [{ var: 'namespacedConfigMaps' }] },
-          [PVC]:        { applyTo: [{ var: 'pvcs' }] },
-          [SECRET]:     {
-            applyTo: [
-              { var: 'namespacedSecrets' },
-              {
-                var:         'imagePullNamespacedSecrets',
-                parsingFunc: (data) => {
-                  return data.filter((secret) => (secret._type === SECRET_TYPES.DOCKER || secret._type === SECRET_TYPES.DOCKER_JSON));
-                }
-              }
-            ]
-          },
-        }
-      };
-    },
-
     initializeModelService() {
       const container = this.value.spec.template.spec.containers[0];
 
@@ -251,16 +121,6 @@ export default {
 
       if (!this.value.spec.volumeClaimTemplates) {
         this.$set(this.value.spec, 'volumeClaimTemplates', []);
-      }
-    },
-
-    clearPvcFormState(hookName) {
-      // On the `closePvcForm` event, remove the
-      // before save hook to prevent the PVC from
-      // being created. Use the PVC's unique ID to distinguish
-      // between hooks for different PVCs.
-      if (this[BEFORE_SAVE_HOOKS]) {
-        this.unregisterBeforeSaveHook(hookName);
       }
     },
 
@@ -283,10 +143,6 @@ export default {
       if (this.errors.length > 0) {
         return Promise.reject(this.errors);
       }
-    },
-
-    removePvcForm(hookName) {
-      this.$emit('removePvcForm', hookName);
     },
 
     update() {
@@ -350,6 +206,8 @@ export default {
       :need-conditions="false"
       :need-related="false"
       :side-tabs="true"
+      :eventOverride="eventOverride"
+      :useOverrideEvents="true"
       :mode="mode"
     >
       <Tab
@@ -485,7 +343,7 @@ export default {
       >
         <Volume
           v-model="spec"
-          :namespace="namespace"
+          :namespace="value.metadata.namespace"
           :register-before-hook="registerBeforeHook"
           :mode="mode"
           :save-pvc-hook-name="savePvcHookName"

@@ -2,7 +2,7 @@
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkloadMixin from '@shell/mixins/llmos-workload';
-import { MANAGEMENT, LLMOS } from '@shell/config/types';
+import { MANAGEMENT, EVENT } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
 
 export default {
@@ -24,8 +24,8 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     await allHash({
-      notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.NOTEBOOK }),
-      settings:  this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING })
+      events:   this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }),
+      settings: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING })
     });
 
     // don't block UI for these resources
@@ -43,6 +43,24 @@ export default {
   },
 
   computed: {
+    eventOverride() {
+      const events = this.$store.getters[`cluster/all`](EVENT);
+
+      return events.filter((event) => {
+        if (event.involvedObject?.uid === this.value?.metadata?.uid ||
+            event.involvedObject?.name.includes(`notebook-${ this.value.metadata?.name }`)) {
+          return true;
+        }
+      }).map((event) => {
+        return {
+          reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),
+          message:   event.message || this.t('generic.unknown'),
+          date:      event.lastTimestamp || event.firstTimestamp || event.metadata.creationTimestamp,
+          eventType: event.eventType
+        };
+      });
+    },
+
     notebookTypeOptions() {
       return [{
         label: 'Jupyter Notebook',
@@ -170,6 +188,8 @@ export default {
         :need-conditions="false"
         :need-related="false"
         :side-tabs="true"
+        :event-override="eventOverride"
+        :use-override-events="true"
         :mode="mode"
       >
         <Tab
