@@ -224,9 +224,9 @@ export default {
               :localized-label="true"
               :mode="mode"
               class="mb-20"
-              :label="t('modelservice.model')"
-              :tooltip="t('modelservice.modelTooltip')"
-              :placeholder="t('modelservice.modelPlaceholder')"
+              :label="t('modelService.model')"
+              :tooltip="t('modelService.modelTooltip')"
+              :placeholder="t('modelService.modelPlaceholder')"
             />
           </div>
           <div class="col span-6">
@@ -235,8 +235,8 @@ export default {
               :localized-label="true"
               :mode="mode"
               class="mb-20"
-              :label="t('modelservice.modelName')"
-              :tooltip="t('modelservice.modelNamePlaceholder')"
+              :label="t('modelService.modelName')"
+              :tooltip="t('modelService.modelNamePlaceholder')"
             />
           </div>
         </div>
@@ -283,7 +283,7 @@ export default {
               :localized-label="true"
               :mode="mode"
               class="mb-20"
-              :label="t('modelservice.hf.endpoint')"
+              :label="t('modelService.hf.endpoint')"
             />
           </div>
         </div>
@@ -314,7 +314,7 @@ export default {
                 :required="true"
                 :mode="mode"
                 class="mb-20"
-                :label="t('modelservice.image')"
+                :label="t('modelService.image')"
               />
             </div>
           </div>

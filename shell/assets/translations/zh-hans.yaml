@@ -4634,6 +4634,7 @@ validation:
   invalidCron: 无效的 cron 调度
   invalidCidr: "无效的 CIDR"
   invalidIP: "无效的 IP"
+  invalidChartRepo: "无效的 Chart 仓库地址"
   k8s:
     name: 必须由小写字母数字或“-”组成，并且开头和结尾必须是字母数字（例如“my-name”或“123-abc”）。
     identifier:

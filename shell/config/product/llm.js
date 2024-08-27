@@ -1,6 +1,6 @@
 import { DSL } from '@shell/store/type-map';
 import {
-  LLMOS, NAMESPACE, NODE, VIRTUAL_TYPES, PVC, STORAGE_CLASS
+  LLMOS, NAMESPACE, NODE, VIRTUAL_TYPES, PVC, STORAGE_CLASS, SECRET, CONFIG_MAP, MANAGEMENT
 } from '@shell/config/types';
 
 export const NAME = 'llm';
@@ -148,22 +148,39 @@ export function init(store) {
 
   // advanced tab
   virtualType({
-    ifHaveType: NAMESPACE,
     label:      'Namespaces',
-    group:      'Root',
+    labelKey:   'namespace.label',
+    group:      'Advanced',
     name:       NAMESPACE,
-    namespaced: false,
+    namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
       params: { resource: NAMESPACE }
     },
     exact:  false,
-    weight: 300,
+    weight: 110,
+  });
+
+  virtualType({
+    ifHaveType: MANAGEMENT.MANAGED_ADDON,
+    labelKey:   'typeLabel."management.llmos.ai.managedaddon"',
+    group:      'Advanced',
+    name:       MANAGEMENT.MANAGED_ADDON,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: MANAGEMENT.MANAGED_ADDON }
+    },
+    exact:  false,
+    weight: 100,
   });
 
   basicType(
     [
+      MANAGEMENT.MANAGED_ADDON,
       NAMESPACE,
+      SECRET,
+      CONFIG_MAP,
     ],
     'advanced',
   );

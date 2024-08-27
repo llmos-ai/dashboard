@@ -45,9 +45,9 @@ export default {
 
       const MODEL = {
         name:  'model',
-        label: 'Model',
+        label: 'Model Name',
         sort:  ['model'],
-        value: 'spec.model',
+        value: 'modelName',
       };
 
       const READY = {
