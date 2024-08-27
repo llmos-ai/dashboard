@@ -4,7 +4,7 @@ import { MANAGEMENT } from '@shell/config/types';
 
 import { set } from '@shell/utils/object';
 import { escapeHtml } from '@shell/utils/string';
-import { insertAt, isArray } from '@shell/utils/array';
+import { isArray } from '@shell/utils/array';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import Vue from 'vue';
 import { hasPSALabels, getPSATooltipsDescription, getPSALabels } from '@shell/utils/pod-security-admission';
@@ -28,29 +28,6 @@ const OBSCURE_NAMESPACE_PREFIX = [
 export default class Namespace extends SteveModel {
   applyDefaults() {
     set(this, 'disableOpenApiValidation', false);
-  }
-
-  get _availableActions() {
-    const out = super._availableActions;
-
-    insertAt(out, 0, { divider: true });
-    if (this.$rootGetters['isMgmt']) {
-      insertAt(out, 0, {
-        action:     'move',
-        label:      this.t('namespace.move'),
-        bulkable:   true,
-        bulkAction: 'move',
-        enabled:    true,
-        icon:       'icon icon-fork',
-        weight:     3,
-      });
-    }
-
-    return out;
-  }
-
-  move(resources = this) {
-    this.$dispatch('promptMove', resources);
   }
 
   get isSystem() {
@@ -139,22 +116,10 @@ export default class Namespace extends SteveModel {
     return true;
   }
 
-  get listLocation() {
-    return 'c-cluster-product-resource';
-  }
-
   get _detailLocation() {
     const _detailLocation = super._detailLocation;
 
     return _detailLocation;
-  }
-
-  get parentLocationOverride() {
-    return this.listLocation;
-  }
-
-  get doneOverride() {
-    return this.listLocation;
   }
 
   get resourceQuota() {
@@ -216,5 +181,10 @@ export default class Namespace extends SteveModel {
 
   get hideDetailLocation() {
     return !!this.$rootGetters['currentProduct'].hideNamespaceLocation;
+  }
+
+  get canDelete() {
+    // not within the system namespaces
+    return !this.isSystem && super.canDelete;
   }
 }

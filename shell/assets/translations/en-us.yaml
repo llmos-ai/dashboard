@@ -4827,6 +4827,7 @@ validation:
   invalidCron: Invalid cron schedule
   invalidCidr: "Invalid CIDR"
   invalidIP: "Invalid IP"
+  invalidChartRepo: "Invalid chart repository URL"
   k8s:
     name: Must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name', or '123-abc').
     identifier:
@@ -5640,6 +5641,11 @@ typeLabel:
       one { Setting }
       other { Settings }
     }
+  management.llmos.ai.managedaddon: |-
+    {count, plural,
+      one { Managed Addon }
+      other { Managed Addons }
+    }
   policy.poddisruptionbudget: |-
     {count, plural,
       one { Pod Disruption Budget }
@@ -6406,7 +6412,7 @@ ray:
     allowScheduling: Allow Scheduling on the Head Node
     enableGCS: Enable Global Control Service(GCS) fault tolerance
 
-modelservice:
+modelService:
   model: Model Name
   modelTooltip: Name or path of the huggingface model
   modelPlaceholder: e.g., facebook/opt-125m
@@ -6435,3 +6441,7 @@ scheduling:
     anyNode: Run on any available node
     schedulingRules: Run on node(s) matching scheduling rules
     specificNode: Run on specific node(s)
+
+managedAddon:
+  type: Managed Addon
+  switchFailed: "{action} {name} failed."

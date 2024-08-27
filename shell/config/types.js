@@ -80,9 +80,10 @@ export const METRIC = {
 // Management API (via Steve)
 // Base: /v1
 export const MANAGEMENT = {
-  CLUSTER: 'management.oneblock.ai.cluster',
-  SETTING: 'management.llmos.ai.setting',
-  USER:    'management.llmos.ai.user',
+  CLUSTER:       'management.oneblock.ai.cluster',
+  SETTING:       'management.llmos.ai.setting',
+  USER:          'management.llmos.ai.user',
+  MANAGED_ADDON: 'management.llmos.ai.managedaddon',
 
   // TODO, add project
   PROJECT: 'management.llmos.io.project',

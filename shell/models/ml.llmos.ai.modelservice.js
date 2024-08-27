@@ -90,6 +90,10 @@ export default class ModelService extends SteveModel {
   }
 
   get msStatus() {
-    return this.status?.state || 'Unknown';
+    return this.status?.state || 'Pending';
+  }
+
+  get modelName() {
+    return this.spec.servedModelName.length > 0 ? this.spec.servedModelName : this.spec.model;
   }
 }
