@@ -95,6 +95,7 @@ export const LLMOS = {
   MODEL_FILE:    'ml.llmos.ai.modelfile',
   MODEL_SERVICE: 'ml.llmos.ai.modelservice',
   NOTEBOOK:      'ml.llmos.ai.notebook',
+  VOLUME:        'llmos.ai.volume',
   CHAT:          'chat',
 
   // nvidia CRDs
