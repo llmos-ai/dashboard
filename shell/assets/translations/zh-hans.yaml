@@ -4312,14 +4312,8 @@ storageClass:
   deprecated:
     title: （已弃用）
     warning: '{provisioner} 树内插件已弃用。你可以在<a target="_blank" rel="noopener noreferrer nofollow" href="https://kubernetes-csi.github.io/docs/drivers.html">这里</a>查找 CSI 驱动。'
-  harvesterhci:
-    title: Harvester (CSI)
-    warning:
-      unSatisfiesVersion: 请升级 Harvester CSI 驱动版本来使用此功能(csi-driver >= v0.1.15)
-    hostStorageClass:
-      label: 主机存储类
-      placeholder: 主机 Harvester 集群上的存储类名称
-      tooltip: 默认使用主机 Harvester 集群上的默认存储类。
+  local-path-provisioner:
+    title: Local Path 驱动 (CSI)
 
 tableHeaders:
   assuredConcurrencyShares: 确保并发份额

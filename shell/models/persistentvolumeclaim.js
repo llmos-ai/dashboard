@@ -1,4 +1,3 @@
-
 import { insertAt } from '@shell/utils/array';
 import {
   AS,
@@ -11,7 +10,8 @@ import {
 import Vue from 'vue';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { STATES_ENUM } from '@shell/plugins/dashboard-store/resource-class';
-import { STORAGE_CLASS } from '@shell/config/types';
+import {LLMOS, STORAGE_CLASS} from '@shell/config/types';
+import { clone } from '@shell/utils/object';
 
 export default class PVC extends SteveModel {
   applyDefaults(_, realMode) {
@@ -60,5 +60,36 @@ export default class PVC extends SteveModel {
     };
 
     this.currentRouter().push(location);
+  }
+
+  get detailLocation() {
+    const detailLocation = clone(this._detailLocation);
+
+    detailLocation.params.resource = LLMOS.VOLUME;
+
+    return detailLocation;
+  }
+
+  get doneOverride() {
+    const detailLocation = clone(this._detailLocation);
+
+    delete detailLocation.params.namespace;
+    delete detailLocation.params.id;
+    detailLocation.params.resource = LLMOS.VOLUME;
+    detailLocation.name = `c-cluster-product-resource`;
+
+    return detailLocation;
+  }
+
+  get parentNameOverride() {
+    return this.$rootGetters['i18n/t'](`typeLabel."${ LLMOS.VOLUME }"`, { count: 1 }).trim();
+  }
+
+  get parentLocationOverride() {
+    return this.doneOverride;
+  }
+
+  get phaseState() {
+    return this.status?.phase || 'N/A';
   }
 }

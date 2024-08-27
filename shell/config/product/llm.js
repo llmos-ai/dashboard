@@ -9,6 +9,7 @@ export function init(store) {
   const {
     product,
     basicType,
+    configureType,
     virtualType,
     weightGroup,
   } = DSL(store, NAME);
@@ -120,24 +121,45 @@ export function init(store) {
   );
 
   // volume management tab
+  configureType(LLMOS.VOLUME, {
+    location: {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.VOLUME }
+    },
+    resource:       PVC,
+    resourceDetail: LLMOS.VOLUME,
+    resourceEdit:   LLMOS.VOLUME
+  });
   virtualType({
     ifHaveType: PVC,
-    labelKey:   'typeLabel."persistentvolumeclaim"',
-    label:      'Volumes',
-    group:      'Root',
-    name:       PVC,
+    labelKey:   'typeLabel."llmos.ai.volume"',
+    group:      'Storage',
+    name:       LLMOS.VOLUME,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: PVC }
+      params: { resource: LLMOS.VOLUME }
     },
     exact:  false,
     weight: 301,
   });
+  virtualType({
+    ifHaveType: STORAGE_CLASS,
+    labelKey:   'typeLabel."storage.k8s.io.storageclass"',
+    group:      'Storage',
+    name:       STORAGE_CLASS,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: STORAGE_CLASS }
+    },
+    exact:  false,
+    weight: 300,
+  });
 
   basicType(
     [
-      PVC,
+      LLMOS.VOLUME,
       STORAGE_CLASS,
       LLMOS.CEPH_CLUSTER,
       LLMOS.CEPH_BLOCK_POOL,
