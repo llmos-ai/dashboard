@@ -10,7 +10,7 @@ import {
 import Vue from 'vue';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { STATES_ENUM } from '@shell/plugins/dashboard-store/resource-class';
-import {LLMOS, STORAGE_CLASS} from '@shell/config/types';
+import { LLMOS, STORAGE_CLASS } from '@shell/config/types';
 import { clone } from '@shell/utils/object';
 
 export default class PVC extends SteveModel {

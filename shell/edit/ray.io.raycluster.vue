@@ -10,13 +10,17 @@ import AdvancedSection from '@shell/components/AdvancedSection.vue';
 import { allHash } from '@shell/utils/promise';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { ANNOTATIONS } from '@shell/config/labels-annotations';
-import { LLMOS, RUNTIME_CLASS } from '@shell/config/types';
+import { RUNTIME_CLASS } from '@shell/config/types';
 import { Checkbox } from '@components/Form/Checkbox';
+import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
+import { FlatResources, GPU_KEY } from '@shell/utils/container-resource';
+import { cleanUp } from '@shell/utils/object';
 
 export default {
   name: 'MLClusterEdit',
 
   components: {
+    ContainerResourceLimit,
     Tab,
     UnitInput,
     CruResource,
@@ -34,7 +38,6 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const hash = await allHash({
-      clusters:       this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.RAY_CLUSTER }),
       runtimeClasses: this.$store.dispatch(`${ inStore }/findAll`, { type: RUNTIME_CLASS }),
       defaultConfig:  this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' })
     });
@@ -44,35 +47,32 @@ export default {
   },
 
   data() {
+    const spec = this.value.spec;
     const annotations = this.value?.annotations || {};
     const enableGCSFaultTolerance = annotations[ANNOTATIONS.RAY_CLUSTER_FT_ENABLED] === 'true';
-    const headGroupSpec = this.value?.spec?.headGroupSpec;
+    const autoScaleOptions = spec.autoscalerOptions;
+
+    // head group configs
+    const headGroupSpec = spec.headGroupSpec;
     const headGroupContainer = headGroupSpec?.template?.spec?.containers[0];
-    const headGroupSpecResource = headGroupSpec?.template?.spec.containers[0]?.resources;
     const scheduleOnHeadNode = headGroupSpec?.rayStartParams['num-cpus'] !== '0';
 
+    // worker group configs
     const workerGroupSpecs = this.value?.spec?.workerGroupSpecs || [];
-    const workerGroupSpecsResource = workerGroupSpecs[0]?.template?.spec.containers[0]?.resources;
-    const gpu = workerGroupSpecsResource?.requests?.['nvidia.com/gpu'] || 0;
-
-    const autoscalerOptions = this.value?.spec?.autoscalerOptions;
-    const enableWorkerGPU = workerGroupSpecs[0].template.spec.runtimeClassName === 'nvidia';
+    const defaultWorkerPodTemplateSpec = workerGroupSpecs[0].template?.spec;
 
     return {
       defaultConfig:   {},
       runtimeClasses:  [],
-      schedulerType:   ['volcano'],
-      gpu,
-      enableGCSFaultTolerance,
-      headGroupSpecResource,
-      headGroupContainer,
-      headGroupSpec,
       savePvcHookName: 'savePvcHook',
-      workerGroupSpecs,
-      workerGroupSpecsResource,
-      autoscalerOptions,
+      spec,
+      autoScaleOptions,
+      enableGCSFaultTolerance,
+      headGroupSpec,
+      headGroupContainer,
       scheduleOnHeadNode,
-      enableWorkerGPU,
+      workerGroupSpecs,
+      defaultWorkerPodTemplateSpec,
     };
   },
 
@@ -90,17 +90,29 @@ export default {
         value: 'Default'
       }];
     },
-    runtimeClassOptions() {
-      const opts = [];
 
-      this.runtimeClasses.filter((runtimeClass) => {
-        opts.push({
-          label: runtimeClass.metadata.name,
-          value: runtimeClass.metadata.name,
-        });
-      });
+    headGroupFlatResources: {
+      get() {
+        return FlatResources.get(this.headGroupContainer);
+      },
 
-      return opts;
+      set(neu) {
+        const out = FlatResources.set(neu);
+
+        this.$set(this.headGroupSpec, 'resources', cleanUp(out));
+      }
+    },
+
+    workerGroupFlatResources: {
+      get() {
+        return FlatResources.get(this.workerGroupSpecs[0]?.template?.spec?.containers[0]);
+      },
+
+      set(neu) {
+        const out = FlatResources.set(neu);
+
+        this.$set(this.workerGroupSpecs[0]?.template?.spec?.containers[0], 'resources', cleanUp(out));
+      }
     }
   },
 
@@ -109,10 +121,12 @@ export default {
       this.errors = [];
       this.update();
 
-      if (this.workerGroupSpecsResource.requests.memory === '' || this.headGroupSpecResource.requests.memory === '') {
+      if (this.headGroupContainer.resources?.requests?.memory === '' ||
+          this.defaultWorkerPodTemplateSpec.resources?.requests?.memory === '') {
         this.errors.push(this.t('validation.required', { key: 'Memory' }, true));
       }
-      if (this.workerGroupSpecsResource.requests.cpu === '' || this.headGroupSpecResource.requests.cpu === '') {
+      if (this.headGroupContainer.resources?.requests?.cpu === '' ||
+          this.defaultWorkerPodTemplateSpec.resources?.requests?.cpu === '') {
         this.errors.push(this.t('validation.required', { key: 'CPU' }, true));
       }
 
@@ -126,14 +140,8 @@ export default {
     },
 
     update() {
-      // set rayVersion
-      if (this.value.spec.rayVersion) {
-        this.value.spec.headGroupSpec.template.spec.containers[0].image = `rayproject/ray:${ this.value.spec.rayVersion }`;
-        this.value.spec.workerGroupSpecs[0].template.spec.containers[0].image = `rayproject/ray:${ this.value.spec.rayVersion }`;
-      }
-
       if (this.scheduleOnHeadNode) {
-        this.headGroupSpec.rayStartParams['num-cpus'] = this.headGroupSpecResource.requests.cpu.toString();
+        this.headGroupSpec.rayStartParams['num-cpus'] = this.headGroupContainer.resources?.requests?.cpu?.toString();
       } else {
         this.headGroupSpec.rayStartParams['num-cpus'] = '0';
       }
@@ -143,27 +151,26 @@ export default {
         [ANNOTATIONS.RAY_CLUSTER_FT_ENABLED]: this.enableGCSFaultTolerance.toString(),
       };
 
-      if (this.enableWorkerGPU) {
-        if (this.gpu === 0) {
-          this.gpu = 1;
+      const workerPodSpec = FlatResources.validateGPU(this.defaultWorkerPodTemplateSpec);
+
+      if (workerPodSpec) {
+        this.workerGroupSpecs[0].template.spec = workerPodSpec;
+      }
+
+      if (this.spec.enableInTreeAutoscaling) {
+        this.spec.autoscalerOptions = this.autoScaleOptions;
+      }
+
+      // set rayVersion
+      if (this.spec.rayVersion) {
+        const nvidiaGpuLimit = this.defaultWorkerPodTemplateSpec.containers[0]?.resources?.limits?.[GPU_KEY];
+
+        this.headGroupContainer.image = `rayproject/ray:${ this.spec.rayVersion }`;
+        if (nvidiaGpuLimit > 0) {
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `rayproject/ray:${ this.spec.rayVersion }-gpu`;
+        } else {
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `rayproject/ray:${ this.spec.rayVersion }`;
         }
-        this.workerGroupSpecs.runtimeClassName = this.runtimeClasses[0]?.name;
-      } else {
-        this.gpu = 0;
-        delete this.workerGroupSpecs.runtimeClassName;
-      }
-
-      this.value.spec.workerGroupSpecs[0] = this.workerGroupSpecs[0];
-      if (!this.gpu) {
-        delete this.value.spec.workerGroupSpecs[0].template.spec.containers[0].resources.requests['nvidia.com/gpu'];
-        delete this.value.spec.workerGroupSpecs[0].template.spec.runtimeClassName;
-      } else {
-        this.value.spec.workerGroupSpecs[0].template.spec.containers[0].resources.requests['nvidia.com/gpu'] = this.gpu;
-        this.value.spec.workerGroupSpecs[0].template.spec.runtimeClassName = 'nvidia';
-      }
-
-      if (this.value.spec.enableInTreeAutoscaling) {
-        this.value.spec.autoscalerOptions = this.autoscalerOptions;
       }
 
       this.value.setAnnotations(annotations);
@@ -201,32 +208,17 @@ export default {
         class="bordered-table"
         :weight="100"
       >
-        <div class="row mb-20">
-          <div class="col span-6">
-            <UnitInput
-              v-model="headGroupSpecResource.requests.cpu"
-              label="CPU"
-              suffix="C"
-              required
-              :output-modifier="true"
-              :mode="mode"
-              @input="update"
-            />
-          </div>
-
-          <div class="col span-6">
-            <UnitInput
-              v-model="headGroupSpecResource.requests.memory"
-              label="Memory"
-              :input-exponent="3"
-              :output-modifier="true"
-              :increment="1024"
-              :mode="mode"
-              suffix="Gi"
-              required
-              @input="update"
-            />
-          </div>
+        <div class="mb-20">
+          <!-- Resources and Limitations -->
+          <ContainerResourceLimit
+            v-model="headGroupFlatResources"
+            :mode="mode"
+            :runtime-classes="runtimeClasses"
+            :pod-spec="headGroupSpec.template.spec"
+            :handle-gpu-limit="false"
+            :show-tip="false"
+            @input="update"
+          />
         </div>
 
         <AdvancedSection
@@ -263,16 +255,6 @@ export default {
       >
         <div class="row mb-20">
           <div class="col span-6">
-            <LabeledInput
-              v-model="workerGroupSpecs[0].groupName"
-              label="Group Name"
-              required
-              :mode="mode"
-              @input="update"
-            />
-          </div>
-
-          <div class="col span-6">
             <UnitInput
               v-model="workerGroupSpecs[0].replicas"
               :hide-unit="true"
@@ -282,8 +264,6 @@ export default {
               @input="update"
             />
           </div>
-        </div>
-        <div class="row mb-20">
           <div class="col span-6">
             <UnitInput
               v-model="workerGroupSpecs[0].minReplicas"
@@ -294,7 +274,9 @@ export default {
               @input="update"
             />
           </div>
+        </div>
 
+        <div class="row mb-20">
           <div class="col span-6">
             <UnitInput
               v-model="workerGroupSpecs[0].maxReplicas"
@@ -307,68 +289,17 @@ export default {
           </div>
         </div>
 
-        <div class="row mb-20">
-          <div class="col span-6">
-            <UnitInput
-              v-model="workerGroupSpecsResource.requests.cpu"
-              label="CPU"
-              suffix="C"
-              required
-              :output-modifier="true"
-              :mode="mode"
-              @input="update"
-            />
-          </div>
-
-          <div class="col span-6">
-            <UnitInput
-              v-model="workerGroupSpecsResource.requests.memory"
-              label="Memory"
-              :input-exponent="3"
-              :output-modifier="true"
-              :increment="1024"
-              :mode="mode"
-              suffix="Gi"
-              required
-              @input="update"
-            />
-          </div>
-        </div>
-
-        <h4>Worker GPU Config</h4>
-        <div class="row mb-20">
-          <div class="col span-6">
-            <Checkbox
-              v-model="enableWorkerGPU"
-              :mode="mode"
-              label="Enable GPU"
-              @input="update"
-            />
-          </div>
-        </div>
-        <div
-          v-if="enableWorkerGPU"
-          class="row"
-        >
-          <div class="col span-6">
-            <LabeledInput
-              v-model="gpu"
-              v-int-number
-              label="GPU"
-              :mode="mode"
-              @input="update"
-            />
-          </div>
-          <div class="col span-6">
-            <LabeledSelect
-              v-model="workerGroupSpecs[0].template.spec.runtimeClassName"
-              label="Runtime Class"
-              :options="runtimeClassOptions"
-              required
-              :mode="mode"
-              @input="update"
-            />
-          </div>
+        <h4>Worker Resources</h4>
+        <div class="mb-20">
+          <!-- Worker Group Resources and Limitations -->
+          <ContainerResourceLimit
+            v-model="workerGroupFlatResources"
+            :mode="mode"
+            :runtime-classes="runtimeClasses"
+            :pod-spec="workerGroupSpecs[0].template.spec"
+            :show-tip="false"
+            @input="update"
+          />
         </div>
       </Tab>
 
@@ -407,8 +338,8 @@ export default {
         >
           <div class="col span-6">
             <LabeledSelect
-              v-if="autoscalerOptions"
-              v-model="autoscalerOptions.upscalingMode"
+              v-if="autoScaleOptions"
+              v-model="autoScaleOptions.upscalingMode"
               label="Upscaling Mode"
               :options="upScalingModeOption"
               required
@@ -419,8 +350,8 @@ export default {
 
           <div class="col span-6">
             <UnitInput
-              v-if="autoscalerOptions"
-              v-model="autoscalerOptions.idleTimeoutSeconds"
+              v-if="autoScaleOptions"
+              v-model="autoScaleOptions.idleTimeoutSeconds"
               label="Idle Timeout Seconds"
               suffix="s"
               required

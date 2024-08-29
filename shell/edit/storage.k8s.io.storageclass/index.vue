@@ -161,7 +161,6 @@ export default {
     getComponent(name) {
       const isCustom = !PROVISIONER_OPTIONS.find((o) => o.value === name);
       const provisioner = isCustom ? 'custom' : name;
-      console.log(`Loading provisioner component: ${ provisioner }`)
 
       return require(`./provisioners/${ provisioner }`).default;
     },

@@ -17,9 +17,9 @@ export default class RayCluster extends SteveModel {
         }
       },
       spec: {
-        rayVersion:        '2.31.0',
+        rayVersion:        '2.35.0',
         autoscalerOptions: {
-          idleTimeoutSeconds: 60,
+          idleTimeoutSeconds: 600,
           resources:          {
             limits: {
               cpu:    '500m',
@@ -89,7 +89,10 @@ export default class RayCluster extends SteveModel {
                       cpu:    '2',
                       memory: '4Gi'
                     },
-                    limits: { memory: '4Gi' },
+                    limits: {
+                      cpu:    '2',
+                      memory: '4Gi'
+                    },
                   },
                   volumeMounts: [
                     {

@@ -1,10 +1,10 @@
 <script>
 import ResourceTable from '@shell/components/ResourceTable';
-import Loading from "@shell/components/Loading.vue";
+import Loading from '@shell/components/Loading.vue';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import { SCHEMA, LLMOS, PV, PVC } from '@shell/config/types';
-import {allHash} from "@shell/utils/promise";
-import {STATE, NAME, AGE, NAMESPACE } from "@shell/config/table-headers";
+import { allHash } from '@shell/utils/promise';
+import { STATE, NAME, AGE, NAMESPACE } from '@shell/config/table-headers';
 
 const schema = {
   id:         LLMOS.VOLUME,
@@ -18,9 +18,7 @@ const schema = {
 
 export default {
   name:       'LLMOSVolumes',
-  components: {
-    Loading, ResourceTable
-  },
+  components: { Loading, ResourceTable },
   mixins:     [ResourceFetch],
 
   async fetch() {
@@ -48,19 +46,19 @@ export default {
         name:     'storageClass',
         sort:     ['storageClass'],
         value:    'spec.storageClassName',
-      }
+      };
       const VOLUME_MODE = {
         labelKey: 'tableHeaders.volumeMode',
         name:     'volumeMode',
         sort:     ['volumeMode'],
         value:    'spec.volumeMode',
-      }
+      };
       const CAPACITY = {
         labelKey: 'tableHeaders.capacity',
         name:     'capacity',
         sort:     ['capacity'],
         value:    'spec.resources.requests.storage',
-      }
+      };
 
       return [
         STATE,
@@ -70,12 +68,11 @@ export default {
         STORAGE_CLASS,
         VOLUME_MODE,
         AGE,
-      ]
+      ];
     },
   },
 
-  methods: {
-  },
+  methods: {},
 
   typeDisplay() {
     return this.$store.getters['type-map/labelFor'](schema, 99);

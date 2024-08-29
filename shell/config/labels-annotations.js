@@ -1,15 +1,16 @@
 // export const NORMAN_NAME = 'field.cattle.io/name';
-export const DESCRIPTION = 'field.llmos.io/description';
 export const HOSTNAME = 'kubernetes.io/hostname';
 export const TIMESTAMP = 'cattle.io/timestamp';
 export const SYSTEM_NAMESPACE = 'management.cattle.io/system-namespace';
 export const PROJECT = 'field.cattle.io/projectId';
-export const CONTAINER_DEFAULT_RESOURCE_LIMIT = 'field.cattle.io/containerDefaultResourceLimit';
 export const CATTLE_PUBLIC_ENDPOINTS = 'field.cattle.io/publicEndpoints';
 export const TARGET_WORKLOADS = 'field.cattle.io/targetWorkloadIds';
 export const UI_MANAGED = 'management.cattle.io/ui-managed';
 export const RESOURCE_QUOTA = 'field.cattle.io/resourceQuota';
 export const WORKSPACE_ANNOTATION = 'objectset.rio.cattle.io/id';
+
+export const DESCRIPTION = 'field.llmos.io/description';
+export const CONTAINER_DEFAULT_RESOURCE_LIMIT = 'field.llmos.ai/containerDefaultResourceLimit';
 
 export const KUBERNETES = {
   SERVICE_ACCOUNT_UID:  'kubernetes.io/service-account.uid',
