@@ -14,7 +14,7 @@ import { ucFirst } from '@shell/utils/string';
 import { SCHEMA, COUNT } from '@shell/config/types';
 import { LLMOS_NAME as HARVESTER } from '@shell/config/features';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
-import { NAME as LLM } from '@shell/config/product/llm';
+import { NAME as LLM } from '@shell/config/product/llmos';
 import { BASIC, FAVORITE, USED } from '@shell/store/type-map';
 import { NAME as NAVLINKS } from '@shell/config/product/navlinks';
 import Group from '@shell/components/nav/Group';

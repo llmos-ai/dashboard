@@ -273,10 +273,7 @@ export default {
           @input="updateLimits"
         />
       </span>
-      <span
-        v-if="runtimeClassOptions.length > 0"
-        class="col span-6"
-      >
+      <span class="col span-6">
         <LabeledSelect
           v-model="podSpec.runtimeClassName"
           label="Runtime Class"

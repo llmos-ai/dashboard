@@ -22,8 +22,8 @@ export const PROVISIONER_OPTIONS = [
     value:    'kubernetes.io/no-provisioner',
   },
   {
-    labelKey:  'storageClass.longhorn.title',
-    value:     'driver.longhorn.io',
+    labelKey: 'storageClass.longhorn.title',
+    value:    'driver.longhorn.io',
   },
   {
     labelKey: 'storageClass.portworx-volume.title',
@@ -42,9 +42,9 @@ export const PROVISIONER_OPTIONS = [
     value:    'kubernetes.io/storageos',
   },
   {
-    labelKey:      'storageClass.local-path-provisioner.title',
-    value:         'rancher.io/local-path',
-    supported:     true,
+    labelKey:  'storageClass.local-path-provisioner.title',
+    value:     'rancher.io/local-path',
+    supported: true,
   }
 ];
 
@@ -54,11 +54,12 @@ export default class extends SteveModel {
     const fallbackStr = `${ this.provisioner } ${ this.t('persistentVolume.csi.drivers.suffix') }`;
 
     let fallback = this.$rootGetters['i18n/withFallback'](`persistentVolume.csi.drivers.${ this.provisioner.replaceAll('.', '-') }`, null, fallbackStr);
+
     if (!option && fallback.includes('undefined')) {
-      fallback = this.provisioner
+      fallback = this.provisioner;
     }
 
-    return option ? this.t(option.labelKey) : fallback
+    return option ? this.t(option.labelKey) : fallback;
   }
 
   get isDefault() {

@@ -1,5 +1,5 @@
 <script>
-import { NAME as LLM } from '@shell/config/product/llm';
+import { NAME as LLM } from '@shell/config/product/llmos';
 import { NODE } from '@shell/config/types';
 
 export default {
