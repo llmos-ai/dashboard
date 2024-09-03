@@ -241,9 +241,9 @@ export default {
 
     async changePassword() {
       try {
-        await this.$store.dispatch('managemenet/collectionAction', {
+        await this.$store.dispatch('management/collectionAction', {
           type:       MANAGEMENT.USER,
-          actionName: 'changepassword',
+          actionName: 'changePassword',
           body:       {
             currentPassword: this.form.currentP,
             newPassword:     this.isRandomGenerated ? this.form.genP : this.form.newP
@@ -265,11 +265,11 @@ export default {
   >
     <div class="form">
       <div class="fields">
-        <Checkbox
-          v-if="isChange"
-          label-key="changePassword.deleteKeys.label"
-          class="mt-10"
-        />
+        <!--        <Checkbox-->
+        <!--          v-if="isChange"-->
+        <!--          label-key="changePassword.deleteKeys.label"-->
+        <!--          class="mt-10"-->
+        <!--        />-->
         <Checkbox
           v-if="isCreateEdit"
           v-model="isRandomGenerated"

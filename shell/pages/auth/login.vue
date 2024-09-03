@@ -140,8 +140,9 @@ export default {
         await this.$store.dispatch('auth/login', {
           provider: 'local',
           body:     {
-            username: this.username,
-            password: this.password
+            username:     this.username,
+            password:     this.password,
+            responseType: 'cookie'
           }
         });
 

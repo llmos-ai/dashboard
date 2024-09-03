@@ -1,27 +1,26 @@
 <script>
-import { mapGetters } from 'vuex';
-import day from 'dayjs';
-import sortBy from 'lodash/sortBy';
-import { MANAGEMENT } from '@shell/config/types';
-import { Banner } from '@components/Banner';
 import DetailText from '@shell/components/DetailText';
 import Footer from '@shell/components/form/Footer';
-import { LabeledInput } from '@components/Form/LabeledInput';
-import LabeledSelect from '@shell/components/form/LabeledSelect';
-import { RadioGroup } from '@components/Form/Radio';
 import Select from '@shell/components/form/Select';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { diffFrom } from '@shell/utils/time';
+import { MANAGEMENT } from '@shell/config/types';
+
+import { RadioGroup } from '@components/Form/Radio';
+import { Banner } from '@components/Banner';
+import { LabeledInput } from '@components/Form/LabeledInput';
+import { mapGetters } from 'vuex';
+import day from 'dayjs';
+import { DESCRIPTION } from '@shell/config/labels-annotations';
 
 export default {
   components: {
-    Banner,
     DetailText,
     Footer,
-    LabeledInput,
-    LabeledSelect,
-    RadioGroup,
     Select,
+    Banner,
+    LabeledInput,
+    RadioGroup,
   },
 
   mixins: [CreateEditView],
@@ -37,32 +36,26 @@ export default {
       maxTTL = 0;
     }
 
+    const description = this.value.annotations[DESCRIPTION];
+
     return {
-      errors: null,
-      form:   {
+      errors:  null,
+      created: null,
+      form:    {
         expiryType:        'never',
         customExpiry:      0,
         customExpiryUnits: 'minute',
       },
-      created:    null,
-      ttlLimited: false,
-      accessKey:  '',
-      secretKey:  '',
+      accessKey: '',
+      secretKey: '',
+      token:     '',
       maxTTL,
+      description
     };
   },
 
   computed: {
     ...mapGetters({ t: 'i18n/t' }),
-    scopes() {
-      const kubeClusters = this.$store.getters['management/all'](MANAGEMENT.CLUSTER);
-      let out = kubeClusters.map((opt) => ({ value: opt.id, label: opt.nameDisplay }));
-
-      out = sortBy(out, ['label']);
-      out.unshift( { value: '', label: this.t('accountAndKeys.apiKeys.add.noScope') } );
-
-      return out;
-    },
 
     expiryOptions() {
       const options = ['never', 'day', 'month', 'year', 'custom'];
@@ -82,6 +75,7 @@ export default {
 
       return opts;
     },
+
     expiryUnitsOptions() {
       const options = ['minute', 'hour', 'day', 'month', 'year'];
       const filtered = this.filterOptionsForTTL(options);
@@ -96,6 +90,16 @@ export default {
   },
 
   methods: {
+    done() {
+      if (!this.created) {
+        this.doneCreate();
+      }
+    },
+
+    doneCreate() {
+      this.$router.push({ name: 'account' });
+    },
+
     filterOptionsForTTL(opts) {
       return opts.filter((option) => {
         if (option === 'never' ) {
@@ -114,40 +118,28 @@ export default {
 
     async actuallySave(url) {
       this.updateExpiry();
+      this.updateDescription();
       if ( this.isCreate ) {
-        // Description is a bit weird, so need to clone and set this
-        // rather than use this.value - need to find a way to set this if we ever
-        // want to allow edit (which I don't think we do)
         const res = await this.value.save();
 
         this.created = res;
-        this.ttlLimited = res.ttl !== this.value.ttl;
-        const token = this.created.token.split(':');
+
+        const token = this.created.spec.token.split(':');
 
         this.accessKey = token[0];
         this.secretKey = (token.length > 1) ? token[1] : '';
-        this.token = this.created.token;
+        this.token = this.created.spec.token;
 
         // Force a refresh of the token so we get the expiry date correctly
-        // await this.$store.dispatch('rancher/find', {
-        //   type: NORMAN.TOKEN,
-        //   id:   res.id,
-        //   opt:  { force: true }
-        // }, { root: true });
+        await this.$store.dispatch('management/find', {
+          type: MANAGEMENT.TOKEN,
+          id:   res.id,
+          opt:  { force: true }
+        }, { root: true });
       } else {
         // Note: update of existing key not supported currently
         await this.value.save();
       }
-    },
-
-    done() {
-      if (!this.created) {
-        this.doneCreate();
-      }
-    },
-
-    doneCreate() {
-      this.$router.push({ name: 'account' });
     },
 
     updateExpiry() {
@@ -162,10 +154,20 @@ export default {
         const now = day();
         const expiry = day().add(increment, units);
 
-        ttl = expiry.diff(now);
+        ttl = expiry.diff(now, 's');
       }
-      this.value.ttl = ttl;
-    }
+      this.value.spec.ttlSeconds = ttl;
+    },
+
+    updateDescription() {
+      if (this.description === '') {
+        return;
+      }
+      if (!this.value.metadata.annotations) {
+        this.$set(this.value.metadata, 'annotations', {});
+      }
+      this.value.metadata.annotations[DESCRIPTION] = this.description;
+    },
   }
 };
 </script>
@@ -175,18 +177,11 @@ export default {
     <div class="pl-10 pr-10">
       <LabeledInput
         key="description"
-        v-model="value.description"
+        v-model="description"
         :placeholder="t('accountAndKeys.apiKeys.add.description.placeholder')"
         label-key="accountAndKeys.apiKeys.add.description.label"
         mode="edit"
         :min-height="30"
-      />
-
-      <LabeledSelect
-        v-model="value.clusterId"
-        class="mt-20 scope-select"
-        label-key="accountAndKeys.apiKeys.add.scope"
-        :options="scopes"
       />
 
       <h5 class="pt-20">
@@ -226,7 +221,6 @@ export default {
   </div>
   <div v-else>
     <div>{{ t('accountAndKeys.apiKeys.info.keyCreated') }}</div>
-
     <DetailText
       :value="accessKey"
       label-key="accountAndKeys.apiKeys.info.accessKey"
@@ -254,16 +248,6 @@ export default {
     >
       <div>
         {{ t('accountAndKeys.apiKeys.info.saveWarning') }}
-      </div>
-    </Banner>
-
-    <Banner
-      v-if="ttlLimited"
-      color="warning"
-      class="mt-20"
-    >
-      <div>
-        {{ t('accountAndKeys.apiKeys.info.ttlLimitedWarning') }}
       </div>
     </Banner>
 

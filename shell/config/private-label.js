@@ -1,7 +1,7 @@
 export const ANY = 0;
 export const STANDARD = 1;
 export const CUSTOM = 2;
-export const DOCS_BASE = 'https://llmos-docs.1block.ai';
+export const DOCS_BASE = 'https://llmos.1block.ai/docs';
 
 const STANDARD_VENDOR = 'LLMOS';
 const STANDARD_PRODUCT = 'Dashboard';

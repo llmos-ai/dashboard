@@ -2,8 +2,6 @@ import { DSL } from '@shell/store/type-map';
 import { MANAGEMENT } from '@shell/config/types';
 
 export const NAME = 'auth';
-const USERS_VIRTUAL_TYPE = 'users';
-
 export function init(store) {
   const {
     product,
@@ -22,9 +20,10 @@ export function init(store) {
     category:            'configuration',
   });
 
+  configureType(MANAGEMENT.USER, { showListMasthead: false });
   virtualType({
     labelKey:   'typeLabel."management.llmos.ai.user"',
-    name:       USERS_VIRTUAL_TYPE,
+    name:       MANAGEMENT.USER,
     namespaced: false,
     weight:     103,
     icon:       'user',
@@ -37,10 +36,9 @@ export function init(store) {
       }
     }
   });
-  configureType(MANAGEMENT.USER, { showListMasthead: false });
 
   basicType([
     'config',
-    USERS_VIRTUAL_TYPE,
+    MANAGEMENT.USER,
   ]);
 }

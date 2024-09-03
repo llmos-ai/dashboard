@@ -335,7 +335,7 @@ accountAndKeys:
         placeholder: Optionally enter a description to help you identify this API Key
       label: Create API Key
       expiry:
-        label: Automatically expire
+        label: "Automatically expire:"
         options:
           never: Never
           day: A day from now
@@ -5630,16 +5630,6 @@ typeLabel:
       one { Project Membership }
       other { Project Memberships }
     }
-  management.llmos.ai.setting: |-
-    {count, plural,
-      one { Setting }
-      other { Settings }
-    }
-  management.llmos.ai.managedaddon: |-
-    {count, plural,
-      one { Managed Addon }
-      other { Managed Addons }
-    }
   policy.poddisruptionbudget: |-
     {count, plural,
       one { Pod Disruption Budget }
@@ -5936,16 +5926,6 @@ typeLabel:
       one { Machine }
       other { Machines }
     }
-  llmos.ai.volume: |-
-    {count, plural,
-      one { Volume }
-      other { Volumes }
-    }
-  ml.llmos.ai.modelservice: |-
-    {count, plural,
-      one { Model Service }
-      other { Model Services }
-    }
   ray.io.raycluster: |-
     {count, plural,
       one { Machine Learning Cluster }
@@ -5960,6 +5940,37 @@ typeLabel:
     {count, plural,
       one { Nvidia Driver }
       other { Nvidia Drivers }
+    }
+  # LLMOS Types
+  llmos.ai.volume: |-
+    {count, plural,
+      one { Volume }
+      other { Volumes }
+    }
+  management.llmos.ai.setting: |-
+    {count, plural,
+      one { Setting }
+      other { Settings }
+    }
+  management.llmos.ai.managedaddon: |-
+    {count, plural,
+      one { Managed Addon }
+      other { Managed Addons }
+    }
+  management.llmos.ai.user: |-
+    {count, plural,
+      one { User }
+      other { Users }
+    }
+  management.llmos.ai.token: |-
+    {count, plural,
+      one { API Key }
+      other { API Keys }
+    }
+  ml.llmos.ai.modelservice: |-
+    {count, plural,
+      one { Model Service }
+      other { Model Services }
     }
 
 action:
@@ -6071,7 +6082,7 @@ advancedSettings:
     'ingress-ip-domain': 'Wildcard DNS domain to use for automatically generated Ingress hostnames. <ingress-name>.<namespace-name>.<ip address of ingress controller> will be added to the domain.'
     'server-url': 'Default {appName} install url. Must be HTTPS. All nodes in your cluster must be able to reach this.'
     'system-default-registry': 'Private registry to be used for all Rancher System Container Images. If no value is specified, the default registry for the container runtime is used. For Docker and containerd, the default is `docker.io`.'
-    'ui-index': 'HTML index location for the Cluster Manager UI.'
+    'ui-index': 'HTML index location for the LLMOS Dashboard UI.'
     'ui-dashboard-index': 'HTML index location for the {appName} UI.'
     'ui-offline-preferred': 'Controls whether UI assets are served locally by the server container or from the remote URL defined in the ui-index and ui-dashboard-index settings. The `Dynamic` option will use local assets in production builds of {appName}.'
     'ui-pl': 'Private-Label company name.'
