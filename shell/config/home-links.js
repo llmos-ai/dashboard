@@ -26,7 +26,7 @@ const DEFAULT_LINKS = [
   },
   {
     key:     'getStarted',
-    value:   `${ DOCS_BASE }/overview`,
+    value:   `${ DOCS_BASE }/quickstart`,
     enabled: true,
   },
 ];

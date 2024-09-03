@@ -113,8 +113,8 @@ export default {
           username:    this.form.username,
           password:    this.form.password.password,
           displayName: this.form.displayName,
-          isAdmin:     true,
-          isActive:    true,
+          Admin:       true,
+          Active:      true,
           description: this.form.description,
         },
       });

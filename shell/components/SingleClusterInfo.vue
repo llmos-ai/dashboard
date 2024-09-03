@@ -187,6 +187,30 @@ export default {
 
     <div>
       <div class="single-cluster-info">
+        <h3>
+          Quick Access
+        </h3>
+        <div class="cluster-counts">
+          <ResourceSummary
+            v-if="canAccessMLCluster"
+            :cluster="clusterDetail.id"
+            resource="ray.io.raycluster"
+            product="llm"
+          />
+          <ResourceSummary
+            v-if="canAccessNotebooks"
+            :cluster="clusterDetail.id"
+            resource="ml.llmos.ai.notebook"
+            product="llm"
+          />
+          <ResourceSummary
+            v-if="canAccessModelServices"
+            :cluster="clusterDetail.id"
+            resource="ml.llmos.ai.modelservice"
+            product="llm"
+          />
+        </div>
+        <h3>Others</h3>
         <div class="cluster-counts">
           <ResourceSummary
             v-if="canAccessNodes"
@@ -206,47 +230,27 @@ export default {
             product="llm"
           />
         </div>
-        <div class="cluster-counts">
-          <ResourceSummary
-            v-if="canAccessMLCluster"
-            :cluster="clusterDetail.id"
-            resource="ray.io.raycluster"
-            product="llm"
-          />
-          <ResourceSummary
-            v-if="canAccessModelServices"
-            :cluster="clusterDetail.id"
-            resource="ml.llmos.ai.modelservice"
-            product="llm"
-          />
-          <ResourceSummary
-            v-if="canAccessNotebooks"
-            :cluster="clusterDetail.id"
-            resource="ml.llmos.ai.notebook"
-            product="llm"
-          />
-        </div>
       </div>
     </div>
 
-    <div v-if="componentServices">
-      <div
-        v-for="status in componentServices"
-        :key="status.name"
-        class="home-component-status"
-        :class="{'home-component-status-healthy': status.healthy, 'home-component-status-unhealthy': !status.healthy}"
-      >
-        <i
-          v-if="status.healthy"
-          class="icon icon-checkmark"
-        />
-        <i
-          v-else
-          class="icon icon-warning"
-        />
-        <div>{{ t(status.labelKey) }}</div>
-      </div>
-    </div>
+    <!--    <div v-if="componentServices">-->
+    <!--      <div-->
+    <!--        v-for="status in componentServices"-->
+    <!--        :key="status.name"-->
+    <!--        class="home-component-status"-->
+    <!--        :class="{'home-component-status-healthy': status.healthy, 'home-component-status-unhealthy': !status.healthy}"-->
+    <!--      >-->
+    <!--        <i-->
+    <!--          v-if="status.healthy"-->
+    <!--          class="icon icon-checkmark"-->
+    <!--        />-->
+    <!--        <i-->
+    <!--          v-else-->
+    <!--          class="icon icon-warning"-->
+    <!--        />-->
+    <!--        <div>{{ t(status.labelKey) }}</div>-->
+    <!--      </div>-->
+    <!--    </div>-->
   </div>
 </template>
 

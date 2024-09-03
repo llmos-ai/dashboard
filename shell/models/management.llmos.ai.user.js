@@ -1,7 +1,10 @@
-import HybridModel from '@shell/plugins/steve/hybrid-class';
 import { MANAGEMENT } from '@shell/config/types';
+import { md5 } from '@shell/utils/crypto';
+import Identicon from 'identicon.js';
+import { ucFirst } from '@shell/utils/string';
+import SteveModel from '@shell/plugins/steve/steve-class';
 
-export default class User extends HybridModel {
+export default class User extends SteveModel {
   // Preserve description
   constructor(data, ctx, rehydrateNamespace = null, setClone = false) {
     const _description = data.spec?.description;
@@ -147,11 +150,34 @@ export default class User extends HybridModel {
     return this.user?.hasLink('remove') && !this.isCurrentUser;
   }
 
-  get canUpdate() {
-    return this.user?.hasLink('update');
+  get avatarSrc() {
+    let id = this.id || 'Unknown';
+
+    id = id.replace(/[^:]+:\/\//, '');
+
+    const hash = md5(id, 'hex');
+    const out = `data:image/png;base64,${ new Identicon(hash, 80, 0.01).toString() }`;
+
+    return out;
   }
 
-  remove() {
-    return this.user?.remove();
+  get roundAvatar() {
+    return this.provider === 'github';
+  }
+
+  get providerSpecificType() {
+    const parts = this.id.replace(/:.*$/, '').split('_', 2);
+
+    if ( parts.length === 2 ) {
+      return parts[1];
+    }
+
+    return null;
+  }
+
+  get displayType() {
+    const provider = this.$rootGetters['i18n/withFallback'](`model.authConfig.provider."${ this.provider }"`, null, this.provider);
+
+    return `${ provider } ${ ucFirst(this.providerSpecificType) }`;
   }
 }

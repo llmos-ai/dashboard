@@ -83,6 +83,7 @@ export const MANAGEMENT = {
   CLUSTER:       'management.oneblock.ai.cluster',
   SETTING:       'management.llmos.ai.setting',
   USER:          'management.llmos.ai.user',
+  TOKEN:         'management.llmos.ai.token',
   MANAGED_ADDON: 'management.llmos.ai.managedaddon',
 
   // TODO, add project

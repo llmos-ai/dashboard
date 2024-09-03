@@ -23,6 +23,14 @@ export const routerOptions = {
     component: () => interopDefault(import('../pages/about.vue' /* webpackChunkName: "pages/about" */)),
     name:      'about'
   }, {
+    path:      '/account',
+    component: () => interopDefault(import('../pages/account/index.vue' /* webpackChunkName: "pages/account/index" */)),
+    name:      'account'
+  }, {
+    path:      '/account/create-key',
+    component: () => interopDefault(import('../pages/account/create-key.vue' /* webpackChunkName: "pages/account/create-key" */)),
+    name:      'account-create-key'
+  }, {
     path:      '/c',
     component: () => interopDefault(import('../pages/c/index.vue' /* webpackChunkName: "pages/c/index" */)),
     name:      'c'
