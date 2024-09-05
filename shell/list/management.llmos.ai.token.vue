@@ -35,7 +35,10 @@ export default {
   async fetch() {
     const store = this.$store;
 
-    await store.dispatch(`management/findAll`, { type: MANAGEMENT.TOKEN });
+    await store.dispatch(`management/findAll`, {
+      type: MANAGEMENT.TOKEN,
+      opt:  { force: true },
+    });
 
     await this.$fetchType(this.resource);
   },

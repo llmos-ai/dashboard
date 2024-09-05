@@ -1,10 +1,19 @@
 import { DSL } from '@shell/store/type-map';
 import { MANAGEMENT } from '@shell/config/types';
+import {
+  RBAC_BUILTIN, RBAC_DEFAULT, STATE, AGE, SIMPLE_NAME,
+  NAME as HEADER_NAME
+} from '@shell/config/table-headers';
 
 export const NAME = 'auth';
+
+const USERS_VIRTUAL_TYPE = 'users';
+const ROLES_VIRTUAL_TYPE = 'roles';
+
 export function init(store) {
   const {
     product,
+    headers,
     basicType,
     configureType,
     virtualType,
@@ -23,7 +32,7 @@ export function init(store) {
   configureType(MANAGEMENT.USER, { showListMasthead: false });
   virtualType({
     labelKey:   'typeLabel."management.llmos.ai.user"',
-    name:       MANAGEMENT.USER,
+    name:       USERS_VIRTUAL_TYPE,
     namespaced: false,
     weight:     103,
     icon:       'user',
@@ -37,8 +46,37 @@ export function init(store) {
     }
   });
 
+  virtualType({
+    ifHaveType: MANAGEMENT.GLOBAL_ROLE,
+    labelKey:   'rbac.roletemplate.label',
+    name:       ROLES_VIRTUAL_TYPE,
+    namespaced: false,
+    weight:     100,
+    icon:       'user',
+    route:      { name: 'c-cluster-auth-roles' }
+  });
+
   basicType([
     'config',
-    MANAGEMENT.USER,
+    USERS_VIRTUAL_TYPE,
+    ROLES_VIRTUAL_TYPE,
+  ]);
+
+  const DISPLAY_NAME = {
+    ...HEADER_NAME,
+    name:     'displayName',
+    labelKey: 'tableHeaders.nameDisplay',
+  };
+
+  headers(MANAGEMENT.GLOBAL_ROLE, [
+    STATE,
+    DISPLAY_NAME,
+    SIMPLE_NAME,
+    RBAC_BUILTIN,
+    {
+      ...RBAC_DEFAULT,
+      labelKey: 'tableHeaders.authRoles.globalDefault',
+    },
+    AGE
   ]);
 }

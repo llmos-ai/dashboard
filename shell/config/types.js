@@ -80,17 +80,23 @@ export const METRIC = {
 // Management API (via Steve)
 // Base: /v1
 export const MANAGEMENT = {
-  CLUSTER:       'management.oneblock.ai.cluster',
-  SETTING:       'management.llmos.ai.setting',
-  USER:          'management.llmos.ai.user',
-  TOKEN:         'management.llmos.ai.token',
-  MANAGED_ADDON: 'management.llmos.ai.managedaddon',
+  CLUSTER:               'management.oneblock.ai.cluster',
+  SETTING:               'management.llmos.ai.setting',
+  USER:                  'management.llmos.ai.user',
+  TOKEN:                 'management.llmos.ai.token',
+  MANAGED_ADDON:         'management.llmos.ai.managedaddon',
+  GLOBAL_ROLE:           'management.llmos.ai.globalrole',
+  ROLE_TEMPLATE:         'management.llmos.ai.roletemplate',
+  ROLE_TEMPLATE_BINDING: 'management.llmos.ai.roletemplatebinding',
 
   // TODO, add project
   PROJECT: 'management.llmos.io.project',
 };
 
 export const LLMOS = {
+  MANAGEMENT_GROUP: 'management.llmos.ai',
+  VERSION:          'v1',
+
   // ML related resources
   RAY_CLUSTER:   'ray.io.raycluster',
   MODEL_FILE:    'ml.llmos.ai.modelfile',

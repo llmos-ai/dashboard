@@ -7,36 +7,54 @@ import CruResource from '@shell/components/CruResource';
 import { exceptionToErrorsArray } from '@shell/utils/error';
 import { _CREATE, _EDIT } from '@shell/config/query-params';
 import Loading from '@shell/components/Loading';
+import GlobalRoleBindings from '@shell/components/GlobalRoleBindings.vue';
+import { Checkbox } from '@components/Form/Checkbox';
 
 export default {
   components: {
-    ChangePassword, CruResource, LabeledInput, Loading
+    ChangePassword, CruResource, GlobalRoleBindings, Loading, LabeledInput, Checkbox
   },
   mixins: [
     CreateEditView
   ],
 
   data() {
+    const showGlobalRoles = !!this.$store.getters[`management/schemaFor`](MANAGEMENT.GLOBAL_ROLE);
+
+    const admin = this.value.spec?.admin || false;
+    const active = this.value.spec?.active || true;
+
     return {
+      showGlobalRoles,
       form: {
         username:    this.value.spec?.username,
         description: this.value.spec?.description,
         displayName: this.value.spec?.displayName,
-        password:    { password: '' }
+        admin,
+        active,
+        password:    {
+          password:          '',
+          userChangeOnLogin: false,
+        }
       },
-      validation: { password: false },
+      validation: {
+        password:     false,
+        roles:        !showGlobalRoles,
+        rolesChanged: false,
+      },
+      roles: [],
     };
   },
 
   computed: {
     valid() {
-      const valid = this.credentialsValid;
+      const valid = this.credentialsValid && this.rolesValid;
 
       if (this.isCreate) {
         return valid;
       }
       if (this.isEdit) {
-        return valid && this.credentialsChanged;
+        return valid && (this.credentialsChanged || this.validation.rolesChanged);
       }
 
       return false;
@@ -60,10 +78,14 @@ export default {
       if (this.isEdit) {
         return !!this.form.password.password ||
           this.form.description !== this.value.spec.description ||
-          this.form.displayName !== this.value.spec.displayName;
+          this.form.displayName !== this.value.spec.displayName ||
+          this.form.password.userChangeOnLogin !== this.value.mustChangePassword;
       }
 
       return false;
+    },
+    rolesValid() {
+      return this.validation.roles;
     },
     isCreate() {
       return this.mode === _CREATE;
@@ -85,9 +107,12 @@ export default {
       this.errors = [];
       try {
         if (this.isCreate) {
-          await this.createUser();
+          const user = await this.createUser();
+
+          await this.updateRoles(user.id);
         } else {
           await this.editUser();
+          await this.updateRoles();
         }
 
         this.$router.replace({ name: this.doneRoute });
@@ -113,8 +138,7 @@ export default {
           username:    this.form.username,
           password:    this.form.password.password,
           displayName: this.form.displayName,
-          Admin:       true,
-          Active:      true,
+          active:      this.form.active,
           description: this.form.description,
         },
       });
@@ -149,6 +173,12 @@ export default {
         opt:  { force: true }
       });
     },
+
+    async updateRoles(userId) {
+      if (this.$refs.grb) {
+        await this.$refs.grb.save(userId);
+      }
+    }
   }
 };
 </script>
@@ -201,6 +231,16 @@ export default {
         </div>
       </div>
 
+      <div class="row">
+        <div class="col span-6">
+          <Checkbox
+            v-model="form.active"
+            :mode="mode"
+            :label="t('user.edit.isActive')"
+          />
+        </div>
+      </div>
+
       <ChangePassword
         v-if="!isView"
         ref="changePassword"
@@ -209,6 +249,21 @@ export default {
         :must-change-password="value.mustChangePassword"
         @valid="validation.password = $event"
       />
+
+      <div
+        v-if="showGlobalRoles"
+        class="global-permissions"
+      >
+        <GlobalRoleBindings
+          ref="grb"
+          :user-id="value.id || liveValue.id"
+          :mode="mode"
+          :real-mode="realMode"
+          type="user"
+          @hasChanges="validation.rolesChanged = $event"
+          @canLogIn="validation.roles = $event"
+        />
+      </div>
     </div>
   </CruResource>
 </template>
