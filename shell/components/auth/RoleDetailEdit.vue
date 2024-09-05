@@ -1,5 +1,4 @@
 <script>
-import { mapGetters } from 'vuex';
 import { MANAGEMENT, RBAC } from '@shell/config/types';
 import CruResource from '@shell/components/CruResource';
 import CreateEditView from '@shell/mixins/create-edit-view';
@@ -15,42 +14,17 @@ import SortableTable from '@shell/components/SortableTable';
 import { _CLONE, _DETAIL } from '@shell/config/query-params';
 import { SCOPED_RESOURCES } from '@shell/config/roles';
 import Loading from '@shell/components/Loading';
+import { SUBTYPE_MAPPING, VERBS } from '@shell/models/management.llmos.ai.globalrole';
+import { RadioGroup } from '@components/Form/Radio';
 
-export const VERBS = [
-  'create',
-  'delete',
-  'get',
-  'list',
-  'patch',
-  'update',
-  'watch',
-];
+const GLOBAL = SUBTYPE_MAPPING.GLOBAL.key;
+const RBAC_ROLE = SUBTYPE_MAPPING.RBAC_ROLE.key;
 
 /**
  * Handles the View, Create and Edit of
- * - management.cattle.io.globalrole
- * - management.cattle.io.roletemplate
+ * - management.llmos.ai.globalrole
  * - rbac.authorization.k8s.io.role
  * - rbac.authorization.k8s.io.clusterrole
- *
- * management.cattle.io.roletemplate is further split into two types
- * - Cluster
- * - Project/Namespace
- *
- * The above means there are 4 types ==> 5 subtypes handled by this component
- *
- * This component is used in these five forms:
- *
- * 1. Cluster Explorer > More Resources > RBAC > ClusterRoles
- *   - Should show list of cluster scoped resources and namespaced resources
- * 2. Cluster Explorer > More Resources > RBAC > Roles
- *   - Should show list of namespaced resources
- * 3. Users & Authentication > Roles > Global
- *   - Should show global, cluster and namespace scoped resources
- * 4. Users & Authentication > Roles > Cluster
- *   - Should show cluster and namespace scoped resources
- * 5. Users & Authentication > Roles > Projects & Namespaces
- *   - Should show only namespace scoped resources
  */
 export default {
   components: {
@@ -63,6 +37,7 @@ export default {
     SortableTable,
     Loading,
     Error,
+    RadioGroup,
   },
 
   mixins: [CreateEditView, FormValidation],
@@ -81,8 +56,7 @@ export default {
     // to be in-app documentation for convenience only, while allowing
     // users to freely type in resources that are not shown in the list.
     if (this.realMode === _CLONE) {
-      this.value.displayName = '';
-      this.value.builtin = false;
+      this.value.spec.builtin = false;
     }
   },
 
@@ -100,11 +74,7 @@ export default {
       keyedTemplateOptions: {},
       resources:            this.value.resources,
       scopedResources:      SCOPED_RESOURCES,
-      defaultValue:         false,
       selectFocused:        null,
-      fvFormRuleSets:       [
-        { path: 'displayName', rules: ['required'] }
-      ],
     };
   },
 
@@ -123,37 +93,12 @@ export default {
       this.value.updateSubtype(roleContext);
     }
 
-    // Set the default value for the mapped subtype
-    // this.defaultValue = !!this.value[SUBTYPE_MAPPING[this.value.subtype].defaultKey];
-
-    // switch (this.value.subtype) {
-    // case CLUSTER:
-    // case NAMESPACE:
-    //   this.$set(this.value, 'roleTemplateNames', this.value.roleTemplateNames || []);
-    //   this.$set(this.value, 'locked', !!this.value.locked);
-    //   break;
-    // }
-
-    // On save hook request
-    if (this.registerBeforeHook) {
-      this.registerBeforeHook(() => {
-        // Map default value back to its own key for given subtype
-        // this.value[SUBTYPE_MAPPING[this.value.subtype].defaultKey] = !!this.defaultValue;
-      });
-    }
-
-    if (this.value?.metadata?.name && !this.value.displayName) {
-      this.$set(this.value, 'displayName', this.value.metadata.name);
-    }
-
     this.$nextTick(() => {
       this.$emit('set-subtype', this.label);
     });
   },
 
   computed: {
-    ...mapGetters(['releaseNotesUrl']),
-
     label() {
       return this.t(`rbac.roletemplate.subtypes.${ this.value.subtype }.label`);
     },
@@ -295,11 +240,20 @@ export default {
         }
       ];
     },
+    isRoleTemplate() {
+      return this.value.namespace;
+    },
+    isNamespaced() {
+      return this.value.subtype === RBAC_ROLE;
+    },
     isDetail() {
       return this.as === _DETAIL;
     },
+    isLLMOSType() {
+      return this.value.subtype === GLOBAL;
+    },
     isBuiltin() {
-      return this.value.builtin;
+      return this.value.spec?.builtin;
     },
     doneLocationOverride() {
       return this.value.listLocation;
@@ -356,7 +310,6 @@ export default {
   },
 
   methods: {
-
     setRule(key, rule, event) {
       // The key is the aspect of a permissions rule
       // that is being set, for example, "verbs," "resources",
@@ -559,11 +512,36 @@ export default {
         v-model="value"
         :namespaced="isNamespaced"
         :mode="mode"
-        name-key="displayName"
-        description-key="description"
         label="Name"
-        :rules="{ name: fvGetAndReportPathRules('displayName') }"
       />
+      <div
+        v-if="isLLMOSType"
+        class="row"
+      >
+        <div class="col span-6">
+          <RadioGroup
+            v-model="value.spec.newUserDefault"
+            name="storageSource"
+            :label="defaultLabel"
+            class="mb-10"
+            :options="newUserDefaultOptions"
+            :mode="mode"
+          />
+        </div>
+        <div
+          v-if="isRoleTemplate"
+          class="col span-6"
+        >
+          <RadioGroup
+            v-model="value.locked"
+            name="storageSource"
+            :label="t('rbac.roletemplate.locked.label')"
+            class="mb-10"
+            :options="lockedOptions"
+            :mode="mode"
+          />
+        </div>
+      </div>
       <div class="spacer" />
       <Tabbed :side-tabs="true">
         <Tab

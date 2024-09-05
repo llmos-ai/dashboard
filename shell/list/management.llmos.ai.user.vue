@@ -32,17 +32,15 @@ export default {
     }
   },
   async fetch() {
-    const store = this.$store;
-
-    await store.dispatch(`management/findAll`, { type: MANAGEMENT.USER });
-
+    this.$store.dispatch(`management/findAll`, {
+      type: MANAGEMENT.USER,
+      opt:  { force: true },
+    });
     await this.$fetchType(this.resource);
   },
 
   data() {
-    const getters = this.$store.getters;
-
-    const schema = getters[`management/schemaFor`](this.resource);
+    const schema = this.$store.getters[`management/schemaFor`](this.resource);
 
     return { schema };
   },
@@ -60,11 +58,8 @@ export default {
     groupBy() {
       return this.$store.getters['type-map/groupByFor'](this.schema);
     },
-
-    users() {
-      return this.rows;
-    }
   },
+  methods: {}
 };
 </script>
 
@@ -80,11 +75,13 @@ export default {
 
     <ResourceTable
       :schema="schema"
-      :rows="users"
+      :rows="rows"
+      :headers="headers"
       :group-by="groupBy"
       :loading="loading"
       :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
       :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
+      :sort-generation-fn="sortBy"
     />
   </div>
 </template>

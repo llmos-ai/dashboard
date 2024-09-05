@@ -2,7 +2,7 @@
 import BrandImage from '@shell/components/BrandImage';
 import ClusterIconMenu from '@shell/components/ClusterIconMenu';
 import IconOrSvg from '../IconOrSvg';
-import { BLANK_CLUSTER } from '@shell/store/store-types.js';
+import { BLANK_CLUSTER } from '@shell/store';
 import { mapGetters } from 'vuex';
 import { MANAGEMENT } from '@shell/config/types';
 import { MENU_MAX_CLUSTERS, VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';

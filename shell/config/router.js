@@ -71,6 +71,18 @@ export const routerOptions = {
     component: () => interopDefault(import('../pages/c/_cluster/auth/index.vue' /* webpackChunkName: "pages/c/_cluster/auth/index" */)),
     name:      'c-cluster-auth'
   }, {
+    path:      '/c/:cluster/auth/roles',
+    component: () => interopDefault(import('../pages/c/_cluster/auth/roles/index.vue' /* webpackChunkName: "pages/c/_cluster/auth/roles/index" */)),
+    name:      'c-cluster-auth-roles'
+  }, {
+    path:      '/c/:cluster/auth/roles/:resource/create',
+    component: () => interopDefault(import('../pages/c/_cluster/auth/roles/_resource/create.vue' /* webpackChunkName: "pages/c/_cluster/auth/roles/_resource/create" */)),
+    name:      'c-cluster-auth-roles-resource-create'
+  }, {
+    path:      '/c/:cluster/auth/roles/:resource/:id?',
+    component: () => interopDefault(import('../pages/c/_cluster/auth/roles/_resource/_id.vue' /* webpackChunkName: "pages/c/_cluster/auth/roles/_resource/_id" */)),
+    name:      'c-cluster-auth-roles-resource-id'
+  }, {
     path:      '/c/:cluster/explorer',
     component: () => interopDefault(import('../pages/c/_cluster/explorer/index.vue' /* webpackChunkName: "pages/c/_cluster/explorer/index" */)),
     name:      'c-cluster-explorer'

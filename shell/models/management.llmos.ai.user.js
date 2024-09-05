@@ -3,14 +3,29 @@ import { md5 } from '@shell/utils/crypto';
 import Identicon from 'identicon.js';
 import { ucFirst } from '@shell/utils/string';
 import SteveModel from '@shell/plugins/steve/steve-class';
+import Vue from 'vue';
+import { set } from '@shell/utils/object';
 
 export default class User extends SteveModel {
-  // Preserve description
-  constructor(data, ctx, rehydrateNamespace = null, setClone = false) {
-    const _description = data.spec?.description;
+  applyDefaults() {
+    const value = {
+      apiVersion: 'management.llmos.ai/v1',
+      kind:       'User',
+      metadata:   {
+        generateName: 'user-',
+        labels:       {},
+        annotations:  {},
+      },
+      spec: {
+        username: '',
+        password: '',
+        active:   true,
+        admin:    false,
+      }
+    };
 
-    super(data, ctx, rehydrateNamespace, setClone);
-    this.description = _description;
+    Vue.set(this, 'metadata', value.metadata);
+    set(this, 'spec', this.spec || value.spec);
   }
 
   get isSystem() {
@@ -47,7 +62,7 @@ export default class User extends SteveModel {
   }
 
   get state() {
-    if ( this.spec?.isActive === false ) {
+    if ( this.status?.isActive === false ) {
       return 'inactive';
     }
 
@@ -83,7 +98,7 @@ export default class User extends SteveModel {
   async setEnabled(enabled) {
     const clone = await this.$dispatch('management/clone', { resource: this.user }, { root: true });
 
-    clone.spec.isActive = enabled;
+    clone.spec.active = enabled;
     await clone.save();
   }
 

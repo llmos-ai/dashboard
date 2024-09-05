@@ -1,7 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import debounce from 'lodash/debounce';
-import { STEVE } from '@shell/config/types';
+import { MANAGEMENT, STEVE } from '@shell/config/types';
 import { ucFirst } from '@shell/utils/string';
 import { isAlternate, isMac } from '@shell/utils/platform';
 import Import from '@shell/components/Import';
@@ -73,9 +73,11 @@ export default {
     },
 
     loggedInUser() {
-      const user = this.$store.getters['auth/user'] || {};
+      // const principalId = this.$store.getters['auth/principalId'] || "";
 
-      return user;
+      return this.$store.getters['management/byId'](MANAGEMENT.USER, this.$store.getters['auth/principalId']) || {};
+
+      // return user;
     },
 
     kubeConfigEnabled() {
@@ -610,7 +612,10 @@ export default {
               width="36"
               height="36"
             >
-            <i class="icon icon-user icon-2x avatar p-5" />
+            <i
+              v-else
+              class="icon icon-user icon-3x avatar"
+            />
           </div>
           <template
             slot="popover"

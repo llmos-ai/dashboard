@@ -23,7 +23,7 @@ import BrowserTabVisibility from '@shell/mixins/browser-tab-visibility';
 import { getClusterFromRoute, getProductFromRoute } from '@shell/middleware/authenticated';
 import { BOTTOM } from '@shell/utils/position';
 import SideNav from '@shell/components/SideNav';
-import { BLANK_CLUSTER } from '@shell/store/store-types.js';
+import { BLANK_CLUSTER } from '@shell/store';
 
 const SET_LOGIN_ACTION = 'set-as-login';
 

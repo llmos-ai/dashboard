@@ -3500,6 +3500,7 @@ rbac:
   members:
     label: 成员
   roletemplate:
+    label: 角色
     newUserDefault:
       no: 否
       tooltip: 不影响已有角色的绑定。
@@ -3573,13 +3574,10 @@ rbac:
     role:
       admin:
         label: 管理员
-        description: 管理员可以完全控制整个安装以及所有集群中的所有资源。
-      restricted-admin:
-        label: 受限管理员
-        description: 受限管理员可以完全控制所有下游集群的所有资源，但不能访问本地集群。
+        description: 管理员可以完全控制整个集群中的所有资源。
       user:
         label: 普通用户
-        description: 普通用户可以创建集群，并管理其授权访问的集群和项目。
+        description: 普通用户可以查看集群基本信息，并管理其授权访问的命名空间和资源。
       user-base:
         label: User-Base 用户
         description: User-Base 用户只拥有登录权限。
@@ -4568,6 +4566,7 @@ user:
         role: 角色
         granted: 授予
   edit:
+    isActive: 启用
     credentials:
       label: 凭证
       username:
@@ -5762,6 +5761,11 @@ typeLabel:
     {count, plural,
       one { API 密钥 }
       other { API 密钥 }
+    }
+  management.llmos.ai.globalrole: |-
+    {count, plural,
+      one { Global Role }
+      other { Global Roles }
     }
   ml.llmos.ai.modelservice: |-
     {count, plural,

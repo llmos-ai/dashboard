@@ -3687,6 +3687,7 @@ rbac:
   members:
     label: Members
   roletemplate:
+    label: Role Templates
     newUserDefault:
       no: No
       tooltip: This does not affect any bindings to the role that already exist.
@@ -3760,14 +3761,10 @@ rbac:
     role:
       admin:
         label: Administrator
-        description: Administrators have full control over the entire installation and all resources in all clusters.
-      restricted-admin:
-        label: Restricted Administrator
-        description: Restricted Admins have full control over all resources in all downstream clusters but no access to the local cluster.
-        deprecation: 'Warning: The Restricted Administrator role has been deprecated as of Rancher 2.8.0 and will be removed in a future release - Check out the <a href="{releaseNotesUrl}" target="_blank" rel="noopener noreferrer nofollow">Release Notes</a>'
+        description: Administrators have full control over the entire installation and all resources in the cluster.
       user:
         label: Standard User
-        description: Standard Users can create new clusters and manage clusters and projects they have been granted access to.
+        description: Standard Users can view cluster and manage namespaces and resources they have been granted access to.
       user-base:
         label: User-Base
         description: User-Base users have login-access only.
@@ -4761,6 +4758,7 @@ user:
         role: Role
         granted: Granted
   edit:
+    isActive: Activate
     credentials:
       label: Credentials
       username:
@@ -5966,6 +5964,11 @@ typeLabel:
     {count, plural,
       one { API Key }
       other { API Keys }
+    }
+  management.llmos.ai.globalrole: |-
+    {count, plural,
+      one { Global Role }
+      other { Global Roles }
     }
   ml.llmos.ai.modelservice: |-
     {count, plural,

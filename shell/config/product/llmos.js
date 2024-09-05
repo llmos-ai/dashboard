@@ -41,6 +41,7 @@ export function init(store) {
   });
 
   virtualType({
+    ifHaveType:    NAMESPACE,
     label:         store.getters['i18n/t'](`typeLabel.${ NAMESPACE }`, { count: 2 }),
     icon:          'globe',
     namespaced:    false,
@@ -52,6 +53,7 @@ export function init(store) {
   });
 
   virtualType({
+    ifHaveType: LLMOS.RAY_CLUSTER,
     labelKey:   'typeLabel."ray.io.raycluster"',
     group:      'Root',
     name:       LLMOS.RAY_CLUSTER,
@@ -65,6 +67,7 @@ export function init(store) {
   });
 
   virtualType({
+    ifHaveType: LLMOS.NOTEBOOK,
     label:      'Notebooks',
     group:      'Root',
     name:       LLMOS.NOTEBOOK,
@@ -78,6 +81,7 @@ export function init(store) {
   });
 
   virtualType({
+    ifHaveType: LLMOS.MODEL_SERVICE,
     labelKey:   'typeLabel."ml.llmos.ai.modelservice"',
     group:      'Root',
     name:       LLMOS.MODEL_SERVICE,
@@ -122,7 +126,8 @@ export function init(store) {
 
   // volume management tab
   configureType(LLMOS.VOLUME, {
-    location: {
+    ifHaveType: PVC,
+    location:   {
       name:   `c-cluster-product-resource`,
       params: { resource: LLMOS.VOLUME }
     },
@@ -170,6 +175,7 @@ export function init(store) {
 
   // advanced tab
   virtualType({
+    ifHaveType: NAMESPACE,
     label:      'Namespaces',
     labelKey:   'namespace.label',
     group:      'Advanced',
