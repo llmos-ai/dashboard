@@ -3719,10 +3719,10 @@ rbac:
         yes: "Yes: Default role for new cluster creation"
         defaultLabel: Cluster Creator Default
       NAMESPACE:
-        createButton: Create Project/Namespaces Role
-        label: Project/Namespaces
-        yes: "Yes: Default role for new project creation"
-        defaultLabel: Project Creator Default
+        createButton: Create Namespaces Role
+        label: Namespaces
+        yes: "Yes: Default role for new Namespace creation"
+        defaultLabel: Namespace Creator Default
       RBAC_ROLE:
         label: Role
       RBAC_CLUSTER_ROLE:
@@ -4518,6 +4518,7 @@ tableHeaders:
     globalDefault: New User Default
     clusterDefault: Cluster Creator Default
     projectDefault: Project Creator Default
+    namespaceDefault: Namespace Default
   branch: Branch
   backupTarget: Backup Target
   builtIn: Built In
@@ -6093,7 +6094,7 @@ advancedSettings:
     'auth-user-info-max-age-seconds': 'The maximum age of a users auth tokens before an auth provider group membership sync will be performed.'
     'auth-user-info-resync-cron': 'Default cron schedule for resyncing auth provider group memberships.'
     'cluster-template-enforcement': 'Non-admins will be restricted to launching clusters via preapproved RKE Templates only.'
-    'auth-user-session-ttl-minutes': 'Custom TTL (in minutes) on a user auth session.'
+    'auth-user-session-max-ttl-minutes': 'Custom TTL (in minutes) on a user auth session.'
     'auth-token-max-ttl-minutes': 'Max TTL (in minutes) for all authentication tokens. When set to 0, the token never expires.'
     'kubeconfig-generate-token': 'Automatically generate tokens for users when a kubeconfig is requested.'
     'kubeconfig-default-token-ttl-minutes': 'TTL (in minutes) applied on all kubeconfig tokens. When set to 0, the token never expires.'

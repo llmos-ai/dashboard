@@ -56,6 +56,18 @@ export function init(store) {
     route:      { name: 'c-cluster-auth-roles' }
   });
 
+  virtualType({
+    labelKey:   'rbac.roletemplate.label',
+    icon:       'user',
+    namespaced: false,
+    name:       ROLES_VIRTUAL_TYPE,
+    weight:     102,
+    route:      { name: 'c-cluster-auth-roles' },
+    // There are two resource types shown on this page, MANAGEMENT.GLOBAL_ROLE and MANAGEMENT.ROLE_TEMPLATE
+    // If there user can't see ROLE_TEMPLATE, they definitely can't see GLOBAL_ROLE
+    ifHaveType: MANAGEMENT.ROLE_TEMPLATE
+  });
+
   basicType([
     'config',
     USERS_VIRTUAL_TYPE,
@@ -77,6 +89,15 @@ export function init(store) {
       ...RBAC_DEFAULT,
       labelKey: 'tableHeaders.authRoles.globalDefault',
     },
+    AGE
+  ]);
+
+  headers(MANAGEMENT.ROLE_TEMPLATE, [
+    STATE,
+    DISPLAY_NAME,
+    SIMPLE_NAME,
+    RBAC_BUILTIN,
+    RBAC_DEFAULT,
     AGE
   ]);
 }

@@ -36,6 +36,7 @@ export const SETTING = {
   CA_CERTS: 'cacerts',
 
   // Allow the local cluster to be hidden
+  AUTH_USER_SESSION_MAX_TTL_MINUTES:    'auth-user-session-max-ttl-minutes',
   AUTH_TOKEN_MAX_TTL_MINUTES:           'auth-token-max-ttl-minutes',
   KUBECONFIG_GENERATE_TOKEN:            'kubeconfig-generate-token',
   KUBECONFIG_DEFAULT_TOKEN_TTL_MINUTES: 'kubeconfig-default-token-ttl-minutes',
@@ -43,6 +44,7 @@ export const SETTING = {
   SERVER_URL:                           'server-url',
   PASSWORD_MIN_LENGTH:                  'password-min-length', // L_PASSWORD_MIN_LENGTH
   UI_OFFLINE_PREFERRED:                 'ui-offline-preferred',
+  SERVER_VERSION:                       'server-version',
 
   UI_INDEX:          'ui-index',
   UI_ISSUES:         'ui-issues',
@@ -89,6 +91,7 @@ export const ALLOWED_SETTINGS: GlobalSetting = {
     ],
   },
   [SETTING.AUTH_TOKEN_MAX_TTL_MINUTES]:           {},
+  [SETTING.AUTH_USER_SESSION_MAX_TTL_MINUTES]:    {},
   [SETTING.KUBECONFIG_GENERATE_TOKEN]:            { kind: 'boolean' },
   [SETTING.KUBECONFIG_DEFAULT_TOKEN_TTL_MINUTES]: { kind: 'integer' },
   [SETTING.SERVER_URL]:                           { kind: 'url', canReset: true },

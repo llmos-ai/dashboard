@@ -21,7 +21,6 @@ export default {
   data() {
     const showGlobalRoles = !!this.$store.getters[`management/schemaFor`](MANAGEMENT.GLOBAL_ROLE);
 
-    const admin = this.value.spec?.admin || false;
     const active = this.value.spec?.active || true;
 
     return {
@@ -30,7 +29,6 @@ export default {
         username:    this.value.spec?.username,
         description: this.value.spec?.description,
         displayName: this.value.spec?.displayName,
-        admin,
         active,
         password:    {
           password:          '',

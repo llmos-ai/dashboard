@@ -59,9 +59,8 @@ export function init(store) {
 
   basicType([
     'settings',
-    'brand',
-    'banners',
-    'links'
+    // 'brand',
+    // 'links'
   ]);
 
   configureType(MANAGEMENT.SETTING, {

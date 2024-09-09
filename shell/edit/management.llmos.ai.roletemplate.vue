@@ -1,5 +1,5 @@
 <script>
-import RoleDetailEdit from '@shell/components/auth/RoleDetailEdit.vue';
+import RoleDetailEdit from '@shell/components/auth/RoleDetailEdit';
 
 export default { components: { RoleDetailEdit } };
 </script>

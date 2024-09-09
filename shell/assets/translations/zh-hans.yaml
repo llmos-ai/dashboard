@@ -3532,10 +3532,10 @@ rbac:
         yes: "是：创建新集群的默认角色"
         defaultLabel: 集群创建者的默认角色
       NAMESPACE:
-        createButton: 创建项目或命名空间的角色
-        label: 项目或命名空间
-        yes: "是：创建新项目的默认角色"
-        defaultLabel: 项目创建者的默认角色
+        createButton: 创建命名空间的角色
+        label: 命名空间
+        yes: "是：创建新命名空间的默认角色"
+        defaultLabel: 命名空间创建者的默认角色
       RBAC_ROLE:
         label: 角色
       RBAC_CLUSTER_ROLE:
@@ -4329,6 +4329,7 @@ tableHeaders:
     globalDefault: 新用户的默认角色
     clusterDefault: 集群创建者的默认角色
     projectDefault: 项目创建者的默认角色
+    namespaceDefault: 命名空间的默认角色
   branch: 分支
   backupTarget: 备份路径
   builtIn: 内置
@@ -5890,7 +5891,7 @@ advancedSettings:
     'auth-user-info-max-age-seconds': '在同步验证提供程序组成员之前，用户验证 Token 的最长存活时间。'
     'auth-user-info-resync-cron': '重新同步验证提供程序组成员的默认 cron 调度。'
     'cluster-template-enforcement': '非管理员只能通过预先批准的 RKE 模板启动集群。'
-    'auth-user-session-ttl-minutes': '用户认证会话的自定义 TTL（单位：分钟）。'
+    'auth-user-session-max-ttl-minutes': '用户认证会话的自定义 TTL（单位：分钟）。'
     'auth-token-max-ttl-minutes': '所有身份认证 Token 的最大 TTL（单位：分钟）。如果设置为 0，则 Token 永不过期。'
     'kubeconfig-generate-token': '请求 kubeconfig 时自动为用户生成 Token。'
     'kubeconfig-default-token-ttl-minutes': '应用于所有 kubeconfig Token 的 TTL（单位：分钟）。如果设置为 0，则 Token 永不过期。'

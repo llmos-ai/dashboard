@@ -20,7 +20,6 @@ export default class User extends SteveModel {
         username: '',
         password: '',
         active:   true,
-        admin:    false,
       }
     };
 

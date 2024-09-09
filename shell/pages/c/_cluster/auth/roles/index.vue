@@ -8,11 +8,21 @@ import { SUBTYPE_MAPPING, CREATE_VERBS } from '@shell/models/management.llmos.ai
 import { NAME } from '@shell/config/product/auth';
 
 const GLOBAL = SUBTYPE_MAPPING.GLOBAL.key;
+const NAMESPACE = SUBTYPE_MAPPING.NAMESPACE.key;
+
 const createGlobalRole = {
   name:   `c-cluster-${ NAME }-roles-resource-create`,
   params: {
     cluster:  'local',
     resource: MANAGEMENT.GLOBAL_ROLE,
+  }
+};
+
+const createRoleTemplate = {
+  name:   `c-cluster-${ NAME }-roles-resource-create`,
+  params: {
+    cluster:  'local',
+    resource: MANAGEMENT.ROLE_TEMPLATE,
   }
 };
 
@@ -24,30 +34,52 @@ export default {
 
   async asyncData({ store }) {
     const globalRoleSchema = store.getters[`management/schemaFor`](MANAGEMENT.GLOBAL_ROLE);
+    const roleTemplatesSchema = store.getters[`management/schemaFor`](MANAGEMENT.ROLE_TEMPLATE);
 
-    return { globalRoles: globalRoleSchema ? await store.dispatch(`management/findAll`, { type: MANAGEMENT.GLOBAL_ROLE }) : [] };
+    return {
+      globalRoles:   globalRoleSchema ? await store.dispatch(`management/findAll`, { type: MANAGEMENT.GLOBAL_ROLE }) : [],
+      roleTemplates: roleTemplatesSchema ? await store.dispatch(`management/findAll`, { type: MANAGEMENT.ROLE_TEMPLATE }) : [],
+    };
   },
 
   data() {
     const globalRoleSchema = this.$store.getters[`management/schemaFor`](MANAGEMENT.GLOBAL_ROLE);
+    const roleTemplatesSchema = this.$store.getters[`management/schemaFor`](MANAGEMENT.ROLE_TEMPLATE);
+
+    const roleTemplateHeaders = this.$store.getters['type-map/headersFor'](roleTemplatesSchema);
+    const defaultHeaderIndex = roleTemplateHeaders.findIndex((header) => header.name === 'default');
 
     return {
       tabs: {
         [GLOBAL]: {
           canFetch:       globalRoleSchema?.collectionMethods.find((verb) => verb === 'GET'),
           canCreate:      globalRoleSchema?.resourceMethods.find((verb) => CREATE_VERBS.has(verb)),
-          weight:         3,
           labelKey:       SUBTYPE_MAPPING.GLOBAL.labelKey,
+          weight:         2,
           schema:         globalRoleSchema,
           createLocation: {
             ...createGlobalRole,
             query: { roleContext: GLOBAL }
           },
         },
+        [NAMESPACE]: {
+          canFetch:       roleTemplatesSchema?.collectionMethods.find((verb) => verb === 'GET'),
+          canCreate:      roleTemplatesSchema?.resourceMethods.find((verb) => CREATE_VERBS.has(verb)),
+          labelKey:       SUBTYPE_MAPPING.NAMESPACE.labelKey,
+          weight:         1,
+          schema:         roleTemplatesSchema,
+          headers:        this.applyDefaultHeaderLabel(roleTemplateHeaders, defaultHeaderIndex, 'tableHeaders.authRoles.namespaceDefault'),
+          createLocation: {
+            ...createRoleTemplate,
+            query: { roleContext: NAMESPACE }
+          },
+        },
       },
 
       GLOBAL,
-      globalRoles: null,
+      NAMESPACE,
+      globalRoles:   null,
+      roleTemplates: null,
     };
   },
 
@@ -56,7 +88,15 @@ export default {
       return this.globalRoles;
     },
 
+    namespaceResources() {
+      return this.roleTemplates.filter((r) => r.context === SUBTYPE_MAPPING.NAMESPACE.context);
+    },
+
     type() {
+      if (this.$route.hash.endsWith(NAMESPACE)) {
+        return NAMESPACE;
+      }
+
       return GLOBAL;
     },
 
@@ -71,8 +111,20 @@ export default {
     createLocation() {
       return this.tabs[this.type].createLocation;
     }
-
   },
+
+  methods: {
+    applyDefaultHeaderLabel(roleTemplateHeaders, defaultHeaderIndex, labelKey) {
+      const headers = [...roleTemplateHeaders];
+
+      headers[defaultHeaderIndex] = {
+        ...roleTemplateHeaders[defaultHeaderIndex],
+        labelKey,
+      };
+
+      return headers;
+    }
+  }
 };
 </script>
 
@@ -107,6 +159,19 @@ export default {
         <ResourceTable
           :schema="tabs[GLOBAL].schema"
           :rows="globalResources"
+        />
+      </Tab>
+
+      <Tab
+        v-if="tabs[NAMESPACE].canFetch"
+        :name="NAMESPACE"
+        :weight="tabs[NAMESPACE].weight"
+        :label-key="tabs[NAMESPACE].labelKey"
+      >
+        <ResourceTable
+          :schema="tabs[NAMESPACE].schema"
+          :headers="tabs[NAMESPACE].headers"
+          :rows="namespaceResources"
         />
       </Tab>
     </Tabbed>
