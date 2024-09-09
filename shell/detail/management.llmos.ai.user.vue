@@ -18,6 +18,11 @@ export default {
     CreateEditView
   ],
   async fetch() {
+    const canSeeGlobalRoles = !!this.$store.getters[`management/canList`](MANAGEMENT.GLOBAL_ROLE);
+
+    if (canSeeGlobalRoles) {
+      this.globalBindings = await this.fetchGlobalRoleBindings(this.value.id);
+    }
     await this.$store.dispatch('management/find', { type: MANAGEMENT.USER, id: this.value.id });
   },
   data() {
@@ -37,6 +42,8 @@ export default {
       formatterOpts: { addSuffix: true },
       width:         '20%',
     };
+
+    const isAdmin = this.value.status?.isAdmin || false;
 
     return {
       headers: {
@@ -89,11 +96,91 @@ export default {
       },
       globalBindings:      null,
       canSeeRoleTemplates: false,
-      isAdmin:             false,
+      isAdmin,
     };
   },
   computed: {},
-  methods:  {}
+  methods:  {
+    async fetchGlobalRoleBindings(userId) {
+      try {
+        const roles = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.GLOBAL_ROLE });
+        const out = await Promise.all(roles
+          .map((r) => this.$store.dispatch(`management/clone`, { resource: r }))
+        );
+
+        out.forEach((r) => {
+          r.hasBound = false;
+        });
+
+        const globalRoleBindings = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.ROLE_TEMPLATE_BINDING });
+
+        globalRoleBindings
+          .filter((binding) => binding.subjects[0]?.name === userId)
+          .forEach((binding) => {
+            const roleTemplateBinding = roles.find((r) => r.id === binding.roleTemplateRef?.name);
+
+            if (roleTemplateBinding.id === 'admin') {
+              this.isAdmin = true;
+            }
+
+            if (roleTemplateBinding.isSpecial) {
+              this.getEnabledRoles(roleTemplateBinding, out).forEach((r) => {
+                r.hasBound = true;
+                r.bound = binding?.metadata.creationTimestamp;
+              });
+            } else {
+              const entry = out.find((o) => o.id === binding.roleTemplateRef.name);
+
+              if (entry) {
+                entry.hasBound = true;
+                entry.bound = binding?.metadata.creationTimestamp;
+              }
+            }
+          });
+
+        return out;
+      } catch (e) {
+        // Swallow the error. It's probably due to the user not having the correct permissions to read global roles
+        console.error('Failed to fetch RoleTemplateBindings: ', e); // eslint-disable-line no-console
+      }
+    },
+
+    getEnabledRoles(globalRole, out) {
+      const globalRoleRules = globalRole.rules || [];
+
+      return out.filter((r) => {
+        // If the global role doesn't contain any rules... don't show the user as having the role (confusing)
+        if (!r?.rules?.length) {
+          return false;
+        }
+
+        return r.rules.every((rule) => this.containsRule(globalRoleRules, rule));
+      });
+    },
+
+    // Global permissions helpers
+    hasPermission(globalRoleRules, permission) {
+      return globalRoleRules.find((gRule) => {
+        return ((gRule.apiGroups || []).includes('*') || (gRule.apiGroups || []).includes(permission.apiGroup)) &&
+            ((gRule.resources || []).includes('*') || (gRule.resources || []).includes(permission.resource)) &&
+            ((gRule.verbs || []).includes('*') || (gRule.verbs || []).includes(permission.verb));
+      });
+    },
+    containsRule(globalRoleRules, rule) {
+      const apiGroups = (rule.apiGroups || []);
+      const resources = (rule.resources || []);
+      const verbs = (rule.verbs || []);
+      const permissions = [];
+
+      apiGroups.forEach((apiGroup) => resources.forEach((resource) => verbs.forEach((verb) => permissions.push({
+        apiGroup,
+        resource,
+        verb
+      }))));
+
+      return permissions.every((permission) => this.hasPermission(globalRoleRules, permission));
+    },
+  }
 
 };
 </script>

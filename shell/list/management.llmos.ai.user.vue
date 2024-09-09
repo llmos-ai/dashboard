@@ -81,7 +81,6 @@ export default {
       :loading="loading"
       :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
       :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
-      :sort-generation-fn="sortBy"
     />
   </div>
 </template>

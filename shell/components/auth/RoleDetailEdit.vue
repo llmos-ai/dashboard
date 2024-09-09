@@ -19,6 +19,7 @@ import { RadioGroup } from '@components/Form/Radio';
 
 const GLOBAL = SUBTYPE_MAPPING.GLOBAL.key;
 const RBAC_ROLE = SUBTYPE_MAPPING.RBAC_ROLE.key;
+const NAMESPACE = SUBTYPE_MAPPING.NAMESPACE.key;
 
 /**
  * Handles the View, Create and Edit of
@@ -55,6 +56,17 @@ export default {
     // Therefore we use a hardcoded list that is essentially intended
     // to be in-app documentation for convenience only, while allowing
     // users to freely type in resources that are not shown in the list.
+    if (this.value.subtype === NAMESPACE) {
+      (await this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.ROLE_TEMPLATE })).forEach((template) => {
+        // Ensure we have quick access to a specific template. This allows unselected drop downs to show the correct value
+        this.keyedTemplateOptions[template.id] = {
+          label: template.nameDisplay,
+          value: template.id
+        };
+      });
+      this.templateOptions = Object.values(this.keyedTemplateOptions);
+    }
+
     if (this.realMode === _CLONE) {
       this.value.spec.builtin = false;
     }
@@ -74,6 +86,7 @@ export default {
       keyedTemplateOptions: {},
       resources:            this.value.resources,
       scopedResources:      SCOPED_RESOURCES,
+      defaultValue:         false,
       selectFocused:        null,
     };
   },
@@ -91,6 +104,23 @@ export default {
 
     if (roleContext && this.value.updateSubtype) {
       this.value.updateSubtype(roleContext);
+    }
+
+    // Set the default value for the mapped subtype
+    this.defaultValue = !!this.value.spec[SUBTYPE_MAPPING[this.value.subtype].defaultKey];
+
+    switch (this.value.subtype) {
+    case NAMESPACE:
+      this.$set(this.value.spec, 'locked', !!this.value.spec?.locked);
+      break;
+    }
+
+    // On save hook request
+    if (this.registerBeforeHook) {
+      this.registerBeforeHook(() => {
+        // Map default value back to its own key for given subtype
+        this.value.spec[SUBTYPE_MAPPING[this.value.subtype].defaultKey] = !!this.defaultValue;
+      });
     }
 
     this.$nextTick(() => {
@@ -241,7 +271,7 @@ export default {
       ];
     },
     isRoleTemplate() {
-      return this.value.namespace;
+      return this.value.subtype === NAMESPACE;
     },
     isNamespaced() {
       return this.value.subtype === RBAC_ROLE;
@@ -250,7 +280,7 @@ export default {
       return this.as === _DETAIL;
     },
     isLLMOSType() {
-      return this.value.subtype === GLOBAL;
+      return this.value.subtype === GLOBAL || this.value.subtype === NAMESPACE;
     },
     isBuiltin() {
       return this.value.spec?.builtin;
@@ -520,7 +550,7 @@ export default {
       >
         <div class="col span-6">
           <RadioGroup
-            v-model="value.spec.newUserDefault"
+            v-model="defaultValue"
             name="storageSource"
             :label="defaultLabel"
             class="mb-10"
@@ -533,7 +563,7 @@ export default {
           class="col span-6"
         >
           <RadioGroup
-            v-model="value.locked"
+            v-model="value.spec.locked"
             name="storageSource"
             :label="t('rbac.roletemplate.locked.label')"
             class="mb-10"

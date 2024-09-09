@@ -7,16 +7,25 @@ import { MANAGEMENT } from '@shell/config/types';
 
 const USER = 'user';
 const ADMIN = 'admin';
-const SPECIAL = [ADMIN, USER];
+const NAMESPACE = 'namespace-owner';
+
+export const SPECIAL = [ADMIN, USER, NAMESPACE];
 
 export const LLMOS_MGMT_API_GROUP = 'management.llmos.ai';
 export const SUBTYPE_MAPPING = {
   GLOBAL: {
     key:        'GLOBAL',
     type:       'management.llmos.ai.globalrole',
-    defaultKey: 'spec.newUserDefault',
+    defaultKey: 'newUserDefault',
     id:         'GLOBAL',
     labelKey:   'rbac.roletemplate.subtypes.GLOBAL.label',
+  },
+  NAMESPACE: {
+    key:        'NAMESPACE',
+    type:       'management.llmos.ai.roletemplate',
+    defaultKey: 'newNamespaceDefault',
+    id:         'NAMESPACE',
+    labelKey:   'rbac.roletemplate.subtypes.NAMESPACE.label',
   },
   RBAC_ROLE: {
     key:      'RBAC_ROLE',
