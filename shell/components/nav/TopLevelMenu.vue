@@ -362,7 +362,7 @@ export default {
                     v-if="c.ready"
                     :data-testid="`menu-cluster-${ c.id }`"
                     class="cluster selector option"
-                    :to="{ name: 'c-cluster-llm', params: { cluster: c.id } }"
+                    :to="{ name: 'c-cluster-llmos', params: { cluster: c.id } }"
                   >
                     <ClusterIconMenu
                       v-tooltip="getTooltipConfig(t('product.llm'))"

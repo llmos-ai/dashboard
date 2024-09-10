@@ -87,9 +87,9 @@ export const routerOptions = {
     component: () => interopDefault(import('../pages/c/_cluster/explorer/index.vue' /* webpackChunkName: "pages/c/_cluster/explorer/index" */)),
     name:      'c-cluster-explorer'
   }, {
-    path:      '/c/:cluster/llm',
-    component: () => interopDefault(import('../pages/c/_cluster/llm/index.vue' /* webpackChunkName: "pages/c/_cluster/llm/index" */)),
-    name:      'c-cluster-llm'
+    path:      '/c/:cluster/llmos',
+    component: () => interopDefault(import('../pages/c/_cluster/llmos/index.vue' /* webpackChunkName: "pages/c/_cluster/llm/index" */)),
+    name:      'c-cluster-llmos'
   }, {
     path:      '/c/:cluster/settings',
     component: () => interopDefault(import('../pages/c/_cluster/settings/index.vue' /* webpackChunkName: "pages/c/_cluster/settings/index" */)),

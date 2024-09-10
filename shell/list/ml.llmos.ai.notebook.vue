@@ -12,6 +12,7 @@ export default {
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
+
     const hash = {
       notebooks: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.NOTEBOOK }),
       services:  this.$store.dispatch(`${ inStore }/findAll`, { type: SERVICE })

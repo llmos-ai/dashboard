@@ -423,26 +423,6 @@ export default {
         />
       </template>
     </div>
-    <!-- SideNav footer area (seems to be tied to harvester) -->
-    <div
-      v-if="showProductFooter"
-      class="footer"
-    >
-      <!-- support link -->
-      <nuxt-link
-        :to="supportLink"
-        class="pull-right"
-      >
-        {{ t('nav.support', {hasSupport: true}) }}
-      </nuxt-link>
-      <!-- version number -->
-      <span
-        v-clean-tooltip="{content: displayVersion, placement: 'top'}"
-        class="clip version text-muted"
-      >
-        {{ displayVersion }}
-      </span>
-    </div>
     <!-- SideNav footer alternative -->
     <div
       class="version text-muted flex"

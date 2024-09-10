@@ -1,11 +1,9 @@
 <script>
 import CreateEditView from '@shell/mixins/create-edit-view';
-// import ResourcesSummary from '@shell/components/fleet/ResourcesSummary';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import { COUNT, WORKLOAD_TYPES } from '@shell/config/types';
 import { WORKLOAD_SCHEMA } from '@shell/config/schema';
 import { getStatesByType } from '@shell/plugins/dashboard-store/resource-class';
-import MoveModal from '@shell/components/MoveModal';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTable from '@shell/components/ResourceTable';
 import SortableTable from '@shell/components/SortableTable';
@@ -16,11 +14,9 @@ import {
 
 export default {
   components: {
-    // ResourcesSummary,
     ResourceTable,
     ResourceTabs,
     Loading,
-    MoveModal,
     Tab,
     SortableTable
   },
@@ -128,22 +124,6 @@ export default {
 
         return namespaced;
       }, []);
-    },
-
-    accumulatedStateCounts() {
-      const totals = {};
-
-      for (const state in this.statesByType) {
-        totals[state] = 0;
-      }
-
-      return this.namespacedResourceCounts.reduce((sum, type) => {
-        for (const state in type.byState) {
-          sum[state] += type.byState[state];
-        }
-
-        return sum;
-      }, totals);
     },
 
     statesByType() {
@@ -262,6 +242,5 @@ export default {
         />
       </Tab>
     </ResourceTabs>
-    <MoveModal />
   </div>
 </template>

@@ -37,6 +37,7 @@ export const USER = 'user';
 export const GROUP = 'group';
 export const RUNTIME_CLASS = 'node.k8s.io.runtimeclass';
 
+export const RBAC_GROUP = 'rbac.authorization.k8s.io';
 export const RBAC = {
   ROLE:                 'rbac.authorization.k8s.io.role',
   CLUSTER_ROLE:         'rbac.authorization.k8s.io.clusterrole',

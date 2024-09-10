@@ -1,7 +1,7 @@
 // export const NORMAN_NAME = 'field.cattle.io/name';
 export const HOSTNAME = 'kubernetes.io/hostname';
 export const TIMESTAMP = 'cattle.io/timestamp';
-export const SYSTEM_NAMESPACE = 'management.cattle.io/system-namespace';
+export const SYSTEM_NAMESPACE = 'management.llmos.ai/system-namespace';
 export const PROJECT = 'field.cattle.io/projectId';
 export const CATTLE_PUBLIC_ENDPOINTS = 'field.cattle.io/publicEndpoints';
 export const TARGET_WORKLOADS = 'field.cattle.io/targetWorkloadIds';

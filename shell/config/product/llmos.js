@@ -3,7 +3,7 @@ import {
   LLMOS, NAMESPACE, NODE, VIRTUAL_TYPES, PVC, STORAGE_CLASS, SECRET, CONFIG_MAP, MANAGEMENT
 } from '@shell/config/types';
 
-export const NAME = 'llm';
+export const NAME = 'llmos';
 
 export function init(store) {
   const {
@@ -31,10 +31,13 @@ export function init(store) {
     labelKey:   'typeLabel."node"',
     group:      'Root',
     name:       NODE,
-    namespaced: true,
+    namespaced: false,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: NODE }
+      params: {
+        resource: NODE,
+        product:  NAME
+      }
     },
     exact:  false,
     weight: 110,

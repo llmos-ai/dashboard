@@ -16,6 +16,8 @@ import ResourceTabs from '@shell/components/form/ResourceTabs';
 import Labels from '@shell/components/form/Labels';
 import { Banner } from '@components/Banner';
 import ResourceManager from '@shell/mixins/resource-manager';
+import { allHash } from '@shell/utils/promise';
+import FormValidation from '@shell/mixins/form-validation';
 
 const DEFAULT_STORAGE = '10Gi';
 
@@ -37,15 +39,18 @@ export default {
     UnitInput,
   },
 
-  mixins: [CreateEditView, ResourceManager],
+  mixins: [CreateEditView, FormValidation, ResourceManager],
   async fetch() {
-    const storageClasses = await this.$store.dispatch('cluster/findAll', { type: STORAGE_CLASS });
+    const inStore = this.$store.getters['currentProduct'].inStore;
 
+    const hash = await allHash({ storageClass: this.$store.dispatch(`${ inStore }/findAll`, { type: STORAGE_CLASS }) });
+
+    // don't block UI for these resources
     if (this.$store.getters['cluster/canList'](PV)) {
       this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
     }
 
-    this.storageClassOptions = storageClasses.map((s) => s.name).sort();
+    this.storageClassOptions = hash.storageClass.map((s) => s.name).sort();
     this.storageClassOptions.unshift(this.t('persistentVolumeClaim.useDefault'));
 
     this.$set(this.value.spec, 'storageClassName', this.value.spec.storageClassName || this.storageClassOptions[0]);

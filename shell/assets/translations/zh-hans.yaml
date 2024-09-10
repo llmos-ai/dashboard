@@ -228,7 +228,7 @@ product:
   clusterManagement: 集群管理
   monitoring: 监控
   mcapps: 全局配置
-  llm: LLM 管理
+  llmos: LLMOS 管理
   rancher: Rancher
   legacy: 旧版
   plugins: 插件
@@ -2274,6 +2274,11 @@ logout:
 managementNode:
   customName: 自定义名称
 
+membershipEditor:
+  label: Members
+  user: User
+  role: Role
+
 monitoring:
   accessModes:
     many: 多次读写
@@ -3362,6 +3367,7 @@ projectMembers:
     servicesView: 查看服务
     persistentvolumeclaimsView: 查看卷
     workloadsView: 查看工作负载
+    noCustomRoles: 无自定义角色
 
 projectNamespaces:
   createNamespace: 创建命名空间

@@ -7,9 +7,8 @@ import { MANAGEMENT } from '@shell/config/types';
 
 const USER = 'user';
 const ADMIN = 'admin';
-const NAMESPACE = 'namespace-owner';
 
-export const SPECIAL = [ADMIN, USER, NAMESPACE];
+export const SPECIAL = [ADMIN, USER];
 
 export const LLMOS_MGMT_API_GROUP = 'management.llmos.ai';
 export const SUBTYPE_MAPPING = {
