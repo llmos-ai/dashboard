@@ -1,15 +1,18 @@
 <script>
 import NameNsDescription from '@shell/components/form/NameNsDescription';
+import FormValidation from '@shell/mixins/form-validation';
 import CreateEditView from '@shell/mixins/create-edit-view';
-import { CONTAINER_DEFAULT_RESOURCE_LIMIT } from '@shell/config/labels-annotations';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import CruResource from '@shell/components/CruResource';
-import { _VIEW, FLAT_VIEW, _CREATE } from '@shell/config/query-params';
+import { _VIEW, FLAT_VIEW, _CREATE, _EDIT } from '@shell/config/query-params';
 import Loading from '@shell/components/Loading';
 import { K8S_TYPES } from '@shell/components/form/ResourceQuota/shared';
 import Labels from '@shell/components/form/Labels';
 import { randomStr } from '@shell/utils/string';
+import ProjectMembershipEditor, { canViewProjectMembershipEditor } from '@shell/components/form/Members/ProjectMembershipEditor';
+import { Banner } from '@components/Banner';
+import { MANAGEMENT } from '@shell/config/types';
 
 export default {
   components: {
@@ -17,15 +20,14 @@ export default {
     Labels,
     Loading,
     NameNsDescription,
+    ProjectMembershipEditor,
     Tab,
     ResourceTabs,
+    Banner,
   },
 
-  mixins: [CreateEditView],
-
-  async fetch() {
-  },
-
+  mixins: [CreateEditView, FormValidation],
+  async fetch() {},
   data() {
     let originalQuotaId = null;
 
@@ -35,9 +37,12 @@ export default {
 
     return {
       originalQuotaId,
-      viewMode:                _VIEW,
-      containerResourceLimits: this.value.annotations?.[CONTAINER_DEFAULT_RESOURCE_LIMIT],
-      rerenderNums:            randomStr(4),
+      viewMode:           _VIEW,
+      rerenderNums:       randomStr(4),
+      membershipUpdate:   {},
+      resource:           MANAGEMENT.ROLE_TEMPLATE_BINDING,
+      saveBindings:       null,
+      membershipHasOwner: false,
       K8S_TYPES,
     };
   },
@@ -45,6 +50,14 @@ export default {
   computed: {
     isCreate() {
       return this.mode === _CREATE;
+    },
+
+    canViewMembers() {
+      return canViewProjectMembershipEditor(this.$store);
+    },
+
+    canEditProject() {
+      return this.value?.links?.update;
     },
 
     doneLocationOverride() {
@@ -59,7 +72,46 @@ export default {
       return false;
     },
 
+    showBannerForOnlyManagingMembers() {
+      return this.mode === _EDIT && !this.canEditProject;
+    },
   },
+
+  methods: {
+    async save(saveCb) {
+      try {
+        if (this.mode === _CREATE) {
+          const savedProject = await this.value.save();
+
+          if (this.membershipUpdate.save) {
+            await this.membershipUpdate.save(savedProject.id);
+          }
+        } else if (this.mode === _EDIT) {
+          if (this.canEditProject) {
+            await this.value.save();
+
+            // we allow users with permissions for roletemplatebindings to be able to manage members on projects
+            if (this.membershipUpdate.save) {
+              await this.membershipUpdate.save(this.value.id);
+            }
+          }
+        }
+        saveCb(true);
+        this.$router.replace(this.value.listLocation);
+      } catch (ex) {
+        this.errors.push(ex);
+        saveCb(false);
+      }
+    },
+
+    onHasOwnerChanged(hasOwner) {
+      this.$set(this, 'membershipHasOwner', hasOwner);
+    },
+
+    onMembershipUpdate(update) {
+      this.$set(this, 'membershipUpdate', update);
+    },
+  }
 };
 </script>
 
@@ -84,11 +136,30 @@ export default {
       :namespaced="false"
       :mode="mode"
     />
+
     <ResourceTabs
       v-model="value"
       :mode="mode"
       :side-tabs="true"
     >
+      <Tab
+        v-if="canViewMembers"
+        name="members"
+        :label="t('project.members.label')"
+        :weight="10"
+      >
+        <Banner
+          v-if="showBannerForOnlyManagingMembers"
+          color="info"
+          :label="t('project.membersEditOnly')"
+        />
+        <ProjectMembershipEditor
+          :mode="mode"
+          :parent-id="value.id"
+          @has-owner-changed="onHasOwnerChanged"
+          @membership-update="onMembershipUpdate"
+        />
+      </Tab>
       <Tab
         name="labels-and-annotations"
         label-key="generic.labelsAndAnnotations"

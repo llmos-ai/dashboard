@@ -45,6 +45,18 @@ export default {
   data() {
     return { principal: null };
   },
+
+  computed: {
+    showBoth() {
+      const p = this.principal;
+
+      if (!!p.spec.username || !!p.spec.displayName) {
+        return false;
+      }
+
+      return p.username.trim().toLowerCase() !== p.spec.displayName.trim().toLowerCase();
+    }
+  },
 };
 </script>
 
@@ -74,13 +86,32 @@ export default {
           :class="{'round': principal.roundAvatar}"
         >
       </div>
-      <div class="name">
+      <div
+        v-if="showLabels"
+        class="name"
+      >
         <table>
           <tr><td>{{ t('principal.name') }}: </td><td>{{ principal.spec.displayName }}</td></tr>
           <tr><td>{{ t('principal.loginName') }}: </td><td>{{ principal.spec.username }}</td></tr>
           <tr><td>{{ t('principal.type') }}: </td><td>{{ principal.displayType }}</td></tr>
         </table>
       </div>
+      <template v-else>
+        <div class="name">
+          <template v-if="showBoth">
+            {{ principal.spec.displayName }}
+            <span
+              v-if="principal.spec.username"
+            >({{ principal.spec.username }})</span>
+          </template>
+          <template v-else>
+            {{ principal.spec.username }}
+          </template>
+        </div>
+        <div class="description">
+          {{ principal.displayType }}
+        </div>
+      </template>
     </template>
 
     <!--unable to fetch user-->

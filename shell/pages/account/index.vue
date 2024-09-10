@@ -180,6 +180,7 @@ export default {
       <Principal
         :value="loggedInUser"
         :use-muted="false"
+        :show-labels="true"
       />
       <div>
         <button

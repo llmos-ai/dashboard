@@ -1,7 +1,7 @@
 <script>
 import { RBAC as RBAC_LABELS } from '@shell/config/labels-annotations';
 import { allHash } from '@shell/utils/promise';
-import { RBAC, MANAGEMENT } from '@shell/config/types';
+import { RBAC, MANAGEMENT, RBAC_GROUP } from '@shell/config/types';
 import { _CONFIG, _DETAIL, _EDIT, _VIEW } from '@shell/config/query-params';
 import { findBy, removeAt, removeObject } from '@shell/utils/array';
 import Loading from '@shell/components/Loading';
@@ -312,14 +312,10 @@ export default {
 
       if ( this.bindingScope === SCOPE_NAMESPACE ) {
         type = RBAC.ROLE_BINDING;
-        apiGroup = 'rbac.authorization.k8s.io';
+        apiGroup = RBAC_GROUP;
       } else if ( this.bindingScope === SCOPE_CLUSTER ) {
         type = RBAC.CLUSTER_ROLE_BINDING;
-        apiGroup = 'rbac.authorization.k8s.io';
-      // } else if ( this.bindingScope === SCOPE_GLOBAL ) {
-      //   type = MANAGEMENT.GLOBAL_ROLE_BINDING;
-      //   inStore = 'management'
-      //   apiGroup = 'management.cattle.io' ?
+        apiGroup = RBAC_GROUP;
       } else {
         throw new Error('Unknown binding scope');
       }

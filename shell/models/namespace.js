@@ -1,12 +1,9 @@
-import SYSTEM_NAMESPACES from '@shell/config/system-namespaces';
-import { PROJECT, SYSTEM_NAMESPACE, ISTIO as ISTIO_LABELS, RESOURCE_QUOTA } from '@shell/config/labels-annotations';
-import { MANAGEMENT } from '@shell/config/types';
-
-import { set } from '@shell/utils/object';
-import { escapeHtml } from '@shell/utils/string';
-import { isArray } from '@shell/utils/array';
-import SteveModel from '@shell/plugins/steve/steve-class';
 import Vue from 'vue';
+import SYSTEM_NAMESPACES from '@shell/config/system-namespaces';
+import SteveModel from '@shell/plugins/steve/steve-class';
+import { PROJECT, SYSTEM_NAMESPACE, RESOURCE_QUOTA } from '@shell/config/labels-annotations';
+import { MANAGEMENT } from '@shell/config/types';
+import { escapeHtml } from '@shell/utils/string';
 import { hasPSALabels, getPSATooltipsDescription, getPSALabels } from '@shell/utils/pod-security-admission';
 import { PSAIconsDisplay, PSALabelsNamespaceVersion } from '@shell/config/pod-security-admission';
 
@@ -26,10 +23,6 @@ const OBSCURE_NAMESPACE_PREFIX = [
 ];
 
 export default class Namespace extends SteveModel {
-  applyDefaults() {
-    set(this, 'disableOpenApiValidation', false);
-  }
-
   get isSystem() {
     if ( this.metadata?.annotations?.[SYSTEM_NAMESPACE] === 'true' ) {
       return true;
@@ -81,35 +74,6 @@ export default class Namespace extends SteveModel {
     } else {
       return this.$rootGetters['i18n/t']('resourceTable.groupLabel.notInAProject');
     }
-  }
-
-  get projectNameSort() {
-    return this.project?.nameSort || '';
-  }
-
-  get injectionEnabled() {
-    return this.labels[ISTIO_LABELS.AUTO_INJECTION] === 'enabled';
-  }
-
-  enableAutoInjection(namespaces = this, enable = true) {
-    if (!isArray(namespaces)) {
-      namespaces = [namespaces];
-    }
-    namespaces.forEach((ns) => {
-      if (!enable && ns?.metadata?.labels) {
-        delete ns.metadata.labels[ISTIO_LABELS.AUTO_INJECTION];
-      } else {
-        if (!ns.metadata.labels) {
-          ns.metadata.labels = {};
-        }
-        ns.metadata.labels[ISTIO_LABELS.AUTO_INJECTION] = 'enabled';
-      }
-      ns.save();
-    });
-  }
-
-  disableAutoInjection(namespaces = this) {
-    this.enableAutoInjection(namespaces, false);
   }
 
   get confirmRemove() {

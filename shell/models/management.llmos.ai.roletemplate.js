@@ -42,7 +42,7 @@ export default class RoleTemplate extends SteveDescriptionModel {
   }
 
   get isSpecial() {
-    return SPECIAL.includes(this.id);
+    return SPECIAL.includes(this.id) || this.spec?.builtin;
   }
 
   get subtype() {

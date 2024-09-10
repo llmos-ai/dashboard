@@ -238,7 +238,7 @@ product:
   uiplugins: Extensions
   elemental: OS Management
   plugins: Plugins
-  llm: LLM Management
+  llmos: LLMOS Management
 
 suffix:
   percent: "%"
@@ -370,6 +370,9 @@ addonConfigConfirmation:
 
 addProjectMemberDialog:
   title: Add Project Member
+
+addNamespaceMemberDialog:
+  title: Add Namespace Member
 
 assignTo:
   title: |-
@@ -2461,6 +2464,11 @@ logout:
 managementNode:
   customName: Custom Name
 
+membershipEditor:
+  label: Members
+  user: User
+  role: Role
+
 monitoring:
   accessModes:
     many: ReadWriteMany
@@ -3513,19 +3521,19 @@ projectMembers:
   project:
     label: Project
   projectPermissions:
-    label: Project Permissions
+    label: Namespace Permissions
     description: Controls what access users have to the Project
     noDescription: User created - no description
     searchForMember: Search for a member to provide project access
     owner:
       label: Owner
-      description: Owners have full control over the Project and all resources inside it.
+      description: Owners have full control over the Namespace and all resources inside it.
     member:
       label: Member
-      description: Members can manage the resources inside the Project but not change the Project itself.
+      description: Members can manage the resources inside the Namespace but not change the Namespace itself.
     readOnly:
       label: Read Only
-      description: Members can only view the resources inside the Project but not change the resources.
+      description: Members can only view the resources inside the Namespace but not change the resources.
     custom:
       label: Custom
       description: Choose individual roles for this user.
@@ -3549,6 +3557,7 @@ projectMembers:
     servicesView: View Services
     persistentvolumeclaimsView: View Volumes
     workloadsView: View Workloads
+    noCustomRoles: No custom roles defined
 
 projectNamespaces:
   createNamespace: Create Namespace

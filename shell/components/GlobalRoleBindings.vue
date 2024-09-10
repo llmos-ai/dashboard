@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import { LLMOS, MANAGEMENT } from '@shell/config/types';
+import { LLMOS, MANAGEMENT, RBAC_GROUP } from '@shell/config/types';
 import { _CREATE, _VIEW } from '@shell/config/query-params';
 import { addObjects, isArray } from '@shell/utils/array';
 import Loading from '@shell/components/Loading';
@@ -203,7 +203,7 @@ export default {
           name:     '', // a placeholder of the role name
         },
         subjects: [{
-          apiGroup: 'rbac.authorization.k8s.io',
+          apiGroup: RBAC_GROUP,
           kind:     'User',
           name:     userId || this.userId,
         }]

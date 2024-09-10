@@ -11,12 +11,13 @@ import {
   VALUE
 } from '@shell/config/table-headers';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
-import { METRIC, NODE, POD } from '@shell/config/types';
+import { METRIC, POD } from '@shell/config/types';
 import createEditView from '@shell/mixins/create-edit-view';
 import { formatSi, exponentNeeded, UNITS } from '@shell/utils/units';
 import { mapGetters } from 'vuex';
 import Loading from '@shell/components/Loading';
 import metricPoller from '@shell/mixins/metric-poller';
+import { allHash } from '@shell/utils/promise';
 
 export default {
   name: 'DetailNode',
@@ -40,14 +41,10 @@ export default {
   },
 
   async fetch() {
-    return this.$store.dispatch('cluster/findAll', { type: POD });
-  },
+    const inStore = this.$store.getters['currentProduct'].inStore;
+    const hash = { pods: this.$store.dispatch(`${ inStore }/findAll`, { type: POD }) };
 
-  beforeDestroy() {
-    // Stop watching pods, nodes and node metrics
-    this.$store.dispatch('cluster/forgetType', POD);
-    this.$store.dispatch('cluster/forgetType', NODE);
-    this.$store.dispatch('cluster/forgetType', METRIC.NODE);
+    await allHash(hash);
   },
 
   data() {

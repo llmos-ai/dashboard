@@ -195,19 +195,19 @@ export default {
             v-if="canAccessMLCluster"
             :cluster="clusterDetail.id"
             resource="ray.io.raycluster"
-            product="llm"
+            product="llmos"
           />
           <ResourceSummary
             v-if="canAccessNotebooks"
             :cluster="clusterDetail.id"
             resource="ml.llmos.ai.notebook"
-            product="llm"
+            product="llmos"
           />
           <ResourceSummary
             v-if="canAccessModelServices"
             :cluster="clusterDetail.id"
             resource="ml.llmos.ai.modelservice"
-            product="llm"
+            product="llmos"
           />
         </div>
         <h3>Others</h3>
@@ -216,18 +216,18 @@ export default {
             v-if="canAccessNodes"
             :cluster="clusterDetail.id"
             resource="node"
-            product="llm"
+            product="llmos"
           />
           <ResourceSummary
             v-if="canAccessNamespaces"
             :cluster="clusterDetail.id"
             resource="namespace"
-            product="llm"
+            product="llmos"
           />
           <ResourceSummary
             :cluster="clusterDetail.id"
             resource="persistentvolumeclaim"
-            product="llm"
+            product="llmos"
           />
         </div>
       </div>
