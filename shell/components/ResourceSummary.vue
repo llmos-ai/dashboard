@@ -1,6 +1,6 @@
 <script>
 import SimpleBox from '@shell/components/SimpleBox';
-import { COUNT } from '@shell/config/types';
+import { COUNT, LLMOS, PVC } from '@shell/config/types';
 import { colorForState } from '@shell/plugins/dashboard-store/resource-class';
 
 export function colorToCountName(color) {
@@ -85,11 +85,17 @@ export default {
 
       const product = this.product || this.$store.getters['currentProduct'].name;
 
+      let resource = this.resource;
+
+      if (resource === PVC) {
+        resource = LLMOS.VOLUME;
+      }
+
       const route = {
         name:   'c-cluster-product-resource',
         params: {
           product,
-          resource: this.resource,
+          resource,
         }
       };
 

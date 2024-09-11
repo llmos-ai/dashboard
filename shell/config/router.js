@@ -63,6 +63,10 @@ export const routerOptions = {
     component: () => interopDefault(import('../pages/auth/logout.vue' /* webpackChunkName: "pages/auth/logout" */)),
     name:      'auth-logout'
   }, {
+    path:      '/auth/setup',
+    component: () => interopDefault(import('../pages/auth/setup.vue' /* webpackChunkName: "pages/auth/setup" */)),
+    name:      'auth-setup'
+  }, {
     path:      '/c/:cluster',
     component: () => interopDefault(import('../pages/c/_cluster/index.vue' /* webpackChunkName: "pages/c/_cluster/index" */)),
     name:      'c-cluster'

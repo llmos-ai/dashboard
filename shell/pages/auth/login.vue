@@ -11,25 +11,33 @@ import { mapGetters } from 'vuex';
 import { MANAGEMENT } from '@shell/config/types';
 import { SETTING } from '@shell/config/settings';
 import { LOGIN_ERRORS } from '@shell/store/auth';
-import {
-  getVendor,
-  getProduct,
-} from '@shell/config/private-label';
+import CopyCode from '@shell/components/CopyCode';
+import { getVendor, getProduct } from '@shell/config/private-label';
+import axios from 'axios';
 
 export default {
   name:       'Login',
   layout:     'unauthenticated',
   components: {
-    AsyncButton, Checkbox, Banner, Password, LocaleSelector, LabeledInput
+    AsyncButton,
+    CopyCode,
+    Password,
+    LocaleSelector,
+    Checkbox,
+    Banner,
+    LabeledInput
   },
 
-  async asyncData() {
+  async asyncData({ route, redirect, store }) {
+    const publicUI = await axios.get(`/v1-public/ui`);
+    const firstLogin = publicUI.data['first-login'] === 'true';
+
     return {
       vendor:             getVendor(),
       hasLocal:           true,
       showLocal:          true,
-      firstLogin:         false,
       showLocaleSelector: true,
+      firstLogin,
     };
   },
 
@@ -37,22 +45,23 @@ export default {
     const username = $cookies.get(USERNAME, { parseJSON: false }) || '';
 
     return {
-      product: getProduct(),
-
+      product:          getProduct(),
       username,
-      remember: !!username,
-      password: '',
-
-      timedOut:  this.$route.query[TIMED_OUT] === _FLAGGED,
-      loggedOut: this.$route.query[LOGGED_OUT] === _FLAGGED,
-      err:       this.$route.query.err,
-
-      customLoginError: {}
+      password:         '',
+      remember:         !!username,
+      timedOut:         this.$route.query[TIMED_OUT] === _FLAGGED,
+      loggedOut:        this.$route.query[LOGGED_OUT] === _FLAGGED,
+      err:              this.$route.query.err,
+      customLoginError: {},
     };
   },
 
   computed: {
     ...mapGetters({ t: 'i18n/t' }),
+
+    kubectlCmd() {
+      return "kubectl get secret --namespace llmos-system llmos-bootstrap-passwd -o go-template='{{.data.password|base64decode}}{{\"\\n\"}}'";
+    },
 
     errorMessage() {
       if (this.err === LOGIN_ERRORS.CLIENT_UNAUTHORIZED) {
@@ -131,10 +140,6 @@ export default {
       }
     },
 
-    handleProviderError(err) {
-      this.err = err;
-    },
-
     async loginLocal(buttonCb) {
       try {
         await this.$store.dispatch('auth/login', {
@@ -146,13 +151,13 @@ export default {
           }
         });
 
-        const user = await this.$store.dispatch('management/findAll', {
+        const users = await this.$store.dispatch('management/findAll', {
           type: MANAGEMENT.USER,
           opt:  { url: `/v1/${ MANAGEMENT.USER }?me=true` }
         });
 
-        if (!!user?.[0]) {
-          this.$store.dispatch('auth/gotUser', user[0]);
+        if (!!users?.[0]) {
+          this.$store.dispatch('auth/gotUser', users[0]);
         }
 
         if ( this.remember ) {
@@ -167,7 +172,11 @@ export default {
           this.$cookies.remove(USERNAME);
         }
 
-        this.$router.replace('/');
+        if (this.firstLogin) {
+          this.$router.push({ name: 'auth-setup' });
+        } else {
+          this.$router.replace('/');
+        }
       } catch (err) {
         this.err = err;
         this.timedOut = null;
@@ -211,6 +220,34 @@ export default {
           </h4>
         </div>
 
+        <div
+          v-if="firstLogin"
+          class="first-login-message pl-10 pr-10"
+          :class="{'mt-30': !hasLoginMessage}"
+          data-testid="first-login-message"
+        >
+          <t
+            k="setup.defaultPassword.intro"
+            :raw="true"
+          />
+
+          <div>
+            <t
+              k="setup.defaultPassword.scriptPrefix"
+              :raw="true"
+            />
+          </div>
+          <CopyCode class="copy-code">
+            {{ kubectlCmd }}
+          </CopyCode>
+          <div>
+            <t
+              k="setup.defaultPassword.dockerSuffix"
+              :raw="true"
+            />
+          </div>
+        </div>
+
         <template v-if="hasLocal">
           <form
             v-if="showLocal"
@@ -219,7 +256,6 @@ export default {
             <div class="span-6 offset-3">
               <div class="mb-20">
                 <LabeledInput
-                  v-if="!firstLogin"
                   id="username"
                   ref="username"
                   v-model.trim="username"
@@ -358,5 +394,8 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     margin: 0 auto;
+  }
+  .copy-code {
+    margin: 10px 0 20px 0;
   }
 </style>
