@@ -1,11 +1,12 @@
 <script>
 import ResourceSummary from '@shell/components/ResourceSummary';
 import {
-  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS
+  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS, PVC
 } from '@shell/config/types';
 import { RESOURCES } from '@shell/pages/c/_cluster/explorer/index';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
 import { mapGetters } from 'vuex';
+import { allHash } from '@shell/utils/promise';
 
 const COMPONENT_STATUS = [
   'etcd',
@@ -18,23 +19,17 @@ export default {
   components: { ResourceSummary },
 
   async fetch() {
-    this.clusters = await this.$store.dispatch('management/findAll', {
-      type: MANAGEMENT.CLUSTER,
-      opt:  { url: MANAGEMENT.CLUSTER }
+    const hash = await allHash({
+      clusters:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER }),
+      settings:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.SETTING }),
+      // cephCluster:   this.$store.dispatch('management/findAll', { type: LLMOS.CEPH_CLUSTER, id: 'ceph-system/llmos-ceph' }),
+      viewContainer: this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD),
     });
-    this.viewContainerDashboard = this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD);
 
-    if (this.$store.getters['management/schemaFor'](LLMOS.CEPH_CLUSTER)) {
-      this.cephCluster = await this.$store.dispatch('management/find',
-        { type: LLMOS.CEPH_CLUSTER, id: 'ceph-system/llmos-ceph' });
-    }
-
-    if (this.$store.getters['management/schemaFor'](MANAGEMENT.SETTING)) {
-      this.settings = await this.$store.dispatch('management/findAll', {
-        type: MANAGEMENT.SETTING,
-        opt:  { url: MANAGEMENT.SETTING }
-      });
-    }
+    this.clusters = hash.clusters;
+    this.settings = hash.settings;
+    // this.cephCluster = hash.cephCluster;
+    this.viewContainerDashboard = hash.viewContainer;
   },
 
   data() {
@@ -81,6 +76,10 @@ export default {
       return !!this.clusterCounts?.[0]?.counts?.[NAMESPACE];
     },
 
+    canAccessPVC() {
+      return !!this.clusterCounts?.[0]?.counts?.[PVC];
+    },
+
     canAccessMLCluster() {
       return !!this.clusterCounts?.[0]?.counts?.[LLMOS.RAY_CLUSTER];
     },
@@ -109,13 +108,25 @@ export default {
       // loop setting and find the server-version
       for ( let i = 0; i < this.settings.length; i++ ) {
         if ( this.settings[i].id === 'server-version' ) {
-          return this.settings[i].value;
+          return this.settings[i].value || this.settings[i].default;
         }
       }
 
       return 'N/A';
     },
 
+    getServerCreatedTime() {
+      if ( this.settings === [] ) {
+        return 'unknown';
+      }
+      const serverVersion = this.settings.find((s) => s.id === 'server-version');
+
+      if ( serverVersion ) {
+        return serverVersion.metadata?.creationTimestamp;
+      }
+
+      return 'unknown';
+    },
   },
 
   watch: {
@@ -177,7 +188,7 @@ export default {
       <div>
         <label>{{ t('home.glance.created') }}: </label>
         <span><LiveDate
-          :value="clusterDetail.metadata.creationTimestamp"
+          :value="getServerCreatedTime"
           :add-suffix="true"
           :show-tooltip="true"
         /></span>
@@ -225,6 +236,7 @@ export default {
             product="llmos"
           />
           <ResourceSummary
+            v-if="canAccessPVC"
             :cluster="clusterDetail.id"
             resource="persistentvolumeclaim"
             product="llmos"
@@ -314,10 +326,6 @@ export default {
 
   &>*:not(:nth-last-child(-n+2)) {
     margin-right: 40px;
-
-    & SPAN {
-      font-weight: bold
-    }
   }
 }
 

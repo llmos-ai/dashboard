@@ -365,13 +365,13 @@ export default {
                     :to="{ name: 'c-cluster-llmos', params: { cluster: c.id } }"
                   >
                     <ClusterIconMenu
-                      v-tooltip="getTooltipConfig(t('product.llm'))"
+                      v-tooltip="getTooltipConfig(t('product.llmos'))"
                       :cluster="c"
                       :llm="true"
                       class="rancher-provider-icon"
                     />
                     <div class="cluster-name">
-                      {{ t('product.llm') }}
+                      {{ t('product.llmos') }}
                     </div>
                   </nuxt-link>
 

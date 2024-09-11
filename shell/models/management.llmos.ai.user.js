@@ -65,6 +65,10 @@ export default class User extends SteveModel {
       return 'inactive';
     }
 
+    if ( this.status?.isActive === true) {
+      return 'active';
+    }
+
     return this.metadata?.state?.name || 'unknown';
   }
 

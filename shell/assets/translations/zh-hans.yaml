@@ -3975,20 +3975,21 @@ setup:
   currentPassword: Bootstrap 密码
   confirmPassword: 确认新密码
   defaultPassword:
-    intro: 这是你第一次访问 {vendor}。如果你预先设置了 Bootstrap 密码，请在此处输入。否则我们会为你生成一个随机密码。找到它：<br/><br/>
+    intro: Hi, 这是你第一次访问 {vendor}。如果你预先设置了 Bootstrap 密码，请在此处输入。否则我们会为你生成一个随机密码。<br/><br/>
+    scriptPrefix: '在你安装的第一台主机上，执行以下命名找到它:'
     dockerPrefix: '"docker run" 安装：'
     dockerPs: '运行<code>docker ps</code>找到你的容器 ID，然后运行：'
     dockerSuffix: ""
     helmPrefix: 'Helm 安装，运行：'
     helmSuffix: ""
-  eula: 选中此框，即表示你接受<a href="https://rancher.com/eula" target="_blank" rel="noopener noreferrer nofollow">最终用户许可协议及条款和条件</a>
+  eula: 选中此框，即表示你接受<a href="https://llmos.1block.ai/eula" target="_blank" rel="noopener noreferrer nofollow">最终用户许可协议及条款和条件</a>
   newPassword: 新密码
-  newUserSetPassword: 请设置强密码。建议使用生成的随机密码。你也可以自行设置。
+  newUserSetPassword: 请设置强密码。可使用生成的随机密码, 也可以自行设置。
   serverUrl:
     label: 服务器 URL
     skip: 跳过
     tip: 此 {vendor} 安装应使用什么 URL？集群中的所有节点都需要能访问该 URL。
-  setPassword: 请为默认用户 <code>{username}</code>设置强密码。建议使用生成的随机密码。你也可以自行设置。
+  setPassword: 请为默认用户 <code>{username}</code>设置强密码。可使用生成的随机密码, 也可以自行设置。
   telemetry: 允许收集<a href="{docsBase}/faq/telemetry/" target="_blank" rel="noopener noreferrer nofollow">匿名统计数据</a>，以帮我们改进 {name}。
   useManual: 设置密码
   useRandom: 使用随机生成的密码
