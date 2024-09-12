@@ -5,7 +5,10 @@ import { SPOOFED_API_PREFIX, SPOOFED_PREFIX } from '@shell/store/type-map';
 import { createYaml } from '@shell/utils/create-yaml';
 import { classify } from '@shell/plugins/dashboard-store/classify';
 import { normalizeType } from './normalize';
+import garbageCollect from '@shell/utils/gc/gc';
 import { addSchemaIndexFields } from '@shell/plugins/steve/schema.utils';
+import { addParam } from '@shell/utils/url';
+import { conditionalDepaginate } from '@shell/store/type-map.utils';
 
 export const _ALL = 'all';
 export const _MERGE = 'merge';
@@ -14,7 +17,8 @@ export const _ALL_IF_AUTHED = 'allIfAuthed';
 export const _NONE = 'none';
 
 const SCHEMA_CHECK_RETRIES = 15;
-const SCHEMA_CHECK_RETRY_LOG = 10;
+const HAVE_ALL_CHECK_RETRIES = 15;
+const RETRY_LOG = 10;
 
 export async function handleSpoofedRequest(rootGetters, schemaStore, opt, product) {
   // Handle spoofed types instead of making an actual request
@@ -121,7 +125,7 @@ export default {
           }
         });
       } else {
-      // We have everything!
+        // We have everything!
         if (opt.hasManualRefresh) {
           dispatch('resource-fetch/updateManualRefreshIsLoading', false, { root: true });
         }
@@ -140,6 +144,11 @@ export default {
     }
   },
 
+  /**
+   *
+   * @param {*} ctx
+   * @param { {type: string, opt: ActionFindPageArgs} } opt
+   */
   async findAll(ctx, { type, opt }) {
     const {
       getters, commit, dispatch, rootGetters
@@ -153,16 +162,16 @@ export default {
     }
 
     // No need to request the resources if we have them already
-    if ( opt.force !== true && (getters['haveAll'](type) || getters['haveAllNamespace'](type, opt.namespaced))) {
-      const args = {
-        type,
-        revision:  '',
-        // watchNamespace - used sometimes when we haven't fetched the results of a single namespace
-        // namespaced - used when we have fetched the result of a single namespace (see https://github.com/rancher/dashboard/pull/7329/files)
-        namespace: opt.watchNamespace || opt.namespaced
-      };
-
+    if ( !opt.force && (getters['haveAll'](type) || getters['haveAllNamespace'](type, opt.namespaced))) {
       if (opt.watch !== false ) {
+        const args = {
+          type,
+          revision:  '',
+          // watchNamespace - used sometimes when we haven't fetched the results of a single namespace
+          // namespaced - used when we have fetched the result of a single namespace (see https://github.com/rancher/dashboard/pull/7329/files)
+          namespace: opt.watchNamespace || opt.namespaced
+        };
+
         dispatch('watch', args);
       }
 
@@ -173,14 +182,6 @@ export default {
 
     if ( opt.load === false || opt.load === _NONE ) {
       load = _NONE;
-    } else if ( opt.load === _ALL_IF_AUTHED ) {
-      const header = rootGetters['auth/fromHeader'];
-
-      if ( `${ header }` === 'true' || `${ header }` === 'none' ) {
-        load = _ALL;
-      } else {
-        load = _MULTI;
-      }
     }
 
     const typeOptions = rootGetters['type-map/optionsFor'](type);
@@ -189,7 +190,7 @@ export default {
     opt = opt || {};
     opt.url = getters.urlFor(type, null, opt);
     opt.stream = opt.stream !== false && load !== _NONE;
-    opt.depaginate = typeOptions?.depaginate;
+    opt.depaginate = conditionalDepaginate(typeOptions?.depaginate, { ctx, args: { type, opt } });
 
     let skipHaveAll = false;
 
@@ -197,6 +198,8 @@ export default {
     // on for a limit of 100, to quickly show data
     // another one with 1st page of the subset of the resource we are fetching
     // the default is 4 pages, but it can be changed on mixin/resource-fetch.js
+    let pageFetchOpts;
+
     if (opt.incremental) {
       commit('incrementLoadCounter', type);
 
@@ -204,14 +207,14 @@ export default {
         dispatch('resource-fetch/updateManualRefreshIsLoading', true, { root: true });
       }
 
-      const pageFetchOpts = {
+      pageFetchOpts = {
         ...opt,
-        url: `${ opt.url }?limit=${ opt.incremental }`
+        url: addParam(opt.url, 'limit', `${ opt.incremental }`),
       };
 
       // this is where we "hijack" the limit for the dispatch('request') some lines below
       // and therefore have 2 initial requests in parallel
-      opt.url = `${ opt.url }?limit=100`;
+      opt.url = addParam(opt.url, 'limit', '100');
       skipHaveAll = true;
 
       // since we are forcing a request, clear the haveAll
@@ -220,8 +223,6 @@ export default {
       if (opt.force) {
         commit('forgetType', type);
       }
-
-      dispatch('loadDataPage', { type, opt: pageFetchOpts });
     }
 
     let streamStarted = false;
@@ -310,11 +311,24 @@ export default {
         commit('loadAll', {
           ctx,
           type,
-          data:      out.data,
-          revision:  out.revision,
+          data:       out.data,
+          revision:   out.revision,
           skipHaveAll,
-          namespace: opt.namespaced
+          namespace:  opt.namespaced,
+          pagination: opt.pagination ? {
+            request: opt.pagination,
+            result:  {
+              count:     out.count,
+              pages:     out.pages,
+              timestamp: new Date().getTime()
+            }
+          } : undefined,
         });
+      }
+
+      if (opt.incremental) {
+        // This needs to come after the loadAll (which resets state) so supplements via loadDataPage aren't lost
+        dispatch('loadDataPage', { type, opt: pageFetchOpts });
       }
     }
 
@@ -336,6 +350,83 @@ export default {
     if (!opt.incremental && opt.hasManualRefresh) {
       dispatch('resource-fetch/updateManualRefreshIsLoading', false, { root: true });
     }
+
+    garbageCollect.gcUpdateLastAccessed(ctx, type);
+
+    return all;
+  },
+
+  /**
+   *
+   * @param {*} ctx
+   * @param { {type: string, opt: FindPageOpt} } opt
+   */
+  async findPage(ctx, { type, opt }) {
+    const { getters, commit, dispatch } = ctx;
+
+    opt = opt || {};
+
+    if (!opt.pagination) {
+      console.error('Attempting to find a page for a resource but no pagination settings supplied', type); // eslint-disable-line no-console
+
+      return;
+    }
+
+    type = getters.normalizeType(type);
+
+    if ( !getters.typeRegistered(type) ) {
+      commit('registerType', type);
+    }
+
+    // No need to request the resources if we have them already
+    if (!opt.force && getters['havePaginatedPage'](type, opt)) {
+      return findAllGetter(getters, type, opt);
+    }
+
+    console.log(`Find Page: [${ ctx.state.config.namespace }] ${ type }. Page: ${ opt.pagination.page }. Size: ${ opt.pagination.pageSize }`); // eslint-disable-line no-console
+    opt = opt || {};
+    opt.url = getters.urlFor(type, null, opt);
+
+    let out;
+
+    try {
+      if (opt.hasManualRefresh) {
+        dispatch('resource-fetch/updateManualRefreshIsLoading', true, { root: true });
+      }
+
+      out = await dispatch('request', { opt, type });
+    } catch (e) {
+      if (opt.hasManualRefresh) {
+        dispatch('resource-fetch/updateManualRefreshIsLoading', false, { root: true });
+      }
+
+      return Promise.reject(e);
+    }
+
+    commit('loadPage', {
+      ctx,
+      type,
+      data:       out.data,
+      pagination: opt.pagination ? {
+        request: {
+          namespace:  opt.namespaced,
+          pagination: opt.pagination
+        },
+        result: {
+          count:     out.count,
+          pages:     out.pages || Math.ceil(out.count / (opt.pagination.pageSize || Number.MAX_SAFE_INTEGER)),
+          timestamp: new Date().getTime()
+        }
+      } : undefined,
+    });
+
+    const all = findAllGetter(getters, type, opt);
+
+    if (opt.hasManualRefresh) {
+      dispatch('resource-fetch/updateManualRefreshIsLoading', false, { root: true });
+    }
+
+    garbageCollect.gcUpdateLastAccessed(ctx, type);
 
     return all;
   },
@@ -364,12 +455,9 @@ export default {
     const typeOptions = rootGetters['type-map/optionsFor'](type);
 
     opt = opt || {};
-
-    opt.filter = opt.filter || {};
-    opt.filter['labelSelector'] = selector;
-
+    opt.labelSelector = selector;
     opt.url = getters.urlFor(type, null, opt);
-    opt.depaginate = typeOptions?.depaginate;
+    opt.depaginate = conditionalDepaginate(typeOptions?.depaginate, { ctx, args: { type, opt } });
 
     const res = await dispatch('request', { opt, type });
 
@@ -393,6 +481,8 @@ export default {
         force:    opt.forceWatch === true,
       });
     }
+
+    garbageCollect.gcUpdateLastAccessed(ctx, type);
 
     return getters.matching( type, selector, namespace );
   },
@@ -439,8 +529,13 @@ export default {
       const watchMsg = {
         type,
         id,
-        revision: res?.metadata?.resourceVersion,
-        force:    opt.forceWatch === true,
+        // Although not used by sockets, we need this for when resyncWatch calls find... which needs namespace to construct the url
+        namespace: opt.namespaced,
+        // Override the revision. Used in cases where we need to avoid using the resource's own revision which would be `too old`.
+        // For the above case opt.revision will be `null`. If left as `undefined` the subscribe mechanism will try to determine a revision
+        // from resources in store (which would be this one, with the too old revision)
+        revision:  typeof opt.revision !== 'undefined' ? opt.revision : res?.metadata?.resourceVersion,
+        force:     opt.forceWatch === true,
       };
 
       const idx = id.indexOf('/');
@@ -454,6 +549,8 @@ export default {
     }
 
     out = getters.byId(type, id);
+
+    garbageCollect.gcUpdateLastAccessed(ctx, type);
 
     return out;
   },
@@ -537,8 +634,18 @@ export default {
     return data.map((d) => classify(ctx, d));
   },
 
-  createPopulated(ctx, userData) {
-    const data = ctx.getters['defaultFor'](userData.type);
+  async createPopulated(ctx, userData) {
+    let data = null;
+
+    const schema = ctx.getters['schemaFor'](userData.type);
+
+    if (schema) {
+      if (schema.fetchResourceFields) {
+        // fetch resourceFields for createYaml
+        await schema.fetchResourceFields();
+      }
+      data = ctx.getters['defaultFor'](userData.type, schema);
+    }
 
     merge(data, userData);
 
@@ -607,10 +714,12 @@ export default {
     let schema = null;
 
     while (!schema && tries > 0) {
-      schema = getters['schemaFor'](type);
+      // Schemas may not have been loaded, so don't error out if they are not loaded yet
+      // the wait here will wait for schemas to load and then for the desired schema to be available
+      schema = getters['schemaFor'](type, false, false);
 
       if (!schema) {
-        if (tries === SCHEMA_CHECK_RETRY_LOG) {
+        if (tries === RETRY_LOG) {
           console.warn(`Schema for ${ type } not available... retrying...`); // eslint-disable-line no-console
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -625,7 +734,36 @@ export default {
     }
   },
 
+  async waitForHaveAll({ getters }, { type, throwError = false, attempts = HAVE_ALL_CHECK_RETRIES }) {
+    let tries = attempts;
+    let haveAll = null;
+
+    while (!haveAll && tries > 0) {
+      haveAll = getters['haveAll'](type);
+
+      if (!haveAll) {
+        if (tries === RETRY_LOG) {
+          console.warn(`wait for all of ${ type } continuing...`); // eslint-disable-line no-console
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        tries--;
+      }
+    }
+
+    if (tries === 0 && throwError) {
+      throw new Error(`Failed to wait for all of ${ type }`);
+    }
+  },
+
   incrementLoadCounter({ commit }, resource) {
     commit('incrementLoadCounter', resource);
   },
+
+  garbageCollect(ctx, ignoreTypes) {
+    return garbageCollect.garbageCollect(ctx, ignoreTypes);
+  },
+
+  gcResetStore({ state }) {
+    garbageCollect.gcResetStore(state);
+  }
 };

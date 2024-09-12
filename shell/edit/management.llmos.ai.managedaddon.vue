@@ -3,7 +3,6 @@ import CruResource from '@shell/components/CruResource';
 import NameNsDescription from '@shell/components/form/NameNsDescription.vue';
 import Tab from '@shell/components/Tabbed/Tab.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
-
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { _CREATE, _EDIT } from '@shell/config/query-params';
 import { LabeledInput } from '@components/Form/LabeledInput';
@@ -12,9 +11,11 @@ import YamlEditor from '@shell/components/YamlEditor.vue';
 import FormValidation from '@shell/mixins/form-validation';
 import { allHash } from '@shell/utils/promise';
 import { EVENT } from '@shell/config/types';
+import Loading from '@shell/components/Loading.vue';
 
 export default {
   components: {
+    Loading,
     YamlEditor,
     Checkbox,
     ResourceTabs,
@@ -26,7 +27,9 @@ export default {
   mixins: [CreateEditView, FormValidation],
 
   async fetch() {
-    await allHash({ events: this.$store.dispatch('cluster/findAll', { type: EVENT }) });
+    const inStore = this.$store.getters['currentProduct'].inStore;
+
+    await allHash({ events: this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }) });
   },
 
   data() {
@@ -115,93 +118,100 @@ export default {
 </script>
 
 <template>
-  <CruResource
-    :done-route="doneRoute"
-    :mode="mode"
-    :resource="value"
-    :validation-passed="fvFormIsValid"
-    :errors="fvUnreportedValidationErrors"
-    :apply-hooks="applyHooks"
-    @finish="save"
+  <Loading v-if="$fetchState.pending" />
+  <form
+    v-else
+    class="filled-height"
   >
-    <NameNsDescription
-      :value="value"
-      :namespaced="true"
+    <CruResource
+      :done-route="doneRoute"
       :mode="mode"
-    />
-
-    <ResourceTabs
-      v-model="value"
-      class="mt-15"
-      :need-conditions="false"
-      :need-related="false"
-      :side-tabs="true"
-      :eventOverride="eventOverride"
-      :useOverrideEvents="true"
-      :mode="mode"
+      :resource="value"
+      :validation-passed="fvFormIsValid"
+      :errors="fvUnreportedValidationErrors"
+      :apply-hooks="applyHooks"
+      @finish="save"
     >
-      <Tab
-        name="basic"
-        :label="t('cluster.tabs.basic')"
-        class="bordered-table"
+      <NameNsDescription
+        :value="value"
+        :namespaced="true"
+        :mode="mode"
+      />
+
+      <ResourceTabs
+        v-model="value"
+        class="mt-15"
+        :need-conditions="false"
+        :need-related="false"
+        :side-tabs="true"
+        :eventOverride="eventOverride"
+        :useOverrideEvents="true"
+        :mode="mode"
       >
-        <h4>Enable Chart</h4>
-        <div class="row mb-20">
-          <Checkbox
-            v-model="spec.enabled"
-            label="Enabled"
-            :disabled="isSystemAddon()"
-            :mode="mode"
-            @input="update"
-          />
-        </div>
-
-        <div class="row mb-20">
-          <div class="col span-6">
-            <labeledInput
-              v-model="spec.repo"
-              label="Chart Repo"
-              required
+        <Tab
+          name="basic"
+          :label="t('cluster.tabs.basic')"
+          class="bordered-table"
+        >
+          <h4>Enable Chart</h4>
+          <div class="row mb-20">
+            <Checkbox
+              v-model="spec.enabled"
+              label="Enabled"
+              :disabled="isSystemAddon()"
               :mode="mode"
               @input="update"
             />
           </div>
 
-          <div class="col span-6">
-            <LabeledInput
-              v-model="spec.chart"
-              label="Chart Name"
-              required
-              :mode="mode"
-              @input="update"
-            />
-          </div>
-        </div>
+          <div class="row mb-20">
+            <div class="col span-6">
+              <labeledInput
+                v-model="spec.repo"
+                label="Chart Repo"
+                required
+                :mode="mode"
+                @input="update"
+              />
+            </div>
 
-        <div class="row mb-20">
-          <div class="col span-6">
-            <labeledInput
-              v-model="spec.version"
-              label="Version"
-              required
-              :mode="mode"
-              @input="update"
-            />
+            <div class="col span-6">
+              <LabeledInput
+                v-model="spec.chart"
+                label="Chart Name"
+                required
+                :mode="mode"
+                @input="update"
+              />
+            </div>
           </div>
-        </div>
 
-        <h4>Values</h4>
-        <div class="row mb-20">
-          <div class="col span-12">
-            <YamlEditor
-              v-model="spec.valuesContent"
-              :value="spec.valuesContent"
-              :mode="mode"
-              @input="update"
-            />
+          <div class="row mb-20">
+            <div class="col span-6">
+              <labeledInput
+                v-model="spec.version"
+                label="Version"
+                required
+                :mode="mode"
+                @input="update"
+              />
+            </div>
           </div>
-        </div>
-      </Tab>
-    </ResourceTabs>
-  </CruResource>
+
+          <h4>Values</h4>
+          <div class="row mb-20">
+            <div class="col span-12">
+              <YamlEditor
+                v-model="spec.valuesContent"
+                :value="spec.valuesContent"
+                :mode="mode"
+                class="yaml-editor"
+                @input="update"
+              />
+            </div>
+          </div>
+        </Tab>
+      </ResourceTabs>
+    </CruResource>
+  </form>
 </template>

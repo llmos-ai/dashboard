@@ -293,98 +293,98 @@ export default {
   </div>
 </template>
 <style lang="scss">
-  .dashboard-root {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
+.dashboard-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
 
-  .dashboard-content {
-    display: grid;
-    position: relative;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    min-height: 0px;
+.dashboard-content {
+  display: grid;
+  position: relative;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0px;
 
-    &.dashboard-padding-left {
+  &.dashboard-padding-left {
     padding-left: $app-bar-collapsed-width;
 
-      .overlay-content-mode {
-        left: calc(var(--nav-width) + $app-bar-collapsed-width);
-      }
-   }
+    .overlay-content-mode {
+      left: calc(var(--nav-width) + $app-bar-collapsed-width);
+    }
+  }
 
-    &.pin-right {
-      grid-template-areas:
+  &.pin-right {
+    grid-template-areas:
         "header  header  header"
         "nav      main     wm";
-      grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: var(--nav-width)     auto var(--wm-width, 0px);
-    }
+    grid-template-rows:    var(--header-height) auto;
+    grid-template-columns: var(--nav-width)     auto var(--wm-width, 0px);
+  }
 
-    &.pin-bottom {
-      grid-template-areas:
+  &.pin-bottom {
+    grid-template-areas:
         "header  header"
         "nav       main"
         "wm         wm";
-      grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
-      grid-template-columns: var(--nav-width)     auto;
-    }
+    grid-template-rows:    var(--header-height) auto  var(--wm-height, 0px);
+    grid-template-columns: var(--nav-width)     auto;
+  }
 
-    &.pin-left {
-      grid-template-areas:
+  &.pin-left {
+    grid-template-areas:
         "header  header  header"
         "wm       nav     main";
-      grid-template-rows:    var(--header-height) auto;
-      grid-template-columns: var(--wm-width, 0px) var(--nav-width) auto;
-    }
-
-    > HEADER {
-      grid-area: header;
-    }
-
-    .default-side-nav {
-      grid-area: nav;
-    }
+    grid-template-rows:    var(--header-height) auto;
+    grid-template-columns: var(--wm-width, 0px) var(--nav-width) auto;
   }
 
-  .wm {
-    grid-area: wm;
-    overflow-y: hidden;
-    z-index: 1;
+  > HEADER {
+    grid-area: header;
   }
 
-  .localeSelector {
-    ::v-deep .popover-inner {
-      padding: 50px 0;
-    }
+  .default-side-nav {
+    grid-area: nav;
+  }
+}
 
-    ::v-deep .popover-arrow {
-      display: none;
-    }
+.wm {
+  grid-area: wm;
+  overflow-y: hidden;
+  z-index: 1;
+}
 
-    ::v-deep .popover:focus {
-      outline: 0;
-    }
-
-    li {
-      padding: 8px 20px;
-
-      &:hover {
-        background-color: var(--primary-hover-bg);
-        color: var(--primary-hover-text);
-        text-decoration: none;
-      }
-    }
+.localeSelector {
+  ::v-deep .popover-inner {
+    padding: 50px 0;
   }
 
-  .drag-start {
-    z-index: 1000;
-    opacity: 0.5;
-    transition: opacity .3s ease;
+  ::v-deep .popover-arrow {
+    display: none;
   }
 
-  .drag-end {
-    opacity: 1;
+  ::v-deep .popover:focus {
+    outline: 0;
   }
+
+  li {
+    padding: 8px 20px;
+
+    &:hover {
+      background-color: var(--primary-hover-bg);
+      color: var(--primary-hover-text);
+      text-decoration: none;
+    }
+  }
+}
+
+.drag-start {
+  z-index: 1000;
+  opacity: 0.5;
+  transition: opacity .3s ease;
+}
+
+.drag-end {
+  opacity: 1;
+}
 </style>

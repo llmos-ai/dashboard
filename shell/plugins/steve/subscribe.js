@@ -20,7 +20,8 @@ import Socket, {
   EVENT_DISCONNECT_ERROR,
   NO_WATCH,
   NO_SCHEMA,
-  REVISION_TOO_OLD
+  REVISION_TOO_OLD,
+  NO_PERMS
 } from '@shell/utils/socket';
 import { normalizeType } from '@shell/plugins/dashboard-store/normalize';
 import day from 'dayjs';
@@ -29,8 +30,9 @@ import { escapeHtml } from '@shell/utils/string';
 import { keyForSubscribe } from '@shell/plugins/steve/resourceWatcher';
 import { waitFor } from '@shell/utils/async';
 import { WORKER_MODES } from './worker';
-import pAndNFiltering from '@shell/utils/projectAndNamespaceFiltering.utils';
-import { BLANK_CLUSTER, STORE } from '@shell/store/store-types';
+import acceptOrRejectSocketMessage from './accept-or-reject-socket-message';
+import { STORE } from '@shell/store/store-types.js';
+import { BLANK_CLUSTER } from '@shell/store';
 
 // minimum length of time a disconnect notification is shown
 const MINIMUM_TIME_NOTIFIED = 3000;
@@ -45,6 +47,10 @@ const isWaitingForDestroy = (storeName, store) => {
 
 const waitForSettingsSchema = (storeName, store) => {
   return waitFor(() => isWaitingForDestroy(storeName, store) || !!store.getters['management/byId'](SCHEMA, MANAGEMENT.SETTING));
+};
+
+const waitForSettings = (storeName, store) => {
+  return waitFor(() => isWaitingForDestroy(storeName, store));
 };
 
 const isAdvancedWorker = (ctx) => {
@@ -105,6 +111,7 @@ export async function createWorker(store, ctx) {
   }
 
   await waitForSettingsSchema(storeName, store);
+  await waitForSettings(storeName, store);
   if (store.$workers[storeName].waitingForDestroy()) {
     store.$workers[storeName].destroy();
 
@@ -123,7 +130,7 @@ export async function createWorker(store, ctx) {
       }
     },
     batchChanges: (batch) => {
-      dispatch('batchChanges', namespaceHandler.validateBatchChange(ctx, batch));
+      dispatch('batchChanges', acceptOrRejectSocketMessage.validateBatchChange(ctx, batch));
     },
     dispatch: (msg) => {
       dispatch(`ws.${ msg.name }`, msg);
@@ -197,66 +204,6 @@ export function equivalentWatch(a, b) {
   return true;
 }
 
-/**
- * Sockets will not be able to subscribe to more than one namespace. If this is requested we pretend to handle it
- * - Changes to all resources are monitored (no namespace provided in sub)
- * - We ignore any events not from a required namespace (we have the conversion of project --> namespaces already)
- */
-const namespaceHandler = {
-  /**
-   * Note - namespace can be a list of projects or namespaces
-   */
-  subscribeNamespace: (namespace) => {
-    if (pAndNFiltering.isApplicable({ namespaced: namespace }) && namespace.length) {
-      return undefined; // AKA sub to everything
-    }
-
-    return namespace;
-  },
-
-  validChange: ({ getters, rootGetters }, type, data) => {
-    const haveNamespace = getters.haveNamespace(type);
-
-    if (haveNamespace?.length) {
-      const namespaces = rootGetters.activeNamespaceCache;
-
-      if (!namespaces[data.metadata.namespace]) {
-        return false;
-      }
-    }
-
-    return true;
-  },
-
-  validateBatchChange: ({ getters, rootGetters }, batch) => {
-    const namespaces = rootGetters.activeNamespaceCache;
-
-    Object.entries(batch).forEach(([type, entries]) => {
-      const haveNamespace = getters.haveNamespace(type);
-
-      if (!haveNamespace?.length) {
-        return;
-      }
-
-      const schema = getters.schemaFor(type);
-
-      if (!schema?.attributes?.namespaced) {
-        return;
-      }
-
-      Object.keys(entries).forEach((id) => {
-        const namespace = id.split('/')[0];
-
-        if (!namespace || !namespaces[namespace]) {
-          delete entries[id];
-        }
-      });
-    });
-
-    return batch;
-  }
-};
-
 function queueChange({ getters, state, rootGetters }, { data, revision }, load, label) {
   const type = getters.normalizeType(data.type);
 
@@ -268,7 +215,8 @@ function queueChange({ getters, state, rootGetters }, { data, revision }, load, 
     return;
   }
 
-  if (!namespaceHandler.validChange({ getters, rootGetters }, type, data)) {
+  // console.log(`${ label } Event [${ state.config.namespace }]`, data.type, data.id); // eslint-disable-line no-console
+  if (!acceptOrRejectSocketMessage.validChange({ getters, rootGetters }, type, data)) {
     return;
   }
 
@@ -407,11 +355,19 @@ const sharedActions = {
       type, selector, id, revision, namespace, stop, force
     } = params;
 
-    namespace = namespaceHandler.subscribeNamespace(namespace);
+    namespace = acceptOrRejectSocketMessage.subscribeNamespace(namespace);
     type = getters.normalizeType(type);
 
     if (rootGetters['type-map/isSpoofed'](type)) {
       state.debugSocket && console.info('Will not Watch (type is spoofed)', JSON.stringify(params)); // eslint-disable-line no-console
+
+      return;
+    }
+
+    const schema = getters.schemaFor(type, false, false);
+
+    if (!!schema?.attributes?.verbs?.includes && !schema.attributes.verbs.includes('watch')) {
+      state.debugSocket && console.info('Will not Watch (type does not have watch verb)', JSON.stringify(params)); // eslint-disable-line no-console
 
       return;
     }
@@ -439,7 +395,7 @@ const sharedActions = {
       return;
     }
 
-    if ( typeof revision === 'undefined' ) {
+    if (typeof revision === 'undefined') {
       revision = getters.nextResourceVersion(type, id);
     }
 
@@ -465,17 +421,17 @@ const sharedActions = {
       msg.selector = selector;
     }
 
-    // TODO, only use when worker mode is enabled
-    // const worker = this.$workers?.[getters.storeName] || {};
-    // if (worker.mode === WORKER_MODES.ADVANCED || worker.mode === WORKER_MODES.WAITING) {
-    //   if ( force ) {
-    //     msg.force = true;
-    //   }
-    //
-    //   worker.postMessage({ watch: msg });
-    //
-    //   return;
-    // }
+    const worker = this.$workers?.[getters.storeName] || {};
+
+    if (worker.mode === WORKER_MODES.ADVANCED || worker.mode === WORKER_MODES.WAITING) {
+      if ( force ) {
+        msg.force = true;
+      }
+
+      worker.postMessage({ watch: msg });
+
+      return;
+    }
 
     return dispatch('send', msg);
   },
@@ -486,7 +442,7 @@ const sharedActions = {
     const { commit, getters, dispatch } = ctx;
 
     if (getters['schemaFor'](type)) {
-      namespace = namespaceHandler.subscribeNamespace(namespace);
+      namespace = acceptOrRejectSocketMessage.subscribeNamespace(namespace);
 
       const obj = {
         type,
@@ -621,13 +577,17 @@ const defaultActions = {
       await dispatch('find', {
         type: resourceType,
         id,
-        opt,
+        opt:  {
+          ...opt,
+          // Pass the namespace so `find` can construct the url correctly
+          namespaced: namespace,
+          // Ensure that find calls watch with no revision (otherwise it'll use the revision from the resource which is probably stale)
+          revision:   null
+        },
       });
-      commit('clearInError', params);
 
       return;
     }
-
     let have, want;
 
     if ( selector ) {
@@ -813,7 +773,7 @@ const defaultActions = {
     state.started.filter((entry) => {
       if (
         entry.type === newWatch.type &&
-        entry.namespace !== newWatch.namespace
+          entry.namespace !== newWatch.namespace
       ) {
         return true;
       }
@@ -830,15 +790,17 @@ const defaultActions = {
     const err = msg.data?.error?.toLowerCase();
 
     if ( err.includes('watch not allowed') ) {
-      commit('setInError', { type: msg.resourceType, reason: NO_WATCH });
+      commit('setInError', { msg, reason: NO_WATCH });
     } else if ( err.includes('failed to find schema') ) {
-      commit('setInError', { type: msg.resourceType, reason: NO_SCHEMA });
+      commit('setInError', { msg, reason: NO_SCHEMA });
     } else if ( err.includes('too old') ) {
       // Set an error for (all) subs of this type. This..
       // 1) blocks attempts by resource.stop to resub (as type is in error)
       // 2) will be cleared when resyncWatch --> watch (with force) --> resource.start completes
-      commit('setInError', { type: msg.resourceType, reason: REVISION_TOO_OLD });
+      commit('setInError', { msg, reason: REVISION_TOO_OLD });
       dispatch('resyncWatch', msg);
+    } else if ( err.includes('the server does not allow this method on the requested resource')) {
+      commit('setInError', { msg, reason: NO_PERMS });
     }
   },
 
@@ -889,7 +851,6 @@ const defaultActions = {
 
   'ws.resource.create'(ctx, msg) {
     ctx.state.debugSocket && console.info(`Resource Create [${ ctx.getters.storeName }]`, msg.resourceType, msg); // eslint-disable-line no-console
-    console.debug(`Resource Create [${ ctx.getters.storeName }]`, msg.resourceType, msg); // eslint-disable-line no-console
     queueChange(ctx, msg, true, 'Create');
   },
 
@@ -1010,10 +971,10 @@ const defaultMutations = {
     }
   },
 
-  setInError(state, msg) {
+  setInError(state, { msg, reason }) {
     const key = keyForSubscribe(msg);
 
-    state.inError[key] = msg.reason;
+    state.inError[key] = reason;
   },
 
   clearInError(state, msg) {
