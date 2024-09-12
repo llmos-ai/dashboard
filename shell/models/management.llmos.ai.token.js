@@ -10,7 +10,7 @@ export default class Token extends SteveModel {
       apiVersion: 'management.llmos.ai/v1',
       kind:       'Token',
       metadata:   {
-        generateName: 'token-',
+        generateName: 'llmos-',
         labels:       {},
         annotations:  {},
       },
