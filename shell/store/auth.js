@@ -11,10 +11,11 @@ export const LOGIN_ERRORS = {
 
 export const state = function() {
   return {
-    hasAuth:     null,
-    loggedIn:    false,
-    user:        null,
-    principalId: null,
+    hasAuth:      null,
+    loggedIn:     false,
+    user:         null,
+    principalId:  null,
+    publicUIInfo: null
   };
 };
 
@@ -34,6 +35,10 @@ export const getters = {
   principalId(state) {
     return state.principalId;
   },
+
+  publicUIInfo(state) {
+    return state.publicUIInfo;
+  }
 
 };
 
@@ -57,6 +62,10 @@ export const mutations = {
   loggedOut(state) {
     state.loggedIn = false;
     state.principalId = null;
+  },
+
+  hasPublicUIInfo(state, publicUIInfo) {
+    state.publicUIInfo = publicUIInfo;
   },
 };
 
@@ -140,5 +149,15 @@ export const actions = {
 
     commit('loggedOut');
     dispatch('onLogout', null, { root: true });
+  },
+
+  async getPublicUIInfo({ commit }) {
+    try {
+      const data = await this.$axios.get('/v1-public/ui');
+
+      commit('hasPublicUIInfo', data.data);
+    } catch (e) {
+      console.error('Error getting public ui info', e); // eslint-disable-line no-console
+    }
   }
 };

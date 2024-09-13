@@ -453,7 +453,7 @@ export const getters = {
    * @returns Record<string, true>
    */
   allowedNamespaces(state, getters) {
-    return () => getActiveNamespaces(state, getters, true);
+    return () => getActiveNamespaces(state, getters);
   },
 
   defaultNamespace(state, getters, rootState, rootGetters) {
@@ -544,7 +544,7 @@ export const getters = {
   releaseNotesUrl(state, getters) {
     const version = getters['management/byId'](MANAGEMENT.SETTING, 'server-version')?.value;
 
-    const base = 'https://github.com/llmos-ai/llmos-operator/releases';
+    const base = 'https://github.com/llmos-ai/llmos/releases';
 
     if (version && !isDevBuild(version)) {
       return `${ base }/tag/${ version }`;
@@ -638,10 +638,6 @@ export const mutations = {
   setSystemNamespaces(state, namespaces) {
     state.systemNamespaces = namespaces;
   },
-
-  // setIsSingleProduct(state, isSingleProduct) {
-  //   state.isSingleProduct = isSingleProduct;
-  // },
 
   targetRoute(state, route) {
     state.targetRoute = route;

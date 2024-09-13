@@ -264,7 +264,7 @@ suffix:
 # Components & Pages
 ##############################
 home:
-  title: LLMOS 概览
+  title: 全局概览
   glance:
     version: 版本
     created: 创建时间
@@ -5892,7 +5892,7 @@ advancedSettings:
     'system-default-registry': '用于所有 Rancher System 容器镜像的私有镜像仓库。如果未指定任何值，则使用容器运行时的默认镜像仓库。对于 Docker 和 containerd，默认为 `docker.io`。'
     'ui-index': 'LLMOS Dashboard UI 的 HTML 索引位置。'
     'ui-dashboard-index': '{appName} UI 的 HTML 索引位置。'
-    'ui-offline-preferred': '控制 UI 资产是由服务器容器在本地提供，还是从 ui-index 和 ui-dashboard-index 设置中定义的远程 URL 提供。`动态` 选项将在 {appName} 的生产版本中使用本地资产。'
+    'ui-source': '控制 UI 资源是由服务器在本地提供，还是从 ui-index 设置中定义的远程 URL 提供。`动态` 选项将在 {appName} 的生产版本中使用本地资产。'
     'ui-pl': '自有品牌公司名称。'
     'telemetry-opt': '遥测报告加入。'
     'auth-user-info-max-age-seconds': '在同步验证提供程序组成员之前，用户验证 Token 的最长存活时间。'
@@ -5909,6 +5909,7 @@ advancedSettings:
     'ui-default-landing': '用户登录后的默认页面。'
     'brand': 在'/assets/brand'中定义，用于替代主题的文件夹名称
     'hide-local-cluster': 隐藏 local 集群
+    'default-notebook-images': '默认的 Notebook 镜像。'
   editHelp:
     'ui-banners': 此设置使用包含 3 个根参数的 JSON 对象，分别是<code>banner</code>、<code>showHeader</code>和<code>showFooter</code>。<code>banner</code> 是包含 <code>textColor</code>，<code>background</code>和<code>text</code>的对象，其中<code>textColor</code> 和 <code>background</code>的值可以是任何有效的 CSS 颜色值。
   enum:
@@ -5919,10 +5920,10 @@ advancedSettings:
       prompt: 提示
       in: 加入遥测
       out: 退出遥测
-    'ui-offline-preferred':
-      dynamic: 动态
-      true: 本地
-      false: 远端
+    'ui-source':
+      auto: 动态
+      bundle: 本地
+      external: 远端
     'harv-ui-source':
       auto: '自动'
       bundled: '包'

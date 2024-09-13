@@ -113,8 +113,6 @@ export const PROVISIONER = create('provisioner', _RKE2, { options: [_RKE1, _RKE2
 
 // Maximum number of clusters to show in the slide-in menu
 export const MENU_MAX_CLUSTERS = 10;
-// Prompt for confirm when scaling down node pool in GUI and save the pref
-export const SCALE_POOL_PROMPT = create('scale-pool-prompt', null, { parseJSON });
 // --------------------
 
 const cookiePrefix = 'L_';

@@ -270,7 +270,7 @@ suffix:
 # Components & Pages
 ##############################
 home:
-  title: LLMOS Overview
+  title: Overview
   glance:
     version: Version
     created: Created
@@ -6098,7 +6098,7 @@ advancedSettings:
     'system-default-registry': 'Private registry to be used for all Rancher System Container Images. If no value is specified, the default registry for the container runtime is used. For Docker and containerd, the default is `docker.io`.'
     'ui-index': 'HTML index location for the LLMOS Dashboard UI.'
     'ui-dashboard-index': 'HTML index location for the {appName} UI.'
-    'ui-offline-preferred': 'Controls whether UI assets are served locally by the server container or from the remote URL defined in the ui-index and ui-dashboard-index settings. The `Dynamic` option will use local assets in production builds of {appName}.'
+    'ui-source': 'Controls whether UI assets are served locally by the API server or from the remote URL defined in the ui-index settings. The `Dynamic` option will use local assets in production builds of {appName}.'
     'ui-pl': 'Private-Label company name.'
     'telemetry-opt': 'Telemetry reporting opt-in.'
     'auth-user-info-max-age-seconds': 'The maximum age of a users auth tokens before an auth provider group membership sync will be performed.'
@@ -6115,6 +6115,7 @@ advancedSettings:
     'ui-default-landing': 'The default page users land on after login.'
     'brand': Folder name for an alternative theme defined in '/assets/brand'
     'hide-local-cluster': Hide the local cluster
+    'default-notebook-images': Define default Notebook images for Jupyter Notebook, VSCode, and RStudio Server.
   editHelp:
     'ui-banners': This setting takes a JSON object containing 3 root parameters; <code>banner</code>, <code>showHeader</code>, <code>showFooter</code>. <code>banner</code> is an object containing; <code>textColor</code>, <code>background</code>, and <code>text</code>, where <code>textColor</code> and <code>background</code> are any valid CSS color value.
   enum:
@@ -6125,10 +6126,10 @@ advancedSettings:
       prompt: Prompt
       in: Opt-in to Telemetry
       out: Opt-out of Telemetry
-    'ui-offline-preferred':
-      dynamic: Dynamic
-      true: Local
-      false: Remote
+    'ui-source':
+      auto: Dynamic
+      bundle: Local
+      external: Remote
     'harv-ui-source':
       auto: 'Auto'
       bundled: 'Bundled'

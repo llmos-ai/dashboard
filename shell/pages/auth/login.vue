@@ -9,11 +9,10 @@ import { Checkbox } from '@components/Form/Checkbox';
 import Password from '@shell/components/form/Password';
 import { mapGetters } from 'vuex';
 import { MANAGEMENT } from '@shell/config/types';
-import { SETTING } from '@shell/config/settings';
 import { LOGIN_ERRORS } from '@shell/store/auth';
 import CopyCode from '@shell/components/CopyCode';
 import { getVendor, getProduct } from '@shell/config/private-label';
-import axios from 'axios';
+import { SETTING } from '@shell/config/settings';
 
 export default {
   name:       'Login',
@@ -29,14 +28,15 @@ export default {
   },
 
   async asyncData({ route, redirect, store }) {
-    const publicUI = await axios.get(`/v1-public/ui`);
-    const firstLogin = publicUI.data['first-login'] === 'true';
+    const publicUIInfo = store.dispatch('auth/getPublicUIInfo');
+    const firstLogin = publicUIInfo[SETTING.FIRST_LOGIN] === 'true';
 
     return {
-      vendor:             getVendor(),
+      vendor:             getVendor(publicUIInfo[SETTING.PL]),
       hasLocal:           true,
       showLocal:          true,
       showLocaleSelector: true,
+      publicUIInfo,
       firstLogin,
     };
   },
@@ -194,7 +194,7 @@ export default {
     <div class="row gutless mb-20">
       <div class="col span-12 p-20">
         <h1 class="text-center login-welcome">
-          {{ t('login.welcome', {vendor: 'LLMOS Dashboard'}) }}
+          {{ t('login.welcome', {vendor}) }}
         </h1>
         <div
           class="login-messages"

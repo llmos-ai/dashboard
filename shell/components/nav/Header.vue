@@ -720,8 +720,8 @@ export default {
     }
 
     .simple-title {
-      align-items: center;
-      display: flex;
+      max-width: 200px;
+      width: 200px;
 
       .title {
         height: 24px;
