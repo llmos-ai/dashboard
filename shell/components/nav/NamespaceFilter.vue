@@ -271,8 +271,8 @@ export default {
           out.push({
             id:       ALL_ORPHANS,
             kind:     NAMESPACE_FILTER_KINDS.PROJECT,
-            label:    t('nav.ns.orphan'),
-            disabled: true,
+            label:    t('nav.ns.namespaced'),
+            disabled: false,
           });
 
           addNamespace(out, orphans);

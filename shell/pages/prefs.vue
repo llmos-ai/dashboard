@@ -8,13 +8,13 @@ import { Checkbox } from '@components/Form/Checkbox';
 import LandingPagePreference from '@shell/components/LandingPagePreference';
 import {
   mapPref, THEME, KEYMAP, DATE_FORMAT, TIME_FORMAT, ROWS_PER_PAGE, HIDE_DESC, VIEW_IN_API,
-  ALL_NAMESPACES, THEME_SHORTCUT, PLUGIN_DEVELOPER, SCALE_POOL_PROMPT
-  , MENU_MAX_CLUSTERS, VIEW_CONTAINER_DASHBOARD
+  ALL_NAMESPACES, THEME_SHORTCUT, PLUGIN_DEVELOPER, MENU_MAX_CLUSTERS, VIEW_CONTAINER_DASHBOARD
 } from '@shell/store/prefs';
 
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { addObject } from '@shell/utils/array';
 import LocaleSelector from '@shell/components/LocaleSelector';
+import { isDevBuild } from '@shell/utils/version';
 
 export default {
   layout:     'plain',
@@ -23,7 +23,10 @@ export default {
   },
   mixins: [BackRoute],
   data() {
-    return { admin: isAdminUser(this.$store.getters) };
+    return {
+      admin: isAdminUser(this.$store.getters),
+      isDevBuild,
+    };
   },
   computed: {
     keymap:                 mapPref(KEYMAP),
@@ -35,7 +38,6 @@ export default {
     perPage:                mapPref(ROWS_PER_PAGE),
     hideDesc:               mapPref(HIDE_DESC),
     pluginDeveloper:        mapPref(PLUGIN_DEVELOPER),
-    scalingDownPrompt:      mapPref(SCALE_POOL_PROMPT),
     viewContainerDashboard: mapPref(VIEW_CONTAINER_DASHBOARD),
 
     theme: {
@@ -244,17 +246,6 @@ export default {
         </div>
       </div>
     </div>
-    <!-- Confirmation setting -->
-    <div class="col adv-features mt-10 mb-10">
-      <hr>
-      <h4 v-t="'prefs.confirmationSetting.title'" />
-      <Checkbox
-        v-model="scalingDownPrompt"
-        data-testid="prefs__scalingDownPrompt"
-        :label="t('prefs.confirmationSetting.scalingDownPrompt')"
-        class="mt-10"
-      />
-    </div>
     <!-- Advanced Features -->
     <div class="col adv-features mt-10 mb-10">
       <hr>
@@ -286,7 +277,7 @@ export default {
         :label="t('prefs.hideDesc.label')"
         class="mt-20"
       />
-      <template v-if="admin">
+      <template v-if="admin && isDevBuild">
         <br>
         <Checkbox
           v-model="viewContainerDashboard"

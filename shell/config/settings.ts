@@ -43,9 +43,10 @@ export const SETTING = {
   FIRST_LOGIN:                          'first-login',
   SERVER_URL:                           'server-url',
   PASSWORD_MIN_LENGTH:                  'password-min-length', // L_PASSWORD_MIN_LENGTH
-  UI_OFFLINE_PREFERRED:                 'ui-offline-preferred',
   SERVER_VERSION:                       'server-version',
+  DEFAULT_NOTEBOOK_IMAGES:              'default-notebook-images',
 
+  UI_SOURCE:         'ui-source',
   UI_INDEX:          'ui-index',
   UI_ISSUES:         'ui-issues',
   PL:                'ui-pl',
@@ -90,17 +91,16 @@ export const ALLOWED_SETTINGS: GlobalSetting = {
       }
     ],
   },
-  [SETTING.AUTH_TOKEN_MAX_TTL_MINUTES]:           {},
-  [SETTING.AUTH_USER_SESSION_MAX_TTL_MINUTES]:    {},
-  [SETTING.KUBECONFIG_GENERATE_TOKEN]:            { kind: 'boolean' },
-  [SETTING.KUBECONFIG_DEFAULT_TOKEN_TTL_MINUTES]: { kind: 'integer' },
-  [SETTING.SERVER_URL]:                           { kind: 'url', canReset: true },
-  [SETTING.UI_INDEX]:                             {},
-  [SETTING.UI_OFFLINE_PREFERRED]:                 {
+  [SETTING.AUTH_TOKEN_MAX_TTL_MINUTES]:        { kind: 'integer' },
+  [SETTING.AUTH_USER_SESSION_MAX_TTL_MINUTES]: { kind: 'integer' },
+  [SETTING.SERVER_URL]:                        { kind: 'url', canReset: true },
+  [SETTING.UI_INDEX]:                          {},
+  [SETTING.DEFAULT_NOTEBOOK_IMAGES]:           { kind: 'multiline', canReset: true },
+  [SETTING.UI_SOURCE]:                         {
     kind:    'enum',
-    options: ['dynamic', 'true', 'false']
+    options: ['auto', 'external', 'bundle']
   },
-  [SETTING.BRAND]: { canReset: true },
+  [SETTING.PL]: { canReset: true },
 };
 
 /**

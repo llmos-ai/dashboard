@@ -434,7 +434,10 @@ export default {
             </nuxt-link>
           </template>
 
-          <div class="category">
+          <div
+            v-if="canEditSettings"
+            class="category"
+          >
             <!-- App menu -->
             <template v-if="configurationApps.length">
               <div class="category-title">

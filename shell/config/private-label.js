@@ -9,6 +9,7 @@ const STANDARD_PRODUCT = 'Dashboard';
 let mode = STANDARD;
 let vendor = STANDARD_VENDOR;
 let product = STANDARD_PRODUCT;
+const vendorProduct = `${ STANDARD_VENDOR } ${ STANDARD_PRODUCT }`;
 let brand = null;
 
 export function setMode(m) {
@@ -50,7 +51,15 @@ export function matches(pl) {
   return pl === mode;
 }
 
-export function getVendor() {
+export function getVendor(ven) {
+  if (!!ven && ven !== 'llmos') {
+    return ven;
+  }
+
+  if (ven === 'llmos') {
+    return vendorProduct;
+  }
+
   return vendor;
 }
 

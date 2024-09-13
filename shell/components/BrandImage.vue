@@ -19,6 +19,11 @@ export default {
   },
   computed: {
     ...mapGetters({ theme: 'prefs/theme' }),
+    pl() {
+      const setting = this.managementSettings.filter((setting) => setting.id === SETTING.PL)[0] || {};
+
+      return setting.value;
+    },
 
     brand() {
       const setting = this.managementSettings.filter((setting) => setting.id === SETTING.BRAND)[0] || {};
@@ -74,12 +79,41 @@ export default {
         return this.defaultPathToBrandedImage;
       }
     },
+    getPL() {
+      if (this.pl === '') {
+        return '1BLOCK.AI';
+      }
+
+      return this.pl;
+    }
   }
 };
 </script>
 <template>
-  <img
-    v-bind="$attrs"
-    :src="pathToBrandedImage"
-  >
+  <div class="brand-image">
+    <img
+      v-if="!pl"
+      v-bind="$attrs"
+      :src="pathToBrandedImage"
+    >
+    <span>{{ getPL }}</span>
+  </div>
 </template>
+<style lang="scss" scoped>
+.brand-image {
+  display: flex;
+  align-items: center; // Vertically centers the items
+  gap: 0px;
+
+  img {
+    max-height: 40px;
+    width: auto;
+    max-width: 200px;
+  }
+
+  span {
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+</style>

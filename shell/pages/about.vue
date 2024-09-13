@@ -23,7 +23,7 @@ export default {
   },
   computed: {
     ...mapGetters(['releaseNotesUrl']),
-    llmosVersion() {
+    llmosOperatorVersion() {
       return this.settings.find((s) => s.id === SETTING.VERSION_PRODUCT);
     },
     appName() {
@@ -48,7 +48,7 @@ export default {
           <th>{{ t('about.versions.version') }}</th>
         </tr>
       </thead>
-      <tr v-if="llmosVersion">
+      <tr v-if="llmosOperatorVersion">
         <td>
           <a
             href="https://github.com/llmos-ai/llmos-operator"
@@ -57,7 +57,7 @@ export default {
           >
             {{ t("about.versions.llmos") }}
           </a>
-        </td><td>{{ llmosVersion.value }}</td>
+        </td><td>{{ llmosOperatorVersion.value || llmosOperatorVersion.default }}</td>
       </tr>
       <tr v-if="dashboardVersion">
         <td>
