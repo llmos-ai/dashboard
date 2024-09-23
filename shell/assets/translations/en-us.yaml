@@ -5567,7 +5567,6 @@ typeDescription:
   monitoring.coreos.com.prometheusrule: A Prometheus Rule resource defines both recording and/or alert rules. A recording rule can pre-compute values and save the results. Alerting rules allow you to define conditions on when to send notifications to AlertManager.
   monitoring.coreos.com.prometheus: A Prometheus server is a Prometheus deployment whose scrape configuration and rules are determined by selected ServiceMonitors, PodMonitors, and PrometheusRules and whose alerts will be sent to all selected Alertmanagers with the custom resource's configuration.
   monitoring.coreos.com.alertmanager: An alert manager is deployment whose configuration will be specified by a secret in the same namespace, which determines which alerts should go to which receiver.
-  node: The base Kubernetes Node resource represents a virtual or physical machine which hosts deployments. To manage the machine lifecycle, if available, go to Cluster Management.
   catalog.cattle.io.clusterrepo: 'A chart repository is a Helm repository or {vendor} git based application catalog. It provides the list of available charts in the cluster.'
   catalog.cattle.io.clusterrepo.local: ' A chart repository is a Helm repository or {vendor} git based application catalog. It provides the list of available charts in the cluster. Cluster Templates are deployed via Helm charts.'
   catalog.cattle.io.operation: An operation is the list of recent Helm operations that have been applied to the cluster.
@@ -6098,7 +6097,7 @@ advancedSettings:
     'system-default-registry': 'Private registry to be used for all Rancher System Container Images. If no value is specified, the default registry for the container runtime is used. For Docker and containerd, the default is `docker.io`.'
     'ui-index': 'HTML index location for the LLMOS Dashboard UI.'
     'ui-dashboard-index': 'HTML index location for the {appName} UI.'
-    'ui-source': 'Controls whether UI assets are served locally by the API server or from the remote URL defined in the ui-index settings. The `Dynamic` option will use local assets in production builds of {appName}.'
+    'ui-source': 'Controls whether UI assets are served locally by the API server or from the remote URL defined in the ui-index settings. The <code>Auto</code> option will use local assets in production builds of {appName}.'
     'ui-pl': 'Private-Label company name.'
     'telemetry-opt': 'Telemetry reporting opt-in.'
     'auth-user-info-max-age-seconds': 'The maximum age of a users auth tokens before an auth provider group membership sync will be performed.'
@@ -6116,6 +6115,9 @@ advancedSettings:
     'brand': Folder name for an alternative theme defined in '/assets/brand'
     'hide-local-cluster': Hide the local cluster
     'default-notebook-images': Define default Notebook images for Jupyter Notebook, VSCode, and RStudio Server.
+    'log-level': 'Define the Log level for the API server.'
+    'upgrade-check-enabled': Specify whether to enable LLMOS upgrade checker. Default to enabled.
+    'upgrade-check-url': Default LLMOS upgrade check url. Only used when the <code>upgrade-checker-enabled</code> is enabled.
   editHelp:
     'ui-banners': This setting takes a JSON object containing 3 root parameters; <code>banner</code>, <code>showHeader</code>, <code>showFooter</code>. <code>banner</code> is an object containing; <code>textColor</code>, <code>background</code>, and <code>text</code>, where <code>textColor</code> and <code>background</code> are any valid CSS color value.
   enum:
@@ -6127,14 +6129,10 @@ advancedSettings:
       in: Opt-in to Telemetry
       out: Opt-out of Telemetry
     'ui-source':
-      auto: Dynamic
-      bundle: Local
-      external: Remote
-    'harv-ui-source':
       auto: 'Auto'
       bundled: 'Bundled'
       external: 'External'
-    'harv-log-level':
+    'log-level':
       info: Info
       debug: Debug
       trace: Trace

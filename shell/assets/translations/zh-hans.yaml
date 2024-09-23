@@ -5366,7 +5366,6 @@ typeDescription:
   monitoring.coreos.com.prometheusrule: PrometheusRule 定义了记录和/或告警规则。记录规则可以预先计算值并保存结果。告警规则允许你定义向 AlertManager 发送通知的条件。
   monitoring.coreos.com.prometheus: Prometheus server 是一个 Prometheus deployment，其抓取的配置和规则由选定的 ServiceMonitor、PodMonitor 和 PrometheusRule 决定。它将其告警信息发送给所有选择的具有定制资源配置的 AlertManager。
   monitoring.coreos.com.alertmanager: Alertmanager 是一个 deployment。其配置由同一命名空间中的密文指定，该密文决定了告警的接收器。
-  node: Kubernetes 节点资源展示了承载 Deployment 的虚拟机或物理机。请进入"集群管理"页面管理可用节点的生命周期。
   catalog.cattle.io.clusterrepo: 'Chart 仓库是一个 Helm 仓库或 {vendor} 基于 Git 的应用商店。此处列出了集群中可用的 Chart。'
   catalog.cattle.io.clusterrepo.local: ' Chart 仓库是一个 Helm 仓库或 {vendor} 基于 Git 的应用商店。此处列出了集群中可用的 Chart。集群模板是通过 Helm Chart 部署的。'
   catalog.cattle.io.operation: 最近的操作指的是最近应用于集群的一系列 Helm 操作。
@@ -5910,6 +5909,9 @@ advancedSettings:
     'brand': 在'/assets/brand'中定义，用于替代主题的文件夹名称
     'hide-local-cluster': 隐藏 local 集群
     'default-notebook-images': '默认的 Notebook 镜像。'
+    'log-level': '设置API的日志级别。'
+    'upgrade-check-enabled': '启用升级检查。'
+    'upgrade-check-url': '升级检查 URL。'
   editHelp:
     'ui-banners': 此设置使用包含 3 个根参数的 JSON 对象，分别是<code>banner</code>、<code>showHeader</code>和<code>showFooter</code>。<code>banner</code> 是包含 <code>textColor</code>，<code>background</code>和<code>text</code>的对象，其中<code>textColor</code> 和 <code>background</code>的值可以是任何有效的 CSS 颜色值。
   enum:
@@ -5921,17 +5923,13 @@ advancedSettings:
       in: 加入遥测
       out: 退出遥测
     'ui-source':
-      auto: 动态
-      bundle: 本地
+      auto: 自动
+      bundled: 本地打包
       external: 远端
-    'harv-ui-source':
-      auto: '自动'
-      bundled: '包'
-      external: '外部'
-    'harv-log-level':
-      info: 信息
-      debug: 调试
-      trace: 跟踪
+    'log-level':
+      info: 信息(Info)
+      debug: 调试(Debug)
+      trace: 跟踪(Trace)
 
 banner:
   label: 固定横幅

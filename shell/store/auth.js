@@ -156,6 +156,8 @@ export const actions = {
       const data = await this.$axios.get('/v1-public/ui');
 
       commit('hasPublicUIInfo', data.data);
+
+      return data.data;
     } catch (e) {
       console.error('Error getting public ui info', e); // eslint-disable-line no-console
     }

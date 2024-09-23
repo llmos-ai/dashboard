@@ -106,7 +106,7 @@ export default {
               class="modified"
             >{{ t('advancedSettings.modified') }}</span>
           </h1>
-          <h2>{{ t(`advancedSettings.descriptions.${setting.id}`) }}</h2>
+          <h2 v-clean-html="t(`advancedSettings.descriptions.${ setting.id }`, {}, true)" />
         </div>
         <div
           v-if="setting.hasActions"
