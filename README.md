@@ -1,5 +1,6 @@
 # LLMOS Dashboard
-[![main-build](https://github.com/llmos-ai/dashboard/actions/workflows/build.yaml/badge.svg)](https://github.com/llmos-ai/dashboard/actions/workflows/build.yaml)
+[![main-build](https://github.com/llmos-ai/dashboard/actions/workflows/build.yml/badge.svg)](https://github.com/llmos-ai/dashboard/actions/workflows/build.yml)
+[![Releases](https://img.shields.io/github/release/llmos-ai/dashboard.svg)](https://github.com/llmos-ai/dashboard/releases)
 
 
 ## Running for Development

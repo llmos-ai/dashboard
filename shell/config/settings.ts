@@ -45,6 +45,9 @@ export const SETTING = {
   PASSWORD_MIN_LENGTH:                  'password-min-length', // L_PASSWORD_MIN_LENGTH
   SERVER_VERSION:                       'server-version',
   DEFAULT_NOTEBOOK_IMAGES:              'default-notebook-images',
+  LOG_LEVEL:                            'log-level',
+  UPGRADE_CHECK_ENABLED:                'upgrade-check-enabled',
+  UPGRADE_CHECK_URL:                    'upgrade-check-url',
 
   UI_SOURCE:         'ui-source',
   UI_INDEX:          'ui-index',
@@ -98,9 +101,15 @@ export const ALLOWED_SETTINGS: GlobalSetting = {
   [SETTING.DEFAULT_NOTEBOOK_IMAGES]:           { kind: 'multiline', canReset: true },
   [SETTING.UI_SOURCE]:                         {
     kind:    'enum',
-    options: ['auto', 'external', 'bundle']
+    options: ['auto', 'external', 'bundled']
   },
-  [SETTING.PL]: { canReset: true },
+  [SETTING.LOG_LEVEL]: {
+    kind:    'enum',
+    options: ['info', 'debug', 'trace']
+  },
+  [SETTING.PL]:                    { canReset: true },
+  [SETTING.UPGRADE_CHECK_ENABLED]: { kind: 'boolean', canReset: true },
+  [SETTING.UPGRADE_CHECK_URL]:     { kind: 'url' },
 };
 
 /**

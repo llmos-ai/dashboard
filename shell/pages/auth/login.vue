@@ -28,7 +28,7 @@ export default {
   },
 
   async asyncData({ route, redirect, store }) {
-    const publicUIInfo = store.dispatch('auth/getPublicUIInfo');
+    const publicUIInfo = await store.dispatch('auth/getPublicUIInfo');
     const firstLogin = publicUIInfo[SETTING.FIRST_LOGIN] === 'true';
 
     return {
