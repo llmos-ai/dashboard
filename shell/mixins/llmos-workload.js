@@ -291,10 +291,25 @@ export default {
         namespace: this.value?.metadata?.namespace || null,
         data:      {
           [CONFIG_MAP]:      { applyTo: [{ var: 'namespacedConfigMaps' }] },
-          [PVC]:             { applyTo: [{ var: 'pvcs' }] },
           [SERVICE_ACCOUNT]: { applyTo: [{ var: 'namespacedServiceNames' }] },
           [RUNTIME_CLASS]:   { applyTo: [{ var: 'runtimeClasses' }] },
-          [SECRET]:          {
+          [PVC]:             {
+            applyTo: [
+              {
+                var:         'pvcs',
+                parsingFunc: (data) => {
+                  return data.filter((pvc) => {
+                    if (pvc.status.phase === 'Bound' && pvc.status.accessModes.includes('ReadWriteOnce')) {
+                      return false;
+                    }
+
+                    return true;
+                  });
+                }
+              },
+            ]
+          },
+          [SECRET]: {
             applyTo: [
               { var: 'namespacedSecrets' },
               {

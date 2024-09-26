@@ -133,6 +133,12 @@ export default {
       this.volumes = this.volumes.filter(({ name }) => name !== removeName);
     },
 
+    removeVolumeClaimTemplates(volume) {
+      const removeName = volume.row.value.metadata?.name;
+
+      this.container.volumeMounts = this.container.volumeMounts.filter(({ name }) => name !== removeName);
+    },
+
     addVolume(type) {
       const name = `vol-${ randomStr(5).toLowerCase() }`;
 
@@ -272,6 +278,7 @@ export default {
       class="mb-20"
       :can-add="false"
       @input="updateTemplates()"
+      @remove="removeVolumeClaimTemplates"
     >
       <template #default="props">
         <div>

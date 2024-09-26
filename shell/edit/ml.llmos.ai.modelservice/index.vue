@@ -81,7 +81,7 @@ export default {
         return {
           reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),
           message:   event.message || this.t('generic.unknown'),
-          date:      event.lastTimestamp || event.firstTimestamp || event.metadata.creationTimestamp,
+          date:      event.lastTimestamp || event.firstTimestamp || event.metadata?.creationTimestamp,
           eventType: event.eventType
         };
       });
@@ -253,14 +253,6 @@ export default {
               />
             </slot>
           </div>
-          <div class="col span-6">
-            <Checkbox
-              v-model="spec.enableGUI"
-              :mode="mode"
-              label="Enable Gradio UI"
-              @input="update"
-            />
-          </div>
         </div>
 
         <h4>Hugging Face Hub Token</h4>
@@ -343,7 +335,7 @@ export default {
       >
         <Volume
           v-model="spec"
-          :namespace="value.metadata.namespace"
+          :namespace="value.metadata?.namespace"
           :register-before-hook="registerBeforeHook"
           :mode="mode"
           :save-pvc-hook-name="savePvcHookName"
