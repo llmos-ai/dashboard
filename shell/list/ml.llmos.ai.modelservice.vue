@@ -64,7 +64,7 @@ export default {
       const STATUS = {
         name:  'status',
         label: 'Status',
-        value: 'msStatus'
+        value: 'stateStatus'
       };
 
       const headers = [
