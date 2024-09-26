@@ -1,4 +1,4 @@
-import { findBy, insertAt } from '@shell/utils/array';
+import { insertAt } from '@shell/utils/array';
 import { POD, LLMOS } from '@shell/config/types';
 import { convertSelectorObj, matching, matches } from '@shell/utils/selector';
 import SteveModel from '@shell/plugins/steve/steve-class';
@@ -7,6 +7,7 @@ export default class LLMOSWorkload extends SteveModel {
   // remove clone as yaml/edit as yaml until API supported
   get _availableActions() {
     let out = super._availableActions;
+
     insertAt(out, 0, {
       action:  'openShell',
       enabled: !!this.links.view,
@@ -106,7 +107,9 @@ export default class LLMOSWorkload extends SteveModel {
 
     switch (type) {
     case LLMOS.MODEL_SERVICE:
-      return this.spec?.selector?.matchLabels;
+      return this.spec?.selector;
+    case LLMOS.NOTEBOOK:
+      return this.spec?.selector;
     default:
       return this.metadata?.labels;
     }

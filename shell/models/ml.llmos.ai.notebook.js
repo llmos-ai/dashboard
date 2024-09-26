@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import SteveModel from '@shell/plugins/steve/steve-class';
 import { set } from '@shell/utils/object';
 import { MANAGEMENT, SERVICE } from '@shell/config/types';
 import { SETTING } from '@shell/config/settings';
+import LLMOSWorkload from '@shell/models/llmos-workload';
 
-export default class NoteBook extends SteveModel {
+export default class NoteBook extends LLMOSWorkload {
   applyDefaults() {
     const value = {
       apiVersion: 'ml.llmos.ai/v1',
