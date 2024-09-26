@@ -59,6 +59,12 @@ export default {
         value: 'memoryRequest'
       };
 
+      const STATUS = {
+        name:  'status',
+        label: 'Status',
+        value: 'stateStatus'
+      };
+
       const headers = [
         STATE,
         NAME,
@@ -67,6 +73,7 @@ export default {
         TYPE,
         CPUS_LIMIT,
         MEMORY_LIMIT,
+        STATUS,
         AGE
       ];
 

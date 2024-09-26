@@ -1,5 +1,5 @@
 import { insertAt } from '@shell/utils/array';
-import { POD, LLMOS } from '@shell/config/types';
+import { POD, LLMOS, WORKLOAD_TYPES } from '@shell/config/types';
 import { convertSelectorObj, matching, matches } from '@shell/utils/selector';
 import SteveModel from '@shell/plugins/steve/steve-class';
 
@@ -113,5 +113,39 @@ export default class LLMOSWorkload extends SteveModel {
     default:
       return this.metadata?.labels;
     }
+  }
+
+  get ready() {
+    const readyReplicas = Math.max(0, (this.status?.replicas || 0) - (this.status?.unavailableReplicas || 0));
+
+    if (this.type === WORKLOAD_TYPES.DAEMON_SET) {
+      return readyReplicas;
+    }
+
+    return `${ readyReplicas }/${ this.desired }`;
+  }
+
+  get unavailable() {
+    return this.status?.unavailableReplicas || 0;
+  }
+
+  get stateStatus() {
+    return this.status?.state || super.state;
+  }
+
+  get state() {
+    if (!this.status || !this.status?.state) {
+      return 'in-progress';
+    }
+
+    return super.state;
+  }
+
+  remove() {
+    const opt = { ...arguments };
+
+    opt.params = { propagationPolicy: 'Foreground' };
+
+    return this._remove(opt);
   }
 }

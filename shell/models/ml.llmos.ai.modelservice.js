@@ -89,10 +89,6 @@ export default class ModelService extends LLMOSWorkload {
     return `${ this.available }/${ this.spec?.replicas }`;
   }
 
-  get msStatus() {
-    return this.status?.state || 'Pending';
-  }
-
   get modelName() {
     return this.spec.servedModelName.length > 0 ? this.spec.servedModelName : this.spec.model;
   }
