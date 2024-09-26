@@ -404,8 +404,10 @@ export default {
       // Handle the case where the user has changed the name of the workload
       // Only do this for clone. Not allowed for edit
       if (this.realMode === _CLONE) {
-        template.metadata.name = this.value.metadata.name;
-        template.metadata.description = this.value.metadata.description;
+        if (template.metadata) {
+          template.metadata.name = this.value.metadata?.name;
+          template.metadata.description = this.value.metadata?.description;
+        }
       }
 
       Object.assign(this.value, { spec: this.spec });

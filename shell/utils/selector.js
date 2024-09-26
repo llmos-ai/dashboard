@@ -172,6 +172,9 @@ export function matches(obj, selector, labelKey = 'metadata.labels') {
   } else if ( isArray(selector) ) {
     // Already matchExpression
     rules = selector;
+  } else if ( typeof selector === 'object' && selector.matchLabels ) {
+    // matchLabels object
+    rules = convert(selector.matchLabels);
   } else if ( typeof selector === 'object' && selector ) {
     // matchLabels object
     rules = convert(selector);
