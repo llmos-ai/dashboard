@@ -49,6 +49,7 @@ const waitForSettingsSchema = (storeName, store) => {
   return waitFor(() => isWaitingForDestroy(storeName, store) || !!store.getters['management/byId'](SCHEMA, MANAGEMENT.SETTING));
 };
 
+// eslint-disable-next-line no-unused-vars
 const waitForSettings = (storeName, store) => {
   return waitFor(() => isWaitingForDestroy(storeName, store));
 };
@@ -111,7 +112,7 @@ export async function createWorker(store, ctx) {
   }
 
   await waitForSettingsSchema(storeName, store);
-  await waitForSettings(storeName, store);
+  // await waitForSettings(storeName, store); // TODO: this will block the WS subscribe
   if (store.$workers[storeName].waitingForDestroy()) {
     store.$workers[storeName].destroy();
 
