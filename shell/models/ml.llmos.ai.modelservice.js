@@ -1,8 +1,8 @@
-import SteveModel from '@shell/plugins/steve/steve-class';
 import Vue from 'vue';
 import { set } from '@shell/utils/object';
+import LLMOSWorkload from '@shell/models/llmos-workload';
 
-export default class ModelService extends SteveModel {
+export default class ModelService extends LLMOSWorkload {
   applyDefaults() {
     const value = {
       apiVersion: 'ml.llmos.ai/v1',
@@ -86,7 +86,7 @@ export default class ModelService extends SteveModel {
   }
 
   get readyReplicas() {
-    return `${ this.status?.readyReplicas || 0 }/${ this.spec?.replicas }`;
+    return `${ this.available }/${ this.spec?.replicas }`;
   }
 
   get msStatus() {

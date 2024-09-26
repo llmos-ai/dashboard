@@ -50,6 +50,11 @@ export default {
         value: 'modelName',
       };
 
+      const INTERNAL_URL = {
+        name:  'internal_url',
+        label: 'Internal URL',
+      };
+
       const READY = {
         name:  'ready',
         label: 'Ready',
@@ -68,6 +73,7 @@ export default {
         NAMESPACE,
         URL,
         MODEL,
+        INTERNAL_URL,
         READY,
         STATUS,
         AGE
@@ -80,11 +86,11 @@ export default {
     getAPIUrl(row) {
       // find service by svc name and namespace
       const svc = this.services.find((s) => {
-        return s.metadata.name === `modelservice-${ row.metadata.name }` && s.metadata.namespace === row.metadata.namespace;
+        return s.metadata.ownerReferences?.find((o) => o.uid === row.metadata.uid);
       });
 
       if (!svc) {
-        return 'not found';
+        return 'URL not found';
       }
 
       const serverURL = this.serverURL || window.location.origin;
@@ -98,8 +104,20 @@ export default {
       case 'LoadBalancer':
         return `http://${ url.hostname }:${ port.port }/v1`;
       default:
-        return `${ window.location.origin }/api/v1/namespaces/${ svc.namespace }/services/${ svc.name }:${ port.name }/proxy/v1`;
+        return `${ serverURL }/api/v1/namespaces/${ svc.namespace }/services/${ svc.name }:${ port.name }/proxy/v1`;
       }
+    },
+
+    getInternalUrl(row) {
+      const svc = this.services.find((s) => {
+        return s.metadata?.ownerReferences?.find((o) => o.uid === row.metadata.uid);
+      });
+
+      if (!svc) {
+        return 'URL not found';
+      }
+
+      return `http://${ svc.metadata.name }.${ svc.metadata.namespace }.svc.cluster.local:${ svc.spec.ports[0].port }/v1`;
     }
   }
 };
@@ -121,6 +139,27 @@ export default {
         <CopyToClipboard
           label-as="tooltip"
           :text="getAPIUrl(row)"
+          class="icon-btn"
+          action-color="bg-transparent"
+        />
+      </td>
+    </template>
+    <template #col:model="{row}">
+      <td>
+        {{ row.spec?.model }}
+        <CopyToClipboard
+          label-as="tooltip"
+          :text="row.spec?.model"
+          class="icon-btn"
+          action-color="bg-transparent"
+        />
+      </td>
+    </template>
+    <template #col:internal_url="{row}">
+      <td>
+        <CopyToClipboard
+          label-as="tooltip"
+          :text="getInternalUrl(row)"
           class="icon-btn"
           action-color="bg-transparent"
         />

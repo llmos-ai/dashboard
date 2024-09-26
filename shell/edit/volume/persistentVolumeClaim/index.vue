@@ -94,6 +94,9 @@ export default {
 
   watch: {
     namespace(neu) {
+      if (!this.value.__newPvc) {
+        return;
+      }
       this.value.__newPvc.metadata.namespace = neu;
     },
 

@@ -9,7 +9,7 @@ export const UI_MANAGED = 'management.cattle.io/ui-managed';
 export const RESOURCE_QUOTA = 'field.cattle.io/resourceQuota';
 export const WORKSPACE_ANNOTATION = 'objectset.rio.cattle.io/id';
 
-export const DESCRIPTION = 'field.llmos.io/description';
+export const DESCRIPTION = 'field.llmos.ai/description';
 export const CONTAINER_DEFAULT_RESOURCE_LIMIT = 'field.llmos.ai/containerDefaultResourceLimit';
 
 export const KUBERNETES = {
