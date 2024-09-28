@@ -52,19 +52,28 @@ export default {
   },
 
   data() {
-    return { canViewPods: false };
+    return {
+      // Pods required for `Pods` column's running pods metrics
+      // podConsumedUsage = podConsumed / podConsumedUsage. podConsumed --> pods. allPods.filter((pod) => pod.spec.nodeName === this.name)
+      canViewPods:        !!this.$store.getters[`cluster/schemaFor`](POD),
+      // Required for CPU and RAM columns
+      canViewNodeMetrics: !!this.$store.getters['cluster/schemaFor'](METRIC.NODE),
+    };
   },
 
   beforeDestroy() {
     // Stop watching pods, nodes and node metrics
-    this.$store.dispatch('cluster/forgetType', POD);
+    if (this.canViewPods) {
+      this.$store.dispatch('cluster/forgetType', POD);
+    }
+
     this.$store.dispatch('cluster/forgetType', NODE);
     this.$store.dispatch('cluster/forgetType', METRIC.NODE);
   },
 
   computed: {
     hasWindowsNodes() {
-      return (this.rows || []).some((node) => node.status.nodeInfo.operatingSystem === 'windows');
+      return (this.rows || []).some((node) => node.status.nodeInfo?.operatingSystem === 'windows');
     },
 
     tableGroup: mapPref(GROUP_RESOURCES),
@@ -114,16 +123,16 @@ export default {
 
   methods: {
     async loadMetrics() {
-      const schema = this.$store.getters['cluster/schemaFor'](METRIC.NODE);
-
-      if (schema) {
-        await this.$store.dispatch('cluster/findAll', {
-          type: METRIC.NODE,
-          opt:  { force: true }
-        });
-
-        this.$forceUpdate();
+      if (!this.canViewNodeMetrics) {
+        return;
       }
+
+      await this.$store.dispatch('cluster/findAll', {
+        type: METRIC.NODE,
+        opt:  { force: true }
+      });
+
+      this.$forceUpdate();
     },
 
     toggleLabels(row) {
