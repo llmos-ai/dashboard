@@ -1,9 +1,5 @@
 name: Tests
 on:
-  push:
-    branches:
-      - main
-      - release-*
   pull_request:
       branches:
         - main
@@ -26,10 +22,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '16.x'
-
       - name: Install packages
         run: yarn install:ci
-
       - name: Run i18n linters
         run: yarn lint-l10n
 
@@ -42,10 +36,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '16.x'
-
       - name: Install packages
         run: yarn install:ci
-
       - name: Run linters
         run: yarn lint
 

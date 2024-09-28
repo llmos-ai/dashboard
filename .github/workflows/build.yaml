@@ -11,17 +11,20 @@ on:
       required: true
 
 jobs:
+  build-validation:
+    name: Validate Code
+    uses: ./.github/workflows/lint.yaml
   build-hosted:
     runs-on: ubuntu-latest
+    needs:
+      - build-validation
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '16'
-
       - name: Build
         run: ./scripts/build-hosted
       - uses: shallwefootball/s3-upload-action@master
@@ -36,21 +39,19 @@ jobs:
 
   build-embedded:
     runs-on: ubuntu-latest
+    needs:
+      - build-validation
     env:
       TARBALL: latest.tar.gz
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '16'
-
       - name: Build Embedded
         run: ./scripts/build-embedded
-
       - uses: shallwefootball/s3-upload-action@master
         name: Upload S3
         id: S3

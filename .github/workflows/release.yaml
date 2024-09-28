@@ -10,20 +10,22 @@ on:
       required: true
 
 jobs:
+  build-validation:
+    name: Validate Code
+    uses: ./.github/workflows/lint.yaml
   build-embedded:
     runs-on: ubuntu-latest
+    needs:
+      - build-validation
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '16'
-
       - name: Build Embedded
         run: ./scripts/build-embedded
-
       - uses: shallwefootball/s3-upload-action@master
         name: Upload S3
         id: S3
