@@ -32,7 +32,6 @@ export const NODE_ROLES = {
   CONTROL_PLANE:     'node-role.kubernetes.io/control-plane',
   WORKER:            'node-role.kubernetes.io/worker',
   ETCD:              'node-role.kubernetes.io/etcd',
-  STORAGE:           'node-role.kubernetes.io/storage',
 };
 
 export const RKE = { EXTERNAL_IP: 'rke.cattle.io/external-ip' };

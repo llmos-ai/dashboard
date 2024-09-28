@@ -142,28 +142,15 @@ export default class ClusterNode extends SteveModel {
   }
 
   get isWorker() {
-    return this.managementNode ? this.managementNode.isWorker : `${ this.labels[NODE_ROLES.WORKER] }` === 'true';
+    return this.labels[NODE_ROLES.WORKER] === 'true';
   }
 
   get isControlPlane() {
-    if (this.managementNode) {
-      return this.managementNode.isControlPlane;
-    } else if (
-      `${ this.labels[NODE_ROLES.CONTROL_PLANE] }` === 'true' ||
-      `${ this.labels[NODE_ROLES.CONTROL_PLANE_OLD] }` === 'true'
-    ) {
-      return true;
-    }
-
-    return false;
+    return this.labels[NODE_ROLES.CONTROL_PLANE] === 'true' || this.labels[NODE_ROLES.CONTROL_PLANE_OLD] === 'true';
   }
 
   get isEtcd() {
-    return this.managementNode ? this.managementNode.isEtcd : `${ this.labels[NODE_ROLES.ETCD] }` === 'true';
-  }
-
-  get isStorage() {
-    return `${ this.labels[NODE_ROLES.STORAGE] }` === 'true';
+    return this.labels[NODE_ROLES.ETCD] === 'true';
   }
 
   get hasARole() {
@@ -179,11 +166,9 @@ export default class ClusterNode extends SteveModel {
   }
 
   get roles() {
-    const {
-      isControlPlane, isWorker, isEtcd, isStorage
-    } = this;
+    const { isControlPlane, isWorker, isEtcd } = this;
 
-    return listNodeRoles(isControlPlane, isWorker, isEtcd, isStorage, this.t('generic.all'));
+    return listNodeRoles(isControlPlane, isWorker, isEtcd, this.t('generic.all'));
   }
 
   get version() {
@@ -277,7 +262,7 @@ export default class ClusterNode extends SteveModel {
   }
 
   get drainedState() {
-    const sNodeCondition = this.managementNode?.status.conditions.find((c) => c.type === 'Drained');
+    const sNodeCondition = this.status?.conditions.find((c) => c.type === 'Drained');
 
     if (sNodeCondition) {
       if (sNodeCondition.status === 'True') {
@@ -435,7 +420,7 @@ function calculatePercentage(allocatable, capacity) {
   return formatPercent(percent);
 }
 
-export function listNodeRoles(isControlPlane, isWorker, isEtcd, isStorage, allString) {
+export function listNodeRoles(isControlPlane, isWorker, isEtcd, allString) {
   const res = [];
 
   if (isControlPlane) {
@@ -450,12 +435,12 @@ export function listNodeRoles(isControlPlane, isWorker, isEtcd, isStorage, allSt
     res.push('Etcd');
   }
 
-  if (isStorage) {
-    res.push('Storage');
+  if (res.length === 3) {
+    return allString;
   }
 
-  if (res.length === 4 || res.length === 0) {
-    return allString;
+  if (res.length === 0) {
+    return 'Worker';
   }
 
   return res.join(', ');
