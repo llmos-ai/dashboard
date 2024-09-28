@@ -3,27 +3,29 @@ on:
   push:
     branches:
       - main
-      - 'release-*'
+      - release-*
   pull_request:
       branches:
         - main
-        - 'release-*'
+        - release-*
   workflow_dispatch:
     environment:
       description: 'Environment to run tests against'
       type: environment
       required: true 
+  # This tells GH that the workflow is reusable
+  workflow_call:
 
 jobs:
   i18n:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: Install packages
         run: yarn install:ci
@@ -34,12 +36,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: Install packages
         run: yarn install:ci
