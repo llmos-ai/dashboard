@@ -59,15 +59,15 @@ export default class LLMOSWorkload extends SteveModel {
   get pods() {
     const selector = this.podSelector;
 
-    if (selector) {
-      const pods = this.$getters['podsByNamespace'](this.metadata.namespace);
-
-      return pods.filter((obj) => {
-        return matches(obj, selector);
-      });
-    } else {
+    if (!selector) {
       return [];
     }
+
+    const pods = this.$getters['podsByNamespace'](this.metadata.namespace);
+
+    return pods.filter((obj) => {
+      return matches(obj, selector);
+    });
   }
 
   get podGauges() {
@@ -110,6 +110,13 @@ export default class LLMOSWorkload extends SteveModel {
       return this.spec?.selector;
     case LLMOS.NOTEBOOK:
       return this.spec?.selector;
+    case LLMOS.RAY_CLUSTER:
+      return {
+        matchLabels: {
+          'app.kubernetes.io/name': 'kuberay',
+          'ray.io/cluster':         this.name
+        }
+      };
     default:
       return this.metadata?.labels;
     }
@@ -139,13 +146,5 @@ export default class LLMOSWorkload extends SteveModel {
     }
 
     return super.state;
-  }
-
-  remove() {
-    const opt = { ...arguments };
-
-    opt.params = { propagationPolicy: 'Foreground' };
-
-    return this._remove(opt);
   }
 }

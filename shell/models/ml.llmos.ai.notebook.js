@@ -142,4 +142,12 @@ export default class NoteBook extends LLMOSWorkload {
 
     return requests.memory;
   }
+
+  remove() {
+    const opt = { ...arguments };
+
+    opt.params = { propagationPolicy: 'Foreground' };
+
+    return this._remove(opt);
+  }
 }
