@@ -1,16 +1,30 @@
 <script>
+import { SERVICE } from '@shell/config/types';
+import { fetchClusterResources } from '@shell/pages/c/_cluster/explorer/explorer-utils';
+
 export default {
-  layout: 'authenticated',
+  layout: 'rayDashboard',
+  async asyncData({ route, redirect, store }) {
+    const services = await fetchClusterResources(store, SERVICE);
+    const id = route.params.id;
+    const namespace = route.params.namespace;
 
-  components: {},
+    let dashboardUrl = '';
 
-  data() {
-    const clusterName = this.$route.params.clusterName;
-    const namespace = this.$route.params.namespace;
+    if (services && services.length > 0) {
+      // find service by svc name and namespace
+      const svc = services.find((s) => {
+        return s.metadata.ownerReferences?.find((o) => o.name === id);
+      });
+      const port = svc.spec.ports.find((p) => p.port === 8265);
 
-    const dashboardUrl = `${ window.location.origin }/api/v1/namespaces/${ namespace }/services/http:${ clusterName }-head-svc:dashboard/proxy/#/overview`;
+      dashboardUrl = `${ window.location.origin }/api/v1/namespaces/${ namespace }/services/http:${ svc.name }:${ port.name }/proxy/#/overview`;
+    }
 
-    return { dashboardUrl };
+    return {
+      services,
+      dashboardUrl,
+    };
   },
 };
 </script>

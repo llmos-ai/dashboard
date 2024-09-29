@@ -92,4 +92,12 @@ export default class ModelService extends LLMOSWorkload {
   get modelName() {
     return this.spec.servedModelName.length > 0 ? this.spec.servedModelName : this.spec.model;
   }
+
+  remove() {
+    const opt = { ...arguments };
+
+    opt.params = { propagationPolicy: 'Foreground' };
+
+    return this._remove(opt);
+  }
 }

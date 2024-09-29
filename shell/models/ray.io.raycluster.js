@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import SteveModel from '@shell/plugins/steve/steve-class';
 import { set } from '@shell/utils/object';
 import { colorForState, STATES_ENUM } from '@shell/plugins/dashboard-store/resource-class';
+import LLMOSWorkload from '@shell/models/llmos-workload';
 
-export default class RayCluster extends SteveModel {
+export default class RayCluster extends LLMOSWorkload {
   applyDefaults() {
     const value = {
       apiVersion: 'ray.io/v1',
