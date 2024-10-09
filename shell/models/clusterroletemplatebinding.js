@@ -1,7 +1,7 @@
 import { MANAGEMENT } from '@shell/config/types';
-import NormanModel from '@shell/plugins/steve/norman-class';
+import SteveModel from '@shell/plugins/steve/steve-class';
 
-export default class CRTB extends NormanModel {
+export default class CRTB extends SteveModel {
   get principalId() {
     return this.userPrincipalId || this.groupPrincipalId;
   }
@@ -15,13 +15,6 @@ export default class CRTB extends NormanModel {
   }
 
   get roleTemplate() {
-    return this.$rootGetters['management/byId'](MANAGEMENT.ROLE_TEMPLATE, this.roleTemplateId);
-  }
-
-  get steve() {
-    return this.$dispatch(`management/find`, {
-      type: MANAGEMENT.CLUSTER_ROLE_TEMPLATE_BINDING,
-      id:   this.id?.replace(':', '/')
-    }, { root: true });
+    return this.$rootGetters['management/byId'](MANAGEMENT.ROLE_TEMPLATE, this.id);
   }
 }

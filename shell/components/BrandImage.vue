@@ -80,7 +80,7 @@ export default {
       }
     },
     getPL() {
-      if (this.pl === '') {
+      if (!this.pl || this.pl === '') {
         return '1BLOCK.AI';
       }
 

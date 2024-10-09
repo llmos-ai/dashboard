@@ -45,6 +45,16 @@ export const PROVISIONER_OPTIONS = [
     labelKey:  'storageClass.local-path-provisioner.title',
     value:     'rancher.io/local-path',
     supported: true,
+  },
+  {
+    labelKey:  'storageClass.ceph-cephfs-provisioner.title',
+    value:     'storage-system.cephfs.csi.ceph.com',
+    supported: true,
+  },
+  {
+    labelKey:  'storageClass.ceph-rbd-provisioner.title',
+    value:     'storage-system.rbd.csi.ceph.com',
+    supported: true,
   }
 ];
 
@@ -118,5 +128,14 @@ export default class extends SteveModel {
     }
 
     return out;
+  }
+
+  get isLLMOSRelease() {
+    return this.annotations?.['meta.helm.sh/release-name'] === 'llmos-ceph-cluster';
+  }
+
+  get canDelete() {
+    // not include llmos-ceph-cluster
+    return !this.isLLMOSRelease && super.canDelete;
   }
 }

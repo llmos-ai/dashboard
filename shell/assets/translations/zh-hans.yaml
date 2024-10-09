@@ -4319,6 +4319,10 @@ storageClass:
     warning: '{provisioner} 树内插件已弃用。你可以在<a target="_blank" rel="noopener noreferrer nofollow" href="https://kubernetes-csi.github.io/docs/drivers.html">这里</a>查找 CSI 驱动。'
   local-path-provisioner:
     title: Local Path 驱动 (CSI)
+  ceph-cephfs-provisioner:
+    title: CephFS 驱动 (CSI)
+  ceph-rbd-provisioner:
+    title: Ceph RBD 驱动 (CSI)
 
 tableHeaders:
   assuredConcurrencyShares: 确保并发份额
@@ -5746,8 +5750,8 @@ typeLabel:
   # LLMOS types label
   llmos.ai.volume: |-
     {count, plural,
-      one { 卷 }
-      other { 卷 }
+      one { 存储卷 }
+      other { 存储卷 }
     }
   management.llmos.ai.setting: |-
     {count, plural,
@@ -5778,6 +5782,22 @@ typeLabel:
     {count, plural,
       one { 模型部署 }
       other { 模型部署 }
+    }
+  # Ceph Types
+  ceph.rook.io.cephcluster: |-
+    {count, plural,
+      one { Ceph 集群 }
+      other { Ceph 集群 }
+    }
+  ceph.rook.io.cephblockpool: |-
+    {count, plural,
+      one { Ceph 块存储 }
+      other { Ceph 块存储 }
+    }
+  ceph.rook.io.cephfilesystem: |-
+    {count, plural,
+      one { Ceph 文件系统 }
+      other { Ceph 文件系统 }
     }
 
 action:
@@ -6251,3 +6271,6 @@ scheduling:
     anyNode: Run on any available node
     schedulingRules: Run on node(s) matching scheduling rules
     specificNode: Run on specific node(s)
+
+storage:
+  addParameters: 添加参数

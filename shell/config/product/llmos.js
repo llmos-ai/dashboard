@@ -122,7 +122,6 @@ export function init(store) {
   basicType(
     [
       LLMOS.CLUSTER_POLICY,
-      LLMOS.NVIDIA_DRIVER,
     ],
     'GPU Management'
   );
@@ -149,7 +148,7 @@ export function init(store) {
       params: { resource: LLMOS.VOLUME }
     },
     exact:  false,
-    weight: 301,
+    weight: 330,
   });
   virtualType({
     ifHaveType: STORAGE_CLASS,
@@ -162,9 +161,50 @@ export function init(store) {
       params: { resource: STORAGE_CLASS }
     },
     exact:  false,
-    weight: 300,
+    weight: 320,
   });
 
+  virtualType({
+    ifHaveType: LLMOS.CEPH_CLUSTER,
+    labelKey:   'typeLabel."ceph.rook.io.cephcluster"',
+    group:      'Storage',
+    name:       LLMOS.CEPH_CLUSTER,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.CEPH_CLUSTER }
+    },
+    exact:  false,
+    weight: 313,
+  });
+
+  virtualType({
+    ifHaveType: LLMOS.CEPH_BLOCK_POOL,
+    labelKey:   'typeLabel."ceph.rook.io.cephblockpool"',
+    group:      'Storage',
+    name:       LLMOS.CEPH_BLOCK_POOL,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.CEPH_BLOCK_POOL }
+    },
+    exact:  false,
+    weight: 312,
+  });
+
+  virtualType({
+    ifHaveType: LLMOS.CEPH_FILESYSTEM,
+    labelKey:   'typeLabel."ceph.rook.io.cephfilesystem"',
+    group:      'Storage',
+    name:       LLMOS.CEPH_FILESYSTEM,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.CEPH_FILESYSTEM }
+    },
+    exact:  false,
+    weight: 311,
+  });
   basicType(
     [
       LLMOS.VOLUME,

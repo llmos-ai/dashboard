@@ -3,6 +3,8 @@ import { DESCRIPTION } from '@shell/config/labels-annotations';
 import Vue from 'vue';
 import { set } from '@shell/utils/object';
 
+export const systemAddonLabel = 'llmos.ai/system-addon';
+
 export default class ManagedAddon extends SteveModel {
   applyDefaults() {
     const value = {
@@ -32,7 +34,7 @@ export default class ManagedAddon extends SteveModel {
 
     const toggleAddon = {
       action:  'toggleAddon',
-      enabled: true,
+      enabled: this.allowDisable,
       icon:    this.spec.enabled ? 'icon icon-pause' : 'icon icon-play',
       label:   this.spec.enabled ? this.t('generic.disable') : this.t('generic.enable'),
     };
@@ -98,6 +100,10 @@ export default class ManagedAddon extends SteveModel {
   }
 
   get canDelete() {
-    return this.metadata?.labels?.['llmos.ai/system-addon'] !== 'true';
+    return this.metadata?.labels?.[systemAddonLabel] !== 'true';
+  }
+
+  get allowDisable() {
+    return this.labels[systemAddonLabel] !== 'true';
   }
 }
