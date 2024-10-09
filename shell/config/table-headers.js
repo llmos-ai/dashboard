@@ -15,6 +15,15 @@ export const STATE = {
   formatter: 'BadgeStateFormatter',
 };
 
+export const PHASE = {
+  name:     'phase',
+  labelKey: 'tableHeaders.phase',
+  sort:     ['phaseSort'],
+  value:    'status.phase',
+  width:    100,
+  default:  'unknown',
+};
+
 export const DOWNLOAD = {
   name:          'download',
   labelKey:      'tableHeaders.download',
@@ -688,156 +697,6 @@ export const WORKLOAD_HEALTH_SCALE = {
   liveUpdates:  true,
 };
 
-export const FLEET_SUMMARY = {
-  name:      'summary',
-  labelKey:  'tableHeaders.resources',
-  value:     'status.resourceCounts',
-  sort:      false,
-  search:    false,
-  formatter: 'FleetSummaryGraph',
-  align:     'center',
-  width:     100,
-};
-
-export const FLEET_REPO_CLUSTER_SUMMARY = {
-  name:      'clusterSummary',
-  labelKey:  'tableHeaders.clusterResources',
-  value:     'status.resourceCounts',
-  sort:      false,
-  search:    false,
-  formatter: 'FleetClusterSummaryGraph',
-  align:     'center',
-  width:     100,
-};
-
-export const FLEET_REPO_PER_CLUSTER_STATE = {
-  name:          'perClusterState',
-  labelKey:      'tableHeaders.repoPerClusterState',
-  tooltip:       'tableHeaders.repoPerClusterStateTooltip',
-  sort:          ['stateSort', 'nameSort'],
-  width:         100,
-  default:       'unknown',
-  formatter:     'BadgeStateFormatter',
-  formatterOpts: { arbitrary: true }
-
-};
-
-export const APP_SUMMARY = {
-  name:      'summary',
-  labelKey:  'tableHeaders.resources',
-  value:     'deployedResources.length',
-  sort:      false,
-  search:    false,
-  formatter: 'AppSummaryGraph',
-  align:     'center',
-  width:     100,
-};
-
-export const CONSTRAINT_VIOLATION_CONSTRAINT_LINK = {
-  name:          'Constraint',
-  labelKey:      'tableHeaders.constraint',
-  value:         'constraintLink',
-  sort:          `constraintLink.text`,
-  formatter:     'Link',
-  formatterOpts: { options: { internal: true } },
-};
-
-export const CONSTRAINT_VIOLATION_RESOURCE_LINK = {
-  name:          'Name',
-  labelKey:      'tableHeaders.name',
-  value:         'resourceLink',
-  sort:          `resourceLink.text`,
-  search:        `resourceLink.text`,
-  formatter:     'Link',
-  formatterOpts: { options: { internal: true } },
-};
-
-export const CONSTRAINT_VIOLATION_TYPE = {
-  name:     'Type',
-  labelKey: 'tableHeaders.type',
-  value:    `kind`,
-  sort:     `kind`
-};
-
-export const CONSTRAINT_VIOLATION_NAMESPACE = {
-  name:     'Namespace',
-  labelKey: 'tableHeaders.namespace',
-  value:    `namespace`,
-  sort:     `namespace`,
-  search:   `namespace`,
-};
-
-export const CONSTRAINT_VIOLATION_MESSAGE = {
-  name:     'Message',
-  labelKey: 'tableHeaders.message',
-  value:    `message`,
-  sort:     `message`
-};
-
-export const CONSTRAINT_VIOLATION_TEMPLATE_LINK = {
-  name:          'TemplateLink',
-  labelKey:      'tableHeaders.template',
-  value:         `templateLink`,
-  sort:          `templateLink.text`,
-  formatter:     'Link',
-  formatterOpts: { options: { internal: true } },
-};
-
-export const CONSTRAINT_VIOLATION_COUNT = {
-  name:          'Count',
-  labelKey:      'tableHeaders.count',
-  value:         `count`,
-  sort:          `count`,
-  formatter:     'QualityText',
-  formatterOpts: {
-    qualityFn(value) {
-      if (value <= 10) {
-        return 'success';
-      }
-
-      if (value <= 20) {
-        return 'warning';
-      }
-
-      return 'error';
-    }
-  }
-};
-
-export const RECEIVER_PROVIDERS = {
-  name:      'receiver-providers',
-  label:     'Configured Providers',
-  value:     'receiverTypes',
-  sort:      'receiverTypes',
-  formatter: 'List',
-};
-
-export const CONFIGURED_RECEIVER = {
-  name:          'receiver',
-  label:         'Configured Receiver',
-  value:         'receiverLink',
-  sort:          'receiverLink.text',
-  formatter:     'Link',
-  formatterOpts: { options: { internal: true } },
-};
-
-export const GROUP_NAME = {
-  name:      'group-name',
-  labelKey:  'tableHeaders.groupName',
-  value:     'id',
-  sort:      ['name'],
-  search:    ['name'],
-  formatter: 'Principal',
-  width:     350
-};
-
-export const GROUP_ROLE_NAME = {
-  name:      'group-role-names',
-  labelKey:  'tableHeaders.groupRoleNames',
-  value:     'id',
-  formatter: 'PrincipalGroupBindings',
-};
-
 export const HPA_REFERENCE = {
   name:     'reference',
   labelKey: 'tableHeaders.hpaReference',
@@ -916,32 +775,6 @@ export const RESTART = {
   align:     'center'
 };
 
-export const ROLE = {
-  name:     'role',
-  value:    'roleDisplay',
-  labelKey: 'tableHeaders.role',
-};
-
-export const FEATURE_DESCRIPTION = {
-  name:          'description',
-  labelKey:      'tableHeaders.description',
-  value:         'status.description',
-  align:         'left',
-  sort:          ['status.description'],
-  formatter:     'Translate',
-  formatterOpts: { prefix: 'featureFlags.description' },
-};
-
-export const STATE_NORMAN = {
-  name:      'state',
-  labelKey:  'tableHeaders.state',
-  sort:      ['stateSort', 'nameSort'],
-  value:     'stateDisplay',
-  width:     100,
-  default:   'unknown',
-  formatter: 'BadgeStateFormatter',
-};
-
 export const KUBE_NODE_OS = {
   name:      'operating-system',
   labelKey:  'tableHeaders.operatingSystem',
@@ -949,96 +782,3 @@ export const KUBE_NODE_OS = {
   sort:      ['status.nodeInfo.operatingSystem'],
   formatter: 'Capitalize'
 };
-
-export const MACHINE_NODE_OS = {
-  name:        'operating-system',
-  labelKey:    'tableHeaders.operatingSystem',
-  value:       'operatingSystem',
-  sort:        ['operatingSystem'],
-  formatter:   'Capitalize',
-  dashIfEmpty: true,
-};
-
-export const MANAGEMENT_NODE_OS = {
-  name:        'operating-system',
-  labelKey:    'tableHeaders.operatingSystem',
-  value:       'status.internalNodeStatus.nodeInfo.operatingSystem',
-  sort:        ['status.internalNodeStatus.nodeInfo.operatingSystem'],
-  formatter:   'Capitalize',
-  dashIfEmpty: true,
-};
-
-// FLEET
-
-export const FLEET_BUNDLE_LAST_UPDATED = {
-  name:          'lastUpdated',
-  labelKey:      'tableHeaders.lastUpdated',
-  value:         'lastUpdateTime',
-  formatter:     'LiveDate',
-  formatterOpts: { addSuffix: true },
-  sort:          ['lastUpdateTime']
-};
-
-export const FLEET_BUNDLE_TYPE = {
-  name:     'bundleType',
-  labelKey: 'tableHeaders.fleetBundleType',
-  value:    'bundleType',
-  sort:     ['bundleType'],
-  width:    100,
-};
-
-export const FLEET_REPO_CLUSTERS_READY = {
-  name:     'clustersReady',
-  labelKey: 'tableHeaders.clustersReady',
-  value:    'status.readyClusters',
-  sort:     'status.readyClusters',
-  search:   false,
-};
-
-export const FLEET_REPO_TARGET = {
-  name:     'target',
-  labelKey: 'tableHeaders.target',
-  value:    'targetInfo.modeDisplay',
-  sort:     ['targetInfo.modeDisplay', 'targetInfo.cluster', 'targetInfo.clusterGroup'],
-
-};
-
-export const FLEET_REPO = {
-  name:     'repo',
-  labelKey: 'tableHeaders.repo',
-  value:    'repoDisplay',
-  sort:     'repoDisplay',
-  search:   ['spec.repo', 'status.commit'],
-};
-
-export const UI_PLUGIN_CATALOG = [
-  {
-    name:          'state',
-    labelKey:      'tableHeaders.state',
-    sort:          ['stateSort', 'nameSort'],
-    value:         'state',
-    width:         100,
-    default:       'unknown',
-    formatter:     'BadgeStateFormatter',
-    formatterOpts: { arbitrary: true }
-  },
-  {
-    name:      'name',
-    labelKey:  'tableHeaders.name',
-    value:     'name',
-    sort:      ['nameSort'],
-    formatter: 'LinkDetail'
-  },
-  {
-    name:     'image',
-    sort:     ['image'],
-    labelKey: 'plugins.manageCatalog.headers.image.label',
-    value:    'image'
-  },
-  {
-    name:     'repository',
-    sort:     ['repository'],
-    labelKey: 'plugins.manageCatalog.headers.repository.label',
-    value:    'repo.metadata.name'
-  }
-];

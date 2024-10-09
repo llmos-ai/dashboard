@@ -68,7 +68,7 @@ export default {
     },
     isEdit() {
       return this.mode === _EDIT;
-    }
+    },
   },
 
   created() {
@@ -107,12 +107,7 @@ export default {
       return pattern.test(url);
     },
 
-    update() {
-    },
-
-    isSystemAddon() {
-      return this.metadata?.labels?.['llmos.ai/system-addon'] === 'true';
-    }
+    update() {},
   }
 };
 </script>
@@ -158,7 +153,6 @@ export default {
             <Checkbox
               v-model="spec.enabled"
               label="Enabled"
-              :disabled="isSystemAddon()"
               :mode="mode"
               @input="update"
             />

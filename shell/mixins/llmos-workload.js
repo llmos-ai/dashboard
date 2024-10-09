@@ -124,6 +124,7 @@ export default {
       namespacedSecrets:     [],
       name:                  this.value?.metadata?.name || null,
       pvcs:                  [],
+      namespacedPvcs:        [],
       pullPolicyOptions:     ['Always', 'IfNotPresent', 'Never'],
       svcOptions:            ['ClusterIP', 'NodePort', 'LoadBalancer'],
       savePvcHookName:       'savePvcHook',
@@ -299,11 +300,7 @@ export default {
                 var:         'pvcs',
                 parsingFunc: (data) => {
                   return data.filter((pvc) => {
-                    if (pvc.status.phase === 'Bound' && pvc.status.accessModes.includes('ReadWriteOnce')) {
-                      return false;
-                    }
-
-                    return true;
+                    return pvc.namespace !== this.value?.metadata?.namespace;
                   });
                 }
               },

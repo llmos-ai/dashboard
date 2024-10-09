@@ -1,13 +1,17 @@
 <script>
 import ResourceTable from '@shell/components/ResourceTable';
-import { LLMOS } from '@shell/config/types';
 import ResourceFetch from '@shell/mixins/resource-fetch';
-export default {
-  name:       'Modelfiles',
-  components: { ResourceTable },
-  mixins:     [ResourceFetch],
+import Loading from '@shell/components/Loading.vue';
+import { AGE, NAME, PHASE, STATE } from '@shell/config/table-headers';
 
-  props: {
+export default {
+  name:       'ListCephFilesystem',
+  components: {
+    ResourceTable,
+    Loading,
+  },
+  mixins: [ResourceFetch],
+  props:  {
     resource: {
       type:     String,
       required: true,
@@ -25,26 +29,34 @@ export default {
   async fetch() {
     await this.$fetchType(this.resource);
   },
+
   computed: {
-    filteredRows() {
-      return this.rows;
+    headers() {
+      const headers = [
+        STATE,
+        NAME,
+        {
+          name:  'activeMds',
+          label: 'Active MDS',
+          value: 'spec.metadataServer.activeCount'
+        },
+        PHASE,
+        AGE,
+      ];
+
+      return headers;
     }
-  },
-  // override with relevant info for the loading indicator since this doesn't use it's own masthead
-  $loadingResources() {
-    return {
-      loadResources:     [LLMOS.MODEL_FILE],
-      loadIndeterminate: true, // results are filtered so we wouldn't get the correct count on indicator...
-    };
   },
 };
 </script>
 
 <template>
+  <Loading v-if="$fetchState.pending" />
   <ResourceTable
+    v-else
     :schema="schema"
-    :rows="filteredRows"
-    :headers="$attrs.headers"
+    :rows="rows"
+    :headers="headers"
     :group-by="$attrs.groupBy"
     :loading="loading"
     :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
