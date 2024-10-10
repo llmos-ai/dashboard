@@ -6,11 +6,12 @@ import CruResource from '@shell/components/CruResource.vue';
 import NameNsDescription from '@shell/components/form/NameNsDescription.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
-import { _CREATE } from '@shell/config/query-params';
 import UnitInput from '@shell/components/form/UnitInput.vue';
 import KeyValue from '@shell/components/form/KeyValue.vue';
 import LabeledInput from '@components/Form/LabeledInput/LabeledInput.vue';
 import { set } from '@shell/utils/object';
+import { Banner } from '@components/Banner';
+import CephConfig from '@shell/mixins/ceph-config';
 
 export const REPLICATED = 'Replicated';
 export const ERASURE_CODED = 'Erasure Coded';
@@ -26,8 +27,9 @@ export default {
     CruResource,
     NameNsDescription,
     KeyValue,
+    Banner,
   },
-  mixins: [CreateEditView, FormValidation],
+  mixins: [CreateEditView, FormValidation, CephConfig],
   props:  {
     value: {
       type:     Object,
@@ -60,11 +62,7 @@ export default {
     this.registerBeforeHook(this.willSave, 'willSave');
   },
 
-  computed: {
-    isCreate() {
-      return this.mode === _CREATE;
-    },
-  },
+  computed: {},
 
   methods: {
     willSave() {
@@ -86,126 +84,140 @@ export default {
         };
       }
     },
+
+    span(text) {
+      return `<span> ${ text } </span>`;
+    }
   }
 };
 </script>
 
 <template>
-  <form class="filled-height">
-    <CruResource
-      :done-route="doneRoute"
-      :mode="mode"
-      :resource="value"
-      :validation-passed="fvFormIsValid"
-      :errors="fvUnreportedValidationErrors"
-      :apply-hooks="applyHooks"
-      @finish="save"
-    >
-      <NameNsDescription
-        :value="value"
-        :namespaced="true"
-        :mode="mode"
+  <div>
+    <div>
+      <Banner
+        v-if="isLLMOSRelease"
+        color="info"
+        class="mb-20"
+        :inner-html="managedWarning"
       />
-
-      <ResourceTabs
-        v-model="value"
-        class="mt-15"
-        :need-conditions="false"
-        :need-related="false"
-        :side-tabs="true"
+    </div>
+    <form class="filled-height">
+      <CruResource
+        :done-route="doneRoute"
         :mode="mode"
+        :resource="value"
+        :validation-passed="fvFormIsValid"
+        :errors="fvUnreportedValidationErrors"
+        :apply-hooks="applyHooks"
+        @finish="save"
       >
-        <Tab
-          name="basic"
-          label="Pool Settings"
-          class="bordered-table"
+        <NameNsDescription
+          :value="value"
+          :namespaced="true"
+          :mode="mode"
+        />
+
+        <ResourceTabs
+          v-model="value"
+          class="mt-15"
+          :need-conditions="false"
+          :need-related="false"
+          :side-tabs="true"
+          :mode="mode"
         >
-          <div class="row">
-            <div class="col span-6 mb-10">
-              <LabeledSelect
-                v-model="spec.failureDomain"
-                label="Failure Domain"
-                :options="['host', 'osd']"
-                required
-                :mode="mode"
-                @input="update"
-              />
+          <Tab
+            name="basic"
+            label="Pool Settings"
+            class="bordered-table"
+          >
+            <div class="row">
+              <div class="col span-6 mb-10">
+                <LabeledSelect
+                  v-model="spec.failureDomain"
+                  label="Failure Domain"
+                  :options="['host', 'osd']"
+                  required
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
+
+              <div class="col span-6 mb-10">
+                <LabeledInput
+                  v-model="spec.deviceClass"
+                  label="Device Class"
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
             </div>
 
-            <div class="col span-6 mb-10">
-              <LabeledInput
-                v-model="spec.deviceClass"
-                label="Device Class"
-                :mode="mode"
-                @input="update"
-              />
-            </div>
-          </div>
+            <!-- Replicated configs -->
+            <div class="row">
+              <div class="col span-6 mb-10">
+                <LabeledSelect
+                  v-model="type"
+                  label="Type"
+                  :options="['Replicated', 'Erasure Coded']"
+                  required
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
 
-          <!-- Replicated configs -->
-          <div class="row">
-            <div class="col span-6 mb-10">
-              <LabeledSelect
-                v-model="type"
-                label="Type"
-                :options="['Replicated', 'Erasure Coded']"
-                required
-                :mode="mode"
-                @input="update"
-              />
+              <div
+                v-if="type === REPLICATED"
+                class="col span-6 mb-10"
+              >
+                <UnitInput
+                  v-model="spec.replicated.size"
+                  :hide-unit="true"
+                  label="Replicas Per Failure Domain"
+                  required
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
             </div>
 
             <div
-              v-if="type === REPLICATED"
-              class="col span-6 mb-10"
+              v-if="type === ERASURE_CODED"
+              class="row"
             >
-              <UnitInput
-                v-model="spec.replicated.size"
-                :hide-unit="true"
-                label="Replicas Per Failure Domain"
-                required
-                :mode="mode"
-                @input="update"
-              />
+              <div class="col span-6 mb-10">
+                <UnitInput
+                  v-model="spec.erasureCoded.dataChunks"
+                  :hide-unit="true"
+                  label="Data Chunks"
+                  required
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
+              <div class="col span-6 mb-10">
+                <UnitInput
+                  v-model="spec.erasureCoded.codingChunks"
+                  :hide-unit="true"
+                  label="Coding Chunks"
+                  required
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
             </div>
-          </div>
 
-          <div
-            v-if="type === ERASURE_CODED"
-            class="row"
-          >
-            <div class="col span-6 mb-10">
-              <UnitInput
-                v-model="spec.erasureCoded.dataChunks"
-                :hide-unit="true"
-                label="Data Chunks"
-                required
-                :mode="mode"
-                @input="update"
-              />
-            </div>
-            <div class="col span-6 mb-10">
-              <UnitInput
-                v-model="spec.erasureCoded.codingChunks"
-                :hide-unit="true"
-                label="Coding Chunks"
-                required
-                :mode="mode"
-                @input="update"
-              />
-            </div>
-          </div>
-
-          <br>
-          <h3>Parameters</h3>
-          <KeyValue
-            v-model="spec.parameters"
-            :add-label="t('storage.addParameters')"
-            :read-allowed="false"
-            :mode="mode"
-          />
-        </Tab>
-      </ResourceTabs>
-    </CruResource>
-  </form>
+            <br>
+            <h3>Parameters</h3>
+            <KeyValue
+              v-model="spec.parameters"
+              :add-label="t('storage.addParameters')"
+              :read-allowed="false"
+              :mode="mode"
+            />
+          </Tab>
+        </ResourceTabs>
+      </CruResource>
+    </form>
+  </div>
 </template>

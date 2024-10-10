@@ -21,6 +21,13 @@ export default Vue.extend({
       default: null
     },
     /**
+     * The inner HTML to display as the banner's default content.
+     */
+    innerHtml: {
+      type:    String,
+      default: null
+    },
+    /**
      * The i18n key for the label to display as the banner's default content.
      */
     labelKey: {
@@ -86,7 +93,12 @@ export default Vue.extend({
         icon
       }"
     >
-      <slot>
+      <!-- Use inner html -->
+      <div v-if="innerHtml">
+        <div v-html="innerHtml"></div>
+      </div>
+
+      <slot v-else>
         <t
           v-if="labelKey"
           :k="labelKey"
@@ -98,6 +110,7 @@ export default Vue.extend({
           v-clean-html="nlToBr(label)"
         />
       </slot>
+
       <div
         v-if="closable"
         class="banner__content__closer"

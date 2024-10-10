@@ -324,6 +324,7 @@ export default {
           :mode="mode"
           :runtime-classes="runtimeClasses"
           :pod-spec="podTemplateSpec"
+          :handle-gpu-limit="true"
           :show-tip="false"
         />
       </Tab>

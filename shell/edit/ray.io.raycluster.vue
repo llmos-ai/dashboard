@@ -215,7 +215,6 @@ export default {
             :mode="mode"
             :runtime-classes="runtimeClasses"
             :pod-spec="headGroupSpec.template.spec"
-            :handle-gpu-limit="false"
             :show-tip="false"
             @input="update"
           />
@@ -297,6 +296,7 @@ export default {
             :mode="mode"
             :runtime-classes="runtimeClasses"
             :pod-spec="workerGroupSpecs[0].template.spec"
+            :handle-gpu-limit="true"
             :show-tip="false"
             @input="update"
           />

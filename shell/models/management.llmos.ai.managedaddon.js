@@ -49,7 +49,7 @@ export default class ManagedAddon extends SteveModel {
 
     try {
       this.spec.enabled = !this.spec.enabled;
-      await this.save();
+      this.goToEdit();
     } catch (err) {
       this.spec.enabled = enableHistory;
       this.$dispatch('growl/fromError', {

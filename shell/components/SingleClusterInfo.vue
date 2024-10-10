@@ -3,69 +3,65 @@ import ResourceSummary from '@shell/components/ResourceSummary';
 import {
   NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS, PVC
 } from '@shell/config/types';
-import { RESOURCES } from '@shell/pages/c/_cluster/explorer/index';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
 import { mapGetters } from 'vuex';
 import { allHash } from '@shell/utils/promise';
-
-const COMPONENT_STATUS = [
-  'etcd',
-  'scheduler',
-  'controller-manager',
-  'storage',
-];
+import { Banner } from '@components/Banner';
 
 export default {
-  components: { ResourceSummary },
+  components: {
+    ResourceSummary,
+    Banner,
+  },
 
   async fetch() {
     const hash = await allHash({
       clusters:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER }),
       settings:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.SETTING }),
-      // cephCluster:   this.$store.dispatch('management/findAll', { type: LLMOS.CEPH_CLUSTER, id: 'ceph-system/llmos-ceph' }),
+      managedAddons: this.$store.dispatch('management/findAll', { type: MANAGEMENT.MANAGED_ADDON }),
+      cephClusters:  this.$store.dispatch('management/findAll', { type: LLMOS.CEPH_CLUSTER }),
       viewContainer: this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD),
     });
 
     this.clusters = hash.clusters;
     this.settings = hash.settings;
-    // this.cephCluster = hash.cephCluster;
+    this.managedAddons = hash.managedAddons;
     this.viewContainerDashboard = hash.viewContainer;
   },
 
   data() {
     return {
       clusters:               [],
-      cephCluster:            {},
+      settings:               [],
+      managedAddons:          [],
+      cephClusters:           [],
       clusterDetail:          null,
       clusterCounts:          {},
       viewContainerDashboard: false,
-      settings:               [],
     };
   },
 
   computed: {
+    LLMOS() {
+      return LLMOS;
+    },
+    MANAGEMENT() {
+      return MANAGEMENT;
+    },
     ...mapGetters(['currentCluster']),
 
-    exploreLink() {
-      return { name: 'c-cluster', params: { cluster: this.clusterDetail.id } };
-    },
+    cephClusterEnabled() {
+      if (this.cephClusters.length > 0 ) {
+        return true;
+      }
 
-    accessibleResources() {
-      return RESOURCES.filter((resource) => this.$store.getters['cluster/schemaFor'](resource));
-    },
+      const cephCluster = this.managedAddons.find((m) => m.metadata.name === 'llmos-ceph-cluster');
 
-    componentServices() {
-      const status = [];
+      if (cephCluster.spec.enabled) {
+        return true;
+      }
 
-      COMPONENT_STATUS.forEach((cs) => {
-        status.push({
-          name:     cs,
-          healthy:  this.isComponentStatusHealthy(cs),
-          labelKey: `clusterIndexPage.sections.componentStatus.${ cs }`,
-        });
-      });
-
-      return status;
+      return false;
     },
 
     canAccessNodes() {
@@ -90,6 +86,10 @@ export default {
 
     canAccessNotebooks() {
       return !!this.clusterCounts?.[0]?.counts?.[LLMOS.NOTEBOOK];
+    },
+
+    canAccessAddons() {
+      return !!this.clusterCounts?.[0]?.counts?.[MANAGEMENT.MANAGED_ADDON];
     },
 
     hasDescription() {
@@ -178,6 +178,13 @@ export default {
       </div>
     </header>
 
+    <Banner
+      v-if="!cephClusterEnabled"
+      color="warning"
+      class="mb-20"
+      :inner-html="t('ceph.enableNotification', null, 'html')"
+    />
+
     <div class="home-overview-glance">
       <div
         v-if="clusterDetail.kubernetesVersionRaw"
@@ -205,19 +212,19 @@ export default {
           <ResourceSummary
             v-if="canAccessMLCluster"
             :cluster="clusterDetail.id"
-            resource="ray.io.raycluster"
+            :resource="LLMOS.RAY_CLUSTER"
             product="llmos"
           />
           <ResourceSummary
             v-if="canAccessNotebooks"
             :cluster="clusterDetail.id"
-            resource="ml.llmos.ai.notebook"
+            :resource="LLMOS.NOTEBOOK"
             product="llmos"
           />
           <ResourceSummary
             v-if="canAccessModelServices"
             :cluster="clusterDetail.id"
-            resource="ml.llmos.ai.modelservice"
+            :resource="LLMOS.MODEL_SERVICE"
             product="llmos"
           />
         </div>
@@ -244,25 +251,6 @@ export default {
         </div>
       </div>
     </div>
-
-    <!--    <div v-if="componentServices">-->
-    <!--      <div-->
-    <!--        v-for="status in componentServices"-->
-    <!--        :key="status.name"-->
-    <!--        class="home-component-status"-->
-    <!--        :class="{'home-component-status-healthy': status.healthy, 'home-component-status-unhealthy': !status.healthy}"-->
-    <!--      >-->
-    <!--        <i-->
-    <!--          v-if="status.healthy"-->
-    <!--          class="icon icon-checkmark"-->
-    <!--        />-->
-    <!--        <i-->
-    <!--          v-else-->
-    <!--          class="icon icon-warning"-->
-    <!--        />-->
-    <!--        <div>{{ t(status.labelKey) }}</div>-->
-    <!--      </div>-->
-    <!--    </div>-->
   </div>
 </template>
 
@@ -289,11 +277,6 @@ export default {
 .single-cluster-info {
   margin-top: 20px;
 
-  .section {
-    margin: 15px 0 5px 0;
-    font-weight: bold;
-  }
-
   .cluster-counts {
     display: flex;
     flex-wrap: wrap;
@@ -302,18 +285,9 @@ export default {
       flex: 1 0 21%;
       margin: 5px;
       height: 100px;
-      //&:not(:last-child) {
-      //  margin-right: 20px;
-      //}
-    }
-  }
-
-  .glance-item {
-    font-size: 14px;
-    padding: 5px 0;
-
-    .cluster-link {
-      font-size: 14px;
+      &:not(:last-child) {
+        margin-right: 20px;
+      }
     }
   }
 }
@@ -331,43 +305,5 @@ export default {
 
 .title h1 {
   margin: 0;
-}
-
-.home-component-status {
-  align-items: center;
-  display: inline-flex;
-  border: 1px solid;
-  border-radius: 3px;
-  margin-top: 20px;
-
-  &:not(:last-child) {
-    margin-right: 20px;
-  }
-
-  > div {
-    padding: 5px 20px;
-  }
-
-  > I {
-    text-align: center;
-    padding: 5px 10px;
-    border-right: 1px solid var(--border);
-  }
-
-  &.home-component-status-unhealthy {
-    border-color: var(--error-border);
-
-    > I {
-      color: var(--error)
-    }
-  }
-
-  &.home-component-status-healthy {
-    border-color: var(--border);
-
-    > I {
-      color: var(--success)
-    }
-  }
 }
 </style>

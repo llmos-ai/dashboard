@@ -3,6 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import Loading from '@shell/components/Loading.vue';
 import { AGE, NAME, PHASE, STATE } from '@shell/config/table-headers';
+import { LLMOS } from '@shell/config/types';
 
 export default {
   name:       'ListCephCluster',
@@ -60,7 +61,39 @@ export default {
       ];
 
       return headers;
+    },
+
+    hasCephClusters() {
+      const clusters = this.$store.getters['cluster/all'](LLMOS.CEPH_CLUSTER);
+
+      return clusters.length > 0;
+    },
+
+    notification() {
+      // if (this.hasCephClusters) {
+      //   return null
+      // }
+      const clusters = this.$store.getters['cluster/all'](LLMOS.CEPH_CLUSTER);
+
+      if (clusters.length === 0) {
+        return {
+          type: 'warning',
+          html: this.t('ceph.enableNotification', null, 'html'),
+        };
+      }
+
+      const isReady = clusters.every((c) => c.status?.phase === 'Ready');
+
+      if (isReady) {
+        return null;
+      }
+
+      return {
+        type: 'warning',
+        html: this.t('ceph.progressingNotification', null, 'html'),
+      };
     }
+
   },
 };
 </script>
@@ -76,5 +109,6 @@ export default {
     :loading="loading"
     :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
     :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
+    :notification="notification"
   />
 </template>

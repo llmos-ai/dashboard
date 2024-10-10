@@ -20,6 +20,10 @@ export default {
     isView: {
       type:    Boolean,
       default: false
+    },
+    showName: {
+      type:    Boolean,
+      default: true
     }
   },
 
@@ -37,13 +41,27 @@ export default {
     };
   },
 
-  methods: {}
+  watch: {
+    type(neu) {
+      if (neu === 'Replicated') {
+        this.$set(this.data, 'replicated', { size: 3 });
+        this.$delete(this.data, 'erasureCoded');
+      } else {
+        this.$set(this.data, 'erasureCoded', { dataChunks: 2, codingChunks: 1 });
+        this.$delete(this.data, 'replicated');
+      }
+    }
+  }
+
 };
 </script>
 
 <template>
   <div>
-    <div class="row">
+    <div
+      v-if="showName"
+      class="row"
+    >
       <div class="col span-6 mb-10">
         <LabeledInput
           v-model="data.name"
@@ -59,6 +77,7 @@ export default {
           label="Failure Domain"
           :options="['host', 'osd']"
           :disabled="isView"
+          required
         />
       </div>
     </div>
@@ -75,7 +94,20 @@ export default {
       </div>
 
       <div
-        v-if="type === REPLICATED"
+        v-if="!showName"
+        class="col span-6 mb-10"
+      >
+        <LabeledSelect
+          v-model="data.failureDomain"
+          label="Failure Domain"
+          :options="['host', 'osd']"
+          :disabled="isView"
+          required
+        />
+      </div>
+
+      <div
+        v-if="showName && type === REPLICATED"
         class="col span-6 mb-10"
       >
         <UnitInput
@@ -89,6 +121,20 @@ export default {
     </div>
 
     <div
+      v-if="!showName && type === REPLICATED"
+      class="row"
+    >
+      <div class="col span-6 mb-10">
+        <UnitInput
+          v-model="data.replicated.size"
+          :hide-unit="true"
+          label="Replicas Per Failure Domain"
+          required
+          :disabled="isView"
+        />
+      </div>
+    </div>
+    <div
       v-if="type === ERASURE_CODED"
       class="row"
     >
@@ -101,6 +147,7 @@ export default {
           required
         />
       </div>
+
       <div class="col span-6 mb-10">
         <UnitInput
           v-model="data.erasureCoded.codingChunks"
