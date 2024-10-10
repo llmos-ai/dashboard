@@ -1,31 +1,39 @@
 <script>
-import CruResource from '@shell/components/CruResource';
 import NameNsDescription from '@shell/components/form/NameNsDescription.vue';
 import Tab from '@shell/components/Tabbed/Tab.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
-import CreateEditView from '@shell/mixins/create-edit-view';
-import { _CREATE, _EDIT } from '@shell/config/query-params';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import YamlEditor from '@shell/components/YamlEditor.vue';
-import FormValidation from '@shell/mixins/form-validation';
 import { allHash } from '@shell/utils/promise';
 import { EVENT } from '@shell/config/types';
-import Loading from '@shell/components/Loading.vue';
+import Vue from 'vue';
 
 export default {
+  name:       'EditGenericAddon',
   components: {
-    Loading,
-    YamlEditor,
-    Checkbox,
     ResourceTabs,
     Tab,
     NameNsDescription,
-    CruResource,
+    YamlEditor,
+    Checkbox,
     LabeledInput,
   },
-  mixins: [CreateEditView, FormValidation],
+  props: {
+    value: {
+      type:     Object,
+      required: true,
+    },
 
+    mode: {
+      type:     String,
+      required: true
+    },
+    registerBeforeHook: {
+      type:     Function,
+      required: true,
+    },
+  },
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
@@ -35,6 +43,11 @@ export default {
   data() {
     const spec = this.value.spec;
     const metadata = this.value.metadata;
+    const enabled = this.$route.query.enabled;
+
+    if (enabled === 'true') {
+      Vue.set(spec, 'enabled', true);
+    }
 
     return { spec, metadata };
   },
@@ -62,17 +75,12 @@ export default {
         };
       });
     },
-
-    isCreate() {
-      return this.mode === _CREATE;
-    },
-    isEdit() {
-      return this.mode === _EDIT;
-    },
   },
 
   created() {
-    this.registerBeforeHook(this.willSave, 'willSave');
+    if (this.registerBeforeHook) {
+      this.registerBeforeHook(this.willSave);
+    }
   },
 
   methods: {
@@ -113,85 +121,73 @@ export default {
 </script>
 
 <template>
-  <Loading v-if="$fetchState.pending" />
-  <form
-    v-else
-    class="filled-height"
-  >
-    <CruResource
-      :done-route="doneRoute"
+  <div>
+    <NameNsDescription
+      :value="value"
+      :namespaced="true"
       :mode="mode"
-      :resource="value"
-      :validation-passed="fvFormIsValid"
-      :errors="fvUnreportedValidationErrors"
-      :apply-hooks="applyHooks"
-      @finish="save"
-    >
-      <NameNsDescription
-        :value="value"
-        :namespaced="true"
-        :mode="mode"
-      />
+    />
 
-      <ResourceTabs
-        v-model="value"
-        class="mt-15"
-        :need-conditions="false"
-        :need-related="false"
-        :side-tabs="true"
-        :eventOverride="eventOverride"
-        :useOverrideEvents="true"
-        :mode="mode"
+    <ResourceTabs
+      v-model="value"
+      class="mt-15"
+      :need-conditions="false"
+      :need-related="false"
+      :side-tabs="true"
+      :eventOverride="eventOverride"
+      :useOverrideEvents="true"
+      :mode="mode"
+    >
+      <Tab
+        name="basic"
+        :label="t('generic.tabs.basic')"
+        class="bordered-table"
       >
-        <Tab
-          name="basic"
-          :label="t('cluster.tabs.basic')"
-          class="bordered-table"
-        >
-          <h4>Enable Chart</h4>
-          <div class="row mb-20">
-            <Checkbox
-              v-model="spec.enabled"
-              label="Enabled"
+        <h4>Enable Chart</h4>
+        <div class="row mb-20">
+          <Checkbox
+            v-model="spec.enabled"
+            label="Enabled"
+            :mode="mode"
+            @input="update"
+          />
+        </div>
+
+        <div class="row mb-20">
+          <div class="col span-6">
+            <labeledInput
+              v-model="spec.repo"
+              label="Chart Repo"
+              required
               :mode="mode"
               @input="update"
             />
           </div>
 
-          <div class="row mb-20">
-            <div class="col span-6">
-              <labeledInput
-                v-model="spec.repo"
-                label="Chart Repo"
-                required
-                :mode="mode"
-                @input="update"
-              />
-            </div>
-
-            <div class="col span-6">
-              <LabeledInput
-                v-model="spec.chart"
-                label="Chart Name"
-                required
-                :mode="mode"
-                @input="update"
-              />
-            </div>
+          <div class="col span-6">
+            <LabeledInput
+              v-model="spec.chart"
+              label="Chart Name"
+              required
+              :mode="mode"
+              @input="update"
+            />
           </div>
+        </div>
 
-          <div class="row mb-20">
-            <div class="col span-6">
-              <labeledInput
-                v-model="spec.version"
-                label="Version"
-                required
-                :mode="mode"
-                @input="update"
-              />
-            </div>
+        <div class="row mb-20">
+          <div class="col span-6">
+            <labeledInput
+              v-model="spec.version"
+              label="Version"
+              required
+              :mode="mode"
+              @input="update"
+            />
           </div>
+        </div>
 
+        <div>
           <h4>Values</h4>
           <div class="row mb-20">
             <div class="col span-12">
@@ -204,8 +200,8 @@ export default {
               />
             </div>
           </div>
-        </Tab>
-      </ResourceTabs>
-    </CruResource>
-  </form>
+        </div>
+      </Tab>
+    </ResourceTabs>
+  </div>
 </template>

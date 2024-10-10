@@ -53,4 +53,8 @@ export default class CephFileSystem extends SteveModel {
     // not include llmos-ceph-cluster
     return !this.isLLMOSRelease && super.canDelete;
   }
+
+  get canUpdate() {
+    return !this.isLLMOSRelease && super.canUpdate;
+  }
 }

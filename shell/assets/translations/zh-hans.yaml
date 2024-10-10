@@ -117,6 +117,10 @@ generic:
     volume: 卷
     addVolume: 添加卷
     storageClass: 存储类
+  tabs:
+    basic: 基本信息
+    advanced: 高级选项
+    addons: 附加配置
 
 locale:
   en-us: English
@@ -3266,7 +3270,7 @@ prefs:
     allNamespaces: 显示由 LLMOS 管理的 system 命名空间（不要编辑或删除）
     themeShortcut: 使用快捷键（shift+T）来切换深色/浅色主题
     pluginDeveloper: 启用扩展开发者功能
-    viewContainerDashboard: 启用容器管理页面
+    viewContainerDashboard: 启用容器管理页面 (仅用于开发者模式)
   hideDesc:
     label: 隐藏所有类型描述
   helm:
@@ -4320,7 +4324,7 @@ storageClass:
   local-path-provisioner:
     title: Local Path 驱动 (CSI)
   ceph-cephfs-provisioner:
-    title: CephFS 驱动 (CSI)
+    title: Ceph Filesystem 驱动 (CSI)
   ceph-rbd-provisioner:
     title: Ceph RBD 驱动 (CSI)
 
@@ -5824,6 +5828,7 @@ action:
   addSidecar: 添加 Sidecar
   rollback: 回滚
   openShell: 执行命令行
+  openToolbox: 运行 Rook 工具箱
   runNow: 立即运行
   suspend: 暂停
   resume: 重新开始
@@ -6274,3 +6279,33 @@ scheduling:
 
 storage:
   addParameters: 添加参数
+
+ceph:
+  tabs:
+    log: 日志采集
+    cluster: Ceph 集群配置
+    blockPools: Block Pool
+    filesystem: Filesystem
+    resources: 资源配置
+  name:
+    mgr: Manager
+    mon: Monitor
+    osd: OSD
+    prepareosd: Prepare OSD
+    mgr-sidecar: Manager Sidecar
+    crashcollector: Crash Collector
+    logcollector: Log Collector
+    cleanup: Cleanup
+    exporter: Prometheus Exporter
+  labels:
+    multiMonPerNode: 允许单个节点运行多个 Mon 副本
+    multiMgrPerNode: 允许单个节点运行多个 Manager 副本
+    enableLogCollector: 启用日志采集
+  enableNotification: |-
+    系统存储 Ceph 未启用，点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">这里</a>立即启用。
+  progressingNotification: |-
+    系统存储 Ceph 未就绪, 点击 
+    <a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">这里</a>查看相关配置。
+  managedWarning: |-
+    此 {type} 由系统拓展组建管理。在此处所做的更改可能会在下次组件运行时被覆盖。<br>
+    欲修改，请编辑<a href="{url}">此处应用</a>。

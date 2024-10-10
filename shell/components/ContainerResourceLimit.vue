@@ -41,7 +41,7 @@ export default {
 
     handleGpuLimit: {
       type:    Boolean,
-      default: true
+      default: false
     },
 
     registerBeforeHook: {

@@ -5,14 +5,15 @@ import Tab from '@shell/components/Tabbed/Tab.vue';
 import CruResource from '@shell/components/CruResource.vue';
 import NameNsDescription from '@shell/components/form/NameNsDescription.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
-import { _CREATE, _EDIT, _VIEW } from '@shell/config/query-params';
 import UnitInput from '@shell/components/form/UnitInput.vue';
 import { cleanUp, set } from '@shell/utils/object';
 import { REPLICATED, ERASURE_CODED } from '@shell/edit/ceph.rook.io.cephblockpool.vue';
 import ArrayListGrouped from '@shell/components/form/ArrayListGrouped.vue';
 import DataPool from '@shell/components/DataPool.vue';
 import { Checkbox } from '@components/Form/Checkbox';
+import { Banner } from '@components/Banner';
 import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
+import CephConfig from '@shell/mixins/ceph-config';
 
 export const DEFAULT_DATA_POOL = {
   name:          '',
@@ -36,8 +37,9 @@ export default {
     Tab,
     CruResource,
     NameNsDescription,
+    Banner,
   },
-  mixins: [CreateEditView, FormValidation],
+  mixins: [CreateEditView, FormValidation, CephConfig],
   props:  {
     value: {
       type:     Object,
@@ -66,18 +68,6 @@ export default {
   },
 
   computed: {
-    isCreate() {
-      return this.mode === _CREATE;
-    },
-
-    isEdit() {
-      return this.mode === _EDIT;
-    },
-
-    isView() {
-      return this.mode === _VIEW;
-    },
-
     flatResources: {
       get() {
         const { limits = {}, requests = {} } = this.spec.metadataServer.resources || {};
@@ -149,117 +139,126 @@ export default {
 </script>
 
 <template>
-  <form class="filled-height">
-    <CruResource
-      :done-route="doneRoute"
-      :mode="mode"
-      :resource="value"
-      :validation-passed="fvFormIsValid"
-      :errors="fvUnreportedValidationErrors"
-      :apply-hooks="applyHooks"
-      @finish="save"
-    >
-      <NameNsDescription
-        :value="value"
-        :namespaced="true"
-        :mode="mode"
-      />
+  <div>
+    <Banner
+      v-if="isLLMOSRelease"
+      color="info"
+      class="mb-20"
+      :inner-html="managedWarning"
+    />
 
-      <ResourceTabs
-        v-model="value"
-        class="mt-15"
-        :need-conditions="false"
-        :need-related="false"
-        :side-tabs="true"
+    <form class="filled-height">
+      <CruResource
+        :done-route="doneRoute"
         :mode="mode"
+        :resource="value"
+        :validation-passed="fvFormIsValid"
+        :errors="fvUnreportedValidationErrors"
+        :apply-hooks="applyHooks"
+        @finish="save"
       >
-        <Tab
-          name="data-pools"
-          label="Data Pools"
-          class="bordered-table"
-        >
-          <div class="row">
-            <div class="col span-6 mb-10">
-              <Checkbox
-                v-model="spec.preserveFilesystemOnDelete"
-                label="Preserve Filesystem On Delete"
-                :mode="mode"
-                tooltip="Data will be deleted permanently if preserveFilesystemOnDelete is not enabled"
-                @input="update"
-              />
-            </div>
-          </div>
+        <NameNsDescription
+          :value="value"
+          :namespaced="true"
+          :mode="mode"
+        />
 
-          <ArrayListGrouped
-            v-model="spec.dataPools"
-            class="mb-20"
-            :mode="mode"
-            :default-add-value="{ ...defaultDataPool }"
-            add-label="Add Data Pool"
-            :can-add="true"
-            @remove="removeDataPool"
+        <ResourceTabs
+          v-model="value"
+          class="mt-15"
+          :need-conditions="false"
+          :need-related="false"
+          :side-tabs="true"
+          :mode="mode"
+        >
+          <Tab
+            name="data-pools"
+            label="Data Pools"
+            class="bordered-table"
           >
-            <template #default="props">
-              <DataPool
-                :data="props.row.value"
-                :isView="isView"
-              />
-            </template>
-          </ArrayListGrouped>
-        </Tab>
-
-        <Tab
-          name="metadata-settings"
-          label="Metadata Pool"
-          class="bordered-table"
-        >
-          <div class="row">
-            <div class="col span-6 mb-10">
-              <UnitInput
-                v-model="spec.metadataPool.replicated.size"
-                :hide-unit="true"
-                label="Replicas Per Failure Domain"
-                required
-                :mode="mode"
-                @input="update"
-              />
+            <div class="row">
+              <div class="col span-6 mb-10">
+                <Checkbox
+                  v-model="spec.preserveFilesystemOnDelete"
+                  label="Preserve Filesystem On Delete"
+                  :mode="mode"
+                  tooltip="Data will be deleted permanently if preserveFilesystemOnDelete is not enabled"
+                  @input="update"
+                />
+              </div>
             </div>
-          </div>
 
-          <br>
-          <h3>Metadata Server</h3>
-          <div class="row">
-            <div class="col span-6 mb-10">
-              <UnitInput
-                v-model="spec.metadataServer.activeCount"
-                :hide-unit="true"
-                label="Active Count"
-                required
-                :mode="mode"
-                @input="update"
-              />
-            </div>
-            <div class="col span-6 mb-10">
-              <Checkbox
-                v-model="spec.metadataServer.activeStandby"
-                label="Enable Active Standby"
-                :mode="mode"
-                @input="update"
-              />
-            </div>
-          </div>
-
-          <div class="mb-20">
-            <ContainerResourceLimit
-              v-model="flatResources"
+            <ArrayListGrouped
+              v-model="spec.dataPools"
+              class="mb-20"
               :mode="mode"
-              :show-tip="false"
-              :handle-gpu-limit="false"
-              @input="update"
-            />
-          </div>
-        </Tab>
-      </ResourceTabs>
-    </CruResource>
-  </form>
+              :default-add-value="{ ...defaultDataPool }"
+              add-label="Add Data Pool"
+              :can-add="true"
+              @remove="removeDataPool"
+            >
+              <template #default="props">
+                <DataPool
+                  :data="props.row.value"
+                  :isView="isView"
+                />
+              </template>
+            </ArrayListGrouped>
+          </Tab>
+
+          <Tab
+            name="metadata-settings"
+            label="Metadata Pool"
+            class="bordered-table"
+          >
+            <div class="row">
+              <div class="col span-6 mb-10">
+                <UnitInput
+                  v-model="spec.metadataPool.replicated.size"
+                  :hide-unit="true"
+                  label="Replicas Per Failure Domain"
+                  required
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
+            </div>
+
+            <br>
+            <h3>Metadata Server</h3>
+            <div class="row">
+              <div class="col span-6 mb-10">
+                <UnitInput
+                  v-model="spec.metadataServer.activeCount"
+                  :hide-unit="true"
+                  label="Active Count"
+                  required
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
+              <div class="col span-6 mb-10">
+                <Checkbox
+                  v-model="spec.metadataServer.activeStandby"
+                  label="Enable Active Standby"
+                  :mode="mode"
+                  @input="update"
+                />
+              </div>
+            </div>
+
+            <div class="mb-20">
+              <ContainerResourceLimit
+                v-model="flatResources"
+                :mode="mode"
+                :show-tip="false"
+                :handle-gpu-limit="false"
+                @input="update"
+              />
+            </div>
+          </Tab>
+        </ResourceTabs>
+      </CruResource>
+    </form>
+  </div>
 </template>

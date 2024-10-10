@@ -117,6 +117,11 @@ generic:
     volume: Volume
     addVolume: Add Volume
     storageClass: Storage Class
+  tabs:
+    basic: Basics
+    advanced: Advanced
+    addons: Add-On Config
+
 
 locale:
   en-us: English
@@ -3456,7 +3461,7 @@ prefs:
     allNamespaces: Show system Namespaces managed by LLMOS (not intended for editing or deletion)
     themeShortcut: Enable Dark/Light Theme keyboard shortcut toggle (shift+T)
     pluginDeveloper: Enable Extension developer features
-    viewContainerDashboard: Enable Container Dashboard View
+    viewContainerDashboard: Enable Container Dashboard View (Dev Only)
   hideDesc:
     label: Hide All Type Descriptions
   helm:
@@ -4512,7 +4517,7 @@ storageClass:
   local-path-provisioner:
     title: Local Path Provisioner (CSI)
   ceph-cephfs-provisioner:
-    title: CephFS Provisioner (CSI)
+    title: Ceph Filesystem Provisioner (CSI)
   ceph-rbd-provisioner:
     title: Ceph RBD Provisioner (CSI)
 
@@ -6030,6 +6035,7 @@ action:
   addSidecar: Add Sidecar
   rollback: Rollback
   openShell: Execute Shell
+  openToolbox: Execute Toolbox
   runNow: Run Now
   suspend: Suspend
   resume: Resume
@@ -6491,3 +6497,35 @@ managedAddon:
 
 storage:
   addParameters: Add Parameters
+
+
+ceph:
+  tabs:
+    log: Log Collector
+    cluster: Ceph Cluster Spec
+    blockPools: Block Pool
+    filesystem: Filesystem
+    resources: Resources
+  name:
+    mgr: Manager
+    mon: Monitor
+    osd: OSD
+    prepareosd: Prepare OSD
+    mgr-sidecar: Manager Sidecar
+    crashcollector: Crash Collector
+    logcollector: Log Collector
+    cleanup: Cleanup
+    exporter: Prometheus Exporter
+  labels:
+    multiMonPerNode: Allow Multiple Monitor Per Node
+    multiMgrPerNode: Allow Multiple Manager Per Node
+    enableLogCollector: Enable Log Collector
+  enableNotification: |-
+    System storage is not enabled, click 
+    <a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">here</a> to enable it now.
+  progressingNotification: |-
+    System storage is progressing, please wait, click 
+    <a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">here</a> to view the configs.
+  managedWarning: |-
+    This {type} is managed by a system addon; changes made here will likely be overwritten the next time addon runs. <br>
+      To make changes, edit the application <a href="{url}">here</a>.

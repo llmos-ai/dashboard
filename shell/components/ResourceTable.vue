@@ -8,6 +8,7 @@ import { NAMESPACE, AGE } from '@shell/config/table-headers';
 import { findBy } from '@shell/utils/array';
 import { ExtensionPoint, TableColumnLocation } from '@shell/core/types';
 import { getApplicableExtensionEnhancements } from '@shell/core/plugin-helpers';
+import { Banner } from '@components/Banner';
 
 // Default group-by in the case the group stored in the preference does not apply
 const DEFAULT_GROUP = 'namespace';
@@ -41,7 +42,9 @@ export default {
 
   name: 'ResourceTable',
 
-  components: { ButtonGroup, SortableTable },
+  components: {
+    ButtonGroup, SortableTable, Banner
+  },
 
   props: {
     schema: {
@@ -166,6 +169,12 @@ export default {
     forceUpdateLiveAndDelayed: {
       type:    Number,
       default: 0
+    },
+
+    notification: {
+      type:     Object,
+      default:  null,
+      required: false
     }
   },
 
@@ -483,94 +492,104 @@ export default {
 </script>
 
 <template>
-  <SortableTable
-    ref="table"
-    v-bind="$attrs"
-    :headers="_headers"
-    :rows="filteredRows"
-    :loading="loading"
-    :group-by="computedGroupBy"
-    :group="group"
-    :group-options="groupOptions"
-    :search="search"
-    :paging="true"
-    :paging-params="parsedPagingParams"
-    :paging-label="pagingLabel"
-    :row-actions="rowActions"
-    :table-actions="_showBulkActions"
-    :overflow-x="overflowX"
-    :overflow-y="overflowY"
-    :get-custom-detail-link="getCustomDetailLink"
-    :has-advanced-filtering="hasAdvancedFiltering"
-    :adv-filter-hide-labels-as-cols="advFilterHideLabelsAsCols"
-    :adv-filter-prevent-filtering-labels="advFilterPreventFilteringLabels"
-    :key-field="keyField"
-    :sort-generation-fn="safeSortGenerationFn"
-    :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
-    :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
-    @clickedActionButton="handleActionButtonClick"
-    @group-value-change="group = $event"
-    v-on="$listeners"
-  >
-    <template
-      v-if="showGrouping"
-      #header-middle
+  <div>
+    <Banner
+      v-if="notification"
+      :color="notification.type || 'info'"
+      class="mb-20"
+      :label="notification.message"
+      :inner-html="notification.html"
+    />
+
+    <SortableTable
+      ref="table"
+      v-bind="$attrs"
+      :headers="_headers"
+      :rows="filteredRows"
+      :loading="loading"
+      :group-by="computedGroupBy"
+      :group="group"
+      :group-options="groupOptions"
+      :search="search"
+      :paging="true"
+      :paging-params="parsedPagingParams"
+      :paging-label="pagingLabel"
+      :row-actions="rowActions"
+      :table-actions="_showBulkActions"
+      :overflow-x="overflowX"
+      :overflow-y="overflowY"
+      :get-custom-detail-link="getCustomDetailLink"
+      :has-advanced-filtering="hasAdvancedFiltering"
+      :adv-filter-hide-labels-as-cols="advFilterHideLabelsAsCols"
+      :adv-filter-prevent-filtering-labels="advFilterPreventFilteringLabels"
+      :key-field="keyField"
+      :sort-generation-fn="safeSortGenerationFn"
+      :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
+      :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
+      @clickedActionButton="handleActionButtonClick"
+      @group-value-change="group = $event"
+      v-on="$listeners"
     >
-      <slot name="more-header-middle" />
-      <ButtonGroup
-        v-model="group"
-        :options="groupOptions"
-      />
-    </template>
+      <template
+        v-if="showGrouping"
+        #header-middle
+      >
+        <slot name="more-header-middle" />
+        <ButtonGroup
+          v-model="group"
+          :options="groupOptions"
+        />
+      </template>
 
-    <template
-      v-if="showGrouping"
-      #header-right
-    >
-      <slot name="header-right" />
-    </template>
+      <template
+        v-if="showGrouping"
+        #header-right
+      >
+        <slot name="header-right" />
+      </template>
 
-    <template #group-by="{group: thisGroup}">
-      <div
-        v-clean-html="thisGroup.ref"
-        class="group-tab"
-      />
-    </template>
+      <template #group-by="{group: thisGroup}">
+        <div
+          v-clean-html="thisGroup.ref"
+          class="group-tab"
+        />
+      </template>
 
-    <!-- Pass down templates provided by the caller -->
-    <template
-      v-for="(_, slot) of $scopedSlots"
-      v-slot:[slot]="scope"
-    >
-      <slot
-        :name="slot"
-        v-bind="scope"
-      />
-    </template>
+      <!-- Pass down templates provided by the caller -->
+      <template
+        v-for="(_, slot) of $scopedSlots"
+        v-slot:[slot]="scope"
+      >
+        <slot
+          :name="slot"
+          v-bind="scope"
+        />
+      </template>
 
-    <template #shortkeys>
-      <button
-        v-shortkey.once="['e']"
-        class="hide"
-        @shortkey="keyAction('edit')"
-      />
-      <button
-        v-shortkey.once="['y']"
-        class="hide"
-        @shortkey="keyAction('yaml')"
-      />
-      <button
-        v-if="_showBulkActions"
-        v-shortkey.once="['del']"
-        class="hide"
-        @shortkey="keyAction('remove')"
-      />
-      <button
-        v-if="_showBulkActions"
-        v-shortkey.once="['backspace']"
-        class="hide"
-        @shortkey="keyAction('remove')"
-      />
-    </template>
-  </SortableTable>
+      <template #shortkeys>
+        <button
+          v-shortkey.once="['e']"
+          class="hide"
+          @shortkey="keyAction('edit')"
+        />
+        <button
+          v-shortkey.once="['y']"
+          class="hide"
+          @shortkey="keyAction('yaml')"
+        />
+        <button
+          v-if="_showBulkActions"
+          v-shortkey.once="['del']"
+          class="hide"
+          @shortkey="keyAction('remove')"
+        />
+        <button
+          v-if="_showBulkActions"
+          v-shortkey.once="['backspace']"
+          class="hide"
+          @shortkey="keyAction('remove')"
+        />
+      </template>
+    </SortableTable>
+  </div>
 </template>
