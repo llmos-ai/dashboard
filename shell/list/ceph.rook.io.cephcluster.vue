@@ -63,16 +63,7 @@ export default {
       return headers;
     },
 
-    hasCephClusters() {
-      const clusters = this.$store.getters['cluster/all'](LLMOS.CEPH_CLUSTER);
-
-      return clusters.length > 0;
-    },
-
     notification() {
-      // if (this.hasCephClusters) {
-      //   return null
-      // }
       const clusters = this.$store.getters['cluster/all'](LLMOS.CEPH_CLUSTER);
 
       if (clusters.length === 0) {
@@ -82,10 +73,19 @@ export default {
         };
       }
 
-      const isReady = clusters.every((c) => c.status?.phase === 'Ready');
+      const isReady = clusters.find((c) => {
+        if (c.metadata.name === 'llmos-ceph' && c.status?.phase === 'Ready') {
+          return true;
+        }
+
+        return false;
+      });
 
       if (isReady) {
-        return null;
+        return {
+          type: 'info',
+          html: this.t('ceph.notification', { status: this.value?.status?.phase }, 'html'),
+        };
       }
 
       return {

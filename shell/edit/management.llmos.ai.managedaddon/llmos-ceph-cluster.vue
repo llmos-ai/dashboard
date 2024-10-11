@@ -5,7 +5,7 @@ import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import { allHash } from '@shell/utils/promise';
-import { EVENT } from '@shell/config/types';
+import { EVENT, NODE } from '@shell/config/types';
 import Vue from 'vue';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import { ToggleSwitch } from '@components/Form/ToggleSwitch';
@@ -61,7 +61,10 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    await allHash({ events: this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }) });
+    await allHash({
+      events: this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }),
+      nodes:  this.$store.dispatch(`${ inStore }/findAll`, { type: NODE }),
+    });
   },
 
   data() {
@@ -73,10 +76,11 @@ export default {
       Vue.set(spec, 'enabled', true);
     }
 
-    let defaultValuesContentJson; let valuesContentJson; let copyValuesContentJson = {};
+    const defaultValuesContentJson = jsyaml.load(spec.defaultValuesContent);
+
+    let valuesContentJson; let copyValuesContentJson = {};
 
     try {
-      defaultValuesContentJson = jsyaml.load(spec.defaultValuesContent);
       if (spec.valuesContent && spec.valuesContent.length > 0) {
         valuesContentJson = jsyaml.load(spec.valuesContent);
       }
@@ -343,6 +347,7 @@ export default {
                 label="Manager Replicas"
                 :mode="mode"
                 :min="1"
+                :max="2"
                 :hide-unit="true"
                 required
               />
@@ -365,6 +370,7 @@ export default {
                 label="Mon Replicas"
                 :mode="mode"
                 :min="1"
+                :max="3"
                 :hide-unit="true"
                 required
               />

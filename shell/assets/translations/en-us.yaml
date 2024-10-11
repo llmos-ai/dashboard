@@ -6494,10 +6494,14 @@ scheduling:
 managedAddon:
   type: Managed Addon
   switchFailed: "{action} {name} failed."
+  disablePrompt:
+    llmos-ceph-cluster: |-
+      You are attempting to disable the {name}. This will remove the Ceph cluster and all data on it. Are you sure you want to continue?
+    generic: |-
+      Are you sure you want to disable {name}?
 
 storage:
   addParameters: Add Parameters
-
 
 ceph:
   tabs:
@@ -6525,7 +6529,10 @@ ceph:
     <a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">here</a> to enable it now.
   progressingNotification: |-
     System storage is progressing, please wait, click 
-    <a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">here</a> to view the configs.
+    <a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit">here</a> to view the configs.
+  notification: |-
+    System storage is ready, click 
+    <a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit">here</a> to manage the configs.
   managedWarning: |-
     This {type} is managed by a system addon; changes made here will likely be overwritten the next time addon runs. <br>
       To make changes, edit the application <a href="{url}">here</a>.

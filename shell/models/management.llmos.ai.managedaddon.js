@@ -4,6 +4,7 @@ import Vue from 'vue';
 import { set } from '@shell/utils/object';
 
 export const systemAddonLabel = 'llmos.ai/system-addon';
+export const addonAllowEditLabel = 'llmos.ai/system-addon-allow-edit';
 
 export default class ManagedAddon extends SteveModel {
   applyDefaults() {
@@ -100,10 +101,10 @@ export default class ManagedAddon extends SteveModel {
   }
 
   get canDelete() {
-    return this.metadata?.labels?.[systemAddonLabel] !== 'true';
+    return this.metadata?.labels?.[systemAddonLabel] !== 'true' && super.canDelete;
   }
 
   get allowDisable() {
-    return this.labels[systemAddonLabel] !== 'true';
+    return (this.labels[systemAddonLabel] !== 'true' || this.labels[addonAllowEditLabel] === 'true') && super.canUpdate;
   }
 }

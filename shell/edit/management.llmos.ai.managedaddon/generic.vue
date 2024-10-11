@@ -8,6 +8,8 @@ import YamlEditor from '@shell/components/YamlEditor.vue';
 import { allHash } from '@shell/utils/promise';
 import { EVENT } from '@shell/config/types';
 import Vue from 'vue';
+import { _EDIT } from '@shell/config/query-params';
+import { systemAddonLabel } from '@shell/models/management.llmos.ai.managedaddon';
 
 export default {
   name:       'EditGenericAddon',
@@ -40,10 +42,18 @@ export default {
     await allHash({ events: this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }) });
   },
 
+  beforeDestroy() {
+    this.$store.dispatch('cluster/forgetType', EVENT);
+  },
+
   data() {
     const spec = this.value.spec;
     const metadata = this.value.metadata;
     const enabled = this.$route.query.enabled;
+
+    if (!spec.valuesContent && spec.defaultValuesContent !== '') {
+      Vue.set(spec, 'valuesContent', spec.defaultValuesContent);
+    }
 
     if (enabled === 'true') {
       Vue.set(spec, 'enabled', true);
@@ -54,6 +64,10 @@ export default {
 
   computed: {
     eventOverride() {
+      if (this.isEdit) {
+        return;
+      }
+
       const events = this.$store.getters[`cluster/all`](EVENT);
 
       return events.filter((event) => {
@@ -75,18 +89,29 @@ export default {
         };
       });
     },
+
+    isEdit() {
+      return this.mode === _EDIT;
+    },
+
+    allowEdit() {
+      return this.isEdit && !this.isSystemAddon;
+    },
+
+    isSystemAddon() {
+      return this.value.metadata?.annotations?.[systemAddonLabel] === 'true';
+    }
   },
 
   created() {
     if (this.registerBeforeHook) {
-      this.registerBeforeHook(this.willSave);
+      this.registerBeforeHook(this.willSave, 'willSave');
     }
   },
 
   methods: {
     willSave() {
       this.errors = [];
-      this.update();
 
       if (this.spec.chart === '') {
         this.errors.push(this.t('validation.required', { key: 'Chart Name' }, true));
@@ -107,6 +132,10 @@ export default {
       if (this.errors.length > 0) {
         return Promise.reject(this.errors);
       }
+
+      if (this.spec.valuesContent === this.spec.defaultValuesContent) {
+        Vue.set(this.spec, 'valuesContent', '');
+      }
     },
 
     validChartRepo(url) {
@@ -114,8 +143,6 @@ export default {
 
       return pattern.test(url);
     },
-
-    update() {},
   }
 };
 </script>
@@ -126,6 +153,7 @@ export default {
       :value="value"
       :namespaced="true"
       :mode="mode"
+      description-disabled
     />
 
     <ResourceTabs
@@ -149,7 +177,6 @@ export default {
             v-model="spec.enabled"
             label="Enabled"
             :mode="mode"
-            @input="update"
           />
         </div>
 
@@ -159,8 +186,8 @@ export default {
               v-model="spec.repo"
               label="Chart Repo"
               required
+              :disabled="allowEdit"
               :mode="mode"
-              @input="update"
             />
           </div>
 
@@ -169,8 +196,8 @@ export default {
               v-model="spec.chart"
               label="Chart Name"
               required
+              :disabled="allowEdit"
               :mode="mode"
-              @input="update"
             />
           </div>
         </div>
@@ -181,8 +208,8 @@ export default {
               v-model="spec.version"
               label="Version"
               required
+              :disabled="allowEdit"
               :mode="mode"
-              @input="update"
             />
           </div>
         </div>
@@ -196,7 +223,6 @@ export default {
                 :value="spec.valuesContent"
                 :mode="mode"
                 class="yaml-editor"
-                @input="update"
               />
             </div>
           </div>
