@@ -58,6 +58,12 @@ export default {
     componentTestid: {
       type:    String,
       default: 'yaml-editor'
+    },
+
+    // Allow the editor to be disabled
+    disabled: {
+      type:    Boolean,
+      default: false
     }
   },
 
@@ -229,6 +235,7 @@ export default {
       :class="{fill: true, scrolling: scrolling}"
       :value="curValue"
       :options="codeMirrorOptions"
+      :disabled="disabled"
       :data-testid="componentTestid + '-code-mirror'"
       @onInput="onInput"
       @onReady="onReady"

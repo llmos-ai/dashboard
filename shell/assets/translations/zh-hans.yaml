@@ -5764,8 +5764,8 @@ typeLabel:
     }
   management.llmos.ai.managedaddon: |-
     {count, plural,
-      one { Addon 组件 }
-      other { Addon 组件 }
+      one { 管理组件 }
+      other { 管理组件 }
     }
   management.llmos.ai.user: |-
     {count, plural,
@@ -6277,6 +6277,15 @@ scheduling:
     schedulingRules: Run on node(s) matching scheduling rules
     specificNode: Run on specific node(s)
 
+managedAddon:
+  type: 管理组件
+  switchFailed: "{action} {name} 失败."
+  disablePrompt:
+    llmos-ceph-cluster: |-
+      禁用 {name} 组件将删除当前Ceph 集群所创建的所有信息和数据，删除的数据📊将不可恢复，是否继续禁用？
+    generic: |-
+      禁用 {name} 组件将会删除当前组件所包含的所有信息和数据，是否继续禁用？
+
 storage:
   addParameters: 添加参数
 
@@ -6304,8 +6313,9 @@ ceph:
   enableNotification: |-
     系统存储 Ceph 未启用，点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">这里</a>立即启用。
   progressingNotification: |-
-    系统存储 Ceph 未就绪, 点击 
-    <a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">这里</a>查看相关配置。
+    系统存储 Ceph 未就绪, 点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit">这里</a>查看相关配置。
+  notification: |-
+    系统存储 Ceph 已就绪, 点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit">这里</a>查看相关配置。
   managedWarning: |-
     此 {type} 由系统拓展组建管理。在此处所做的更改可能会在下次组件运行时被覆盖。<br>
     欲修改，请编辑<a href="{url}">此处应用</a>。

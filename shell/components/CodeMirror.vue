@@ -24,6 +24,10 @@ export default {
     asTextArea: {
       type:    Boolean,
       default: false
+    },
+    disabled: {
+      type:    Boolean,
+      default: false
     }
   },
 
@@ -37,6 +41,10 @@ export default {
   computed: {
 
     isDisabled() {
+      if (this.disabled) {
+        return true;
+      }
+
       return this.mode === _VIEW;
     },
 

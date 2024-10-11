@@ -100,4 +100,8 @@ export default class CephCluster extends SteveModel {
   get canUpdate() {
     return !this.isLLMOSRelease && super.canUpdate;
   }
+
+  get canClone() {
+    return !this.isLLMOSRelease && super.canClone;
+  }
 }

@@ -31,6 +31,7 @@ import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import Resource from '@shell/plugins/dashboard-store/resource-class';
+import { FlatResources } from '@shell/utils/container-resource';
 
 const TAB_WEIGHT_MAP = {
   general:        99,
@@ -181,45 +182,13 @@ export default {
 
     flatResources: {
       get() {
-        const { limits = {}, requests = {} } = this.container.resources || {};
-        const {
-          cpu: limitsCpu,
-          memory: limitsMemory,
-          [GPU_KEY]: limitsGpu,
-        } = limits;
-        const { cpu: requestsCpu, memory: requestsMemory } = requests;
-
-        return {
-          limitsCpu,
-          limitsMemory,
-          requestsCpu,
-          requestsMemory,
-          limitsGpu,
-        };
+        return FlatResources.get(this.container);
       },
       set(neu) {
-        const {
-          limitsCpu,
-          limitsMemory,
-          requestsCpu,
-          requestsMemory,
-          limitsGpu,
-        } = neu;
-
-        const out = {
-          requests: {
-            cpu:    requestsCpu,
-            memory: requestsMemory,
-          },
-          limits: {
-            cpu:       limitsCpu,
-            memory:    limitsMemory,
-            [GPU_KEY]: limitsGpu,
-          },
-        };
+        const out = FlatResources.set(neu);
 
         this.$set(this.container, 'resources', cleanUp(out));
-      },
+      }
     },
 
     healthCheck: {
