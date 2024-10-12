@@ -6323,11 +6323,11 @@ ceph:
     multiMgrPerNode: 允许单个节点运行多个 Manager 副本
     enableLogCollector: 启用日志采集
   enableNotification: |-
-    系统存储 Ceph 未启用，点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true">这里</a>立即启用。
+    系统存储 Ceph 未启用，点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true#cluster-spec">这里</a>立即启用。
   progressingNotification: |-
-    系统存储 Ceph 未就绪, 点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit">这里</a>查看相关配置。
+    系统存储 Ceph 未就绪, 点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit#cluster-spec">这里</a>查看相关配置。
   notification: |-
-    系统存储 Ceph 已就绪, 点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit">这里</a>查看相关配置。
+    系统存储 Ceph 已就绪, 点击<a href="/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit#cluster-spec">这里</a>查看相关配置。
   managedWarning: |-
     此 {type} 由系统拓展组建管理。在此处所做的更改可能会在下次组件运行时被覆盖。<br>
     欲修改，请编辑<a href="{url}">此处应用</a>。
