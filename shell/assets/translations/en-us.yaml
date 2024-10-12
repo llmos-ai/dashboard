@@ -824,12 +824,20 @@ cluster:
         label: Add Label
     registrationCommand:
       label: Registration Command
-      linuxDetail: Run this command on each of the existing Linux machines you want to register.
+      saveLLMOSConfig: "Step 1: Add LLMOS configuration file to each of the Linux machines you want to register."
+      linuxDetail: |-
+        {step, plural,
+          =0 { Run this command on each of the existing Linux machines you want to register. }
+          other { Step 2: Run this command on each of the existing Linux machines you want to register. }
+        }
       windowsDetail: Run this command in PowerShell on each of the existing Windows machines you want to register. Windows nodes can only be workers.
       windowsNotReady: The cluster must be up and running with Linux etcd, control plane, and worker nodes before the registration command for adding Windows workers will display.
       windowsWarning: Workload pods, including some deployed by Rancher charts, will be scheduled on both Linux and Windows nodes by default. Edit NodeSelector in the chart to direct them to be placed onto a compatible node.
       windowsDeprecatedForRKE1: Windows support is being deprecated for RKE1. We suggest migrating to RKE2.
       insecure: "Insecure: Select this to skip TLS verification if your server has a self-signed certificate."
+      skipDownloadBinary: "Skip Download Binary: select this if you already have the LLMOS binary installed in the `/usr/local/bin/llmos` path."
+      moreConfigs: |-
+        <b>Note</b>: You can refer to the <a href="https://llmos.1block.ai/docs/installation/" target="_blank">installation documentation</a> for more configuration options.
   credential:
     banner:
       createCredential: |-
@@ -3891,6 +3899,8 @@ resourceList:
     create: Create
     createFromYaml: Create from YAML
     createResource: "Create {resourceName}"
+    import: Import
+    register: Register
   nsFiltering: "Please select one or more namespaces or projects using the filter above."
   nsFilterToolTip: "Filtering is restricted to projects and namespaces"
 resourceLoadingIndicator:
@@ -5528,6 +5538,7 @@ model:
     displayKind: L7 Ingress
   machine:
     role:
+      server: Server
       controlPlane: Control Plane
       etcd: etcd
       worker: Worker

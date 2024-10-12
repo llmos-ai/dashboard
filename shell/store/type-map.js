@@ -461,6 +461,7 @@ export const getters = {
       depaginate:           false,
       customRoute:          undefined,
       resourceEditMasthead: true,
+      createButtonLabel:    '',
     };
 
     return (schemaOrType) => {

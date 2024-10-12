@@ -92,8 +92,7 @@ export default {
         type: 'warning',
         html: this.t('ceph.progressingNotification', null, 'html'),
       };
-    }
-
+    },
   },
 };
 </script>

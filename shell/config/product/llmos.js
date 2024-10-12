@@ -26,6 +26,9 @@ export function init(store) {
     category:            NAME,
   });
 
+  configureType(NODE, {
+    isCreatable: true, isEditable: true, createButtonLabel: 'import'
+  });
   virtualType({
     ifHaveType: NODE,
     labelKey:   'typeLabel."node"',
@@ -164,6 +167,7 @@ export function init(store) {
     weight: 320,
   });
 
+  configureType(LLMOS.CEPH_CLUSTER, { isCreatable: false });
   virtualType({
     ifHaveType: LLMOS.CEPH_CLUSTER,
     labelKey:   'typeLabel."ceph.rook.io.cephcluster"',
