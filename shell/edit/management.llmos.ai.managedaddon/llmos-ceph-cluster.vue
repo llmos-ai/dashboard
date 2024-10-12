@@ -292,6 +292,7 @@ export default {
               v-model="spec.repo"
               label="Chart Repo"
               required
+              disabled
               :mode="mode"
             />
           </div>
@@ -301,6 +302,7 @@ export default {
               v-model="spec.chart"
               label="Chart Name"
               required
+              disabled
               :mode="mode"
             />
           </div>
@@ -312,6 +314,7 @@ export default {
               v-model="spec.version"
               label="Version"
               required
+              disabled
               :mode="mode"
             />
           </div>
