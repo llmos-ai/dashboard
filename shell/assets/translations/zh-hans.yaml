@@ -598,12 +598,21 @@ cluster:
         label: 添加标签
     registrationCommand:
       label: 注册命令
-      linuxDetail: 在每台要注册的 Linux 主机上运行此命令。
+      saveLLMOSConfig: "步骤1：在每台要注册的 Linux 主机上创建 LLMOS 配置文件。"
+      linuxDetail: |-
+        {step, plural,
+          =0 { 在每台要注册的 Linux 主机上运行此命令。}
+          other { 步骤 2: 在每台要注册的 Linux 主机上运行此命令。}
+        }
       windowsDetail: 在每台要注册的 Windows 主机中的 PowerShell 上运行此命令。Windows 节点只能充当 worker。
       windowsNotReady: 在用于添加 Windows worker 的注册命令显示之前，集群必须已启动并运行 Linux ETCD，Control Plane，以及 worker 节点。
       windowsWarning: 工作负载 Pod（包括由 Rancher Chart 部署的 Pod）将默认调度到 Linux 和 Windows 节点上。编辑 Chart 中的 NodeSelector 以将它们放置到兼容的节点上。
       windowsDeprecatedForRKE1: RKE1 已弃用 Windows 支持。建议你迁移到 RKE2。
       insecure: "不安全：如果你的服务器具有自签名证书，选择此项以跳过 TLS 验证。"
+      skipDownloadBinary: 如果你已经在 `/usr/local/bin/llmos` 中安装了 LLMOS 二进制文件，并且想要跳过下载步骤
+#        You can refer to the installation <a href="https://llmos.1block.ai/docs/installation/" target="_blank">documentation</a> for more detailed configuration options.
+      moreConfigs: |-
+        <b>注意</b>: 你可以参考<a href="https://llmos.1block.ai/docs/installation/" target="_blank">安装文档</a>了解更多配置选项。
   credential:
     banner:
       createCredential: |-
@@ -3700,6 +3709,8 @@ resourceList:
     create: 创建
     createFromYaml: 使用 YAML 文件创建
     createResource: "创建 {resourceName}"
+    import: 导入
+    register: 注册
   nsFiltering: "请使用上面的过滤器选择一个或多个命名空间或项目。"
   nsFilterToolTip: "仅限于过滤项目和命名空间"
 resourceLoadingIndicator:
@@ -5328,6 +5339,7 @@ model:
     role:
       controlPlane: Control Plane
       etcd: ETCD
+      server: Server
       worker: Worker
   openldapconfig:
     domain:

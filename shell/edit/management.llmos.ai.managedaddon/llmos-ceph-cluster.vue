@@ -6,7 +6,6 @@ import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import { allHash } from '@shell/utils/promise';
 import { EVENT, NODE } from '@shell/config/types';
-import Vue from 'vue';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import { ToggleSwitch } from '@components/Form/ToggleSwitch';
 import jsyaml from 'js-yaml';
@@ -61,10 +60,18 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    await allHash({
+    const hash = await allHash({
       events: this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }),
       nodes:  this.$store.dispatch(`${ inStore }/findAll`, { type: NODE }),
     });
+
+    // Set default mon and mgr count by node count
+    if (this.spec.valuesContent === '') {
+      const nodes = hash.nodes.filter((node) => node.isKubeletOk);
+
+      this.valuesContentJson.cephClusterSpec.mon.count = Math.min(3, nodes.length);
+      this.valuesContentJson.cephClusterSpec.mgr.count = Math.min(2, nodes.length);
+    }
   },
 
   data() {
@@ -73,7 +80,7 @@ export default {
     const enabled = this.$route.query.enabled;
 
     if (enabled === 'true') {
-      Vue.set(spec, 'enabled', true);
+      this.spec.enabled = true;
     }
 
     const defaultValuesContentJson = jsyaml.load(spec.defaultValuesContent);

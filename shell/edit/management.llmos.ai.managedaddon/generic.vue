@@ -134,7 +134,7 @@ export default {
       }
 
       if (this.spec.valuesContent === this.spec.defaultValuesContent) {
-        Vue.set(this.spec, 'valuesContent', '');
+        this.spec.valuesContent = null;
       }
     },
 

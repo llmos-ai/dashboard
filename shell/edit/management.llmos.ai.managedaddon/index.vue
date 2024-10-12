@@ -32,7 +32,7 @@ export default {
         const shouldContinue = await this.showDisablePrompt();
 
         if (!shouldContinue) {
-          return done(true);
+          return done('cancelled');
         }
       }
       this.save(done);

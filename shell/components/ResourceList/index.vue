@@ -9,7 +9,6 @@ import { ResourceListComponentName } from './resource-list.config';
 import { PanelLocation, ExtensionPoint } from '@shell/core/types';
 import ExtensionPanel from '@shell/components/ExtensionPanel';
 import { sameContents } from '@shell/utils/array';
-import { LLMOS } from '@shell/config/types';
 
 export default {
   name: ResourceListComponentName,
@@ -135,16 +134,6 @@ export default {
     showIncrementalLoadingIndicator() {
       return this.perfConfig?.incrementalLoading?.enabled;
     },
-
-    isCreatable() {
-      // Note: disable create button for ceph cluster since it will be managed by the managedAddon
-      if (this.schema && this.schema.id === LLMOS.CEPH_CLUSTER) {
-        return false;
-      }
-
-      return true;
-    },
-
   },
 
   watch: {
@@ -203,7 +192,6 @@ export default {
       :show-incremental-loading-indicator="showIncrementalLoadingIndicator"
       :load-resources="loadResources"
       :load-indeterminate="loadIndeterminate"
-      :is-creatable="isCreatable"
     >
       <template slot="extraActions">
         <slot name="extraActions" />

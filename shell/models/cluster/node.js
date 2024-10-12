@@ -87,7 +87,7 @@ export default class ClusterNode extends SteveModel {
   }
 
   get name() {
-    return this.metadata.name;
+    return this.metadata?.name;
   }
 
   get addresses() {

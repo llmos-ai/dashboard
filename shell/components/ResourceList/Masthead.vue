@@ -155,6 +155,10 @@ export default {
     },
 
     _createButtonlabel() {
+      const buttonLabel = this.$store.getters['type-map/optionsFor'](this.resource).createButtonLabel;
+
+      if ( buttonLabel) return this.t(`resourceList.head.${ buttonLabel }`);
+
       return this.createButtonLabel || this.t('resourceList.head.create');
     }
 
