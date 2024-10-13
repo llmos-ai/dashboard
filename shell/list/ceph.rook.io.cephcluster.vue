@@ -3,7 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import Loading from '@shell/components/Loading.vue';
 import { AGE, NAME, PHASE, STATE } from '@shell/config/table-headers';
-import { getCephClusterAddonUrl } from '@shell/utils/url';
+import cephConfig from '@shell/mixins/ceph-config';
 
 export default {
   name:       'ListCephCluster',
@@ -11,7 +11,7 @@ export default {
     ResourceTable,
     Loading,
   },
-  mixins: [ResourceFetch],
+  mixins: [ResourceFetch, cephConfig],
   props:  {
     resource: {
       type:     String,
@@ -68,12 +68,10 @@ export default {
     },
 
     notification() {
-      const isDev = !!process.env.dev;
-
       if (this.clusters.length === 0) {
         return {
           type: 'warning',
-          html: this.t('ceph.enableNotification', { url: getCephClusterAddonUrl(isDev) }, 'html'),
+          html: this.t('ceph.enableNotification', { url: this.cephAddonUrl }, 'html'),
         };
       }
 
@@ -82,7 +80,7 @@ export default {
 
       return {
         type,
-        html: this.t('ceph.notification', { status: this.clusters[0]?.status?.phase, url: getCephClusterAddonUrl(isDev) }, 'html'),
+        html: this.t('ceph.notification', { status: this.clusters[0]?.status?.phase, url: this.cephAddonUrl }, 'html'),
       };
     },
   },
