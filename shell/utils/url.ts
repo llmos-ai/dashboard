@@ -169,3 +169,13 @@ export function stringify(uri: ParsedUri): string {
 
   return out;
 }
+
+export function getCephClusterAddonUrl(isDev: boolean): string {
+  const baseUrl = '/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true';
+
+  if (isDev) {
+    return baseUrl;
+  }
+
+  return `/dashboard${ baseUrl }`;
+}

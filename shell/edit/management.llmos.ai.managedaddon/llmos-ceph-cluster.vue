@@ -66,11 +66,11 @@ export default {
     });
 
     // Set default mon and mgr count by node count
-    if (this.spec.valuesContent === '') {
+    if (!this.spec.valuesContent || this.spec.valuesContent === '') {
       const nodes = hash.nodes.filter((node) => node.isKubeletOk);
 
       this.valuesContentJson.cephClusterSpec.mon.count = Math.min(3, nodes.length);
-      this.valuesContentJson.cephClusterSpec.mgr.count = Math.min(2, nodes.length);
+      this.valuesContentJson.cephClusterSpec.mgr.count = 1;
     }
   },
 
@@ -80,7 +80,7 @@ export default {
     const enabled = this.$route.query.enabled;
 
     if (enabled === 'true') {
-      this.spec.enabled = true;
+      spec.enabled = true;
     }
 
     const defaultValuesContentJson = jsyaml.load(spec.defaultValuesContent);
@@ -238,16 +238,6 @@ export default {
       });
 
       return out;
-    },
-  },
-
-  watch: {
-    valuesContentJson: {
-      handler(neu) {
-        this.$set(this.value.spec, 'valuesContent', jsyaml.dump(neu));
-      },
-      deep:      true,
-      immediate: true
     },
   },
 };
