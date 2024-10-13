@@ -3,7 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import Loading from '@shell/components/Loading.vue';
 import { AGE, NAME, PHASE, STATE } from '@shell/config/table-headers';
-import { LLMOS } from '@shell/config/types';
+import { getCephClusterAddonUrl } from '@shell/utils/url';
 
 export default {
   name:       'ListCephCluster',
@@ -28,7 +28,11 @@ export default {
   },
 
   async fetch() {
-    await this.$fetchType(this.resource);
+    this.clusters = await this.$fetchType(this.resource);
+  },
+
+  data() {
+    return { clusters: [] };
   },
 
   computed: {
@@ -64,33 +68,21 @@ export default {
     },
 
     notification() {
-      const clusters = this.$store.getters['cluster/all'](LLMOS.CEPH_CLUSTER);
+      const isDev = !!process.env.dev;
 
-      if (clusters.length === 0) {
+      if (this.clusters.length === 0) {
         return {
           type: 'warning',
-          html: this.t('ceph.enableNotification', null, 'html'),
+          html: this.t('ceph.enableNotification', { url: getCephClusterAddonUrl(isDev) }, 'html'),
         };
       }
 
-      const isReady = clusters.find((c) => {
-        if (c.metadata.name === 'llmos-ceph' && c.status?.phase === 'Ready') {
-          return true;
-        }
-
-        return false;
-      });
-
-      if (isReady) {
-        return {
-          type: 'info',
-          html: this.t('ceph.notification', { status: this.value?.status?.phase }, 'html'),
-        };
-      }
+      const isReady = this.clusters.find((c) => c.metadata.name === 'llmos-ceph' && c.status?.phase === 'Ready');
+      const type = isReady ? 'info' : 'warning';
 
       return {
-        type: 'warning',
-        html: this.t('ceph.progressingNotification', null, 'html'),
+        type,
+        html: this.t('ceph.notification', { status: this.clusters[0]?.status?.phase, url: getCephClusterAddonUrl(isDev) }, 'html'),
       };
     },
   },

@@ -7,6 +7,7 @@ import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
 import { mapGetters } from 'vuex';
 import { allHash } from '@shell/utils/promise';
 import { Banner } from '@components/Banner';
+import { getCephClusterAddonUrl } from '@shell/utils/url';
 
 export default {
   components: {
@@ -25,6 +26,7 @@ export default {
 
     this.clusters = hash.clusters;
     this.settings = hash.settings;
+    this.cephClusters = hash.cephClusters;
     this.managedAddons = hash.managedAddons;
     this.viewContainerDashboard = hash.viewContainer;
   },
@@ -49,20 +51,6 @@ export default {
       return MANAGEMENT;
     },
     ...mapGetters(['currentCluster']),
-
-    cephClusterEnabled() {
-      if (this.cephClusters.length > 0 ) {
-        return true;
-      }
-
-      const cephCluster = this.managedAddons.find((m) => m.metadata.name === 'llmos-ceph-cluster');
-
-      if (cephCluster.spec.enabled) {
-        return true;
-      }
-
-      return false;
-    },
 
     canAccessNodes() {
       return !!this.clusterCounts?.[0]?.counts?.[NODE];
@@ -101,13 +89,13 @@ export default {
     },
 
     getServerVersion() {
-      if ( this.settings === [] ) {
+      if (this.settings === []) {
         return 'unknown';
       }
 
       // loop setting and find the server-version
-      for ( let i = 0; i < this.settings.length; i++ ) {
-        if ( this.settings[i].id === 'server-version' ) {
+      for (let i = 0; i < this.settings.length; i++) {
+        if (this.settings[i].id === 'server-version') {
           return this.settings[i].value || this.settings[i].default;
         }
       }
@@ -116,16 +104,42 @@ export default {
     },
 
     getServerCreatedTime() {
-      if ( this.settings === [] ) {
+      if (this.settings === []) {
         return 'unknown';
       }
       const serverVersion = this.settings.find((s) => s.id === 'server-version');
 
-      if ( serverVersion ) {
+      if (serverVersion) {
         return serverVersion.metadata?.creationTimestamp;
       }
 
       return 'unknown';
+    },
+
+    cephStorageReady() {
+      return this.cephClusters.find((c) => c.metadata.name === 'llmos-ceph' && c.status?.phase === 'Ready');
+    },
+
+    storageNotification() {
+      const isDev = !!process.env.dev;
+      const cephCluster = this.managedAddons.find((m) => m.metadata.name === 'llmos-ceph-cluster');
+
+      if (!cephCluster || !cephCluster.spec?.enabled) {
+        return {
+          type: 'warning',
+          msg:  this.t('ceph.enableNotification', { url: getCephClusterAddonUrl(isDev) }, 'html'),
+        };
+      }
+
+      const type = this.cephStorageReady ? 'info' : 'warning';
+
+      return {
+        type,
+        msg: this.t('ceph.notification', {
+          status: this.cephClusters[0].status?.phase,
+          url:    getCephClusterAddonUrl(isDev)
+        }, 'html'),
+      };
     },
   },
 
@@ -136,29 +150,6 @@ export default {
       this.clusterCounts = this.$store.getters[`cluster/all`](COUNT);
     }
   },
-
-  methods: {
-    isComponentStatusHealthy(field) {
-      if (field === 'storage') {
-        return this.cephCluster?.status?.phase === 'Ready';
-      }
-
-      const matching = (this.currentCluster?.status?.componentStatuses || []).filter((s) => s.name.startsWith(field));
-
-      // If there's no matching component status, it's "healthy"
-      if ( !matching.length ) {
-        return true;
-      }
-
-      const count = matching.reduce((acc, status) => {
-        const conditions = status.conditions.find((c) => c.status !== 'True');
-
-        return !conditions ? acc : acc + 1;
-      }, 0);
-
-      return count === 0;
-    },
-  }
 };
 </script>
 
@@ -179,10 +170,10 @@ export default {
     </header>
 
     <Banner
-      v-if="!cephClusterEnabled"
-      color="warning"
+      v-if="!cephStorageReady"
+      :color="storageNotification.type"
       class="mb-20"
-      :inner-html="t('ceph.enableNotification', null, 'html')"
+      :inner-html="storageNotification.msg"
     />
 
     <div class="home-overview-glance">
