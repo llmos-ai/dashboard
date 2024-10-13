@@ -170,7 +170,8 @@ export function stringify(uri: ParsedUri): string {
   return out;
 }
 
-export function getCephClusterAddonUrl(isDev: boolean): string {
+export function getCephClusterAddonUrl(): string {
+  const isDev = !!process.env.dev;
   const baseUrl = '/c/local/llmos/management.llmos.ai.managedaddon/storage-system/llmos-ceph-cluster?mode=edit&enabled=true';
 
   if (isDev) {

@@ -8,6 +8,7 @@ import { mapGetters } from 'vuex';
 import { allHash } from '@shell/utils/promise';
 import { Banner } from '@components/Banner';
 import { getCephClusterAddonUrl } from '@shell/utils/url';
+import { isAdminUser } from '@shell/store/type-map';
 
 export default {
   components: {
@@ -16,17 +17,19 @@ export default {
   },
 
   async fetch() {
+    if (this.isAdmin) {
+      this.cephClusters = await this.$store.dispatch('management/findAll', { type: LLMOS.CEPH_CLUSTER });
+    }
+
     const hash = await allHash({
       clusters:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER }),
       settings:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.SETTING }),
       managedAddons: this.$store.dispatch('management/findAll', { type: MANAGEMENT.MANAGED_ADDON }),
-      cephClusters:  this.$store.dispatch('management/findAll', { type: LLMOS.CEPH_CLUSTER }),
       viewContainer: this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD),
     });
 
     this.clusters = hash.clusters;
     this.settings = hash.settings;
-    this.cephClusters = hash.cephClusters;
     this.managedAddons = hash.managedAddons;
     this.viewContainerDashboard = hash.viewContainer;
   },
@@ -76,8 +79,8 @@ export default {
       return !!this.clusterCounts?.[0]?.counts?.[LLMOS.NOTEBOOK];
     },
 
-    canAccessAddons() {
-      return !!this.clusterCounts?.[0]?.counts?.[MANAGEMENT.MANAGED_ADDON];
+    isAdmin() {
+      return isAdminUser(this.$store.getters);
     },
 
     hasDescription() {
@@ -121,13 +124,12 @@ export default {
     },
 
     storageNotification() {
-      const isDev = !!process.env.dev;
-      const cephCluster = this.managedAddons.find((m) => m.metadata.name === 'llmos-ceph-cluster');
+      const cephClusterAddon = this.managedAddons.find((m) => m.metadata.name === 'llmos-ceph-cluster');
 
-      if (!cephCluster || !cephCluster.spec?.enabled) {
+      if (!cephClusterAddon || !cephClusterAddon.spec?.enabled) {
         return {
           type: 'warning',
-          msg:  this.t('ceph.enableNotification', { url: getCephClusterAddonUrl(isDev) }, 'html'),
+          msg:  this.t('ceph.enableNotification', { url: getCephClusterAddonUrl() }, 'html'),
         };
       }
 
@@ -136,8 +138,8 @@ export default {
       return {
         type,
         msg: this.t('ceph.notification', {
-          status: this.cephClusters[0].status?.phase,
-          url:    getCephClusterAddonUrl(isDev)
+          status: this.cephClusters[0]?.status?.phase,
+          url:    getCephClusterAddonUrl()
         }, 'html'),
       };
     },
@@ -170,7 +172,7 @@ export default {
     </header>
 
     <Banner
-      v-if="!cephStorageReady"
+      v-if="!cephStorageReady && isAdmin"
       :color="storageNotification.type"
       class="mb-20"
       :inner-html="storageNotification.msg"
