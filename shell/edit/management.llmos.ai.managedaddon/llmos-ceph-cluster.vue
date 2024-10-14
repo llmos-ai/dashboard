@@ -71,6 +71,10 @@ export default {
 
       this.valuesContentJson.cephClusterSpec.mon.count = Math.min(3, nodes.length);
       this.valuesContentJson.cephClusterSpec.mgr.count = 1;
+
+      const maxFsCount = Math.min(3, nodes.length+1) // default FS replicated size to 2 when only has 1 node
+      this.valuesContentJson.cephFileSystems[0].spec.metadataPool.replicated.size = maxFsCount;
+      this.valuesContentJson.cephFileSystems[0].spec.dataPools[0].replicated.size = maxFsCount;
     }
   },
 
@@ -249,6 +253,7 @@ export default {
       :value="value"
       :namespaced="true"
       :mode="mode"
+      description-disabled
     />
 
     <ResourceTabs
