@@ -182,3 +182,17 @@ export default {
   formatSi,
   parseSi,
 };
+
+export function roundToDecimal(num, decimalPlaces) {
+  if (typeof num !== 'number' || typeof decimalPlaces !== 'number') {
+    throw new TypeError('input is not a valid number', num);
+  }
+
+  if (num % 1 !== 0) {
+    const factor = Math.pow(10, decimalPlaces);
+
+    return Math.round(num * factor) / factor;
+  }
+
+  return num;
+}

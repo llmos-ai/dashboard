@@ -1,5 +1,5 @@
 <script>
-import { NAME as EXPLORER } from '@shell/config/product/explorer';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 import { canViewResource } from '@shell/utils/auth';
 
 export default {
@@ -26,7 +26,7 @@ export default {
 
     product: {
       type:    String,
-      default: EXPLORER,
+      default: LLMOS,
     }
   },
 
@@ -38,7 +38,7 @@ export default {
         resource:  this.type,
         namespace: this.namespace,
         id:        this.objectId ? this.objectId : this.value,
-        product:   this.product || EXPLORER,
+        product:   this.product || LLMOS,
       };
 
       return { name, params };

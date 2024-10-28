@@ -3005,8 +3005,10 @@ node:
       consumptionGauge:
         used: Used
         amount: "{used} of {total} {unit}"
+        uAmount: "{used}/{total} {unit}"
         cpu: CPU
         memory: MEMORY
+        vram: VRAM
         pods: PODS
       diskPressure: Disk Pressure
       kubelet: kubelet
@@ -4674,6 +4676,8 @@ tableHeaders:
   queues: Queues
   queueLengthLimit: Queue Length Limit
   ram: RAM
+  vram: VRAM Utilization
+  vramUsage: VRAM (Request/Total)
   rbac:
     create: Create
     delete: Delete
@@ -6004,6 +6008,11 @@ typeLabel:
     {count, plural,
       one { Model Service }
       other { Model Services }
+    }
+  ml.llmos.ai.gpudevice: |-
+    {count, plural,
+      one { GPU Device }
+      other { GPU Devices }
     }
   # Ceph Types
   ceph.rook.io.cephcluster: |-

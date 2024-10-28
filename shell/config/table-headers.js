@@ -212,6 +212,16 @@ export const RAM = {
   width:     120,
 };
 
+export const VRAM = {
+  name:      'vram',
+  labelKey:  'tableHeaders.vram',
+  sort:      'vramUsage',
+  search:    false,
+  value:     'vramUsagePercentage',
+  formatter: 'PercentageBar',
+  width:     140,
+};
+
 export const PRINCIPAL = {
   name:      'principal',
   labelKey:  'tableHeaders.name',
