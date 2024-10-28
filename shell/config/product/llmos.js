@@ -121,10 +121,29 @@ export function init(store) {
     weight: 200,
   });
 
+  configureType(LLMOS.GPUDEVICE, { isCreatable: false, isEditable: true });
+  virtualType({
+    ifHaveType: LLMOS.GPUDEVICE,
+    labelKey:   'typeLabel."ml.llmos.ai.gpudevice"',
+    group:      'GPU Management',
+    name:       LLMOS.GPUDEVICE,
+    namespaced: false,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: {
+        resource: LLMOS.GPUDEVICE,
+        product:  NAME
+      }
+    },
+    exact:  false,
+    weight: 201,
+  });
+
   // nvidia pages
   basicType(
     [
       LLMOS.CLUSTER_POLICY,
+      LLMOS.GPUDEVICE,
     ],
     'GPU Management'
   );

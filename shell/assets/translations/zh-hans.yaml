@@ -4482,6 +4482,8 @@ tableHeaders:
   queues: 队列
   queueLengthLimit: 队列长度限制
   ram: 内存（RAM）
+  vram: 显存（VRAM）
+  vramUsage: VRAM (已分配/总量)
   rbac:
     create: Create
     delete: Delete
@@ -5798,6 +5800,11 @@ typeLabel:
     {count, plural,
       one { 模型部署 }
       other { 模型部署 }
+    }
+  ml.llmos.ai.gpudevice: |-
+    {count, plural,
+      one { GPU 设备 }
+      other { GPU 设备 }
     }
   # Ceph Types
   ceph.rook.io.cephcluster: |-

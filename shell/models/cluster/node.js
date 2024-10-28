@@ -188,7 +188,7 @@ export default class ClusterNode extends SteveModel {
   }
 
   get cpuCapacity() {
-    return parseSi(this.status.allocatable.cpu);
+    return parseSi(this.status.allocatable?.cpu);
   }
 
   get cpuUsagePercentage() {

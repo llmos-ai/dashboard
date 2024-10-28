@@ -102,6 +102,7 @@ export const LLMOS = {
   RAY_CLUSTER:   'ray.io.raycluster',
   MODEL_SERVICE: 'ml.llmos.ai.modelservice',
   NOTEBOOK:      'ml.llmos.ai.notebook',
+  GPUDEVICE:     'ml.llmos.ai.gpudevice',
   VOLUME:        'llmos.ai.volume',
   CHAT:          'chat',
 
