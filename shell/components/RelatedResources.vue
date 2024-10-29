@@ -3,7 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import { colorForState, stateDisplay } from '@shell/plugins/dashboard-store/resource-class';
 import { NAME, NAMESPACE, STATE, TYPE } from '@shell/config/table-headers';
 import { sortableNumericSuffix } from '@shell/utils/sort';
-import { NAME as EXPLORER } from '@shell/config/product/explorer';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 import { BadgeState } from '@components/BadgeState';
 
 export default {
@@ -94,7 +94,7 @@ export default {
         const detailLocation = {
           name:   `c-cluster-product-resource${ namespace ? '-namespace' : '' }-id`,
           params: {
-            product:  EXPLORER,
+            product:  LLMOS,
             cluster:  inStore === 'management' ? 'local' : cluster,
             resource: type,
             namespace,

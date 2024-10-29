@@ -75,7 +75,13 @@ export default {
     },
 
     notebookImages() {
-      const imagesString = this.$store.getters['management/all'](MANAGEMENT.SETTING).find((setting) => setting.id === 'default-notebook-images').default;
+      const notebookImages = this.$store.getters['management/all'](MANAGEMENT.SETTING).find((setting) => setting.id === 'default-notebook-images');
+      let imagesString = notebookImages?.value;
+
+      if (!notebookImages.value) {
+        imagesString = notebookImages.default;
+      }
+
       let images = JSON.parse(imagesString);
 
       if (this.notebookType) {

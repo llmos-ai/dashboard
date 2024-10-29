@@ -175,6 +175,7 @@ nav:
     RBAC: RBAC
     Scheduling: 调度
     Storage: 存储
+    GPUManagement: GPU 管理
   ns:
     all: 所有命名空间
     clusterLevel: 集群资源
@@ -4482,8 +4483,10 @@ tableHeaders:
   queues: 队列
   queueLengthLimit: 队列长度限制
   ram: 内存（RAM）
-  vram: 显存（VRAM）
+  vram: 分配显存（VRAM）
   vramUsage: VRAM (已分配/总量)
+  vgpu: vGPU
+  cores: CUDA 算力
   rbac:
     create: Create
     delete: Delete
@@ -5801,7 +5804,7 @@ typeLabel:
       one { 模型部署 }
       other { 模型部署 }
     }
-  ml.llmos.ai.gpudevice: |-
+  gpustack.llmos.ai.gpudevice: |-
     {count, plural,
       one { GPU 设备 }
       other { GPU 设备 }
@@ -6336,3 +6339,23 @@ ceph:
   managedWarning: |-
     此 {type} 由系统组件管理。在此处所做的更改可能会在下次组件运行时被覆盖。<br>
     欲修改，请编辑<a href="{url}">此处应用</a>。
+
+gpuDevice:
+  detail:
+    info:
+      label: 设备信息
+      key:
+        status: 显卡状态
+        uuid: 显卡 ID
+        vendor: 品牌
+        devName: 显卡名称
+        vRAM: 显存
+        vGPU: vGPU
+        nodeName: 所属节点
+    health: 健康
+    tab:
+      pods: GPU 任务
+    consumptionGauge:
+      vram: 显存
+      amount: "已使用 {total} {unit} 中的 {used}"
+      uAmount: "{used}/{total} {unit}"

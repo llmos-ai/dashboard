@@ -213,13 +213,27 @@ export const RAM = {
 };
 
 export const VRAM = {
-  name:      'vram',
-  labelKey:  'tableHeaders.vram',
-  sort:      'vramUsage',
-  search:    false,
-  value:     'vramUsagePercentage',
-  formatter: 'PercentageBar',
-  width:     140,
+  name:     'vram',
+  labelKey: 'tableHeaders.vram',
+  sort:     'vram',
+  search:   false,
+  value:    'vram',
+};
+
+export const VGPU = {
+  name:     'vgpu',
+  labelKey: 'tableHeaders.vgpu',
+  sort:     'vgpu',
+  search:   false,
+  value:    'vgpu',
+};
+
+export const CORES = {
+  name:     'cores',
+  labelKey: 'tableHeaders.cores',
+  sort:     'cores',
+  search:   false,
+  value:    'cores',
 };
 
 export const PRINCIPAL = {

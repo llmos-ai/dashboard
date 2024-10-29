@@ -141,7 +141,7 @@ import {
   importList, importDetail, importEdit, listProducts, loadProduct, importCustomPromptRemove, resolveList, resolveEdit, resolveWindowComponent, importWindowComponent, importLogin, resolveDetail, importDialog,
 } from '@shell/utils/dynamic-importer';
 
-import { NAME as EXPLORER } from '@shell/config/product/explorer';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 import isObject from 'lodash/isObject';
 import { normalizeType } from '@shell/plugins/dashboard-store/normalize';
 import { sortBy } from '@shell/utils/sort';
@@ -1416,7 +1416,7 @@ export const mutations = {
 
   basicType(state, { product, group, types }) {
     if ( !product ) {
-      product = EXPLORER;
+      product = LLMOS;
     }
 
     if ( !group ) {

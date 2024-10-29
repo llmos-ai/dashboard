@@ -2,10 +2,9 @@
 import ResourceTable from '@shell/components/ResourceTable';
 import Loading from '@shell/components/Loading';
 import { allHash } from '@shell/utils/promise';
-import { STATE, AGE, VRAM } from '@shell/config/table-headers';
-import { LLMOS, NODE as NODE_TYPE } from '@shell/config/types';
+import { STATE, AGE } from '@shell/config/table-headers';
+import { LLMOS, NODE as NODE_TYPE, POD } from '@shell/config/types';
 import CopyToClipboard from '@shell/components/CopyToClipboard.vue';
-import { COLUMN_BREAKPOINTS } from '@shell/components/SortableTable/index.vue';
 
 export default {
   name:       'GPUDeviceList',
@@ -17,23 +16,30 @@ export default {
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
-    const hash = { gpuDevices: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.GPUDEVICE }) };
+    const hash = {
+      gpuDevices: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.GPUDEVICE }),
+      pods:       this.$store.dispatch(`${ inStore }/findAll`, { type: POD })
+    };
 
     const res = await allHash(hash);
 
     this.rows = res.gpuDevices;
+    this.pods = res.pods;
   },
 
   data() {
-    return { rows: [] };
+    return {
+      rows: [],
+      pods: [],
+    };
   },
 
   computed: {
     headers() {
       const ID = {
-        name:  'id',
+        name:  'uuid',
         label: 'Device ID',
-        value: 'status.id',
+        value: 'status.uuid',
       };
       const VENDOR = {
         name:  'vendor',
@@ -44,7 +50,7 @@ export default {
       const DEVICE_NAME = {
         name:  'device_name',
         label: 'Device Name',
-        value: 'status.deviceName',
+        value: 'status.devName',
       };
 
       const VGPU = {
@@ -82,11 +88,6 @@ export default {
         DEVICE_NAME,
         VGPU,
         VRAM_USAGE,
-        {
-          ...VRAM,
-          breakpoint: COLUMN_BREAKPOINTS.LAPTOP,
-          getValue:   (row) => row.vRAMUsagePercentage
-        },
         STATUS,
         AGE
       ];
@@ -94,7 +95,6 @@ export default {
       return headers;
     },
   },
-  methods: {}
 };
 
 </script>
@@ -109,14 +109,14 @@ export default {
     key-field="_key"
     v-on="$listeners"
   >
-    <template #col:id="{row}">
+    <template #col:uuid="{row}">
       <td>
         <n-link :to="row.detailLocation">
-          {{ row.status?.id }}
+          {{ row.status?.uuid }}
         </n-link>
         <CopyToClipboard
           label-as="tooltip"
-          :text="row.status?.id"
+          :text="row.status?.uuid"
           class="icon-btn"
           action-color="bg-transparent"
         />
