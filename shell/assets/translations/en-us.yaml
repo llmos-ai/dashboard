@@ -178,6 +178,7 @@ nav:
     RBAC: RBAC
     Scheduling: Scheduling
     Storage: Storage
+    GPUManagement: GPU Management
   ns:
     all: All Namespaces
     clusterLevel: Only Cluster Resources
@@ -4676,7 +4677,9 @@ tableHeaders:
   queues: Queues
   queueLengthLimit: Queue Length Limit
   ram: RAM
-  vram: VRAM Utilization
+  vram: VRAM
+  vgpu: vGPU
+  cores: CUDA Cores
   vramUsage: VRAM (Request/Total)
   rbac:
     create: Create
@@ -6009,7 +6012,7 @@ typeLabel:
       one { Model Service }
       other { Model Services }
     }
-  ml.llmos.ai.gpudevice: |-
+  gpustack.llmos.ai.gpudevice: |-
     {count, plural,
       one { GPU Device }
       other { GPU Devices }
@@ -6553,3 +6556,23 @@ ceph:
   managedWarning: |-
     This {type} is managed by a system addon; changes made here will likely be overwritten the next time addon runs. <br>
       To make changes, edit the addon <a href="{url}">here</a>.
+
+gpuDevice:
+  detail:
+    info:
+      label: Device Info
+      key:
+        status: Status
+        uuid: Device ID
+        vendor: Vendor
+        devName: Device Name
+        vRAM: VRAM
+        vGPU: vGPU
+        nodeName: Node Name
+    health: Health
+    tab:
+      pods: GPU Pods
+    consumptionGauge:
+      vram: VRAM
+      amount: "{used} of {total} {unit}"
+      uAmount: "{used}/{total} {unit}"

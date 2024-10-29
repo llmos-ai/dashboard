@@ -14,7 +14,7 @@ import { ucFirst } from '@shell/utils/string';
 import { SCHEMA, COUNT } from '@shell/config/types';
 import { LLMOS_NAME as HARVESTER } from '@shell/config/features';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
-import { NAME as LLM } from '@shell/config/product/llmos';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 import { BASIC, FAVORITE, USED } from '@shell/store/type-map';
 import { NAME as NAVLINKS } from '@shell/config/product/navlinks';
 import Group from '@shell/components/nav/Group';
@@ -228,7 +228,7 @@ export default {
 
       if ( this.isExplorer ) {
         for ( const product of this.activeProducts ) {
-          if ( product.inStore === 'cluster' && product.name !== LLM) {
+          if ( product.inStore === 'cluster' && product.name !== LLMOS) {
             addObject(loadProducts, product.name);
           }
         }

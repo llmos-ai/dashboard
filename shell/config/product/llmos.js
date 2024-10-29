@@ -110,7 +110,7 @@ export function init(store) {
   virtualType({
     ifHaveType: LLMOS.CLUSTER_POLICY,
     labelKey:   'typeLabel."nvidia.com.clusterpolicy"',
-    group:      'GPU Management',
+    group:      'GPUManagement',
     name:       LLMOS.CLUSTER_POLICY,
     namespaced: true,
     route:      {
@@ -124,8 +124,8 @@ export function init(store) {
   configureType(LLMOS.GPUDEVICE, { isCreatable: false, isEditable: true });
   virtualType({
     ifHaveType: LLMOS.GPUDEVICE,
-    labelKey:   'typeLabel."ml.llmos.ai.gpudevice"',
-    group:      'GPU Management',
+    labelKey:   'typeLabel."gpustack.llmos.ai.gpudevice"',
+    group:      'GPUManagement',
     name:       LLMOS.GPUDEVICE,
     namespaced: false,
     route:      {
@@ -145,7 +145,7 @@ export function init(store) {
       LLMOS.CLUSTER_POLICY,
       LLMOS.GPUDEVICE,
     ],
-    'GPU Management'
+    'GPUManagement'
   );
 
   // volume management tab
@@ -244,7 +244,7 @@ export function init(store) {
     ifHaveType: NAMESPACE,
     label:      'Namespaces',
     labelKey:   'namespace.label',
-    group:      'Advanced',
+    group:      'advanced',
     name:       NAMESPACE,
     namespaced: true,
     route:      {
@@ -258,7 +258,7 @@ export function init(store) {
   virtualType({
     ifHaveType: MANAGEMENT.MANAGED_ADDON,
     labelKey:   'typeLabel."management.llmos.ai.managedaddon"',
-    group:      'Advanced',
+    group:      'advanced',
     name:       MANAGEMENT.MANAGED_ADDON,
     namespaced: true,
     route:      {
@@ -279,7 +279,7 @@ export function init(store) {
     'advanced',
   );
 
-  weightGroup('storage', 100, true);
-  weightGroup('gpu management', 99, true);
+  weightGroup('GPUManagement', 100, true);
+  weightGroup('Storage', 99, true);
   weightGroup('advanced', 98, true);
 }

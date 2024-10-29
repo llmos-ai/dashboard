@@ -25,12 +25,14 @@ export default {
       clusters:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER }),
       settings:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.SETTING }),
       managedAddons: this.$store.dispatch('management/findAll', { type: MANAGEMENT.MANAGED_ADDON }),
+      gpuDevices:    this.$store.dispatch('management/findAll', { type: LLMOS.GPUDEVICE }),
       viewContainer: this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD),
     });
 
     this.clusters = hash.clusters;
     this.settings = hash.settings;
     this.managedAddons = hash.managedAddons;
+    this.gpuDevices = hash.gpuDevices;
     this.viewContainerDashboard = hash.viewContainer;
   },
 
@@ -40,6 +42,7 @@ export default {
       settings:               [],
       managedAddons:          [],
       cephClusters:           [],
+      gpuDevices:             [],
       clusterDetail:          null,
       clusterCounts:          {},
       viewContainerDashboard: false,
@@ -77,6 +80,10 @@ export default {
 
     canAccessNotebooks() {
       return !!this.clusterCounts?.[0]?.counts?.[LLMOS.NOTEBOOK];
+    },
+
+    canAccessGPUDevices() {
+      return !!this.clusterCounts?.[0]?.counts?.[LLMOS.GPUDEVICE];
     },
 
     isAdmin() {
@@ -230,9 +237,9 @@ export default {
             product="llmos"
           />
           <ResourceSummary
-            v-if="canAccessNamespaces"
+            v-if="canAccessGPUDevices"
             :cluster="clusterDetail.id"
-            resource="namespace"
+            :resource="LLMOS.GPUDEVICE"
             product="llmos"
           />
           <ResourceSummary
