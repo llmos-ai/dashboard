@@ -1,13 +1,17 @@
 <script>
-import isEmpty from 'lodash/isEmpty';
 import UnitInput from '@shell/components/form/UnitInput';
 import { CONTAINER_DEFAULT_RESOURCE_LIMIT } from '@shell/config/labels-annotations';
 import { cleanUp } from '@shell/utils/object';
 import { _VIEW } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
+import { RadioGroup } from '@components/Form/Radio';
+import { ToggleSwitch } from '@components/Form/ToggleSwitch';
+import { Accelerators, NVIDIA } from '@shell/utils/container-resource';
 
 export default {
-  components: { LabeledSelect, UnitInput },
+  components: {
+    LabeledSelect, UnitInput, RadioGroup, ToggleSwitch
+  },
 
   props: {
     mode: {
@@ -52,23 +56,42 @@ export default {
     showTip: {
       type:    Boolean,
       default: true
+    },
+
+    handleVGpu: {
+      type:    Boolean,
+      default: false
     }
   },
 
   data() {
     const {
-      limitsCpu, limitsMemory, requestsCpu, requestsMemory, limitsGpu
+      limitsCpu, limitsMemory, requestsCpu, requestsMemory, limitsGpu, gpuType, limitsVGpuMem, limitsVGpuCores,
     } = this.value;
 
+    const enableVGpu = limitsVGpuMem !== undefined || limitsVGpuCores !== undefined;
+
     return {
-      limitsCpu, limitsMemory, requestsCpu, requestsMemory, limitsGpu, viewMode: _VIEW
+      limitsCpu,
+      limitsMemory,
+      requestsCpu,
+      requestsMemory,
+      limitsGpu,
+      gpuType,
+      limitsVGpuMem,
+      limitsVGpuCores,
+      viewMode:     _VIEW,
+      nvidia:       NVIDIA,
+      accelerators: Accelerators,
+      enableVGpu,
+      radioStyle:   'display: flex; gap: 10px; align-items: center;',
     };
   },
 
   watch: {
     value() {
       const {
-        limitsCpu, limitsMemory, requestsCpu, requestsMemory, limitsGpu
+        limitsCpu, limitsMemory, requestsCpu, requestsMemory, limitsGpu, gpuType, limitsVGpuMem, limitsVGpuCores,
       } = this.value;
 
       this.limitsCpu = limitsCpu;
@@ -76,6 +99,13 @@ export default {
       this.requestsCpu = requestsCpu;
       this.requestsMemory = requestsMemory;
       this.limitsGpu = limitsGpu;
+      this.limitsVGpuMem = limitsVGpuMem;
+      this.limitsVGpuCores = limitsVGpuCores;
+
+      if (gpuType) {
+        this.podSpec.runtimeClassName = this.podSpec.runtimeClassName || gpuType;
+        this.limitsGpu = limitsGpu || 1;
+      }
     }
   },
 
@@ -104,10 +134,6 @@ export default {
   },
 
   created() {
-    if (this?.namespace?.id) {
-      this.initLimits();
-    }
-
     if (this.registerBeforeHook) {
       this.registerBeforeHook(this.updateBeforeSave);
     }
@@ -115,12 +141,20 @@ export default {
 
   methods: {
     updateLimits() {
+      if (!this.enableVGpu) {
+        this.limitsVGpuMem = undefined;
+        this.limitsVGpuCores = undefined;
+      }
+
       const {
         limitsCpu,
         limitsMemory,
         requestsCpu,
         requestsMemory,
-        limitsGpu
+        limitsGpu,
+        gpuType,
+        limitsVGpuMem,
+        limitsVGpuCores,
       } = this;
 
       this.$emit('input', cleanUp({
@@ -128,7 +162,10 @@ export default {
         limitsMemory,
         requestsCpu,
         limitsGpu,
-        requestsMemory
+        requestsMemory,
+        gpuType,
+        limitsVGpuMem,
+        limitsVGpuCores,
       }));
     },
 
@@ -138,7 +175,10 @@ export default {
         limitsMemory,
         requestsCpu,
         requestsMemory,
-        limitsGpu
+        limitsGpu,
+        gpuType,
+        limitsVGpuMem,
+        limitsVGpuCores,
       } = this;
       const namespace = this.namespace; // no deep copy in destructure proxy yet
 
@@ -147,7 +187,10 @@ export default {
         limitsMemory,
         requestsCpu,
         limitsGpu,
-        requestsMemory
+        requestsMemory,
+        gpuType,
+        limitsVGpuMem,
+        limitsVGpuCores,
       });
 
       if (namespace) {
@@ -155,29 +198,7 @@ export default {
       }
     },
 
-    initLimits() {
-      const namespace = this.namespace;
-      const defaults = namespace?.metadata?.annotations[CONTAINER_DEFAULT_RESOURCE_LIMIT];
-
-      // Ember UI can set the defaults to the string literal 'null'
-      if (!isEmpty(defaults) && defaults !== 'null') {
-        const {
-          limitsCpu,
-          limitsMemory,
-          requestsCpu,
-          requestsMemory,
-          limitsGpu
-        } = JSON.parse(defaults);
-
-        this.limitsCpu = limitsCpu;
-        this.limitsMemory = limitsMemory;
-        this.requestsCpu = requestsCpu;
-        this.requestsMemory = requestsMemory;
-        this.limitsGpu = limitsGpu;
-      }
-    },
-  }
-
+  },
 };
 </script>
 
@@ -258,31 +279,83 @@ export default {
         />
       </span>
     </div>
-    <div
-      v-if="handleGpuLimit"
-      class="row"
-    >
-      <span class="col span-6">
-        <UnitInput
-          v-model="limitsGpu"
-          :placeholder="t('containerResourceLimit.gpuPlaceholder')"
-          :label="t('containerResourceLimit.limitsGpu')"
-          :mode="mode"
-          :base-unit="t('suffix.gpus')"
-          data-testid="gpu-limit"
-          @input="updateLimits"
-        />
-      </span>
-      <span class="col span-6">
-        <LabeledSelect
-          v-model="podSpec.runtimeClassName"
-          label="Runtime Class"
-          :options="runtimeClassOptions"
-          :mode="mode"
-          :clearable="true"
-          @input="updateBeforeSave"
-        />
-      </span>
+
+    <div v-if="handleGpuLimit">
+      <div class="row mb-20">
+        <span class="col span-12">
+          <RadioGroup
+            v-model="gpuType"
+            name="gpuType"
+            :mode="mode"
+            :label="t('accelerator.label')"
+            :options="accelerators"
+            :rstyle="radioStyle"
+            @input="updateLimits"
+          />
+        </span>
+      </div>
+
+      <div class="row mb-20">
+        <span class="col span-6">
+          <UnitInput
+            v-model="limitsGpu"
+            :placeholder="t('containerResourceLimit.gpuPlaceholder')"
+            :label="t('containerResourceLimit.limitsGpu')"
+            :mode="mode"
+            :base-unit="t('suffix.gpus')"
+            data-testid="gpu-limit"
+            @input="updateLimits"
+          />
+        </span>
+        <span class="col span-6">
+          <LabeledSelect
+            v-model="podSpec.runtimeClassName"
+            label="Runtime Class"
+            :options="runtimeClassOptions"
+            :mode="mode"
+            :clearable="true"
+            @input="updateBeforeSave"
+          />
+        </span>
+      </div>
+
+      <h4> {{ t('accelerator.vgpu.title') }} </h4>
+      <div class="row mb-20">
+        <div class="col span-6">
+          <ToggleSwitch
+            v-model="enableVGpu"
+            name="label-vgpu-toggle"
+            :on-label="t('accelerator.vgpu.enableLabel')"
+            @input="updateLimits"
+          />
+        </div>
+      </div>
+      <div
+        v-if="enableVGpu"
+        class="row mb-20"
+      >
+        <span class="col span-6">
+          <UnitInput
+            v-model="limitsVGpuMem"
+            required
+            :placeholder="t('containerResourceLimit.vGPUMemPlaceholder')"
+            :label="t('containerResourceLimit.vGPUMem')"
+            :mode="mode"
+            :base-unit="t('suffix.mib')"
+            @input="updateLimits"
+          />
+        </span>
+        <span class="col span-6">
+          <UnitInput
+            v-model="limitsVGpuCores"
+            :placeholder="t('containerResourceLimit.vGPUCoresPlaceholder')"
+            :label="t('containerResourceLimit.vGPUCores')"
+            :mode="mode"
+            :base-unit="t('suffix.percent')"
+            @input="updateLimits"
+          />
+        </span>
+      </div>
     </div>
   </div>
 </template>

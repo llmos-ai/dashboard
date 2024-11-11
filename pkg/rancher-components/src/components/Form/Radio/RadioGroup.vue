@@ -99,6 +99,11 @@ export default Vue.extend({
     row: {
       type:    Boolean,
       default: false
+    },
+
+    rstyle: {
+      type: String,
+      default: null
     }
   },
 
@@ -202,6 +207,7 @@ export default Vue.extend({
       class="radio-group"
       :class="{'row':row}"
       tabindex="0"
+      :style="rstyle"
       @keyup.down.stop="clickNext(1)"
       @keyup.up.stop="clickNext(-1)"
     >

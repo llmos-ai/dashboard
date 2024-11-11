@@ -1667,9 +1667,12 @@ containerResourceLimit:
   helpTextDetail: The amount of resources the container can consume by default.
   label: Container Default Resource Limit
   limitsCpu: CPU Limit
-  limitsGpu: NVIDIA GPU Limit/Reservation
-  limitsMemory: Memory Limit
+  limitsGpu: GPU Limit/Reservation
   memPlaceholder: e.g. 128
+  vGPUMem: vGPU Memory Limit/Reservation
+  vGPUMemPlaceholder: e.g. 4096
+  vGPUCores: vGPU Cores Limit/Reservation
+  vGPUCoresPlaceholder: e.g. 100
   requestsCpu: CPU Reservation
   requestsMemory: Memory Reservation
 
@@ -6576,3 +6579,13 @@ gpuDevice:
       vram: VRAM
       amount: "{used} of {total} {unit}"
       uAmount: "{used}/{total} {unit}"
+
+accelerator:
+  label: Accelerator
+  nvidia:
+    name: NVIDIA
+  ascend:
+    name: Huawei Ascend
+  vgpu:
+    enableLabel: Enable vGPU
+    title: vGPU Configuration

@@ -119,7 +119,7 @@ export default {
         if (devPod) {
           pod.vram = `${ roundToDecimal((devPod.memReq / 1024) || 0, 2) } Gi`;
           pod.vgpu = 1;
-          pod.cores = devPod.coresReq || 'N/A';
+          pod.cores = devPod.coresReq ? `${ devPod.coresReq }%` : 'N/A';
         }
 
         return Boolean(devPod); // Return true only if devPod was found and modified

@@ -1476,9 +1476,13 @@ containerResourceLimit:
   helpTextDetail: 容器可以使用的的默认资源配额
   label: 容器默认资源限制
   limitsCpu: CPU 限制
-  limitsGpu: NVIDIA GPU 限制/预留
+  limitsGpu: GPU 限制/预留
   limitsMemory: 内存限制
   memPlaceholder: 例如：128
+  vGPUMem: vGPU 显存限制/预留
+  vGPUMemPlaceholder: e.g. 4096
+  vGPUCores: CUDA 算力限制/预留
+  vGPUCoresPlaceholder: e.g. 100
   requestsCpu: CPU 预留
   requestsMemory: 内存预留
 
@@ -4486,7 +4490,7 @@ tableHeaders:
   vram: 分配显存（VRAM）
   vramUsage: VRAM (已分配/总量)
   vgpu: vGPU
-  cores: CUDA 算力
+  cores: CUDA 算力限制
   rbac:
     create: Create
     delete: Delete
@@ -6359,3 +6363,13 @@ gpuDevice:
       vram: 显存
       amount: "已使用 {total} {unit} 中的 {used}"
       uAmount: "{used}/{total} {unit}"
+
+accelerator:
+  label: GPU 资源
+  nvidia:
+    name: NVIDIA
+  ascend:
+    name: Huawei Ascend
+  vgpu:
+    enableLabel: 启用 vGPU
+    title: vGPU 配置

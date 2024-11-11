@@ -26,7 +26,7 @@ export default class ModelService extends LLMOSWorkload {
             containers:       [
               {
                 args:  [],
-                image: 'vllm/vllm-openai:v0.5.4',
+                image: 'vllm/vllm-openai:v0.6.3',
                 name:  'server',
                 ports: [
                   {
