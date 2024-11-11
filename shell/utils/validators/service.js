@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import { validateDnsLabel, validateHostname } from '@shell/utils/validators';
+import { SvcOptions } from '@shell/config/constants';
 
 export function servicePort(spec, getters, errors, validatorArgs) {
   const { ports, type: serviceType } = spec;
@@ -99,7 +100,7 @@ export function clusterIp(spec, getters, errors, validatorArgs) {
     Only applies to types ClusterIP, NodePort, and LoadBalancer. Ignored if type is ExternalName.
     More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
   */
-  const typesToCheck = ['ClusterIP', 'NodePort', 'LoadBalancer'];
+  const typesToCheck = SvcOptions;
   const serviceType = spec?.type;
 
   if (!typesToCheck.includes(serviceType)) {

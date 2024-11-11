@@ -32,6 +32,7 @@ import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import Resource from '@shell/plugins/dashboard-store/resource-class';
 import { FlatResources } from '@shell/utils/container-resource';
+import { PullPolicyOptions, SvcOptions } from '@shell/config/constants';
 
 const TAB_WEIGHT_MAP = {
   general:        99,
@@ -126,8 +127,8 @@ export default {
       name:                  this.value?.metadata?.name || null,
       pvcs:                  [],
       namespacedPvcs:        [],
-      pullPolicyOptions:     ['Always', 'IfNotPresent', 'Never'],
-      svcOptions:            ['ClusterIP', 'NodePort', 'LoadBalancer'],
+      pullPolicyOptions:     PullPolicyOptions,
+      svcOptions:            SvcOptions,
       savePvcHookName:       'savePvcHook',
       tabWeightMap:          TAB_WEIGHT_MAP,
       isNamespaceNew:        false,

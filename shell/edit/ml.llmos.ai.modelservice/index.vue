@@ -4,14 +4,16 @@ import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkload from '@shell/mixins/llmos-workload';
 import { EVENT } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
+import { SvcOptions } from '@shell/config/constants';
 
 export default {
   name:   'ModelService',
   mixins: [CreateEditView, FormValidation, LLMOSWorkload],
   props:  {
     value: {
-      type:     Object,
-      required: true,
+      type:       Object,
+      required:   true,
+      svcOptions: SvcOptions,
     },
 
     mode: {
@@ -309,6 +311,17 @@ export default {
                 :label="t('modelService.image')"
               />
             </div>
+
+            <div class="col span-6">
+              <LabeledSelect
+                v-model="spec.serviceType"
+                :mode="mode"
+                :options="svcOptions"
+                :label="t('workload.networking.networkMode.label')"
+                :placeholder="t('workload.networking.networkMode.placeholder')"
+                @input="update"
+              />
+            </div>
           </div>
         </AdvancedSection>
       </Tab>
@@ -325,6 +338,7 @@ export default {
           :runtime-classes="runtimeClasses"
           :pod-spec="podTemplateSpec"
           :handle-gpu-limit="true"
+          :handle-v-gpu="true"
           :show-tip="false"
         />
       </Tab>

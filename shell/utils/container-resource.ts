@@ -1,6 +1,37 @@
 export const GPU_KEY = 'nvidia.com/gpu';
 export const DefaultGPURuntimeClass = 'nvidia';
 
+export const NVIDIA = {
+  Name:           'nvidia',
+  GPU:            'nvidia.com/gpu', // 1, each GPU is allocated 1 GPU.
+  GPUMem:         'nvidia.com/gpumem', // 1024, each GPU allocates 1024MB of memory.
+  GPUMemPercent:  'nvidia.com/gpumem-percentage', // 50, each GPU allocates 50% of its memory.
+  GPUCores:       'nvidia.com/gpucores', // 50, each GPU allocates 50% device cores.
+  AnnoDeviceType: 'nvidia.com/use-gputype', // "A100, V100", each GPU allocates the specified type.
+  AnnoDeviceUUID: 'nvidia.com/use-gpuuid',
+};
+export const Accelerators = [
+  {
+    label: 'Nvidia',
+    value: NVIDIA.Name,
+    key:   NVIDIA.GPU,
+  }];
+
+export const ASCEND = {
+  GPU_910A: {
+    GPU:    'huawei.com/Ascend910A',
+    GPUMem: 'huawei.com/Ascend910A-memory',
+  },
+  GPU_910B: {
+    GPU:    'huawei.com/Ascend910B',
+    GPUMem: 'huawei.com/Ascend910B-memory',
+  },
+  GPU_310P: {
+    GPU:    'huawei.com/Ascend310P',
+    GPUMem: 'huawei.com/Ascend310P-memory',
+  },
+};
+
 export const FlatResources = {
   get(container: object): {
     limitsCpu?: string;
@@ -8,6 +39,9 @@ export const FlatResources = {
     requestsCpu?: string;
     requestsMemory?: string;
     limitsGpu?: string;
+    gpuType?: string;
+    limitsVGpuMem?: string;
+    limitsVGpuCores?: string;
   } {
     const { limits = {}, requests = {} } = container.resources || {};
     const {
@@ -17,12 +51,29 @@ export const FlatResources = {
     } = limits;
     const { cpu: requestsCpu, memory: requestsMemory } = requests;
 
+    let limitsVGpuMem, limitsVGpuCores;
+    const gpuType = getGpuType(container.resources);
+
+    if (gpuType) {
+      switch (gpuType) {
+      case NVIDIA.Name:
+        limitsVGpuMem = limits[NVIDIA.GPUMem];
+        limitsVGpuCores = limits[NVIDIA.GPUCores];
+        break;
+      default:
+        console.error('FlatResources: unknown gpuType', gpuType); // eslint-disable-line no-console
+      }
+    }
+
     return {
       limitsCpu,
       limitsMemory,
       requestsCpu,
       requestsMemory,
       limitsGpu,
+      gpuType,
+      limitsVGpuMem,
+      limitsVGpuCores,
     };
   },
 
@@ -32,6 +83,9 @@ export const FlatResources = {
     requestsCpu?: string;
     requestsMemory?: string;
     limitsGpu?: string;
+    gpuType?: string;
+    limitsVGpuMem?: string;
+    limitsVGpuCores?: string;
   }): object {
     const {
       limitsCpu,
@@ -39,6 +93,9 @@ export const FlatResources = {
       requestsCpu,
       requestsMemory,
       limitsGpu,
+      gpuType,
+      limitsVGpuMem,
+      limitsVGpuCores,
     } = neu;
 
     const out = {
@@ -50,7 +107,12 @@ export const FlatResources = {
         cpu:       limitsCpu,
         memory:    limitsMemory,
         [GPU_KEY]: limitsGpu,
+        ...(gpuType === NVIDIA.Name ? {
+          [NVIDIA.GPUMem]:   limitsVGpuMem,
+          [NVIDIA.GPUCores]: limitsVGpuCores,
+        } : {})
       },
+      gpuType,
     };
 
     return out;
@@ -105,4 +167,17 @@ function nvidiaIsValid(nvidiaGpuLimit): boolean {
   } else {
     return true;
   }
+}
+
+function getGpuType(resources: object): string {
+  if (resources.gpuType) {
+    return resources.gpuType;
+  }
+  if (resources.limits[NVIDIA.GPU]) {
+    return NVIDIA.Name;
+  }
+}
+
+export function hasGPUResources(resources: object): boolean {
+  return !!resources?.limits?.[NVIDIA.GPU];
 }

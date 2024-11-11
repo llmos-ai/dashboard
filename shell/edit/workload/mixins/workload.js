@@ -49,6 +49,7 @@ import formRulesGenerator from '@shell/utils/validators/formRules';
 import { TYPES as SECRET_TYPES } from '@shell/models/secret';
 import { defaultContainer } from '@shell/models/workload';
 import { allHash } from '@shell/utils/promise';
+import { PullPolicyOptions } from '@shell/config/constants';
 
 const TAB_WEIGHT_MAP = {
   general:              99,
@@ -255,7 +256,7 @@ export default {
       pvcs:                       [],
       namespacedServiceNames:     [],
       showTabs:                   false,
-      pullPolicyOptions:          ['Always', 'IfNotPresent', 'Never'],
+      pullPolicyOptions:          PullPolicyOptions,
       spec,
       type,
       servicesOwned:              [],
