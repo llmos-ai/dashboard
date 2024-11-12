@@ -13,11 +13,11 @@ export default {
   props: {
     monitoringNamespace: {
       type:    String,
-      default: 'cattle-monitoring-system'
+      default: 'llmos-monitoring-system'
     },
     alertServiceEndpoint: {
       type:    String,
-      default: 'rancher-monitoring-alertmanager'
+      default: 'llmos-monitoring-alertmanager'
     },
   },
 

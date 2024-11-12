@@ -59,6 +59,7 @@ export default {
       matchingServices:   [],
       allNodes:           [],
       showMetrics:        false,
+      showVmMetrics:      true,
       showProjectMetrics: false,
     };
   },
@@ -104,7 +105,7 @@ export default {
       const total = this.value.pods.length;
 
       return !podGauges.find((pg) => pg.count === total);
-    },
+    }
   },
   methods: {
     findMatchingServices() {

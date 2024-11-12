@@ -1632,6 +1632,8 @@ clusterIndexPage:
       label: Alerts
     clusterMetrics:
       label: Cluster Metrics
+    clusterGpuMetrics:
+      label: GPU Metrics
     etcdMetrics:
       label: Etcd Metrics
     k8sMetrics:
@@ -1668,6 +1670,7 @@ containerResourceLimit:
   label: Container Default Resource Limit
   limitsCpu: CPU Limit
   limitsGpu: GPU Limit/Reservation
+  limitsMemory: Memory Limit
   memPlaceholder: e.g. 128
   vGPUMem: vGPU Memory Limit/Reservation
   vGPUMemPlaceholder: e.g. 4096
@@ -2505,9 +2508,9 @@ monitoring:
         label: Additional Secrets
       existing: Choose an existing config secret
       info: |
-        <span class="text-bold">Create default config</span>:<br>A Secret containing your Alertmanager Config will be created in the <pre class='inline-block m-0'>cattle-monitoring-system</pre> namespace on deploying this chart under the name <pre class='inline-block m-0'>alertmanager-rancher-monitoring-alertmanager</pre>. By default, this Secret will never be modified on an uninstall or upgrade of this chart. <br /><br />
+        <span class="text-bold">Create default config</span>:<br>A Secret containing your Alertmanager Config will be created in the <pre class='inline-block m-0'>monitoring-system</pre> namespace on deploying this chart under the name <pre class='inline-block m-0'>alertmanager-llmos-monitoring-alertmanager</pre>. By default, this Secret will never be modified on an uninstall or upgrade of this chart. <br /><br />
         Once you have deployed this chart, you should edit the Secret via the UI in order to add your custom notification configurations that will be used by Alertmanager to send alerts. <br /> <br />
-        <span class="text-bold">Choose an existing config secret</span>:<br>You must specify a Secret that exists in the <pre class='inline-block m-0'>cattle-monitoring-system</pre> namespace. If the namespace does not exist, you will not be able to select an existing secret.
+        <span class="text-bold">Choose an existing config secret</span>:<br>You must specify a Secret that exists in the <pre class='inline-block m-0'>monitoring-system</pre> namespace. If the namespace does not exist, you will not be able to select an existing secret.
       label: Alertmanager Secret
       new: Create default config
       radio:
@@ -2998,6 +3001,7 @@ node:
     nodeLabels: Labels
     hideLabels: Show less
     showLabels: Show more
+    gpu: GPU Devices
   detail:
     detailTop:
       containerRuntime: Container Runtime
@@ -3005,6 +3009,7 @@ node:
       externalIP: External IP
       os: OS
       version: Version
+      cudaVersion: CUDA Version
     glance:
       consumptionGauge:
         used: Used
@@ -3021,7 +3026,9 @@ node:
     tab:
       conditions: Conditions
       images: Images
+      gpus: GPUs
       metrics: Metrics
+      gpuMetrics: GPU Metrics
       info:
         label: Info
         key:
@@ -4592,6 +4599,7 @@ tableHeaders:
   download: Download
   duration: Duration
   diskState: Disk State
+  deviceName: Device Name
   drivers: Drivers
   distinguisherMethod: Distinguisher Method
   effect: Effect
@@ -4682,6 +4690,7 @@ tableHeaders:
   ram: RAM
   vram: VRAM
   vgpu: vGPU
+  vendor: Vendor
   cores: CUDA Cores
   vramUsage: VRAM (Request/Total)
   rbac:
@@ -6572,9 +6581,11 @@ gpuDevice:
         vRAM: VRAM
         vGPU: vGPU
         nodeName: Node Name
+        index: Device Index
     health: Health
     tab:
       pods: GPU Pods
+      metrics: Metrics
     consumptionGauge:
       vram: VRAM
       amount: "{used} of {total} {unit}"

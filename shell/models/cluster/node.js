@@ -105,6 +105,10 @@ export default class ClusterNode extends SteveModel {
     return statusAddress || annotationAddress;
   }
 
+  get cudaVersion() {
+    return this.metadata?.labels?.['nvidia.com/cuda.runtime-version.full'] || '';
+  }
+
   get labels() {
     return this.metadata?.labels || {};
   }
@@ -377,6 +381,13 @@ export default class ClusterNode extends SteveModel {
         label:     this.t('node.detail.detailTop.externalIP'),
         formatter: 'CopyToClipboard',
         content:   this.externalIp
+      });
+    }
+
+    if (this.cudaVersion) {
+      details.push({
+        label:   this.t('node.detail.detailTop.cudaVersion'),
+        content: this.cudaVersion
       });
     }
 

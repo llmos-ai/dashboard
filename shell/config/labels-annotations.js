@@ -79,6 +79,10 @@ export const SYSTEM_LABELS = [
   'node.kubernetes.io',
   'egress.rke2.io',
   'llmos.ai',
+  'ml.llmos.ai',
+  'management.llmos.ai',
+  'gpustack.llmos.ai',
+  'gpu',
   'feature.node.kubernetes.io',
 ];
 

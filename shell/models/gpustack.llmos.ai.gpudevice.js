@@ -29,6 +29,10 @@ export default class GPUDevice extends SteveModel {
     return count;
   }
 
+  get vram() {
+    return parseSi(`${ this.status?.vram }Gi`);
+  }
+
   get vramUsage() {
     return parseSi(`${ this.vramUsageValue }Mi`);
   }

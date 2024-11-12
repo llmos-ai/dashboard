@@ -996,7 +996,7 @@ export const getters = {
       function fromSchema(col, rootGetters) {
         let formatter, width, formatterOpts;
 
-        if ( (col.format === '' || col.format === 'date') && col.name === 'Age' ) {
+        if ( (col.format === '' || col.format === 'date' || col.type === 'date') && col.name === 'Age' ) {
           return AGE;
         }
 

@@ -1443,6 +1443,8 @@ clusterIndexPage:
       label: 告警
     clusterMetrics:
       label: 集群指标
+    clusterGpuMetrics:
+      label: GPU 指标
     etcdMetrics:
       label: ETCD 指标
     k8sMetrics:
@@ -2316,9 +2318,9 @@ monitoring:
         label: 补充密文
       existing: 选择现有的配置密文
       info: |
-        <span class="text-bold">创建默认配置</span>。在部署这个 Chart 时，将在<pre class='inline-block m-0'>cattle-monitoring-system</pre> 命名空间中创建一个包含 Alertmanager 配置的密文，名称为<pre class='inline-block m-0'>alertmanager-rancher-monitoring-alertmanager</pre>。默认情况下，在卸载或升级此 Chart 时，此密文均不会被修改。<br />
+        <span class="text-bold">创建默认配置</span>。在部署这个 Chart 时，将在<pre class='inline-block m-0'>monitoring-system</pre> 命名空间中创建一个包含 Alertmanager 配置的密文，名称为<pre class='inline-block m-0'>alertmanager-llmos-monitoring-alertmanager</pre>。默认情况下，在卸载或升级此 Chart 时，此密文均不会被修改。<br />
         部署这个 Chart 之后，你需要在 UI 中编辑密文，从而添加 Alertmanager 用于发送告警的自定义通知配置。<br /> <br />
-        <span class="text-bold">选择一个现有的配置密文</span>：你必须指定一个存在于<pre class='inline-block m-0'>cattle-monitoring-system</pre>命名空间内的密文。如果命名空间不存在，你将无法选择现有的密钥。
+        <span class="text-bold">选择一个现有的配置密文</span>：你必须指定一个存在于<pre class='inline-block m-0'>monitoring-system</pre>命名空间内的密文。如果命名空间不存在，你将无法选择现有的密钥。
       label: Alertmanager 密文
       new: 创建默认配置
       radio:
@@ -2809,6 +2811,7 @@ node:
     nodeLabels: 标签
     hideLabels: 显示更少
     showLabels: 显示更多
+    gpu: 显卡设备
   detail:
     detailTop:
       containerRuntime: 容器运行时
@@ -2816,6 +2819,7 @@ node:
       externalIP: 外网 IP
       os: 操作系统
       version: 版本
+      cudaVersion: CUDA 版本
     glance:
       consumptionGauge:
         used: 已使用
@@ -2831,6 +2835,8 @@ node:
       conditions: 状况
       images: 镜像
       metrics: 指标
+      gpus: 显卡
+      gpuMetrics: 显卡指标
       info:
         label: 信息
         key:
@@ -4401,6 +4407,7 @@ tableHeaders:
   diskState: 磁盘状态
   drivers: 驱动
   distinguisherMethod: 区分方法
+  deviceName: 设备名称
   effect: 效果
   endpoints: 端点
   firstSeen: 首次出现时间
@@ -4487,9 +4494,10 @@ tableHeaders:
   queues: 队列
   queueLengthLimit: 队列长度限制
   ram: 内存（RAM）
-  vram: 分配显存（VRAM）
-  vramUsage: VRAM (已分配/总量)
+  vram: 显存（VRAM）
+  vramUsage: 显存 (已分配/总量)
   vgpu: vGPU
+  vendor: GPU 厂商
   cores: CUDA 算力限制
   rbac:
     create: Create
@@ -6356,9 +6364,11 @@ gpuDevice:
         vRAM: 显存
         vGPU: vGPU
         nodeName: 所属节点
+        index: 设备号
     health: 健康
     tab:
       pods: GPU 任务
+      metrics: 监控指标
     consumptionGauge:
       vram: 显存
       amount: "已使用 {total} {unit} 中的 {used}"

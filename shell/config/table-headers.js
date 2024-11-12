@@ -32,6 +32,12 @@ export const DOWNLOAD = {
   align:         'right',
 };
 
+export const DEVICE_NAME = {
+  name:     'device_name',
+  labelKey: 'tableHeaders.deviceName',
+  value:    'status.devName',
+};
+
 // This header is used for nodes in
 // both Cluster Explorer and Cluster Management.
 export const INTERNAL_EXTERNAL_IP = {
@@ -169,12 +175,12 @@ export const NODE = {
 };
 
 export const NODE_NAME = {
-  name:      'nodeName',
-  labelKey:  'tableHeaders.nodeName',
-  sort:      'name',
-  value:     'name',
-  getValue:  (row) => row.name,
-  formatter: 'LinkDetail',
+  name:          'nodeName',
+  labelKey:      'tableHeaders.nodeName',
+  sort:          'status.nodeName',
+  value:         'status.nodeName',
+  formatter:     'LinkName',
+  formatterOpts: { type: NODE_TYPE },
 };
 
 export const ROLES = {
@@ -210,30 +216,6 @@ export const RAM = {
   value:     'ramUsagePercentage',
   formatter: 'PercentageBar',
   width:     120,
-};
-
-export const VRAM = {
-  name:     'vram',
-  labelKey: 'tableHeaders.vram',
-  sort:     'vram',
-  search:   false,
-  value:    'vram',
-};
-
-export const VGPU = {
-  name:     'vgpu',
-  labelKey: 'tableHeaders.vgpu',
-  sort:     'vgpu',
-  search:   false,
-  value:    'vgpu',
-};
-
-export const CORES = {
-  name:     'cores',
-  labelKey: 'tableHeaders.cores',
-  sort:     'cores',
-  search:   false,
-  value:    'cores',
 };
 
 export const PRINCIPAL = {
@@ -487,6 +469,7 @@ export const STATUS = {
   sort:     ['status'],
   width:    175
 };
+
 export const LAST_SEEN_TIME = {
   name:     'lastSeen',
   labelKey: 'tableHeaders.lastSeen',
@@ -805,4 +788,44 @@ export const KUBE_NODE_OS = {
   value:     'status.nodeInfo.operatingSystem',
   sort:      ['status.nodeInfo.operatingSystem'],
   formatter: 'Capitalize'
+};
+
+export const GPU = {
+  name:       'gpu',
+  labelKey:   'node.list.gpu',
+  sort:       'gpu',
+  width:      120,
+  breakpoint: COLUMN_BREAKPOINTS.LAPTOP,
+};
+
+export const VRAM = {
+  name:     'vram',
+  labelKey: 'tableHeaders.vram',
+  sort:     'vram',
+  search:   false,
+  value:    'status.vram',
+};
+
+export const VGPU = {
+  name:     'vgpu',
+  labelKey: 'tableHeaders.vgpu',
+  sort:     'vgpu',
+  search:   false,
+  value:    'status.vgpu',
+};
+
+export const VENDOR = {
+  name:        'vendor',
+  labelKey:    'tableHeaders.vendor',
+  value:       'status.vendor',
+  sort:        'vendor',
+  dashIfEmpty: true,
+};
+
+export const CORES = {
+  name:     'cores',
+  labelKey: 'tableHeaders.cores',
+  sort:     'cores',
+  search:   false,
+  value:    'status.cores',
 };
