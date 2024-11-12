@@ -19,6 +19,10 @@ import { allHash } from '@shell/utils/promise';
 import InfoBox from '@shell/components/InfoBox.vue';
 import CopyToClipboardText from '@shell/components/CopyToClipboardText.vue';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
+import DashboardMetrics from '@shell/components/DashboardMetrics.vue';
+import { allDashboardsExist } from '@shell/utils/grafana';
+
+const GPU_DEVICE_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-gpu-device-1/llmos-gpu-device?orgId=1';
 
 export default {
   name: 'DetailGPUDevice',
@@ -32,6 +36,7 @@ export default {
     ResourceTabs,
     Tab,
     ResourceTable,
+    DashboardMetrics,
   },
 
   mixins: [createEditView, metricPoller],
@@ -49,6 +54,7 @@ export default {
     const res = await allHash(hash);
 
     this.pods = res.pods;
+    this.showMetrics = await allDashboardsExist(this.$store, this.currentCluster.id, [GPU_DEVICE_METRICS_DETAIL_URL]);
   },
 
   data() {
@@ -80,6 +86,7 @@ export default {
       showMetrics: false,
       product:     LLMOS,
       pods:        [],
+      GPU_DEVICE_METRICS_DETAIL_URL,
     };
   },
 
@@ -117,9 +124,9 @@ export default {
 
         // If a matching devPod is found, add calculated properties to the pod
         if (devPod) {
-          pod.vram = `${ roundToDecimal((devPod.memReq / 1024) || 0, 2) } Gi`;
-          pod.vgpu = 1;
-          pod.cores = devPod.coresReq ? `${ devPod.coresReq }%` : 'N/A';
+          pod.status.vram = `${ roundToDecimal((devPod.memReq / 1024) || 0, 2) } Gi`;
+          pod.status.vgpu = 1;
+          pod.status.cores = devPod.coresReq ? `${ devPod.coresReq }%` : 'N/A';
         }
 
         return Boolean(devPod); // Return true only if devPod was found and modified
@@ -141,6 +148,7 @@ export default {
         vRAM:     this.value.vRAMTotal,
         vGPU:     this.value.vGPUCount,
         nodeName: status.nodeName,
+        index:    status.index,
       };
 
       const t = this.$store.getters['i18n/exists'];
@@ -150,7 +158,14 @@ export default {
         key,
         value: info[key]
       }));
-    }
+    },
+
+    gpuGraphVars() {
+      return {
+        instance: this.value.status?.internalIP,
+        gpu:      this.value.status?.index,
+      };
+    },
 
   },
 
@@ -246,6 +261,22 @@ export default {
           :table-actions="false"
           :search="false"
         />
+      </Tab>
+      <Tab
+        v-if="showMetrics"
+        :label="t('gpuDevice.detail.tab.metrics')"
+        name="node-gpu-metrics"
+        :weight="3"
+      >
+        <template #default="props">
+          <DashboardMetrics
+            v-if="props.active"
+            :detail-url="GPU_DEVICE_METRICS_DETAIL_URL"
+            :has-summary-and-detail="false"
+            :vars="gpuGraphVars"
+            graph-height="825px"
+          />
+        </template>
       </Tab>
     </ResourceTabs>
   </div>

@@ -24,15 +24,17 @@ export function computeDashboardUrl(monitoringVersion, embedUrl, clusterId, para
 
 export async function dashboardExists(monitoringVersion, store, clusterId, embedUrl, storeName = 'cluster', projectId = null) {
   const url = parseUrl(embedUrl);
-  let prefix = `${ getClusterPrefix(monitoringVersion, clusterId) }/api/v1/namespaces/cattle-monitoring-system/services/http:rancher-monitoring-grafana:80/proxy/`;
-  let delimiter = 'http:rancher-monitoring-grafana:80/proxy/';
+  const prefix = `${ getClusterPrefix(monitoringVersion, clusterId) }/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/`;
+  const delimiter = 'http:llmos-monitoring-grafana:80/proxy/';
 
-  if (projectId) {
-    prefix = `${ getClusterPrefix(monitoringVersion, clusterId) }/api/v1/namespaces/cattle-project-${ projectId }-monitoring/services/http:cattle-project-${ projectId }-monitoring-grafana:80/proxy/`;
-    delimiter = `http:cattle-project-${ projectId }-monitoring-grafana:80/proxy/`;
-  }
+  // NOTE: project-level dashboards are not supported yet
+  // if (projectId) {
+  //   prefix = `${ getClusterPrefix(monitoringVersion, clusterId) }/api/v1/namespaces/llmos-project-${ projectId }-monitoring/services/http:llmos-project-${ projectId }-monitoring-grafana:80/proxy/`;
+  //   delimiter = `http:cattle-project-${ projectId }-monitoring-grafana:80/proxy/`;
+  // }
   const path = url.path.split(delimiter)[1];
   const uid = path.split('/')[1];
+
   const newUrl = `${ prefix }api/dashboards/uid/${ uid }`;
 
   try {
@@ -52,9 +54,11 @@ export async function allDashboardsExist(store, clusterId, embeddedUrls, storeNa
 }
 
 export function queryGrafana(monitoringVersion, dispatch, clusterId, query, range, step) {
-  const url = `${ getClusterPrefix(monitoringVersion, clusterId) }/api/v1/namespaces/cattle-monitoring-system/services/http:rancher-monitoring-grafana:80/proxy/api/datasources/proxy/1/api/v1/query_range?query=${ query }&start=${ range.start }&end=${ range.end }&step=${ step }`;
+  const url = `${ getClusterPrefix(monitoringVersion, clusterId) }/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/api/datasources/proxy/1/api/v1/query_range?query=${ query }&start=${ range.start }&end=${ range.end }&step=${ step }`;
 
-  return dispatch('cluster/request', { url, redirectUnauthorized: false });
+  const req = dispatch('cluster/request', { url, redirectUnauthorized: false });
+
+  return req;
 }
 
 export async function hasLeader(monitoringVersion, dispatch, clusterId) {

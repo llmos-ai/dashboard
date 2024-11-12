@@ -5,14 +5,25 @@ import {
 } from '@shell/config/types';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
 import { mapGetters } from 'vuex';
-import { allHash } from '@shell/utils/promise';
+import { allHash, setPromiseResult } from '@shell/utils/promise';
 import { Banner } from '@components/Banner';
 import { getCephClusterAddonUrl } from '@shell/utils/url';
 import { isAdminUser } from '@shell/store/type-map';
+import DashboardMetrics from '@shell/components/DashboardMetrics.vue';
+import { allDashboardsExist } from '@shell/utils/grafana';
+import Tab from '@shell/components/Tabbed/Tab.vue';
+import Tabbed from '@shell/components/Tabbed/index.vue';
+
+const CLUSTER_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-cluster-nodes-1/llmos-cluster-nodes?orgId=1';
+const CLUSTER_METRICS_SUMMARY_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-cluster-1/llmos-cluster?orgId=1';
+const CLUSTER_GPU_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-gpu-cluster-nodes-1/llmos-gpu-cluster-nodes?orgId=1';
 
 export default {
   components: {
     ResourceSummary,
+    DashboardMetrics,
+    Tab,
+    Tabbed,
     Banner,
   },
 
@@ -34,6 +45,20 @@ export default {
     this.managedAddons = hash.managedAddons;
     this.gpuDevices = hash.gpuDevices;
     this.viewContainerDashboard = hash.viewContainer;
+
+    setPromiseResult(
+      allDashboardsExist(this.$store, 'local', [CLUSTER_METRICS_DETAIL_URL, CLUSTER_METRICS_SUMMARY_URL]),
+      this,
+      'showClusterMetrics',
+      'Determine cluster metrics'
+    );
+
+    setPromiseResult(
+      allDashboardsExist(this.$store, 'local', [CLUSTER_GPU_METRICS_DETAIL_URL]),
+      this,
+      'showClusterGpuMetrics',
+      'Determine cluster gpu metrics'
+    );
   },
 
   data() {
@@ -46,6 +71,9 @@ export default {
       clusterDetail:          null,
       clusterCounts:          {},
       viewContainerDashboard: false,
+      CLUSTER_METRICS_SUMMARY_URL,
+      CLUSTER_METRICS_DETAIL_URL,
+      CLUSTER_GPU_METRICS_DETAIL_URL,
     };
   },
 
@@ -251,6 +279,39 @@ export default {
         </div>
       </div>
     </div>
+
+    <h3>Monitoring</h3>
+    <Tabbed class="mt-30">
+      <Tab
+        name="cluster-metrics"
+        :label="t('clusterIndexPage.sections.clusterMetrics.label')"
+        :weight="99"
+      >
+        <template #default="props">
+          <DashboardMetrics
+            v-if="props.active"
+            :detail-url="CLUSTER_METRICS_DETAIL_URL"
+            :summary-url="CLUSTER_METRICS_SUMMARY_URL"
+            graph-height="825px"
+          />
+        </template>
+      </Tab>
+
+      <Tab
+        name="cluster-gpu-metrics"
+        :label="t('clusterIndexPage.sections.clusterGpuMetrics.label')"
+        :weight="98"
+      >
+        <template #default="props">
+          <DashboardMetrics
+            v-if="props.active"
+            :detail-url="CLUSTER_GPU_METRICS_DETAIL_URL"
+            :has-summary-and-detail="false"
+            graph-height="825px"
+          />
+        </template>
+      </Tab>
+    </Tabbed>
   </div>
 </template>
 

@@ -8,23 +8,40 @@ import {
   IMAGE_SIZE,
   KEY,
   SIMPLE_NAME,
-  VALUE
+  VALUE,
 } from '@shell/config/table-headers';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
-import { METRIC, POD } from '@shell/config/types';
+import { LLMOS, METRIC, POD } from '@shell/config/types';
 import createEditView from '@shell/mixins/create-edit-view';
 import { formatSi, exponentNeeded, UNITS } from '@shell/utils/units';
 import { mapGetters } from 'vuex';
 import Loading from '@shell/components/Loading';
 import metricPoller from '@shell/mixins/metric-poller';
-import { allHash } from '@shell/utils/promise';
+import { allHash, setPromiseResult } from '@shell/utils/promise';
+import DashboardMetrics from '@shell/components/DashboardMetrics.vue';
+import { allDashboardsExist } from '@shell/utils/grafana';
+
+const NODE_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-node-detail-1/llmos-node-detail?orgId=1';
+const NODE_METRICS_SUMMARY_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-node-1/llmos-node?orgId=1';
+const NODE_GPU_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-gpu-node-detail-1/llmos-gpu-node-detail?orgId=1';
+const NODE_GPU_METRICS_SUMMARY_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-gpu-node-1/llmos-gpu-node?orgId=1';
+
+const TAB_WEIGHT_MAP = {
+  pods:        99,
+  metrics:     98,
+  info:        80,
+  gpus:        71,
+  gpusMetrics: 70,
+  tains:       60,
+  images:      50,
+};
 
 export default {
-  name: 'DetailNode',
-
+  name:       'DetailNode',
   components: {
     Alert,
     ConsumptionGauge,
+    DashboardMetrics,
     Loading,
     ResourceTabs,
     Tab,
@@ -42,13 +59,26 @@ export default {
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
-    const hash = { pods: this.$store.dispatch(`${ inStore }/findAll`, { type: POD }) };
+    const hash = {
+      pods:       this.$store.dispatch(`${ inStore }/findAll`, { type: POD }),
+      gpuDevices: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.GPUDEVICE })
+    };
 
     await allHash(hash);
+
+    setPromiseResult(
+      allDashboardsExist(this.$store, this.currentCluster.id, [NODE_GPU_METRICS_DETAIL_URL, NODE_GPU_METRICS_SUMMARY_URL]),
+      this,
+      'showNodeGpuMetrics',
+      'Determine node gpu metrics'
+    );
+
+    this.showMetrics = await allDashboardsExist(this.$store, this.currentCluster.id, [NODE_METRICS_DETAIL_URL, NODE_METRICS_SUMMARY_URL]);
   },
 
   data() {
     const podSchema = this.$store.getters['cluster/schemaFor'](POD);
+    const gpuDeviceSchema = this.$store.getters['cluster/schemaFor'](LLMOS.GPUDEVICE);
 
     return {
       metrics:          { cpu: 0, memory: 0 },
@@ -73,8 +103,14 @@ export default {
         VALUE,
         EFFECT
       ],
-      podTableHeaders: this.$store.getters['type-map/headersFor'](podSchema),
-      showMetrics:     false
+      podTableHeaders:       this.$store.getters['type-map/headersFor'](podSchema),
+      gpuDeviceTableHeaders: this.$store.getters['type-map/headersFor'](gpuDeviceSchema),
+      NODE_METRICS_DETAIL_URL,
+      NODE_METRICS_SUMMARY_URL,
+      NODE_GPU_METRICS_SUMMARY_URL,
+      NODE_GPU_METRICS_DETAIL_URL,
+      showMetrics:           false,
+      tabWeightMap:          TAB_WEIGHT_MAP,
     };
   },
 
@@ -125,7 +161,18 @@ export default {
     },
 
     graphVars() {
-      return { instance: `${ this.value.internalIp }:9796` };
+      return { instance: `${ this.value.internalIp }:9100` };
+    },
+    gpuGraphVars() {
+      return { instance: `${ this.value.internalIp }` };
+    },
+
+    nodeGpus() {
+      return this.$store.getters['cluster/all'](LLMOS.GPUDEVICE).filter((gpu) => gpu.status.nodeName === this.value.name);
+    },
+
+    hasGPUs() {
+      return this.nodeGpus.length > 0;
     }
   },
 
@@ -216,9 +263,25 @@ export default {
       :mode="mode"
     >
       <Tab
+        name="info"
+        :label="t('node.detail.tab.info.label')"
+        class="bordered-table"
+        :weight="tabWeightMap.info"
+      >
+        <ResourceTable
+          key-field="_key"
+          :headers="infoTableHeaders"
+          :rows="infoTableRows"
+          :row-actions="false"
+          :table-actions="false"
+          :show-headers="false"
+          :search="false"
+        />
+      </Tab>
+      <Tab
         name="pods"
         :label="t('node.detail.tab.pods')"
-        :weight="4"
+        :weight="tabWeightMap.pods"
       >
         <ResourceTable
           key-field="_key"
@@ -233,28 +296,53 @@ export default {
         v-if="showMetrics"
         :label="t('node.detail.tab.metrics')"
         name="node-metrics"
-        :weight="3"
-      />
+        :weight="tabWeightMap.metrics"
+      >
+        <template #default="props">
+          <DashboardMetrics
+            v-if="props.active"
+            :detail-url="NODE_METRICS_DETAIL_URL"
+            :summary-url="NODE_METRICS_SUMMARY_URL"
+            :vars="graphVars"
+            graph-height="825px"
+          />
+        </template>
+      </Tab>
       <Tab
-        name="info"
-        :label="t('node.detail.tab.info.label')"
-        class="bordered-table"
-        :weight="2"
+        v-if="hasGPUs"
+        name="gpus"
+        :label="t('node.detail.tab.gpus')"
+        :weight="tabWeightMap.gpus"
       >
         <ResourceTable
           key-field="_key"
-          :headers="infoTableHeaders"
-          :rows="infoTableRows"
+          :headers="gpuDeviceTableHeaders"
+          :rows="nodeGpus"
           :row-actions="false"
           :table-actions="false"
-          :show-headers="false"
           :search="false"
         />
       </Tab>
       <Tab
+        v-if="showMetrics && hasGPUs"
+        :label="t('node.detail.tab.gpuMetrics')"
+        name="node-gpu-metrics"
+        :weight="tabWeightMap.gpusMetrics"
+      >
+        <template #default="props">
+          <DashboardMetrics
+            v-if="props.active"
+            :detail-url="NODE_GPU_METRICS_DETAIL_URL"
+            :summary-url="NODE_GPU_METRICS_SUMMARY_URL"
+            :vars="gpuGraphVars"
+            graph-height="825px"
+          />
+        </template>
+      </Tab>
+      <Tab
         name="images"
         :label="t('node.detail.tab.images')"
-        :weight="1"
+        :weight="tabWeightMap.images"
       >
         <ResourceTable
           key-field="_key"
@@ -267,7 +355,7 @@ export default {
       <Tab
         name="taints"
         :label="t('node.detail.tab.taints')"
-        :weight="0"
+        :weight="tabWeightMap.tains"
       >
         <ResourceTable
           key-field="_key"
