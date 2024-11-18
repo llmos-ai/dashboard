@@ -1269,7 +1269,7 @@ cluster:
     upcloud: UpCloud
     vmwarevsphere: VMware vSphere
     zstack: ZStack
-    machineinventoryselectortemplate: Elemental 集群
+    machinventoryselectortemplate: Elemental 集群
   providerTag:
     rke2:
       harvester: '{tag}'
@@ -4355,7 +4355,9 @@ tableHeaders:
   accessKey: Access Key
   addressType: 地址类型
   accessModes: 访问模式
+  access: 访问
   address: 地址
+  apiUrl: API 地址
   age: 存活时间
   apiGroup: API 组
   apikey: API 密钥
@@ -4384,6 +4386,7 @@ tableHeaders:
   cluster-Name: 集群
   clustersReady: 就绪集群
   clusterGroups: 集群组
+  clusterVersion: 集群版本
   commit: Commit
   condition: 状态
   constraint: 约束
@@ -4436,6 +4439,7 @@ tableHeaders:
   internalExternalIp: 外网 IP/内网 IP
   ipaddress: IP 地址
   internalIpSameAsExternal: 与外网 IP 相同
+  internalUrl: Internal 地址
   jobs: Job
   key: 键
   keys: 数据
@@ -4456,7 +4460,7 @@ tableHeaders:
   minReplicas: 最小副本数
   maxReplicas: 最大副本数
   missingPL: 缺少 PL
-  memory: 内存
+  memory: 内存 (RAM)
   monitored: 已监控
   name: 名称
   nameDisplay: 显示名称
@@ -4464,12 +4468,14 @@ tableHeaders:
   namespace: 命名空间
   namespaceName: 名称
   namespaceNameUnlinked: 名称
+  modelName: 模型名称
   networkType: 类型
   networkVlan: Vlan ID
   node: 节点
   nodeName: 节点名称
   nodesReady: 就绪节点
   nodePort: Node Port
+  notebookType: 类型
   object: 对象
   operatingSystem: 操作系统
   output: 输出
@@ -4571,6 +4577,7 @@ tableHeaders:
   username: 本地用户名
   value: 值
   version: 版本
+  visit: 访问
   volume: 卷
   volumeMode: 卷模式
   weight: 权重
@@ -6280,6 +6287,23 @@ gitPicker:
 networkAttachmentDefinition:
   tabs:
     config: 配置
+
+mlWorkload:
+  detail:
+    detailTop:
+      cpu: CPU
+      memory: 内存
+      notebookType: Notebook 类型
+      vgpu: 显卡 (vGPU)
+      vram: 显存（VRAM）
+      workers: Worker 节点
+      workerReplicas: Worker 副本数量
+      modelName: 模型名称
+
+ray:
+  cluster:
+    allowScheduling: Allow Scheduling on the Head Node
+    enableGCS: Enable Global Control Service(GCS) fault tolerance
 
 modelservice:
   model: Name

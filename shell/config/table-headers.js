@@ -790,10 +790,10 @@ export const KUBE_NODE_OS = {
   formatter: 'Capitalize'
 };
 
-export const GPU = {
-  name:       'gpu',
+export const GPU_DEVICE = {
+  name:       'gpu-device',
   labelKey:   'node.list.gpu',
-  sort:       'gpu',
+  sort:       'gpu-device',
   width:      120,
   breakpoint: COLUMN_BREAKPOINTS.LAPTOP,
 };
@@ -803,7 +803,7 @@ export const VRAM = {
   labelKey: 'tableHeaders.vram',
   sort:     'vram',
   search:   false,
-  value:    'status.vram',
+  value:    'vram',
 };
 
 export const VGPU = {
@@ -811,7 +811,7 @@ export const VGPU = {
   labelKey: 'tableHeaders.vgpu',
   sort:     'vgpu',
   search:   false,
-  value:    'status.vgpu',
+  value:    'vgpu',
 };
 
 export const VENDOR = {
@@ -827,5 +827,92 @@ export const CORES = {
   labelKey: 'tableHeaders.cores',
   sort:     'cores',
   search:   false,
-  value:    'status.cores',
+  value:    'cores',
+};
+
+export const NOTEBOOK_TYPE = {
+  name:      'notebook-type',
+  labelKey:  'tableHeaders.notebookType',
+  sort:      ['notebook-type'],
+  value:     'notebookType',
+  formatter: 'ProductTypeIcon',
+};
+
+export const API_URL = {
+  name:          'api',
+  label:         'API URL',
+  formatter:     'CopyButton',
+  value:         'endpointUrl',
+  formatterOpts: { showLabel: false },
+};
+
+export const VISIT = {
+  name:      'visit',
+  labelKey:  'tableHeaders.visit',
+  formatter: 'Visit',
+  value:     'endpointUrl'
+};
+
+export const ACCESS_URL = {
+  name:      'access',
+  label:     'Access',
+  labelKey:  'tableHeaders.access',
+  formatter: 'Link',
+};
+
+export const CPU_LIMIT = {
+  name:     'cpuLimit',
+  labelKey: 'tableHeaders.cpu',
+  sort:     ['cpuLimit'],
+  value:    'cpuLimit'
+};
+
+export const MEMORY_LIMIT = {
+  name:     'memoryLimit',
+  label:    'Memory',
+  labelKey: 'tableHeaders.memory',
+  sort:     ['memoryLimit'],
+  value:    'memoryLimit'
+};
+
+export const STATUS_STATE = {
+  name:     'status',
+  labelKey: 'tableHeaders.status',
+  label:    'Status',
+  value:    'status.state'
+};
+
+export const OPENAI_API_URL = {
+  name:          'openaiApiUrl',
+  label:         'API URL',
+  labelKey:      'tableHeaders.apiUrl',
+  formatter:     'copyButton',
+  value:         'openaiApiUrl',
+  formatterOpts: { showLabel: false },
+};
+
+export const INTERNAL_API_URL = {
+  name:          'internalApiUrl',
+  label:         'Internal URL',
+  labelKey:      'tableHeaders.internalUrl',
+  value:         'internalApiUrl',
+  formatter:     'copyButton',
+  formatterOpts: { showLabel: false },
+};
+
+export const MODEL_NAME = {
+  name:      'modelName',
+  label:     'Model Name',
+  labelKey:  'tableHeaders.modelName',
+  sort:      ['model'],
+  value:     'modelName',
+  formatter: 'copyButton',
+};
+
+export const RAY_VERSION = {
+  name:     'rayVersion',
+  label:    'Cluster Version',
+  labelKey: 'tableHeaders.clusterVersion',
+  sort:     ['spec.rayVersion'],
+  value:    'spec.rayVersion',
 };

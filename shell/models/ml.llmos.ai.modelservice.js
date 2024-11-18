@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { set } from '@shell/utils/object';
-import LLMOSWorkload from '@shell/models/llmos-workload';
+import MlWorkload from '@shell/models/ml_workload';
 
-export default class ModelService extends LLMOSWorkload {
+export default class ModelService extends MlWorkload {
   applyDefaults() {
     const value = {
       apiVersion: 'ml.llmos.ai/v1',
@@ -91,6 +91,15 @@ export default class ModelService extends LLMOSWorkload {
 
   get modelName() {
     return this.spec.servedModelName.length > 0 ? this.spec.servedModelName : this.spec.model;
+  }
+
+  get details() {
+    return [
+      ...super.details,
+      {
+        label:   this.t('mlWorkload.detail.detailTop.modelName'),
+        content: this.modelName,
+      }];
   }
 
   remove() {
