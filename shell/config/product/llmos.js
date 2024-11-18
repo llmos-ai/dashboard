@@ -1,7 +1,28 @@
 import { DSL } from '@shell/store/type-map';
 import {
-  LLMOS, NAMESPACE, NODE, VIRTUAL_TYPES, PVC, STORAGE_CLASS, SECRET, CONFIG_MAP, MANAGEMENT
+  LLMOS,
+  NAMESPACE,
+  NODE,
+  VIRTUAL_TYPES,
+  PVC,
+  STORAGE_CLASS,
+  SECRET,
+  CONFIG_MAP,
+  MANAGEMENT,
+  ML_WORKLOAD_TYPES, CEPH, NVIDIA
 } from '@shell/config/types';
+
+import {
+  STATE,
+  NAME as NAME_COL,
+  NAMESPACE as NAMESPACE_COL,
+  AGE,
+  WORKLOAD_HEALTH_SCALE,
+  NOTEBOOK_TYPE,
+  CPU_LIMIT,
+  MEMORY_LIMIT,
+  OPENAI_API_URL, MODEL_NAME, INTERNAL_API_URL, ACCESS_URL, RAY_VERSION, VGPU, VRAM, API_URL, VISIT,
+} from '@shell/config/table-headers';
 
 export const NAME = 'llmos';
 
@@ -12,10 +33,10 @@ export function init(store) {
     configureType,
     virtualType,
     weightGroup,
+    headers,
   } = DSL(store, NAME);
 
   product({
-    ifHaveGroup:         /^ml(.*\.)*llmos\.ai$/,
     icon:                NAME,
     showNamespaceFilter: true,
     hideKubeShell:       true,
@@ -59,63 +80,63 @@ export function init(store) {
   });
 
   virtualType({
-    ifHaveType: LLMOS.RAY_CLUSTER,
+    ifHaveType: ML_WORKLOAD_TYPES.RAY_CLUSTER,
     labelKey:   'typeLabel."ray.io.raycluster"',
     group:      'Root',
-    name:       LLMOS.RAY_CLUSTER,
+    name:       ML_WORKLOAD_TYPES.RAY_CLUSTER,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.RAY_CLUSTER }
+      params: { resource: ML_WORKLOAD_TYPES.RAY_CLUSTER }
     },
     exact:  false,
     weight: 100,
   });
 
   virtualType({
-    ifHaveType: LLMOS.NOTEBOOK,
+    ifHaveType: ML_WORKLOAD_TYPES.NOTEBOOK,
     label:      'Notebooks',
     group:      'Root',
-    name:       LLMOS.NOTEBOOK,
+    name:       ML_WORKLOAD_TYPES.NOTEBOOK,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.NOTEBOOK }
+      params: { resource: ML_WORKLOAD_TYPES.NOTEBOOK }
     },
     exact:  false,
     weight: 99,
   });
 
   virtualType({
-    ifHaveType: LLMOS.MODEL_SERVICE,
+    ifHaveType: ML_WORKLOAD_TYPES.MODEL_SERVICE,
     labelKey:   'typeLabel."ml.llmos.ai.modelservice"',
     group:      'Root',
-    name:       LLMOS.MODEL_SERVICE,
+    name:       ML_WORKLOAD_TYPES.MODEL_SERVICE,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.MODEL_SERVICE }
+      params: { resource: ML_WORKLOAD_TYPES.MODEL_SERVICE }
     },
     exact:  false,
     weight: 98,
   });
 
   basicType([
-    LLMOS.RAY_CLUSTER,
-    LLMOS.NOTEBOOK,
-    LLMOS.MODEL_SERVICE,
+    ML_WORKLOAD_TYPES.RAY_CLUSTER,
+    ML_WORKLOAD_TYPES.NOTEBOOK,
+    ML_WORKLOAD_TYPES.MODEL_SERVICE,
     NODE,
   ]);
 
   virtualType({
-    ifHaveType: LLMOS.CLUSTER_POLICY,
+    ifHaveType: NVIDIA.CLUSTER_POLICY,
     labelKey:   'typeLabel."nvidia.com.clusterpolicy"',
     group:      'GPUManagement',
-    name:       LLMOS.CLUSTER_POLICY,
+    name:       NVIDIA.CLUSTER_POLICY,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.CLUSTER_POLICY }
+      params: { resource: NVIDIA.CLUSTER_POLICY }
     },
     exact:  false,
     weight: 200,
@@ -142,7 +163,7 @@ export function init(store) {
   // nvidia pages
   basicType(
     [
-      LLMOS.CLUSTER_POLICY,
+      NVIDIA.CLUSTER_POLICY,
       LLMOS.GPUDEVICE,
     ],
     'GPUManagement'
@@ -186,44 +207,44 @@ export function init(store) {
     weight: 320,
   });
 
-  configureType(LLMOS.CEPH_CLUSTER, { isCreatable: false });
+  configureType(CEPH.CEPH_CLUSTER, { isCreatable: false });
   virtualType({
-    ifHaveType: LLMOS.CEPH_CLUSTER,
+    ifHaveType: CEPH.CEPH_CLUSTER,
     labelKey:   'typeLabel."ceph.rook.io.cephcluster"',
     group:      'Storage',
-    name:       LLMOS.CEPH_CLUSTER,
+    name:       CEPH.CEPH_CLUSTER,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.CEPH_CLUSTER }
+      params: { resource: CEPH.CEPH_CLUSTER }
     },
     exact:  false,
     weight: 313,
   });
 
   virtualType({
-    ifHaveType: LLMOS.CEPH_BLOCK_POOL,
+    ifHaveType: CEPH.CEPH_BLOCK_POOL,
     labelKey:   'typeLabel."ceph.rook.io.cephblockpool"',
     group:      'Storage',
-    name:       LLMOS.CEPH_BLOCK_POOL,
+    name:       CEPH.CEPH_BLOCK_POOL,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.CEPH_BLOCK_POOL }
+      params: { resource: CEPH.CEPH_BLOCK_POOL }
     },
     exact:  false,
     weight: 312,
   });
 
   virtualType({
-    ifHaveType: LLMOS.CEPH_FILESYSTEM,
+    ifHaveType: CEPH.CEPH_FILESYSTEM,
     labelKey:   'typeLabel."ceph.rook.io.cephfilesystem"',
     group:      'Storage',
-    name:       LLMOS.CEPH_FILESYSTEM,
+    name:       CEPH.CEPH_FILESYSTEM,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.CEPH_FILESYSTEM }
+      params: { resource: CEPH.CEPH_FILESYSTEM }
     },
     exact:  false,
     weight: 311,
@@ -232,9 +253,9 @@ export function init(store) {
     [
       LLMOS.VOLUME,
       STORAGE_CLASS,
-      LLMOS.CEPH_CLUSTER,
-      LLMOS.CEPH_BLOCK_POOL,
-      LLMOS.CEPH_FILESYSTEM,
+      CEPH.CEPH_CLUSTER,
+      CEPH.CEPH_BLOCK_POOL,
+      CEPH.CEPH_FILESYSTEM,
     ],
     'Storage',
   );
@@ -282,4 +303,8 @@ export function init(store) {
   weightGroup('GPUManagement', 100, true);
   weightGroup('Storage', 99, true);
   weightGroup('advanced', 98, true);
+
+  headers(ML_WORKLOAD_TYPES.RAY_CLUSTER, [STATE, NAME_COL, NAMESPACE_COL, ACCESS_URL, RAY_VERSION, CPU_LIMIT, MEMORY_LIMIT, API_URL, VGPU, VRAM, AGE, WORKLOAD_HEALTH_SCALE]);
+  headers(ML_WORKLOAD_TYPES.NOTEBOOK, [STATE, NAME_COL, NAMESPACE_COL, VISIT, NOTEBOOK_TYPE, CPU_LIMIT, MEMORY_LIMIT, VGPU, VRAM, AGE, WORKLOAD_HEALTH_SCALE]);
+  headers(ML_WORKLOAD_TYPES.MODEL_SERVICE, [STATE, NAME_COL, NAMESPACE_COL, OPENAI_API_URL, MODEL_NAME, INTERNAL_API_URL, CPU_LIMIT, MEMORY_LIMIT, VGPU, VRAM, AGE, WORKLOAD_HEALTH_SCALE]);
 }

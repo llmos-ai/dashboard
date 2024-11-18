@@ -11,10 +11,6 @@ export default class GPUDevice extends SteveModel {
     return `${ requestedCount }/${ this.status.maxCount }`;
   }
 
-  get vRAMTotal() {
-    return `${ roundToDecimal((this.status.vram / 1024) || 0, 1) }Gi`;
-  }
-
   get vramUsageValue() {
     let count = 0;
 
@@ -39,10 +35,6 @@ export default class GPUDevice extends SteveModel {
 
   get vramCapacity() {
     return parseSi(`${ this.status?.vram }Mi`);
-  }
-
-  get vramUsagePercentage() {
-    return ((this.vramUsage * 100) / this.vramCapacity).toString();
   }
 
   get vramAllocated() {

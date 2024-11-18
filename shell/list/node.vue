@@ -3,7 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import Tag from '@shell/components/Tag';
 import { Banner } from '@components/Banner';
 import {
-  STATE, NAME, ROLES, INTERNAL_EXTERNAL_IP, CPU, RAM, AGE, KUBE_NODE_OS, GPU
+  STATE, NAME, ROLES, INTERNAL_EXTERNAL_IP, CPU, RAM, AGE, KUBE_NODE_OS, GPU_DEVICE
 } from '@shell/config/table-headers';
 import metricPoller from '@shell/mixins/metric-poller';
 
@@ -109,7 +109,7 @@ export default {
           breakpoint: COLUMN_BREAKPOINTS.LAPTOP,
           getValue:   (row) => row.status?.nodeInfo?.operatingSystem
         },
-        GPU,
+        GPU_DEVICE,
         {
           ...CPU,
           breakpoint: COLUMN_BREAKPOINTS.LAPTOP,
@@ -258,8 +258,7 @@ export default {
           />
         </tr>
       </template>
-
-      <template #col:gpu="{row}">
+      <template #col:gpu-device="{row}">
         <td>
           <div v-if="!Object.keys(countGPUsByVendor(row)).length">
             <span>N/A</span>

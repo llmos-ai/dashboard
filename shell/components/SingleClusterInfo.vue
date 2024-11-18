@@ -1,7 +1,7 @@
 <script>
 import ResourceSummary from '@shell/components/ResourceSummary';
 import {
-  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS, PVC
+  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS, PVC, ML_WORKLOAD_TYPES, CEPH
 } from '@shell/config/types';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
 import { mapGetters } from 'vuex';
@@ -29,7 +29,7 @@ export default {
 
   async fetch() {
     if (this.isAdmin) {
-      this.cephClusters = await this.$store.dispatch('management/findAll', { type: LLMOS.CEPH_CLUSTER });
+      this.cephClusters = await this.$store.dispatch('management/findAll', { type: CEPH.CEPH_CLUSTER });
     }
 
     const hash = await allHash({
@@ -78,6 +78,9 @@ export default {
   },
 
   computed: {
+    ML_WORKLOAD_TYPES() {
+      return ML_WORKLOAD_TYPES;
+    },
     LLMOS() {
       return LLMOS;
     },
@@ -99,15 +102,15 @@ export default {
     },
 
     canAccessMLCluster() {
-      return !!this.clusterCounts?.[0]?.counts?.[LLMOS.RAY_CLUSTER];
+      return !!this.clusterCounts?.[0]?.counts?.[ML_WORKLOAD_TYPES.RAY_CLUSTER];
     },
 
     canAccessModelServices() {
-      return !!this.clusterCounts?.[0]?.counts?.[LLMOS.MODEL_SERVICE];
+      return !!this.clusterCounts?.[0]?.counts?.[ML_WORKLOAD_TYPES.MODEL_SERVICE];
     },
 
     canAccessNotebooks() {
-      return !!this.clusterCounts?.[0]?.counts?.[LLMOS.NOTEBOOK];
+      return !!this.clusterCounts?.[0]?.counts?.[ML_WORKLOAD_TYPES.NOTEBOOK];
     },
 
     canAccessGPUDevices() {
@@ -240,19 +243,19 @@ export default {
           <ResourceSummary
             v-if="canAccessMLCluster"
             :cluster="clusterDetail.id"
-            :resource="LLMOS.RAY_CLUSTER"
+            :resource="ML_WORKLOAD_TYPES.RAY_CLUSTER"
             product="llmos"
           />
           <ResourceSummary
             v-if="canAccessNotebooks"
             :cluster="clusterDetail.id"
-            :resource="LLMOS.NOTEBOOK"
+            :resource="ML_WORKLOAD_TYPES.NOTEBOOK"
             product="llmos"
           />
           <ResourceSummary
             v-if="canAccessModelServices"
             :cluster="clusterDetail.id"
-            :resource="LLMOS.MODEL_SERVICE"
+            :resource="ML_WORKLOAD_TYPES.MODEL_SERVICE"
             product="llmos"
           />
         </div>

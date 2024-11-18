@@ -1,5 +1,5 @@
 <script>
-import { LLMOS, MANAGEMENT, RBAC_GROUP } from '@shell/config/types';
+import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from '@shell/config/types';
 import { _CREATE, _VIEW } from '@shell/config/query-params';
 import MembershipEditor, { canViewMembershipEditor } from '@shell/components/form/Members/MembershipEditor';
 
@@ -49,7 +49,7 @@ export default {
       return this.$store.dispatch(`management/create`, {
         type:            MANAGEMENT.ROLE_TEMPLATE_BINDING,
         roleTemplateRef: {
-          apiGroup: LLMOS.MANAGEMENT_GROUP,
+          apiGroup: MANAGEMENT_GROUP,
           kind:     'RoleTemplate',
           name:     'namespace-owner',
         },

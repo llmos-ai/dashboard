@@ -1,6 +1,6 @@
 // export const NORMAN_NAME = 'field.cattle.io/name';
 export const HOSTNAME = 'kubernetes.io/hostname';
-export const TIMESTAMP = 'cattle.io/timestamp';
+export const TIMESTAMP = 'llmos.ai/timestamp';
 export const PROJECT = 'field.cattle.io/projectId';
 export const CATTLE_PUBLIC_ENDPOINTS = 'field.cattle.io/publicEndpoints';
 export const TARGET_WORKLOADS = 'field.cattle.io/targetWorkloadIds';

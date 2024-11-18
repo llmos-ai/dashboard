@@ -11,7 +11,7 @@ import {
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import { POD } from '@shell/config/types';
 import createEditView from '@shell/mixins/create-edit-view';
-import { formatSi, exponentNeeded, UNITS, roundToDecimal } from '@shell/utils/units';
+import { formatSi, exponentNeeded, UNITS, parseSi } from '@shell/utils/units';
 import { mapGetters } from 'vuex';
 import Loading from '@shell/components/Loading';
 import metricPoller from '@shell/mixins/metric-poller';
@@ -102,6 +102,14 @@ export default {
       return this.mapToStatus(this.value.status?.health);
     },
 
+    memSiOptions() {
+      return {
+        increment:        1024,
+        startingExponent: 2,
+        suffix:           'i',
+      };
+    },
+
     podTableRows() {
       // Return an empty array if pods list, value status, or value status pods are missing
       if (!this.pods.length || !this.value?.status?.uuid || !this.value.status.pods) {
@@ -124,9 +132,9 @@ export default {
 
         // If a matching devPod is found, add calculated properties to the pod
         if (devPod) {
-          pod.status.vram = `${ roundToDecimal((devPod.memReq / 1024) || 0, 2) } Gi`;
-          pod.status.vgpu = 1;
-          pod.status.cores = devPod.coresReq ? `${ devPod.coresReq }%` : 'N/A';
+          pod.vram = formatSi(devPod.memReq, this.memSiOptions);
+          pod.vgpu = devPod.vgpu ? parseSi(devPod.vgpu) : 1;
+          pod.cores = devPod.coresReq ? `${ devPod.coresReq }%` : 'N/A';
         }
 
         return Boolean(devPod); // Return true only if devPod was found and modified
@@ -145,7 +153,7 @@ export default {
         uuid:     status.uuid,
         vendor:   status.vendor,
         devName:  status.devName,
-        vRAM:     this.value.vRAMTotal,
+        vRAM:     formatSi(status.vram, this.memSiOptions),
         vGPU:     this.value.vGPUCount,
         nodeName: status.nodeName,
         index:    status.index,
@@ -166,7 +174,6 @@ export default {
         gpu:      this.value.status?.index,
       };
     },
-
   },
 
   methods: {

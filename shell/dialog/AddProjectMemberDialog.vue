@@ -3,7 +3,7 @@ import { Card } from '@components/Card';
 import ProjectMemberEditor from '@shell/components/form/ProjectMemberEditor.vue';
 import AsyncButton from '@shell/components/AsyncButton.vue';
 import Banner from '@components/Banner/Banner.vue';
-import { LLMOS, MANAGEMENT, RBAC_GROUP } from '@shell/config/types';
+import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from '@shell/config/types';
 
 export default {
   components: {
@@ -68,7 +68,7 @@ export default {
         type:            MANAGEMENT.ROLE_TEMPLATE_BINDING,
         namespaceId:     this.projectId,
         roleTemplateRef: {
-          apiGroup: LLMOS.MANAGEMENT_GROUP,
+          apiGroup: MANAGEMENT_GROUP,
           kind:     'RoleTemplate',
           name:     roleTemplateId,
         },

@@ -80,6 +80,7 @@ export const METRIC = {
 
 // Management API (via Steve)
 // Base: /v1
+export const MANAGEMENT_GROUP = 'management.llmos.ai';
 export const MANAGEMENT = {
   CLUSTER:               'management.oneblock.ai.cluster',
   SETTING:               'management.llmos.ai.setting',
@@ -95,30 +96,39 @@ export const MANAGEMENT = {
 };
 
 export const LLMOS = {
-  MANAGEMENT_GROUP: 'management.llmos.ai',
-  VERSION:          'v1',
+  VERSION:   'v1',
+  GPUDEVICE: 'gpustack.llmos.ai.gpudevice',
+  VOLUME:    'llmos.ai.volume',
+  CHAT:      'chat',
+};
 
-  // ML related resources
+export const ML_WORKLOAD = 'ml_workload';
+export const ML_WORKLOAD_TYPES = {
   RAY_CLUSTER:   'ray.io.raycluster',
   MODEL_SERVICE: 'ml.llmos.ai.modelservice',
   NOTEBOOK:      'ml.llmos.ai.notebook',
-  GPUDEVICE:     'gpustack.llmos.ai.gpudevice',
-  VOLUME:        'llmos.ai.volume',
-  CHAT:          'chat',
-
-  // nvidia CRDs
-  CLUSTER_POLICY: 'nvidia.com.clusterpolicy',
-  NVIDIA_DRIVER:  'nvidia.com.nvidiadriver',
-
-  // rook ceph CRDs
-  CEPH_CLUSTER:    'ceph.rook.io.cephcluster',
-  CEPH_FILESYSTEM: 'ceph.rook.io.cephfilesystem',
-  CEPH_BLOCK_POOL: 'ceph.rook.io.cephblockpool',
 };
+
+export const ML_SCALABLE_WORKLOAD_TYPES = {};
+
+export const ML_LIST_WORKLOAD_TYPES = { ...ML_WORKLOAD_TYPES };
 
 export const VIRTUAL_TYPES = { NAMESPACES: 'namespaces' };
 
 export const DEFAULT_WORKSPACE = 'default';
+
+// nvidia CRDs
+export const NVIDIA = {
+  CLUSTER_POLICY: 'nvidia.com.clusterpolicy',
+  NVIDIA_DRIVER:  'nvidia.com.nvidiadriver',
+};
+
+// rook ceph CRDs
+export const CEPH = {
+  CEPH_CLUSTER:    'ceph.rook.io.cephcluster',
+  CEPH_FILESYSTEM: 'ceph.rook.io.cephfilesystem',
+  CEPH_BLOCK_POOL: 'ceph.rook.io.cephblockpool',
+};
 
 export const AUTH_TYPE = {
   _NONE:  '_none',

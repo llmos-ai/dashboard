@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import { LLMOS, MANAGEMENT, RBAC_GROUP } from '@shell/config/types';
+import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from '@shell/config/types';
 import { _CREATE, _VIEW } from '@shell/config/query-params';
 import { addObjects, isArray } from '@shell/utils/array';
 import Loading from '@shell/components/Loading';
@@ -198,7 +198,7 @@ export default {
           labels:       { 'auth.management.llmos.ai/user-id': userId || this.userId },
         },
         roleTemplateRef: {
-          apiGroup: LLMOS.MANAGEMENT_GROUP,
+          apiGroup: MANAGEMENT_GROUP,
           kind:     'GlobalRole',
           name:     '', // a placeholder of the role name
         },

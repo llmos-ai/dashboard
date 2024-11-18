@@ -1,7 +1,7 @@
 <script>
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
-import LLMOSWorkloadMixin from '@shell/mixins/llmos-workload';
+import LLMOSWorkloadMixin from '@shell/mixins/llmos/ml-workload';
 import { MANAGEMENT, EVENT } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
 

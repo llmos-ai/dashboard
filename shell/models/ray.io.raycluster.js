@@ -1,9 +1,8 @@
 import Vue from 'vue';
 import { set } from '@shell/utils/object';
-import { colorForState, STATES_ENUM } from '@shell/plugins/dashboard-store/resource-class';
-import LLMOSWorkload from '@shell/models/llmos-workload';
+import MlWorkload from '@shell/models/ml_workload';
 
-export default class RayCluster extends LLMOSWorkload {
+export default class RayCluster extends MlWorkload {
   applyDefaults() {
     const value = {
       apiVersion: 'ray.io/v1',
@@ -178,56 +177,35 @@ export default class RayCluster extends LLMOSWorkload {
     set(this, 'spec', this.spec || value.spec);
   }
 
-  get stateDisplay() {
-    if (this.status?.state === 'failed') {
-      return STATES_ENUM.ERROR;
+  redeploy() {
+    // Redeploy Ray workload by deleting its pods
+    const pods = this.pods || [];
+
+    for (const pod of pods) {
+      pod.remove();
     }
 
-    if (this.metadata?.deletionTimestamp) {
-      return STATES_ENUM.REMOVING;
-    }
-
-    return this.stateDescription ? STATES_ENUM.PENDING : super.stateDisplay;
+    this.$dispatch('growl/info', { message: `${ this.kind } ${ this.name } has been successfully redeployed.` }, { root: true });
   }
 
-  get stateBackground() {
-    const color = colorForState(this.stateDisplay);
-
-    return color.replace('text-', 'bg-');
+  get details() {
+    return [
+      ...super.details,
+      {
+        label:   this.t('mlWorkload.detail.detailTop.workers'),
+        content: this.workerReady,
+      },
+      {
+        label:   this.t('mlWorkload.detail.detailTop.workerReplicas'),
+        content: this.workerReplicaRange,
+      }];
   }
 
-  get stateDescription() {
-    if (this.status?.state === 'failed') {
-      return this.status?.reason;
-    }
-
-    const relationships = this.metadata.relationships || [];
-    const hasIssue = relationships.find((r) => {
-      if (r.error === true || r.transitioning === true) {
-        return r;
-      }
-    });
-
-    if (hasIssue) {
-      return hasIssue.message;
-    }
-
-    return false;
+  get workerReady() {
+    return `${ this.status.readyWorkerReplicas }/${ this.status.desiredWorkerReplicas }`;
   }
 
-  get rayVersion() {
-    const version = this.spec?.rayVersion;
-
-    if (version) {
-      return version;
-    }
-
-    const image = this.spec.headGroupSpec?.template?.spec?.containers?.[0]?.image;
-
-    if (image) {
-      return image.split(':')[1];
-    }
-
-    return 'N/A';
+  get workerReplicaRange() {
+    return `${ this.status.minWorkerReplicas }-${ this.status.maxWorkerReplicas }`;
   }
 }

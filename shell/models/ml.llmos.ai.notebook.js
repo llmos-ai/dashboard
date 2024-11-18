@@ -1,10 +1,8 @@
 import Vue from 'vue';
 import { set } from '@shell/utils/object';
-import { MANAGEMENT, SERVICE } from '@shell/config/types';
-import { SETTING } from '@shell/config/settings';
-import LLMOSWorkload from '@shell/models/llmos-workload';
+import MlWorkload from '@shell/models/ml_workload';
 
-export default class NoteBook extends LLMOSWorkload {
+export default class NoteBook extends MlWorkload {
   applyDefaults() {
     const value = {
       apiVersion: 'ml.llmos.ai/v1',
@@ -71,76 +69,13 @@ export default class NoteBook extends LLMOSWorkload {
     return this.metadata.labels['ml.llmos.ai/notebook-type'];
   }
 
-  getServerUrl() {
-    const serverUrl = this.$getters['byId'](MANAGEMENT.SETTING, SETTING.SERVER_URL);
-
-    if (serverUrl.value !== '') {
-      return serverUrl.value;
-    }
-
-    return serverUrl.default;
-  }
-
-  get connectUrl() {
-    const uid = this.metadata.uid;
-    const services = this.$rootGetters['cluster/all'](SERVICE) || [];
-    const svc = services.find((s) => {
-      const ownerReferences = s.metadata.ownerReferences || [];
-
-      return ownerReferences.find((o) => o.uid === uid);
-    });
-
-    if (!svc || this.status?.state !== 'Running') {
-      return '';
-    }
-
-    const serverURL = this.getServerUrl() || window.location.origin;
-    const url = new URL(serverURL);
-
-    const port = svc.spec.ports[0];
-
-    switch (svc.spec.type) {
-    case 'NodePort':
-      return `http://${ url.hostname }:${ port.nodePort }/`;
-    case 'LoadBalancer':
-      return `http://${ url.hostname }:${ port.port }/`;
-    default:
-      return `${ window.location.origin }/api/v1/namespaces/${ svc.namespace }/services/${ svc.name }:${ port.name }/proxy/`;
-    }
-  }
-
-  get gpus() {
-    const limit = this.spec.template.spec.containers[0].resources.limit;
-
-    if (limit === null || limit === undefined) {
-      return 0;
-    }
-
-    if (limit['nvidia.com/gpu']) {
-      return limit['nvidia.com/gpu'];
-    }
-
-    return 0;
-  }
-
-  get cpusRequest() {
-    const requests = this.spec.template.spec.containers[0].resources?.requests;
-
-    if (requests === null || requests.cpu === null) {
-      return 0;
-    }
-
-    return requests.cpu;
-  }
-
-  get memoryRequest() {
-    const requests = this.spec.template.spec.containers[0].resources?.requests;
-
-    if (requests === null || requests.memory === null) {
-      return 0;
-    }
-
-    return requests.memory;
+  get details() {
+    return [
+      ...super.details,
+      {
+        label:   this.t('mlWorkload.detail.detailTop.notebookType'),
+        content: this.notebookType,
+      }];
   }
 
   remove() {

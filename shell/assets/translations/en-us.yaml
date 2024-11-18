@@ -4549,10 +4549,12 @@ tableHeaders:
   accessKey: Access Key
   addressType: Address Type
   accessModes: Access Modes
+  access: Access
   address: Address
   age: Age
   apiGroup: API Groups
   apikey: API Key
+  apiUrl: API URL
   available: Available
   attachedVM: Attached VM
 
@@ -4578,6 +4580,7 @@ tableHeaders:
   cluster-Name: Cluster
   clustersReady: Clusters Ready
   clusterGroups: Cluster Groups
+  clusterVersion: Cluster Version
   commit: Commit
   condition: Condition
   constraint: Constraint
@@ -4630,6 +4633,7 @@ tableHeaders:
   internalExternalIp: External/Internal IP
   ipaddress: IP Address
   internalIpSameAsExternal: Same as External
+  internalUrl: Internal URL
   jobs: Jobs
   key: Key
   keys: Data
@@ -4652,6 +4656,7 @@ tableHeaders:
   missingPL: MissingPL
   memory: Memory
   monitored: Monitored
+  modelName: Model Name
   name: Name
   nameDisplay: Display Name
   nameUnlinked: Name
@@ -4664,6 +4669,7 @@ tableHeaders:
   nodeName: Node Name
   nodesReady: Nodes Ready
   nodePort: Node Port
+  notebookType: Type
   object: Object
   operatingSystem: OS
   output: Output
@@ -4691,6 +4697,7 @@ tableHeaders:
   vram: VRAM
   vgpu: vGPU
   vendor: Vendor
+  visit: Visit
   cores: CUDA Cores
   vramUsage: VRAM (Request/Total)
   rbac:
@@ -6491,6 +6498,18 @@ networkAttachmentDefinition:
   tabs:
     config: Config
 
+mlWorkload:
+  detail:
+    detailTop:
+      cpu: CPU
+      memory: Memory
+      notebookType: Notebook Type
+      vgpu: vGPU
+      vram: VRAM
+      workers: Workers
+      workerReplicas: Worker Replicas
+      modelName: Model Name
+
 ray:
   cluster:
     allowScheduling: Allow Scheduling on the Head Node
@@ -6592,7 +6611,7 @@ gpuDevice:
       uAmount: "{used}/{total} {unit}"
 
 accelerator:
-  label: Accelerator
+  label: GPU Accelerator
   nvidia:
     name: NVIDIA
   ascend:
