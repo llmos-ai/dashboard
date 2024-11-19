@@ -112,8 +112,9 @@ export default {
   }
 
   span {
-    font-size: 14px;
-    font-weight: 550;
+    font-size: 18px;
+    font-weight: 540;
+    color: #4F4F50;
   }
 }
 </style>

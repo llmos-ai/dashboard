@@ -1,4 +1,4 @@
-import { NAME as EXPLORER } from '@shell/config/product/explorer';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 import { TIMED_OUT, UPGRADED, _FLAGGED, _UNFLAG } from '@shell/config/query-params';
 import { MANAGEMENT } from '@shell/config/types';
 import { _ALL_IF_AUTHED } from '@shell/plugins/dashboard-store/actions';
@@ -82,7 +82,7 @@ function setProduct(store, to, redirect) {
   }
 
   if ( !product ) {
-    product = EXPLORER;
+    product = LLMOS;
   }
 
   const oldProduct = store.getters['productId'];

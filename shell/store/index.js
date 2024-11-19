@@ -1,6 +1,7 @@
 import { BACK_TO } from '@shell/config/local-storage';
 import { setBrand, setVendor } from '@shell/config/private-label';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 import { LOGGED_OUT, TIMED_OUT, UPGRADED, _FLAGGED } from '@shell/config/query-params';
 import { SETTING } from '@shell/config/settings';
 import {
@@ -285,7 +286,7 @@ export const getters = {
     let out = findBy(active, 'name', state.productId);
 
     if ( !out ) {
-      out = findBy(active, 'name', EXPLORER);
+      out = findBy(active, 'name', LLMOS);
     }
 
     if ( !out ) {
@@ -685,6 +686,10 @@ export const actions = {
     if ( getters['management/schemaFor'](NAMESPACE) ) {
       promises['namespaces'] = dispatch('management/findAll', { type: NAMESPACE });
     }
+
+    // if ( getters['management/schemaFor'](ENDPOINTS) ) {
+    //   promises['namespaces'] = dispatch('management/findAll', { type: ENDPOINTS });
+    // }
 
     res = await allHash(promises);
     dispatch('i18n/init');

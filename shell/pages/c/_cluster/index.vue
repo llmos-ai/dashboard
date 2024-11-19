@@ -1,5 +1,5 @@
 <script>
-import { NAME as EXPLORER } from '@shell/config/product/explorer';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 export default {
   layout: 'plain',
@@ -9,7 +9,7 @@ export default {
       name:   'c-cluster-product',
       params: {
         ...route.params,
-        product: EXPLORER,
+        product: LLMOS,
       }
     });
   }

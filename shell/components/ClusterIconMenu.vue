@@ -7,7 +7,7 @@ export default {
       type:     Object,
       required: true,
     },
-    llm: {
+    llmos: {
       type:    Boolean,
       default: false,
     },
@@ -24,8 +24,8 @@ export default {
 
       return color ? `4px solid ${ color }` : '';
     },
-    showLLMIcon() {
-      return this.llm;
+    showLLMOSIcon() {
+      return this.llmos;
     }
   },
   methods: {
@@ -59,7 +59,7 @@ export default {
       >
         {{ smallIdentifier(cluster.label) }}
       </span>
-      <div v-if="showLLMIcon">
+      <div v-if="showLLMOSIcon">
         <img
           class="cluster-local-logo"
           :src="cluster.llmNavLogo"
