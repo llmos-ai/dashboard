@@ -6510,6 +6510,8 @@ mlWorkload:
       workers: Workers
       workerReplicas: Worker Replicas
       modelName: Model Name
+  titles:
+    tokenMetrics: Token Metrics
 
 ray:
   cluster:

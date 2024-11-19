@@ -2835,7 +2835,7 @@ node:
     tab:
       conditions: 状况
       images: 镜像
-      metrics: 指标
+      metrics: 监控指标
       gpus: 显卡
       gpuMetrics: 显卡指标
       info:
@@ -4993,7 +4993,7 @@ workload:
       networkSettings: 网络设置
       podAnnotations: Pod 注释
       podLabels: Pod 标签
-      metrics: 指标
+      metrics: 监控指标
       podScheduling: Pod 调度
       nodeScheduling: 节点调度
       ports: 端口
@@ -6300,6 +6300,8 @@ mlWorkload:
       workers: Worker 节点
       workerReplicas: Worker 副本数量
       modelName: 模型名称
+  titles:
+    tokenMetrics: Token 指标
 
 ray:
   cluster:
