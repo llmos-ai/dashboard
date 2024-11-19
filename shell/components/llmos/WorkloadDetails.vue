@@ -23,6 +23,7 @@ import { matches } from '@shell/utils/selector';
 const SCALABLE_TYPES = Object.values(ML_SCALABLE_WORKLOAD_TYPES);
 const WORKLOAD_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-workload-pods-1/llmos-workload-pods?orgId=1';
 const WORKLOAD_METRICS_SUMMARY_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-workload-1/llmos-workload?orgId=1';
+const MODEL_SERVICE_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-model-service-1/llmos-model-service?orgId=1';
 
 export const ML_WORKLOAD_TYPE_TO_KIND_MAPPING = {
   [ML_WORKLOAD_TYPES.RAY_CLUSTER]:   'RayCluster',
@@ -95,10 +96,11 @@ export default {
       matchingServices:   [],
       allJobs:            [],
       allNodes:           [],
-      WORKLOAD_METRICS_DETAIL_URL,
-      WORKLOAD_METRICS_SUMMARY_URL,
       showMetrics:        false,
       showProjectMetrics: false,
+      WORKLOAD_METRICS_DETAIL_URL,
+      WORKLOAD_METRICS_SUMMARY_URL,
+      MODEL_SERVICE_METRICS_DETAIL_URL,
     };
   },
 
@@ -204,12 +206,22 @@ export default {
       }
     },
 
+    showTokenMetrics() {
+      return this.value.type === ML_WORKLOAD_TYPES.MODEL_SERVICE;
+    },
+
     graphVars() {
-      return {
+      const vars = {
         namespace: this.value.namespace,
         kind:      ML_WORKLOAD_TYPE_TO_KIND_MAPPING[this.value.type],
-        workload:  this.graphVarsWorkload
+        workload:  this.graphVarsWorkload,
       };
+
+      if (this.value.type === ML_WORKLOAD_TYPES.MODEL_SERVICE) {
+        vars.model_name = this.value.spec.servedModelName || this.value.spec.model;
+      }
+
+      return vars;
     },
 
     showPodGaugeCircles() {
@@ -337,7 +349,7 @@ export default {
         v-if="isCronJob"
         name="jobs"
         :label="t('tableHeaders.jobs')"
-        :weight="4"
+        :weight="5"
       >
         <ResourceTable
           :rows="value.jobs"
@@ -365,10 +377,26 @@ export default {
         />
       </Tab>
       <Tab
+        v-if="showMetrics && showTokenMetrics"
+        :label="t('mlWorkload.titles.tokenMetrics')"
+        name="token-metrics"
+        :weight="3"
+      >
+        <template #default="props">
+          <DashboardMetrics
+            v-if="props.active"
+            :detail-url="MODEL_SERVICE_METRICS_DETAIL_URL"
+            :has-summary-and-detail="false"
+            :vars="graphVars"
+            graph-height="550px"
+          />
+        </template>
+      </Tab>
+      <Tab
         v-if="showMetrics"
         :label="t('workload.container.titles.metrics')"
         name="workload-metrics"
-        :weight="3"
+        :weight="2"
       >
         <template #default="props">
           <DashboardMetrics
@@ -384,7 +412,7 @@ export default {
         v-if="!isJob && !isCronJob"
         name="services"
         :label="t('workload.detail.services')"
-        :weight="3"
+        :weight="1"
       >
         <p
           v-if="!serviceSchema"
