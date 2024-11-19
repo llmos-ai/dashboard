@@ -1,10 +1,9 @@
 <script>
 import ResourceSummary from '@shell/components/ResourceSummary';
 import {
-  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS, PVC, ML_WORKLOAD_TYPES, CEPH
+  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS, PVC, ML_WORKLOAD_TYPES, CEPH,
 } from '@shell/config/types';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
-import { mapGetters } from 'vuex';
 import { allHash, setPromiseResult } from '@shell/utils/promise';
 import { Banner } from '@components/Banner';
 import { getCephClusterAddonUrl } from '@shell/utils/url';
@@ -13,81 +12,124 @@ import DashboardMetrics from '@shell/components/DashboardMetrics.vue';
 import { allDashboardsExist } from '@shell/utils/grafana';
 import Tab from '@shell/components/Tabbed/Tab.vue';
 import Tabbed from '@shell/components/Tabbed/index.vue';
+import { canViewGrafanaLink } from '@shell/utils/monitoring';
+import { NODE_ARCHITECTURE } from '@shell/config/labels-annotations';
+import capitalize from 'lodash/capitalize';
+import TabTitle from '@shell/components/TabTitle.vue';
 
 const CLUSTER_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-cluster-nodes-1/llmos-cluster-nodes?orgId=1';
 const CLUSTER_METRICS_SUMMARY_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-cluster-1/llmos-cluster?orgId=1';
 const CLUSTER_GPU_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-gpu-cluster-nodes-1/llmos-gpu-cluster-nodes?orgId=1';
 
 export default {
+  name:  'SingleClusterHomeOverview',
+  props: {
+    clusterId: {
+      type:    String,
+      default: 'local'
+    }
+  },
   components: {
     ResourceSummary,
     DashboardMetrics,
     Tab,
     Tabbed,
     Banner,
+    TabTitle,
   },
 
   async fetch() {
-    if (this.isAdmin) {
-      this.cephClusters = await this.$store.dispatch('management/findAll', { type: CEPH.CEPH_CLUSTER });
+    if (this.currentCluster) {
+      // Load the current cluster first
+      await this.$store.dispatch('loadCluster', { id: this.currentCluster.id });
+
+      const hash = await allHash({
+        settings:      this.$store.dispatch('cluster/findAll', { type: MANAGEMENT.SETTING }),
+        managedAddons: this.$store.dispatch('cluster/findAll', { type: MANAGEMENT.MANAGED_ADDON }),
+      });
+
+      this.settings = hash.settings;
+      this.managedAddons = hash.managedAddons;
+
+      setPromiseResult(
+        allDashboardsExist(this.$store, this.currentCluster.id, [CLUSTER_METRICS_DETAIL_URL, CLUSTER_METRICS_SUMMARY_URL]),
+        this,
+        'showClusterMetrics',
+        'Determine cluster metrics'
+      );
+
+      setPromiseResult(
+        allDashboardsExist(this.$store, this.currentCluster.id, [CLUSTER_GPU_METRICS_DETAIL_URL]),
+        this,
+        'showClusterGPUMetrics',
+        'Determine cluster gpu metrics'
+      );
+
+      setPromiseResult(canViewGrafanaLink(this.$store, 'management'), this, 'canViewMetrics', 'Determine can view metrics');
     }
 
-    const hash = await allHash({
-      clusters:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER }),
-      settings:      this.$store.dispatch('management/findAll', { type: MANAGEMENT.SETTING }),
-      managedAddons: this.$store.dispatch('management/findAll', { type: MANAGEMENT.MANAGED_ADDON }),
-      gpuDevices:    this.$store.dispatch('management/findAll', { type: LLMOS.GPUDEVICE }),
-      viewContainer: this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD),
-    });
+    this.canViewCeph = this.$store.getters[`cluster/schemaFor`](CEPH.CEPH_CLUSTER);
+    this.canViewGpuDevices = this.$store.getters[`cluster/schemaFor`](LLMOS.GPUDEVICE);
+    this.canViewNodes = this.$store.getters[`cluster/schemaFor`](NODE);
 
-    this.clusters = hash.clusters;
-    this.settings = hash.settings;
-    this.managedAddons = hash.managedAddons;
-    this.gpuDevices = hash.gpuDevices;
-    this.viewContainerDashboard = hash.viewContainer;
+    if (this.canViewCeph) {
+      this.cephClusters = await this.$store.dispatch('cluster/findAll', { type: CEPH.CEPH_CLUSTER });
+    }
 
-    setPromiseResult(
-      allDashboardsExist(this.$store, 'local', [CLUSTER_METRICS_DETAIL_URL, CLUSTER_METRICS_SUMMARY_URL]),
-      this,
-      'showClusterMetrics',
-      'Determine cluster metrics'
-    );
+    if (this.canViewGpuDevices) {
+      this.gpuDevices = await this.$store.dispatch('cluster/findAll', { type: LLMOS.GPUDEVICE });
+    }
 
-    setPromiseResult(
-      allDashboardsExist(this.$store, 'local', [CLUSTER_GPU_METRICS_DETAIL_URL]),
-      this,
-      'showClusterGpuMetrics',
-      'Determine cluster gpu metrics'
-    );
+    if (this.canViewNodes) {
+      this.nodes = await this.$store.dispatch('cluster/findAll', { type: NODE });
+    }
   },
 
   data() {
+    const currentCluster = this.$store.getters['management/byId'](MANAGEMENT.CLUSTER, this.clusterId);
+
     return {
-      clusters:               [],
-      settings:               [],
-      managedAddons:          [],
-      cephClusters:           [],
-      gpuDevices:             [],
-      clusterDetail:          null,
-      clusterCounts:          {},
-      viewContainerDashboard: false,
+      currentCluster,
+      nodes:                 [],
+      settings:              [],
+      managedAddons:         [],
+      cephClusters:          [],
+      gpuDevices:            [],
+      canViewMetrics:        false,
+      showClusterMetrics:    false,
+      showClusterGPUMetrics: false,
+      canViewGpuDevices:     false,
+      canViewCeph:           false,
       CLUSTER_METRICS_SUMMARY_URL,
       CLUSTER_METRICS_DETAIL_URL,
       CLUSTER_GPU_METRICS_DETAIL_URL,
     };
   },
 
+  beforeDestroy() {
+    // Remove the data and stop watching resources that were fetched in this page
+    this.$store.dispatch('cluster/forgetType', MANAGEMENT.SETTING);
+    this.$store.dispatch('cluster/forgetType', MANAGEMENT.MANAGED_ADDON);
+    if (this.canViewNodes || this.canViewGpuDevices) {
+      this.$store.dispatch('cluster/forgetType', NODE);
+      this.$store.dispatch('cluster/forgetType', LLMOS.GPUDEVICE);
+    }
+
+    clearInterval(this.interval);
+  },
+
   computed: {
+    clusterCounts() {
+      return this.$store.getters['cluster/all'](COUNT);
+    },
+
     ML_WORKLOAD_TYPES() {
       return ML_WORKLOAD_TYPES;
     },
+
     LLMOS() {
       return LLMOS;
     },
-    MANAGEMENT() {
-      return MANAGEMENT;
-    },
-    ...mapGetters(['currentCluster']),
 
     canAccessNodes() {
       return !!this.clusterCounts?.[0]?.counts?.[NODE];
@@ -95,6 +137,42 @@ export default {
 
     canAccessNamespaces() {
       return !!this.clusterCounts?.[0]?.counts?.[NAMESPACE];
+    },
+
+    viewContainerDashboard() {
+      return this.$store.getters['prefs/get'](VIEW_CONTAINER_DASHBOARD);
+    },
+
+    nodesArchitecture() {
+      const obj = {};
+
+      this.nodes?.forEach((node) => {
+        if (!node.metadata?.state?.transitioning) {
+          const architecture = node.labels?.[NODE_ARCHITECTURE];
+
+          const key = architecture ? capitalize(architecture) : this.t('cluster.architecture.label.unknown');
+
+          obj[key] = (obj[key] || 0) + 1;
+        }
+      });
+
+      return obj;
+    },
+
+    architecture() {
+      const keys = Object.keys(this.nodesArchitecture);
+
+      switch (keys.length) {
+      case 0:
+        return { label: this.t('generic.provisioning') };
+      case 1:
+        return { label: keys[0] };
+      default:
+        return {
+          label:   this.t('cluster.architecture.label.mixed'),
+          tooltip: keys.reduce((acc, k) => `${ acc }${ k }: ${ this.nodesArchitecture[k] }<br>`, '')
+        };
+      }
     },
 
     canAccessPVC() {
@@ -122,10 +200,14 @@ export default {
     },
 
     hasDescription() {
-      return !!this.currentCluster?.spec?.description;
+      return !!this.cluster?.spec?.description;
     },
 
-    llmIcon() {
+    hasMetricsTabs() {
+      return this.canViewMetrics && ( this.showClusterMetrics || this.showClusterGPUMetrics);
+    },
+
+    dashboardIcon() {
       return require(`~shell/assets/images/providers/llm.svg`);
     },
 
@@ -158,7 +240,12 @@ export default {
     },
 
     cephStorageReady() {
-      return this.cephClusters.find((c) => c.metadata.name === 'llmos-ceph' && c.status?.phase === 'Ready');
+      if (!this.canViewCeph) {
+        return false;
+      }
+      const ready = this.cephClusters.find((c) => c.metadata.name === 'llmos-ceph' && c.status?.phase === 'Ready');
+
+      return ready;
     },
 
     storageNotification() {
@@ -171,7 +258,7 @@ export default {
         };
       }
 
-      const type = this.cephStorageReady ? 'info' : 'warning';
+      const type = this.cephStorageReady ? 'success' : 'warning';
 
       return {
         type,
@@ -182,46 +269,45 @@ export default {
       };
     },
   },
-
-  watch: {
-    async clusters(neu) {
-      this.clusterDetail = neu[0];
-      await this.$store.dispatch('loadCluster', { id: this.clusterDetail.id });
-      this.clusterCounts = this.$store.getters[`cluster/all`](COUNT);
-    }
-  },
 };
 </script>
 
 <template>
-  <div v-if="clusterDetail">
-    <header class="single-cluster-header">
-      <img
-        class="cluster-llm-logo"
-        :src="llmIcon"
-        alt="LLM ICON"
-      >
-      <h1>
-        <t k="home.title" />
-      </h1>
-      <div>
-        <span v-if="hasDescription">{{ currentCluster.spec.description }}</span>
+  <section
+    v-if="currentCluster"
+    class="dashboard"
+  >
+    <header>
+      <div class="title">
+        <h1>
+          <img
+            class="cluster-dashboard-logo"
+            :src="dashboardIcon"
+            alt="Dashboard Icon"
+          >
+          <TabTitle>
+            {{ t('home.title') }}
+          </TabTitle>
+        </h1>
+        <div
+          v-if="hasDescription"
+          class="cluster-dashboard-description"
+        >
+          <span>{{ currentCluster.spec.description }}</span>
+        </div>
       </div>
     </header>
 
-    <Banner
-      v-if="!cephStorageReady && isAdmin"
-      :color="storageNotification.type"
-      class="mb-20"
-      :inner-html="storageNotification.msg"
-    />
-
-    <div class="home-overview-glance">
-      <div
-        v-if="clusterDetail.kubernetesVersionRaw"
-      >
+    <div class="home-dashboard-glance mb-20">
+      <div>
         <label>{{ t('home.glance.version') }}: </label>
         <span>{{ getServerVersion }}</span>
+      </div>
+      <div v-if="nodes.length > 0">
+        <label>{{ t('home.glance.architecture') }}: </label>
+        <span v-clean-tooltip="architecture.tooltip">
+          {{ architecture.label }}
+        </span>
       </div>
       <div>
         <label>{{ t('home.glance.created') }}: </label>
@@ -234,132 +320,119 @@ export default {
       <div :style="{'flex':1}" />
     </div>
 
-    <div>
-      <div class="single-cluster-info">
-        <h3>
-          Quick Access
-        </h3>
-        <div class="cluster-counts">
-          <ResourceSummary
-            v-if="canAccessMLCluster"
-            :cluster="clusterDetail.id"
-            :resource="ML_WORKLOAD_TYPES.RAY_CLUSTER"
-            product="llmos"
-          />
-          <ResourceSummary
-            v-if="canAccessNotebooks"
-            :cluster="clusterDetail.id"
-            :resource="ML_WORKLOAD_TYPES.NOTEBOOK"
-            product="llmos"
-          />
-          <ResourceSummary
-            v-if="canAccessModelServices"
-            :cluster="clusterDetail.id"
-            :resource="ML_WORKLOAD_TYPES.MODEL_SERVICE"
-            product="llmos"
-          />
-        </div>
-        <h3>Others</h3>
-        <div class="cluster-counts">
-          <ResourceSummary
-            v-if="canAccessNodes"
-            :cluster="clusterDetail.id"
-            resource="node"
-            product="llmos"
-          />
-          <ResourceSummary
-            v-if="canAccessGPUDevices"
-            :cluster="clusterDetail.id"
-            :resource="LLMOS.GPUDEVICE"
-            product="llmos"
-          />
-          <ResourceSummary
-            v-if="canAccessPVC"
-            :cluster="clusterDetail.id"
-            resource="persistentvolumeclaim"
-            product="llmos"
-          />
-        </div>
+    <div
+      v-if="canViewCeph && !cephStorageReady"
+      class="mb-20"
+    >
+      <Banner
+        :color="storageNotification.type"
+        :inner-html="storageNotification.msg"
+      />
+    </div>
+
+    <div class="home-dashboard-info">
+      <h4>
+        Quick Access
+      </h4>
+      <div class="resource-gauges mb-20">
+        <ResourceSummary
+          v-if="canAccessMLCluster"
+          :cluster="currentCluster.id"
+          :resource="ML_WORKLOAD_TYPES.RAY_CLUSTER"
+        />
+        <ResourceSummary
+          v-if="canAccessNotebooks"
+          :cluster="currentCluster.id"
+          :resource="ML_WORKLOAD_TYPES.NOTEBOOK"
+        />
+        <ResourceSummary
+          v-if="canAccessModelServices"
+          :cluster="currentCluster.id"
+          :resource="ML_WORKLOAD_TYPES.MODEL_SERVICE"
+        />
+      </div>
+
+      <h3>Others</h3>
+      <div class="resource-gauges mb-20">
+        <ResourceSummary
+          v-if="canAccessNodes"
+          :cluster="currentCluster.id"
+          resource="node"
+        />
+        <ResourceSummary
+          v-if="canAccessNamespaces"
+          :cluster="currentCluster.id"
+          resource="namespace"
+        />
+        <ResourceSummary
+          v-if="canAccessGPUDevices"
+          :cluster="currentCluster.id"
+          :resource="LLMOS.GPUDEVICE"
+        />
+        <ResourceSummary
+          v-if="canAccessPVC"
+          :cluster="currentCluster.id"
+          resource="persistentvolumeclaim"
+        />
       </div>
     </div>
 
-    <h3>Monitoring</h3>
-    <Tabbed class="mt-30">
-      <Tab
-        name="cluster-metrics"
-        :label="t('clusterIndexPage.sections.clusterMetrics.label')"
-        :weight="99"
-      >
-        <template #default="props">
-          <DashboardMetrics
-            v-if="props.active"
-            :detail-url="CLUSTER_METRICS_DETAIL_URL"
-            :summary-url="CLUSTER_METRICS_SUMMARY_URL"
-            graph-height="825px"
-          />
-        </template>
-      </Tab>
+    <div v-if="hasMetricsTabs">
+      <h3>Monitoring</h3>
+      <Tabbed class="mt-15">
+        <Tab
+          name="cluster-metrics"
+          :label="t('clusterIndexPage.sections.clusterMetrics.label')"
+          :weight="99"
+        >
+          <template #default="props">
+            <DashboardMetrics
+              v-if="props.active"
+              :detail-url="CLUSTER_METRICS_DETAIL_URL"
+              :summary-url="CLUSTER_METRICS_SUMMARY_URL"
+              graph-height="825px"
+            />
+          </template>
+        </Tab>
 
-      <Tab
-        name="cluster-gpu-metrics"
-        :label="t('clusterIndexPage.sections.clusterGpuMetrics.label')"
-        :weight="98"
-      >
-        <template #default="props">
-          <DashboardMetrics
-            v-if="props.active"
-            :detail-url="CLUSTER_GPU_METRICS_DETAIL_URL"
-            :has-summary-and-detail="false"
-            graph-height="825px"
-          />
-        </template>
-      </Tab>
-    </Tabbed>
-  </div>
+        <Tab
+          name="cluster-gpu-metrics"
+          :label="t('clusterIndexPage.sections.clusterGpuMetrics.label')"
+          :weight="98"
+        >
+          <template #default="props">
+            <DashboardMetrics
+              v-if="props.active"
+              :detail-url="CLUSTER_GPU_METRICS_DETAIL_URL"
+              :has-summary-and-detail="false"
+              graph-height="825px"
+            />
+          </template>
+        </Tab>
+      </Tabbed>
+    </div>
+  </section>
 </template>
 
 <style lang="scss" scoped>
-.single-cluster-header {
+.extension-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(calc((100%/3) - 40px), 1fr));
+  grid-column-gap: 15px;
+  grid-row-gap: 20px;
+}
+
+@media only screen and (max-width: map-get($breakpoints, "--viewport-9")) {
+  .extension-card-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.home-dashboard-glance {
   align-items: center;
-  display: flex;
-
-  .provider-icon {
-    margin-right: 10px;
-  }
-
-  h1 {
-    font-size: 20px;
-    margin: 0;
-  }
-
-  .cluster-llm-logo {
-    margin-right: 10px;
-    width: 30px;
-    height: 30px;
-  }
-}
-.single-cluster-info {
-  margin-top: 20px;
-
-  .cluster-counts {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 10px 0;
-    > * {
-      flex: 1 0 21%;
-      margin: 5px;
-      height: 100px;
-      &:not(:last-child) {
-        margin-right: 20px;
-      }
-    }
-  }
-}
-
-.home-overview-glance {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 20px 0px;
+  padding: 15px 0px;
   display: flex;
 
   &>*:not(:nth-last-child(-n+2)) {
@@ -367,7 +440,116 @@ export default {
   }
 }
 
-.title h1 {
-  margin: 0;
+.title {
+  h1 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .cluster-dashboard-description {
+    margin: 5px 0;
+    opacity: 0.7;
+  }
+
+  .cluster-dashboard-logo {
+    margin-right: .6rem;
+    width: 25px;
+    height: 25px;
+    float: left;
+  }
+}
+
+.home-dashboard-info {
+  .resource-gauges {
+    margin-top: 10px;
+  }
+}
+
+.actions-span {
+  align-self: center;
+}
+
+.events {
+  margin-top: 30px;
+}
+
+.graph-options {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.etcd-metrics ::v-deep .external-link {
+  top: -107px;
+}
+
+.cluster-tools-tip {
+  margin-top: 0;
+}
+
+.cluster-tools-link {
+  display: flex;
+  margin-right: 10px;
+
+  > I {
+    line-height: inherit;
+    margin-right: 4px;
+  }
+
+  &:focus {
+    outline: 0;
+  }
+}
+
+.events-table-link, .cert-table-link {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.k8s-service-status {
+  align-items: center;
+  display: inline-flex;
+  border: 1px solid;
+  border-color: var(--border);
+  margin-top: 20px;
+
+  .label {
+    border-left: 1px solid var(--border);
+  }
+
+  &:not(:last-child) {
+    margin-right: 20px;
+  }
+
+  > div {
+    padding: 5px 20px;
+  }
+
+  > I {
+    text-align: center;
+    padding: 5px 10px;
+  }
+
+  &.unhealthy {
+    border-color: var(--error-border);
+
+    > I {
+      color: var(--error)
+    }
+  }
+
+  &.warning {
+    > I {
+      color: var(--warning)
+    }
+  }
+
+  &.healthy {
+    > I {
+      color: var(--success)
+    }
+  }
 }
 </style>

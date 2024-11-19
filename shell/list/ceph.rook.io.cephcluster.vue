@@ -76,7 +76,7 @@ export default {
       }
 
       const isReady = this.clusters.find((c) => c.metadata.name === 'llmos-ceph' && c.status?.phase === 'Ready');
-      const type = isReady ? 'info' : 'warning';
+      const type = isReady ? 'success' : 'warning';
 
       return {
         type,

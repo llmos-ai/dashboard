@@ -280,6 +280,7 @@ home:
   glance:
     version: Version
     created: Created
+    architecture: Architecture
 about:
   title: About
   versions:

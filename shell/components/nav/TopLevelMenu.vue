@@ -357,7 +357,7 @@ export default {
                   :data-testid="`top-level-menu-cluster-${index}`"
                   @click="hide()"
                 >
-                  <!-- Clusters LLM entry -->
+                  <!-- Clusters LLMOS entry -->
                   <nuxt-link
                     v-if="c.ready"
                     :data-testid="`menu-cluster-${ c.id }`"
@@ -367,7 +367,7 @@ export default {
                     <ClusterIconMenu
                       v-tooltip="getTooltipConfig(t('product.llmos'))"
                       :cluster="c"
-                      :llm="true"
+                      :llmos="true"
                       class="rancher-provider-icon"
                     />
                     <div class="cluster-name">

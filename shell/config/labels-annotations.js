@@ -11,6 +11,7 @@ export const WORKSPACE_ANNOTATION = 'objectset.rio.cattle.io/id';
 export const SYSTEM_NAMESPACE = 'management.llmos.ai/system-namespace';
 export const DESCRIPTION = 'field.llmos.ai/description';
 export const CONTAINER_DEFAULT_RESOURCE_LIMIT = 'field.llmos.ai/containerDefaultResourceLimit';
+export const NODE_ARCHITECTURE = 'kubernetes.io/arch';
 
 export const KUBERNETES = {
   SERVICE_ACCOUNT_UID:  'kubernetes.io/service-account.uid',
