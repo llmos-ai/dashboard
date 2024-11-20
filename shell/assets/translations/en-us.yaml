@@ -6517,6 +6517,13 @@ ray:
   cluster:
     allowScheduling: Allow Scheduling on the Head Node
     enableGCS: Enable Global Control Service(GCS) fault tolerance
+    enableMonitoring: Enable Monitoring
+  monitoring:
+    grafana:
+      iframe: Grafana iFrame Host
+      host: Grafana Host
+    prometheus:
+      host: Prometheus Host
 
 modelService:
   model: Model Name

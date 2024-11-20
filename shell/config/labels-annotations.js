@@ -1,4 +1,3 @@
-// export const NORMAN_NAME = 'field.cattle.io/name';
 export const HOSTNAME = 'kubernetes.io/hostname';
 export const TIMESTAMP = 'llmos.ai/timestamp';
 export const PROJECT = 'field.cattle.io/projectId';
@@ -89,5 +88,6 @@ export const SYSTEM_LABELS = [
 
 export const ANNOTATIONS = {
   VOLUME_CLAIM_TEMPLATE:  'llmos.ai/volume-claim-templates',
+  MONITORING_ENABLED:     'llmos.ai/monitoring-enabled',
   RAY_CLUSTER_FT_ENABLED: 'ray.io/ft-enabled',
 };

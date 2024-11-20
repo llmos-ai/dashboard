@@ -96,8 +96,7 @@ export default {
     await allHash(fetches);
 
     // don't block UI for these resources
-    this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
-    // this.servicesOwned = await this.value.getServicesOwned();
+    await this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
   },
 
   data() {
@@ -140,8 +139,6 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['currentCluster']),
-
     isEdit() {
       return this.mode === _EDIT;
     },
@@ -240,8 +237,6 @@ export default {
       this.secondaryResourceData.namespace = neu;
       // Fetch resources that are namespace specific, we don't need to re-fetch non-namespaced resources on namespace change
       this.resourceManagerFetchSecondaryResources(this.secondaryResourceData, true);
-
-      // this.servicesOwned = await this.value.getServicesOwned();
     },
 
     isNamespaceNew(neu, old) {
