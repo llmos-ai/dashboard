@@ -92,7 +92,7 @@ export default class MlWorkload extends MLWorkloadService {
     set(this.metadata, 'annotations', annotations);
 
     this.save();
-    this.$dispatch('growl/info', { message: `${ this.kind } ${ this.name } has been successfully redeployed.'` }, { root: true });
+    this.$dispatch('growl/success', { message: `${ this.kind } ${ this.name } has been successfully redeployed.` }, { root: true });
   }
 
   get warnDeletionMessage() {

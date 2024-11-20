@@ -185,7 +185,7 @@ export default class RayCluster extends MlWorkload {
       pod.remove();
     }
 
-    this.$dispatch('growl/info', { message: `${ this.kind } ${ this.name } has been successfully redeployed.` }, { root: true });
+    this.$dispatch('growl/success', { message: `ML Cluster ${ this.name } has been successfully redeployed.` }, { root: true });
   }
 
   get details() {

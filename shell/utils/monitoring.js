@@ -3,6 +3,7 @@ import { ENDPOINTS } from '@shell/config/types';
 import { isEmpty } from '@shell/utils/object';
 
 export const MONITORING_NAMESPACE = 'llmos-monitoring-system';
+export const MONITORING_GRAFANA_PATH = `/api/v1/namespaces/${ MONITORING_NAMESPACE }/services/http:llmos-monitoring-grafana:80/proxy`;
 
 async function hasEndpointSubsets(store, storeType, id) {
   const type = storeType || 'cluster';

@@ -17,7 +17,6 @@ export default class ModelService extends MlWorkload {
         replicas:        1,
         model:           '',
         servedModelName: '',
-        enabledGUI:      false,
         serviceType:     'ClusterIP',
         updateStrategy:  { type: 'RollingUpdate' },
         template:        {

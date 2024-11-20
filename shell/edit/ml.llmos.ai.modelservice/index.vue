@@ -5,6 +5,7 @@ import LLMOSWorkload from '@shell/mixins/llmos/ml-workload';
 import { EVENT } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
 import { SvcOptions } from '@shell/config/constants';
+import { mergeEnvs } from '@shell/utils/merge';
 
 export default {
   name:   'ModelService',
@@ -154,34 +155,7 @@ export default {
     mergeEnvs() {
       const huggingFaceEnv = [this.hfToken, this.hfEndpoint];
 
-      // merge envs the arrays and ensure unique names
-      const mergedEnvs = [...this.container.env, ...huggingFaceEnv].reduce((acc, current) => {
-        // Check if the current object has a valid value or typed keyRef value
-        const hasValidName = current.name !== undefined && current.name !== '';
-        const hasValidValue = current.value !== undefined && current.value !== '';
-        const hasValidSecretKeyRef = current.valueFrom && current.valueFrom.secretKeyRef && current.valueFrom.secretKeyRef.name !== '' && current.valueFrom.secretKeyRef.key !== '';
-        const hasValidConfigMapKeyRef = current.valueFrom && current.valueFrom.configMapKeyRef && current.valueFrom.configMapKeyRef.name !== '' && current.valueFrom.configMapKeyRef.key !== '';
-        const hasValidResourceField = current.valueFrom && current.valueFrom.resourceFieldRef && current.valueFrom.resourceFieldRef.resource !== '';
-        const hasValidFieldRef = current.valueFrom && current.valueFrom.fieldRef && current.valueFrom.fieldRef.fieldPath !== '';
-
-        // If the object has valid data, proceed
-        if (hasValidName && (hasValidValue || hasValidSecretKeyRef || hasValidConfigMapKeyRef || hasValidResourceField || hasValidFieldRef)) {
-          // Check if the name already exists in the accumulator
-          const existingIndex = acc.findIndex((item) => item.name === current.name);
-
-          if (existingIndex > -1) {
-            // Merge or replace the existing object
-            acc[existingIndex] = { ...acc[existingIndex], ...current };
-          } else {
-            // Add the new object if the name does not exist
-            acc.push(current);
-          }
-        }
-
-        return acc;
-      }, []);
-
-      this.container.env = mergedEnvs;
+      this.container.env = mergeEnvs(this.container.env, huggingFaceEnv);
     }
   },
 };
