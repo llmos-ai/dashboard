@@ -95,6 +95,10 @@ export const routerOptions = {
     component: () => interopDefault(import('../pages/c/_cluster/llmos/index.vue' /* webpackChunkName: "pages/c/_cluster/llm/index" */)),
     name:      'c-cluster-llmos'
   }, {
+    path:      '/c/:cluster/monitoring',
+    component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/index.vue')),
+    name:      'c-cluster-monitoring'
+  }, {
     path:      '/c/:cluster/settings',
     component: () => interopDefault(import('../pages/c/_cluster/settings/index.vue' /* webpackChunkName: "pages/c/_cluster/settings/index" */)),
     name:      'c-cluster-settings'
@@ -122,6 +126,26 @@ export const routerOptions = {
     path:      '/c/:cluster/navlinks/:group?',
     component: () => interopDefault(import('../pages/c/_cluster/navlinks/_group.vue' /* webpackChunkName: "pages/c/_cluster/navlinks/_group" */)),
     name:      'c-cluster-navlinks-group'
+  }, {
+    path:      '/c/:cluster/monitoring/alertmanagerconfig',
+    component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/alertmanagerconfig/index.vue')),
+    name:      'c-cluster-monitoring-alertmanagerconfig'
+  }, {
+    path:      '/c/:cluster/monitoring/monitor',
+    component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/monitor/index.vue')),
+    name:      'c-cluster-monitoring-monitor'
+  }, {
+    path:      '/c/:cluster/monitoring/monitor/create',
+    component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/monitor/create.vue')),
+    name:      'c-cluster-monitoring-monitor-create'
+  }, {
+    path:      '/c/:cluster/monitoring/monitor/:namespace/:id?',
+    component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/monitor/_namespace/_id.vue')),
+    name:      'c-cluster-monitoring-monitor-namespace-id'
+  }, {
+    path:      '/c/:cluster/monitoring/alertmanagerconfig/:alertmanagerconfigid/receiver',
+    component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/alertmanagerconfig/_alertmanagerconfigid/receiver.vue')),
+    name:      'c-cluster-monitoring-alertmanagerconfig-alertmanagerconfigid-receiver'
   }, {
     path:      '/c/:cluster/:product',
     component: () => interopDefault(import('../pages/c/_cluster/_product/index.vue' /* webpackChunkName: "pages/c/_cluster/_product/index" */)),

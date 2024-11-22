@@ -1122,6 +1122,16 @@ export default class Resource {
   }
 
   /**
+   * Remove any unwanted properties from the object that will be saved
+   */
+  cleanForSave(data, forNew) {
+    delete data.__rehydrate;
+    delete data.__clone;
+
+    return data;
+  }
+
+  /**
    * Allow to handle the response of the save request
    * @param {*} res Full request response
    */
@@ -1193,6 +1203,7 @@ export default class Resource {
       opt.data.annotations = opt.data._annotations;
     }
 
+    opt.data = this.cleanForSave(opt.data, forNew);
     // handle "replace" opt as a query param _replace=true for norman PUT requests
     if (opt?.replace && opt.method === 'put') {
       const argParam = opt.url.includes('?') ? '&' : '?';
