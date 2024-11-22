@@ -2377,6 +2377,9 @@ monitoring:
       start:
         label: 开始于
     linkedList:
+      config:
+        description: 管理监控配置
+        label: 监控配置
       alertManager:
         description: 已启用的告警
         label: Alertmanager
@@ -2536,8 +2539,8 @@ monitoringReceiver:
     label: Webhook
     title: Webhook 配置
     urlTooltip: 对于一些 Webhook 而言，这是一个指向 DNS 服务的 URL
-    modifyNamespace: 如果 <pre class="inline-block m-0 p-0 vertical-middle">rancher-alerting-drivers</pre> 的默认值改变了，请以 http://&lt;new_service_name&gt;.&lt;new_namespace&gt.svc.&lt;port&gt/&lt;path&gt 格式更新以下 URL。
-    banner: 要使用 Microsoft Teams 或短信，请先安装至少一个 <pre class="inline-block m-0 p-0 vertical-middle">rancher-alerting-drivers</pre> 实例。
+    modifyNamespace: 如果 <pre class="inline-block m-0 p-0 vertical-middle">alerting-drivers</pre> 的默认值改变了，请以 http://&lt;new_service_name&gt;.&lt;new_namespace&gt.svc.&lt;port&gt/&lt;path&gt 格式更新以下 URL。
+    banner: 要使用 Microsoft Teams 或 SMS，请先安装至少一个 <pre class="inline-block m-0 p-0 vertical-middle">alerting-drivers</pre> 实例。
     add:
       selectWebhookType: 选择 Webhook 类型
       generic: 通用
@@ -4721,6 +4724,7 @@ validation:
   path: '"{key}" 必须是绝对路径'
   prometheusRule:
     noEdit: 名称中的字符无效，可能无法编辑此 PrometheusRule。
+    systemNoEdit: 此 Prometheus 规则无法修改，因为它是默认资源。
     groups:
       required: 至少需要一个规则组。
       singleAlert: 规则可以包含告警规则或记录规则，但不能同时包含两者。

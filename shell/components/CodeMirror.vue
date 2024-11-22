@@ -166,7 +166,7 @@ export default {
 
     .vue-codemirror .CodeMirror {
       height: initial;
-      background: none
+      border-radius: 2px;
     }
 
     &.as-text-area {
@@ -218,6 +218,7 @@ export default {
       .CodeMirror-lines {
         color: var(--input-text);
         padding: 0;
+        background: #1b1c21 !important;
 
         .CodeMirror-line > span > span {
           &.cm-overlay {

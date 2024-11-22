@@ -2567,6 +2567,9 @@ monitoring:
       start:
         label: Starts At
     linkedList:
+      config:
+        description: Monitoring Addon Config
+        label: Config
       alertManager:
         description: Active Alerts
         label: Alertmanager
@@ -2726,8 +2729,8 @@ monitoringReceiver:
     label: Webhook
     title: Webhook Config
     urlTooltip: For some webhooks this a url that points to the service DNS
-    modifyNamespace: If <pre class="inline-block m-0 p-0 vertical-middle">rancher-alerting-drivers</pre> default values were changed, please update the url below in the format http://&lt;new_service_name&gt;.&lt;new_namespace&gt.svc.&lt;port&gt/&lt;path&gt
-    banner: To use MS Teams or SMS you will need to have at least one instance of <pre class="inline-block m-0 p-0 vertical-middle">rancher-alerting-drivers</pre> installed first.
+    modifyNamespace: If <pre class="inline-block m-0 p-0 vertical-middle">alerting-drivers</pre> default values were changed, please update the url below in the format http://&lt;new_service_name&gt;.&lt;new_namespace&gt.svc.&lt;port&gt/&lt;path&gt
+    banner: To use MS Teams or SMS you will need to have at least one instance of <pre class="inline-block m-0 p-0 vertical-middle">alerting-drivers</pre> installed first.
     add:
       selectWebhookType: Select Webhook Type
       generic: Generic
@@ -4918,6 +4921,7 @@ validation:
   path: '"{key}" must be an absolute path'
   prometheusRule:
     noEdit: This Prometheus Rule may not be edited due to invalid characters in name.
+    systemNoEdit: This Prometheus Rule can't be modified because it is a built-in resource.
     groups:
       required: At least one rule group is required.
       singleAlert: A rule may contain alert rules or recording rules but not both.

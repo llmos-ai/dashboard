@@ -4,7 +4,10 @@
 
 // Steve-specific virtual types
 // Base: /v1
-export const STEVE = { PREFERENCE: 'userpreference' };
+export const STEVE = {
+  PREFERENCE:        'userpreference',
+  SCHEMA_DEFINITION: 'schemaDefinition'
+};
 
 // Common native k8s types (via Steve)
 // Base: /k8s/clusters/<id>/v1/
@@ -131,26 +134,13 @@ export const CEPH = {
 };
 
 export const MONITORING = {
-  ALERTMANAGER:       'monitoring.coreos.com.alertmanager',
-  ALERTMANAGERCONFIG: 'monitoring.coreos.com.alertmanagerconfig',
-  PODMONITOR:         'monitoring.coreos.com.podmonitor',
-  PROMETHEUS:         'monitoring.coreos.com.prometheus',
-  PROMETHEUSRULE:     'monitoring.coreos.com.prometheusrule',
-  SERVICEMONITOR:     'monitoring.coreos.com.servicemonitor',
-  THANOSRULER:        'monitoring.coreos.com.thanosruler',
-  SPOOFED:            {
-    RECEIVER:             'monitoring.coreos.com.receiver',
-    RECEIVER_SPEC:        'monitoring.coreos.com.receiver.spec',
-    RECEIVER_EMAIL:       'monitoring.coreos.com.receiver.email',
-    RECEIVER_SLACK:       'monitoring.coreos.com.receiver.slack',
-    RECEIVER_WEBHOOK:     'monitoring.coreos.com.receiver.webhook',
-    RECEIVER_PAGERDUTY:   'monitoring.coreos.com.receiver.pagerduty',
-    RECEIVER_OPSGENIE:    'monitoring.coreos.com.receiver.opsgenie',
-    RECEIVER_HTTP_CONFIG: 'monitoring.coreos.com.receiver.httpconfig',
-    RESPONDER:            'monitoring.coreos.com.receiver.responder',
-    ROUTE:                'monitoring.coreos.com.route',
-    ROUTE_SPEC:           'monitoring.coreos.com.route.spec',
-  }
+  ALERTMANAGER:        'monitoring.coreos.com.alertmanager',
+  ALERTMANAGER_CONFIG: 'monitoring.coreos.com.alertmanagerconfig',
+  PROMETHEUS:          'monitoring.coreos.com.prometheus',
+  PROMETHEUS_RULE:     'monitoring.coreos.com.prometheusrule',
+  SERVICE_MONITOR:     'monitoring.coreos.com.servicemonitor',
+  POD_MONITOR:         'monitoring.coreos.com.podmonitor',
+  THANOS_RULER:        'monitoring.coreos.com.thanosruler',
 };
 
 export const AUTH_TYPE = {

@@ -10,6 +10,7 @@ import { isEmpty } from '@shell/utils/object';
 import HybridModel from '@shell/plugins/steve/hybrid-class';
 import { PINNED_CLUSTERS } from '@shell/store/prefs';
 import { copyTextToClipboard } from '@shell/utils/clipboard';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 // See translation file cluster.providers for list of providers
 // If the logo is not named with the provider name, add an override here
@@ -161,7 +162,23 @@ export default class MgmtCluster extends HybridModel {
   }
 
   get providerNavLogo() {
+    const product = this.$rootGetters['currentProduct'];
+
+    if (product.category === LLMOS) {
+      return this.llmNavLogo;
+    }
+
     return this.providerLogo;
+  }
+
+  get displayName() {
+    const product = this.$rootGetters['currentProduct'];
+
+    if (product.category === LLMOS) {
+      return this.t(`product."${ product.category }"`);
+    }
+
+    return this.spec.displayName;
   }
 
   // Custom badge to show for the Cluster (if the appropriate annotations are set)

@@ -4,6 +4,7 @@ import Poller from '@shell/utils/poller';
 import SortableTable from '@shell/components/SortableTable';
 import { ENDPOINTS } from '@shell/config/types';
 import { mapGetters } from 'vuex';
+import { MONITORING_NAMESPACE } from '@shell/utils/monitoring';
 const ALERTMANAGER_POLL_RATE_MS = 30000;
 const MAX_FAILURES = 2;
 
@@ -13,7 +14,7 @@ export default {
   props: {
     monitoringNamespace: {
       type:    String,
-      default: 'llmos-monitoring-system'
+      default: MONITORING_NAMESPACE
     },
     alertServiceEndpoint: {
       type:    String,
@@ -73,7 +74,7 @@ export default {
       const inStore = this.$store.getters['currentProduct'].inStore;
       const alertsEvents = await this.$store.dispatch(
         `${ inStore }/request`,
-        { url: `/k8s/clusters/${ this.currentCluster.id }/api/v1/namespaces/${ this.monitoringNamespace }/services/http:${ this.alertServiceEndpoint }:9093/proxy/api/v1/alerts` }
+        { url: `/api/v1/namespaces/${ this.monitoringNamespace }/services/http:${ this.alertServiceEndpoint }:9093/proxy/api/v2/alerts` }
       );
 
       if (alertsEvents.data) {
