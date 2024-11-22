@@ -73,11 +73,7 @@ export default {
     },
 
     loggedInUser() {
-      // const principalId = this.$store.getters['auth/principalId'] || "";
-
       return this.$store.getters['management/byId'](MANAGEMENT.USER, this.$store.getters['auth/principalId']) || {};
-
-      // return user;
     },
 
     kubeConfigEnabled() {
@@ -143,6 +139,10 @@ export default {
       const name = this.currentProduct.name;
 
       return this.$store.getters['i18n/withFallback'](`product."${ name }"`, null, ucFirst(name));
+    },
+
+    category() {
+      return this.$store.getters['i18n/withFallback'](`product.${ this.currentProduct.category }.label`, null, this.currentProduct.category);
     },
 
     showSearch() {
@@ -353,7 +353,7 @@ export default {
             ref="clusterName"
             class="cluster-name"
           >
-            {{ currentCluster.spec.displayName }}
+            {{ currentCluster.displayName }}
           </div>
           <ClusterBadge
             v-if="currentCluster"
@@ -780,7 +780,7 @@ export default {
     .side-menu-logo-img {
       object-fit: contain;
       height: 30px;
-      max-width: 60px;
+      max-width: 200px;
     }
 
     > * {

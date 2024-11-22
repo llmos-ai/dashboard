@@ -239,9 +239,7 @@ export function init(store) {
     exact:         true,
   });
 
-  // Ignore these types as they are managed through the auth\settings product
+  // Ignore these types as they are managed through the auth/llmos product
   ignoreGroup(/^(.*\.)?management\.llmos\.ai$/);
-
-  // Ignore these types as they are managed through the auth product
   ignoreGroup(/^(.*\.)?llmos\.ai$/);
 }

@@ -98,6 +98,16 @@ export default {
     namespaceIcon() {
       return this.type.namespaced;
     },
+
+    count() {
+      if (this.type.count !== undefined) {
+        return this.type.count;
+      }
+
+      const inStore = this.$store.getters['currentStore'](this.type.name);
+
+      return this.$store.getters[`${ inStore }/count`]({ name: this.type.name });
+    }
   },
 
   methods: {

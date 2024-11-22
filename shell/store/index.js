@@ -2,7 +2,9 @@ import { BACK_TO } from '@shell/config/local-storage';
 import { setBrand, setVendor } from '@shell/config/private-label';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
-import { LOGGED_OUT, TIMED_OUT, UPGRADED, _FLAGGED } from '@shell/config/query-params';
+import {
+  LOGGED_OUT, TIMED_OUT, UPGRADED, _FLAGGED, IS_SSO
+} from '@shell/config/query-params';
 import { SETTING } from '@shell/config/settings';
 import {
   COUNT,
@@ -32,6 +34,7 @@ import { addParam } from '@shell/utils/url';
 import semver from 'semver';
 import { STORE } from '@shell/store/store-types';
 import { isDevBuild } from '@shell/utils/version';
+import { markRaw } from 'vue';
 
 // Disables strict mode for all store instances to prevent warning about changing state outside of mutations
 // because it's more efficient to do that sometimes.
@@ -233,7 +236,10 @@ export const state = () => {
     pageActions:             [],
     serverVersion:           null,
     systemNamespaces:        [],
-    targetRoute:             null
+    targetRoute:             null,
+    rootProduct:             undefined,
+    $router:                 markRaw(undefined),
+    $route:                  markRaw(undefined),
   };
 };
 
@@ -296,6 +302,13 @@ export const getters = {
     return out;
   },
 
+  // Get the root product - this is either the current product or the current product's root (if set)
+  // Used for navigation and other areas that don't want to re-evaluate when the product changes, but is still within
+  // a common root product
+  rootProduct(state) {
+    return state.rootProduct;
+  },
+
   getStoreNameByProductId(state) {
     const products = state['type-map']?.products;
 
@@ -326,6 +339,20 @@ export const getters = {
     }
 
     return product.name === EXPLORER;
+  },
+
+  isLLMOS(state, getters) {
+    const product = getters.currentProduct;
+
+    if ( !product ) {
+      return false;
+    }
+
+    return product.name === LLMOS;
+  },
+
+  isRootProduct(state, getters) {
+    return getters.rootProduct?.name === LLMOS;
   },
 
   defaultClusterId(state, getters) {
@@ -611,8 +638,20 @@ export const mutations = {
     state.clusterId = neu;
   },
 
-  setProduct(state, neu) {
-    state.productId = neu;
+  setProduct(state, value) {
+    state.productId = value;
+
+    // Update rootProduct ONLY if the root product has changed as a result of the product change
+    const newProduct = this.getters['type-map/productByName'](value);
+    let newRootProduct = newProduct;
+
+    if (newProduct?.rootProduct) {
+      newRootProduct = this.getters['type-map/productByName'](newProduct.rootProduct) || newProduct;
+    }
+
+    if (newRootProduct?.name !== state.rootProduct?.name) {
+      state.rootProduct = newRootProduct;
+    }
   },
 
   setError(state, { error: obj, locationError }) {
@@ -983,9 +1022,16 @@ export const actions = {
         window.localStorage.setItem(BACK_TO, window.location.href);
       }
 
-      const QUERY = (LOGGED_OUT in route.query) ? LOGGED_OUT : TIMED_OUT;
+      let QUERY = (LOGGED_OUT in route.query) ? LOGGED_OUT : TIMED_OUT;
 
-      router.replace(`/auth/login?${ QUERY }`);
+      // adds IS_SSO query param to login route if logout came with an auth provider enabled
+      QUERY += (IS_SSO in route.query) ? `&${ IS_SSO }` : '';
+
+      // Go back to login and force a full page reload, this ensures we unload any dangling resources the user is no longer authorized to use (like extensions).
+      // We use document instead of router because router does a clunky job of visiting a new page and reloading. In this case it would cause the login page to flash before actually reloading.
+      const base = process.env.routerBase || '/';
+
+      document.location.href = `${ base }auth/login?${ QUERY }`;
     }
   },
 

@@ -175,7 +175,9 @@ nav:
     RBAC: RBAC
     Scheduling: 调度
     Storage: 存储
-    GPUManagement: GPU 管理
+    gpuManagement: GPU 管理
+    llmosStorage: 存储
+    ceph: Ceph 管理
   ns:
     all: 所有命名空间
     clusterLevel: 集群资源
