@@ -1,12 +1,12 @@
-import { REPO_TYPE, REPO, CHART, VERSION } from '@shell/config/query-params';
+import { MANAGEMENT } from '@shell/config/types';
+import { ADDON_NAME, ADDON_NAMESPACE } from '@shell/config/product/monitoring';
 
-export default function(product, chartName, defaultResourceOrRoute, aa, install = true) {
+export default function(product, chartName, defaultResourceOrRoute, install = true) {
   return async function middleware({ redirect, store } ) {
     const cluster = store.getters['currentCluster']?.id || 'local';
 
     if ( store.getters['type-map/isProductActive'](product) ) {
       // If the product is installed and there's a default resource, redirect there
-
       if ( defaultResourceOrRoute ) {
         if ( typeof defaultResourceOrRoute === 'object' ) {
           return redirect(defaultResourceOrRoute);
@@ -21,33 +21,22 @@ export default function(product, chartName, defaultResourceOrRoute, aa, install 
           },
         });
       }
-
       // Otherwise just let the middleware pass through
     } else if (install) {
       // The product is not installed, redirect to the details chart
-
-      await store.dispatch('catalog/load', { force: true });
-
-      const chart = store.getters['catalog/chart']({ chartName });
-
-      if ( chart ) {
-        return redirect({
-          name:   'c-cluster-apps-charts-chart',
-          params: { cluster },
-          query:  {
-            [REPO_TYPE]: chart.repoType,
-            [REPO]:      chart.repoName,
-            [CHART]:     chart.chartName,
-            [VERSION]:   chart.versions[0].version
-          },
-        });
-      } else {
-        // The chart's not available
-        store.dispatch('loadingError', `Chart not found for ${ product }`);
-      }
+      return redirect({
+        name:   'c-cluster-product-resource-namespace-id',
+        params: {
+          cluster,
+          product:   'llmos',
+          resource:  MANAGEMENT.MANAGED_ADDON,
+          namespace: ADDON_NAMESPACE,
+          id:        ADDON_NAME,
+        },
+      });
     } else {
       return redirect({
-        name:   'c-cluster-explorer',
+        name:   'c-cluster-llmos',
         params: { cluster },
       });
     }

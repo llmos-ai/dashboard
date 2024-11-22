@@ -12,10 +12,9 @@ import { sortBy } from '@shell/utils/sort';
 import { ucFirst } from '@shell/utils/string';
 
 import { SCHEMA, COUNT } from '@shell/config/types';
-import { LLMOS_NAME as HARVESTER } from '@shell/config/features';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
-import { BASIC, FAVORITE, USED } from '@shell/store/type-map';
+import { TYPE_MODES } from '@shell/store/type-map';
 import { NAME as NAVLINKS } from '@shell/config/product/navlinks';
 import Group from '@shell/components/nav/Group';
 
@@ -114,7 +113,7 @@ export default {
 
   computed: {
     ...mapState(['managementReady', 'clusterReady']),
-    ...mapGetters(['productId', 'clusterId', 'currentProduct', 'namespaceMode', 'isExplorer']),
+    ...mapGetters(['productId', 'clusterId', 'currentProduct', 'namespaceMode', 'isExplorer', 'isLLMOS', 'isRootProduct']),
     ...mapGetters({ locale: 'i18n/selectedLocaleLabel', availableLocales: 'i18n/availableLocales' }),
     ...mapGetters('type-map', ['activeProducts']),
 
@@ -134,18 +133,6 @@ export default {
       const { displayVersion } = getVersionInfo(this.$store);
 
       return displayVersion;
-    },
-
-    showProductFooter() {
-      if (this.isVirtualProduct) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-
-    isVirtualProduct() {
-      return this.currentProduct.name === HARVESTER;
     },
 
     allNavLinks() {
@@ -209,47 +196,46 @@ export default {
       }
 
       const currentProduct = this.$store.getters['productId'];
-      let namespaces = null;
-
-      if ( !this.$store.getters['isAllNamespaces'] ) {
-        const namespacesObject = this.$store.getters['namespaces']();
-
-        namespaces = Object.keys(namespacesObject);
-      }
 
       // Always show cluster-level types, regardless of the namespace filter
       const namespaceMode = 'both';
       const out = [];
-      const loadProducts = this.isExplorer ? [EXPLORER] : [];
+      let loadProducts = this.isRootProduct ? [LLMOS] : [];
+
+      if ( this.isExplorer ) {
+        loadProducts = [EXPLORER];
+      }
 
       const productMap = this.activeProducts.reduce((acc, p) => {
         return { ...acc, [p.name]: p };
       }, {});
 
-      if ( this.isExplorer ) {
+      if ( this.isLLMOS ) {
         for ( const product of this.activeProducts ) {
-          if ( product.inStore === 'cluster' && product.name !== LLMOS) {
+          if ( product.inStore === 'cluster' && product.name !== EXPLORER && product.name !== LLMOS ) {
             addObject(loadProducts, product.name);
           }
         }
       }
 
       // This should already have come into the list from above, but in case it hasn't...
-      addObject(loadProducts, currentProduct);
+      if (!this.isLLMOS) {
+        addObject(loadProducts, currentProduct);
+      }
 
-      this.getProductsGroups(out, loadProducts, namespaceMode, namespaces, productMap);
+      this.getProductsGroups(out, loadProducts, namespaceMode, productMap);
       this.getExplorerGroups(out);
 
       replaceWith(this.groups, ...sortBy(out, ['weight:desc', 'label']));
       this.gettingGroups = false;
     },
 
-    getProductsGroups(out, loadProducts, namespaceMode, namespaces, productMap) {
+    getProductsGroups(out, loadProducts, namespaceMode, productMap) {
       const clusterId = this.$store.getters['clusterId'];
       const currentType = this.$route.params.resource || '';
 
       for ( const productId of loadProducts ) {
-        const modes = [BASIC];
+        const modes = [TYPE_MODES.BASIC];
 
         if ( productId === NAVLINKS ) {
           // Navlinks produce their own top-level nav items so don't need to show it as a product.
@@ -257,16 +243,18 @@ export default {
         }
 
         if ( productId === EXPLORER ) {
-          modes.push(FAVORITE);
-          modes.push(USED);
+          modes.push(TYPE_MODES.FAVORITE);
+          modes.push(TYPE_MODES.USED);
         }
 
+        // Get all types for all modes
+        const typesByMode = this.$store.getters['type-map/allTypes'](productId, modes);
+
         for ( const mode of modes ) {
-          const types = this.$store.getters['type-map/allTypes'](productId, mode) || {};
+          const types = typesByMode[mode] || {};
+          const more = this.$store.getters['type-map/getTree'](productId, mode, types, clusterId, namespaceMode, currentType);
 
-          const more = this.$store.getters['type-map/getTree'](productId, mode, types, clusterId, namespaceMode, namespaces, currentType);
-
-          if ( productId === EXPLORER || !this.isExplorer ) {
+          if ( productId === EXPLORER || productId === LLMOS || !this.isRootProduct ) {
             addObjects(out, more);
           } else {
             const root = more.find((x) => x.name === 'root');

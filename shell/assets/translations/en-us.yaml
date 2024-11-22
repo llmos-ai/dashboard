@@ -178,7 +178,9 @@ nav:
     RBAC: RBAC
     Scheduling: Scheduling
     Storage: Storage
-    GPUManagement: GPU Management
+    gpuManagement: GPU Management
+    llmosStorage: Storage
+    ceph: Ceph Management
   ns:
     all: All Namespaces
     clusterLevel: Only Cluster Resources

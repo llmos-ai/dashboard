@@ -1,6 +1,18 @@
-// Helpers for determining if Monitoring are installed
-import { ENDPOINTS } from '@shell/config/types';
 import { isEmpty } from '@shell/utils/object';
+import { normalizeType } from '@shell/plugins/dashboard-store/normalize';
+import { findBy } from '@shell/utils/array';
+import { ENDPOINTS, MONITORING, SCHEMA } from '@shell/config/types';
+
+// Helpers for determining if Monitoring are installed
+export function haveMonitoring(getters) {
+  const inStore = getters['getStoreNameByProductId'];
+
+  // Just check for the pod monitors CRD
+  const schemas = getters[`${ inStore }/all`](SCHEMA);
+  const exists = findBy(schemas, 'id', normalizeType(MONITORING.POD_MONITOR));
+
+  return !!exists;
+}
 
 export const MONITORING_NAMESPACE = 'llmos-monitoring-system';
 export const MONITORING_GRAFANA_PATH = `/api/v1/namespaces/${ MONITORING_NAMESPACE }/services/http:llmos-monitoring-grafana:80/proxy`;

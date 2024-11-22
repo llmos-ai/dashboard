@@ -34,6 +34,7 @@ export function init(store) {
     virtualType,
     weightGroup,
     headers,
+    ignoreType,
   } = DSL(store, NAME);
 
   product({
@@ -41,19 +42,20 @@ export function init(store) {
     showNamespaceFilter: true,
     hideKubeShell:       true,
     hideKubeConfig:      true,
-    showClusterSwitcher: false,
-    iconHeader:          require(`~shell/assets/images/pl/llm.svg`),
     hideCopyConfig:      true,
     category:            NAME,
+    removable:           false,
+    iconHeader:          require(`@shell/assets/images/pl/llm.svg`),
   });
 
   configureType(NODE, {
     isCreatable: true, isEditable: true, createButtonLabel: 'import'
   });
+
+  basicType([NODE]);
   virtualType({
     ifHaveType: NODE,
     labelKey:   'typeLabel."node"',
-    group:      'Root',
     name:       NODE,
     namespaced: false,
     route:      {
@@ -82,7 +84,6 @@ export function init(store) {
   virtualType({
     ifHaveType: ML_WORKLOAD_TYPES.RAY_CLUSTER,
     labelKey:   'typeLabel."ray.io.raycluster"',
-    group:      'Root',
     name:       ML_WORKLOAD_TYPES.RAY_CLUSTER,
     namespaced: true,
     route:      {
@@ -96,7 +97,6 @@ export function init(store) {
   virtualType({
     ifHaveType: ML_WORKLOAD_TYPES.NOTEBOOK,
     label:      'Notebooks',
-    group:      'Root',
     name:       ML_WORKLOAD_TYPES.NOTEBOOK,
     namespaced: true,
     route:      {
@@ -110,7 +110,6 @@ export function init(store) {
   virtualType({
     ifHaveType: ML_WORKLOAD_TYPES.MODEL_SERVICE,
     labelKey:   'typeLabel."ml.llmos.ai.modelservice"',
-    group:      'Root',
     name:       ML_WORKLOAD_TYPES.MODEL_SERVICE,
     namespaced: true,
     route:      {
@@ -125,13 +124,12 @@ export function init(store) {
     ML_WORKLOAD_TYPES.RAY_CLUSTER,
     ML_WORKLOAD_TYPES.NOTEBOOK,
     ML_WORKLOAD_TYPES.MODEL_SERVICE,
-    NODE,
   ]);
 
   virtualType({
     ifHaveType: NVIDIA.CLUSTER_POLICY,
     labelKey:   'typeLabel."nvidia.com.clusterpolicy"',
-    group:      'GPUManagement',
+    group:      'gpuManagement',
     name:       NVIDIA.CLUSTER_POLICY,
     namespaced: true,
     route:      {
@@ -146,7 +144,7 @@ export function init(store) {
   virtualType({
     ifHaveType: LLMOS.GPUDEVICE,
     labelKey:   'typeLabel."gpustack.llmos.ai.gpudevice"',
-    group:      'GPUManagement',
+    group:      'gpuManagement',
     name:       LLMOS.GPUDEVICE,
     namespaced: false,
     route:      {
@@ -166,7 +164,7 @@ export function init(store) {
       NVIDIA.CLUSTER_POLICY,
       LLMOS.GPUDEVICE,
     ],
-    'GPUManagement'
+    'gpuManagement'
   );
 
   // volume management tab
@@ -183,7 +181,7 @@ export function init(store) {
   virtualType({
     ifHaveType: PVC,
     labelKey:   'typeLabel."llmos.ai.volume"',
-    group:      'Storage',
+    group:      'llmosStorage',
     name:       LLMOS.VOLUME,
     namespaced: true,
     route:      {
@@ -196,7 +194,7 @@ export function init(store) {
   virtualType({
     ifHaveType: STORAGE_CLASS,
     labelKey:   'typeLabel."storage.k8s.io.storageclass"',
-    group:      'Storage',
+    group:      'llmosStorage',
     name:       STORAGE_CLASS,
     namespaced: true,
     route:      {
@@ -211,7 +209,7 @@ export function init(store) {
   virtualType({
     ifHaveType: CEPH.CEPH_CLUSTER,
     labelKey:   'typeLabel."ceph.rook.io.cephcluster"',
-    group:      'Storage',
+    group:      'llmosStorage',
     name:       CEPH.CEPH_CLUSTER,
     namespaced: true,
     route:      {
@@ -225,7 +223,7 @@ export function init(store) {
   virtualType({
     ifHaveType: CEPH.CEPH_BLOCK_POOL,
     labelKey:   'typeLabel."ceph.rook.io.cephblockpool"',
-    group:      'Storage',
+    group:      'llmosStorage',
     name:       CEPH.CEPH_BLOCK_POOL,
     namespaced: true,
     route:      {
@@ -239,7 +237,7 @@ export function init(store) {
   virtualType({
     ifHaveType: CEPH.CEPH_FILESYSTEM,
     labelKey:   'typeLabel."ceph.rook.io.cephfilesystem"',
-    group:      'Storage',
+    group:      'llmosStorage',
     name:       CEPH.CEPH_FILESYSTEM,
     namespaced: true,
     route:      {
@@ -249,15 +247,22 @@ export function init(store) {
     exact:  false,
     weight: 311,
   });
+
   basicType(
     [
-      LLMOS.VOLUME,
-      STORAGE_CLASS,
       CEPH.CEPH_CLUSTER,
       CEPH.CEPH_BLOCK_POOL,
       CEPH.CEPH_FILESYSTEM,
     ],
-    'Storage',
+    'llmosStorage::ceph',
+  );
+
+  basicType(
+    [
+      LLMOS.VOLUME,
+      STORAGE_CLASS,
+    ],
+    'llmosStorage',
   );
 
   // advanced tab
@@ -300,11 +305,23 @@ export function init(store) {
     'advanced',
   );
 
-  weightGroup('GPUManagement', 100, true);
-  weightGroup('Storage', 99, true);
-  weightGroup('advanced', 98, true);
+  weightGroup('gpuManagement', 100, true);
+  weightGroup('llmosStorage', 99, true);
+  weightGroup('monitoring', 98, true);
+  weightGroup('advanced', 97, true);
 
   headers(ML_WORKLOAD_TYPES.RAY_CLUSTER, [STATE, NAME_COL, NAMESPACE_COL, ACCESS_URL, RAY_VERSION, CPU_LIMIT, MEMORY_LIMIT, API_URL, VGPU, VRAM, AGE, WORKLOAD_HEALTH_SCALE]);
   headers(ML_WORKLOAD_TYPES.NOTEBOOK, [STATE, NAME_COL, NAMESPACE_COL, VISIT, NOTEBOOK_TYPE, CPU_LIMIT, MEMORY_LIMIT, VGPU, VRAM, AGE, WORKLOAD_HEALTH_SCALE]);
   headers(ML_WORKLOAD_TYPES.MODEL_SERVICE, [STATE, NAME_COL, NAMESPACE_COL, OPENAI_API_URL, MODEL_NAME, INTERNAL_API_URL, CPU_LIMIT, MEMORY_LIMIT, VGPU, VRAM, AGE, WORKLOAD_HEALTH_SCALE]);
+
+  // Ignore these types as they are managed through the settings product
+  ignoreType(MANAGEMENT.SETTING);
+
+  // Don't show Tokens/API Keys in the side navigation
+  ignoreType(MANAGEMENT.TOKEN);
+
+  // Ignore these types as they are managed through the auth product
+  ignoreType(MANAGEMENT.USER);
+  ignoreType(MANAGEMENT.GLOBAL_ROLE);
+  ignoreType(MANAGEMENT.ROLE_TEMPLATE);
 }

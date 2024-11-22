@@ -11,6 +11,8 @@ import { ucFirst } from '@shell/utils/string';
 import { KEY } from '@shell/utils/platform';
 import { getVersionInfo } from '@shell/utils/version';
 import { SETTING } from '@shell/config/settings';
+import { getProductFromRoute } from '@shell/middleware/authenticated';
+import { NAME as EXPLORER } from '@shell/config/product/explorer';
 
 export default {
   components: {
@@ -42,7 +44,6 @@ export default {
   computed: {
     ...mapGetters(['clusterId']),
     ...mapGetters(['clusterReady', 'isMgmt', 'currentCluster', 'currentProduct']),
-    ...mapGetters({ features: 'features/get' }),
 
     value: {
       get() {
@@ -95,7 +96,9 @@ export default {
           isLocal:         x.isLocal,
           pinned:          x.pinned,
           pin:             () => x.pin(),
-          unpin:           () => x.unpin()
+          unpin:           () => x.unpin(),
+          clusterRoute:    { name: 'c-cluster-explorer', params: { cluster: x.id } },
+          llmosRoute:      { name: 'c-cluster-llmos', params: { cluster: x.id } },
         };
       }) || [];
     },
@@ -183,6 +186,59 @@ export default {
     canEditSettings() {
       return (this.$store.getters['management/schemaFor'](MANAGEMENT.SETTING)?.resourceMethods || []).includes('PUT');
     },
+
+    appBar() {
+      let activeFound = false;
+
+      // order is important for the object keys here
+      // since we want to check last pinFiltered and clustersFiltered
+      const appBar = {
+        configurationApps: this.configurationApps,
+        pinFiltered:       this.pinFiltered,
+        clustersFiltered:  this.clustersFiltered,
+      };
+
+      Object.keys(appBar).forEach((menuSection) => {
+        const menuSectionItems = appBar[menuSection];
+        const isClusterCheck = menuSection === 'pinFiltered' || menuSection === 'clustersFiltered';
+
+        // need to reset active state on other menu items
+        menuSectionItems.forEach((item) => {
+          item.isMenuActive = false;
+          item.isExplorerActive = false;
+
+          if (!activeFound && this.checkActiveRoute(item, isClusterCheck)) {
+            activeFound = true;
+            item.isMenuActive = true;
+          }
+
+          if (this.isCurrRouteClusterExplorer) {
+            activeFound = true;
+            item.isMenuActive = false;
+            item.isExplorerActive = true;
+          }
+        });
+      });
+
+      return appBar;
+    },
+
+    isCurrRouteClusterExplorer() {
+      if (this.$route.name?.startsWith('c-cluster-explorer')) {
+        return true;
+      }
+      const product = this.$route.params?.product;
+
+      return this.$route?.name?.startsWith('c-cluster') && product === EXPLORER;
+    },
+
+    isCurrRouteClusterLLMOS() {
+      return this.$route?.name?.startsWith('c-cluster');
+    },
+
+    productFromRoute() {
+      return getProductFromRoute(this.$route);
+    },
   },
 
   watch: {
@@ -200,6 +256,15 @@ export default {
   },
 
   methods: {
+    checkActiveRoute(obj, isClusterRoute) {
+      // for Cluster links in main nav: check if route is a cluster with LLMOS + check if route cluster matches cluster obj id + check if curr product matches route product
+      if (isClusterRoute) {
+        return this.isCurrRouteClusterLLMOS && this.$route?.params?.cluster === obj?.id && this.productFromRoute === this.currentProduct?.name;
+      }
+
+      // for remaining main nav items, check if curr product matches route product is enough
+      return this.productFromRoute === obj?.value;
+    },
     /**
      * Converts a pixel value to an em value based on the default font size.
      * @param {number} elementFontSize - The font size of the element in pixels.
@@ -352,7 +417,7 @@ export default {
               <!-- Clusters Search result -->
               <div class="clustersList">
                 <div
-                  v-for="(c, index) in clustersFiltered"
+                  v-for="(c, index) in appBar.clustersFiltered"
                   :key="c.id"
                   :data-testid="`top-level-menu-cluster-${index}`"
                   @click="hide()"
@@ -362,7 +427,8 @@ export default {
                     v-if="c.ready"
                     :data-testid="`menu-cluster-${ c.id }`"
                     class="cluster selector option"
-                    :to="{ name: 'c-cluster-llmos', params: { cluster: c.id } }"
+                    :class="{'active-menu-link': c.isMenuActive }"
+                    :to="c.llmosRoute"
                   >
                     <ClusterIconMenu
                       v-tooltip="getTooltipConfig(t('product.llmos'))"
@@ -381,7 +447,8 @@ export default {
                       v-if="c.ready"
                       :data-testid="`menu-cluster-${ c.id }`"
                       class="cluster selector option"
-                      :to="{ name: 'c-cluster-explorer', params: { cluster: c.id } }"
+                      :class="{'active-menu-link': c.isExplorerActive }"
+                      :to="c.clusterRoute"
                     >
                       <ClusterIconMenu
                         v-tooltip="getTooltipConfig(c.label)"
@@ -453,6 +520,7 @@ export default {
               >
                 <nuxt-link
                   class="option"
+                  :class="{'active-menu-link': a.isMenuActive }"
                   :to="a.to"
                 >
                   <IconOrSvg
@@ -472,11 +540,6 @@ export default {
           class="footer"
         >
           <div
-            v-if="canEditSettings"
-            class="support"
-            @click="hide()"
-          />
-          <div
             class="version"
             @click="hide()"
           >
@@ -493,6 +556,19 @@ export default {
 </template>
 
 <style lang="scss">
+.menu-description-tooltip {
+  max-width: 200px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.description-tooltip-pos-adjustment {
+  // needs !important so that we can
+  // offset the tooltip a bit so it doesn't
+  // overlap the pin icon and cause bad UX
+  left: 35px !important;
+}
+
 .localeSelector, .footer-tooltip {
   z-index: 1000;
 }
@@ -508,6 +584,17 @@ export default {
 
   .popover:focus {
     outline: 0;
+  }
+}
+
+.theme-dark .cluster-name .description {
+  color: var(--input-label) !important;
+}
+.theme-dark .body .option  {
+  &:hover .cluster-name .description,
+  &.router-link-active .cluster-name .description,
+  &.active-menu-link .cluster-name .description {
+    color: var(--side-menu-desc) !important;
   }
 }
 </style>
@@ -550,14 +637,15 @@ $option-height: $icon-size + $option-padding + $option-padding;
   flex-direction: column;
   padding: 0;
   overflow: hidden;
-  transition: width 500ms;
+  transition: width 250ms;
 
   &:focus {
     outline: 0;
   }
 
   &.menu-open {
-    width: 300px;
+    width: 280px;
+    box-shadow: 1px 1px 1px var(--shadow);
   }
 
   .title {
@@ -565,7 +653,6 @@ $option-height: $icon-size + $option-padding + $option-padding;
     height: 55px;
     flex: 0 0 55px;
     width: 100%;
-    border-bottom: 1px solid var(--nav-border);
     justify-content: flex-start;
     align-items: center;
 
@@ -604,6 +691,10 @@ $option-height: $icon-size + $option-padding + $option-padding;
       font-size: 14px;
       height: $option-height;
       white-space: nowrap;
+      background-color: transparent;
+      width: 100%;
+      border-radius: 0;
+      border: none;
 
       .cluster-badge-logo-text {
         color: var(--default-active-text);
@@ -620,6 +711,24 @@ $option-height: $icon-size + $option-padding + $option-padding;
         }
       }
 
+      .cluster-name {
+        line-height: normal;
+
+        & > p {
+          width: 195px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: left;
+
+          &.description {
+            font-size: 12px;
+            padding-right: 8px;
+            color: var(--darker);
+          }
+        }
+      }
+
       &:hover {
         text-decoration: none;
 
@@ -633,9 +742,9 @@ $option-height: $icon-size + $option-padding + $option-padding;
         cursor: not-allowed;
 
         .rancher-provider-icon,
-        .cluster-name {
+        .cluster-name p {
           filter: grayscale(1);
-          color: var(--muted);
+          color: var(--muted) !important;
         }
 
         .pin {
@@ -645,12 +754,14 @@ $option-height: $icon-size + $option-padding + $option-padding;
 
       &:focus {
         outline: 0;
+        box-shadow: none;
+
         > div {
           text-decoration: underline;
         }
       }
 
-      > i {
+      > i, > img {
         display: block;
         width: 42px;
         font-size: $icon-size;
@@ -662,11 +773,8 @@ $option-height: $icon-size + $option-padding + $option-padding;
         margin-right: 16px;
         fill: var(--link);
       }
-      img {
-        margin-right: 16px;
-      }
 
-      &.nuxt-link-active {
+      &.router-link-active, &.active-menu-link {
         background: var(--primary-hover-bg);
         color: var(--primary-hover-text);
 
@@ -677,6 +785,10 @@ $option-height: $icon-size + $option-padding + $option-padding;
         i {
           color: var(--primary-hover-text);
         }
+
+        div .description {
+          color: var(--default);
+        }
       }
 
       &:hover {
@@ -684,6 +796,10 @@ $option-height: $icon-size + $option-padding + $option-padding;
         background: var(--primary-hover-bg);
         > div {
           color: var(--primary-hover-text);
+
+          .description {
+            color: var(--default);
+          }
         }
         svg {
           fill: var(--primary-hover-text);
@@ -701,13 +817,6 @@ $option-height: $icon-size + $option-padding + $option-padding;
           }
         }
       }
-
-      .cluster-name {
-        max-width: 220px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
     }
 
     .option, .option-disabled {
@@ -718,13 +827,31 @@ $option-height: $icon-size + $option-padding + $option-padding;
       position: relative;
       > input {
         background-color: transparent;
-        margin-bottom: 8px;
         padding-right: 35px;
+        padding-left: 25px;
+        height: 32px;
+      }
+      > .magnifier {
+        position: absolute;
+        top: 12px;
+        left: 8px;
+        width: 12px;
+        height: 12px;
+        font-size: 12px;
+        opacity: 0.4;
+
+        &.active {
+          opacity: 1;
+
+          &:hover {
+            color: var(--body-text);
+          }
+        }
       }
       > i {
         position: absolute;
-        font-size: $clear-search-size;
-        top: 11px;
+        font-size: 12px;
+        top: 12px;
         right: 8px;
         opacity: 0.7;
         cursor: pointer;
@@ -761,10 +888,10 @@ $option-height: $icon-size + $option-padding + $option-padding;
         height: 42px;
 
         .search {
-          transition: all 0.5s ease-in-out;
+          transition: all 0.25s ease-in-out;
           transition-delay: 2s;
           width: 72%;
-          height: 42px;
+          height: 36px;
 
           input {
             height: 100%;
@@ -790,7 +917,7 @@ $option-height: $icon-size + $option-padding + $option-padding;
             font-size: 14px;
           }
 
-          .nuxt-link-active {
+          .router-link-active {
             &:hover {
               text-decoration: none;
             }
@@ -812,6 +939,24 @@ $option-height: $icon-size + $option-padding + $option-padding;
       padding: 8px
     }
 
+    .clustersPinned {
+      .category {
+        &-title {
+          margin: 8px 0;
+          margin-left: 16px;
+          hr {
+            margin: 0;
+            width: 94%;
+            transition: all 0.25s ease-in-out;
+            max-width: 100%;
+          }
+        }
+      }
+      .pin {
+        display: block;
+      }
+    }
+
     .category {
       display: flex;
       flex-direction: column;
@@ -829,7 +974,7 @@ $option-height: $icon-size + $option-padding + $option-padding;
         text-transform: uppercase;
 
         span {
-          transition: all 0.5s ease-in-out;
+          transition: all 0.25s ease-in-out;
           display: flex;
           max-height: 16px;
         }
@@ -838,7 +983,7 @@ $option-height: $icon-size + $option-padding + $option-padding;
           margin: 0;
           max-width: 50px;
           width: 0;
-          transition: all 0.5s ease-in-out;
+          transition: all 0.25s ease-in-out;
         }
       }
 
@@ -874,15 +1019,30 @@ $option-height: $icon-size + $option-padding + $option-padding;
       }
     }
 
+    .clustersPinned {
+      .category {
+        &-title {
+          hr {
+            width: 40px;
+          }
+        }
+      }
+    }
+
     .footer {
-      margin: 20px 15px;
+      margin: 20px 10px;
+      width: 50px;
 
       .support {
         display: none;
       }
 
       .version{
-        text-align: left;
+        text-align: center;
+
+        &.version-small {
+          font-size: 12px;
+        }
       }
     }
   }
@@ -934,18 +1094,18 @@ $option-height: $icon-size + $option-padding + $option-padding;
   overflow: hidden;
   & IMG {
     object-fit: contain;
-    height: 35px;
+    height: 21px;
     max-width: 200px;
   }
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: all 0.2s;
+  transition: all 0.25s;
   transition-timing-function: ease;
 }
 
 .fade-leave-active {
-  transition: all 0.4s;
+  transition: all 0.25s;
 }
 
 .fade-leave-to {
