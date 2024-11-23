@@ -13,7 +13,6 @@ import { conditionalDepaginate } from '@shell/store/type-map.utils';
 export const _ALL = 'all';
 export const _MERGE = 'merge';
 export const _MULTI = 'multi';
-export const _ALL_IF_AUTHED = 'allIfAuthed';
 export const _NONE = 'none';
 
 const SCHEMA_CHECK_RETRIES = 15;
@@ -162,7 +161,13 @@ export default {
     }
 
     // No need to request the resources if we have them already
-    if ( !opt.force && (getters['haveAll'](type) || getters['haveAllNamespace'](type, opt.namespaced))) {
+    if (
+      !opt.force &&
+      (
+        getters['haveAll'](type) ||
+        getters['haveAllNamespace'](type, opt.namespaced)
+      )
+    ) {
       if (opt.watch !== false ) {
         const args = {
           type,

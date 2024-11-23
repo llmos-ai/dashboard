@@ -26,7 +26,6 @@ function modeFor(route) {
 }
 
 async function getYaml(store, model) {
-  const inStore = store.getters['currentStore'](model.type);
   let yaml;
   const opt = { headers: { accept: 'application/yaml' } };
 
@@ -34,9 +33,7 @@ async function getYaml(store, model) {
     yaml = (await model.followLink('view', opt)).data;
   }
 
-  const cleanedYaml = await store.dispatch(`${ inStore }/cleanForDownload`, yaml);
-
-  return cleanedYaml;
+  return model.cleanForDownload(yaml);
 }
 
 export default {
@@ -155,6 +152,11 @@ export default {
       }
 
       if ( as === _YAML ) {
+        if (schema?.fetchResourceFields) {
+          // fetch resourceFields for createYaml
+          await schema.fetchResourceFields();
+        }
+
         yaml = createYaml(schemas, resource, data);
       }
     } else {

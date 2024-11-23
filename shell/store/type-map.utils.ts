@@ -36,20 +36,20 @@ export function createHeaders(
        */
       state: TableColumn,
       /**
-        * If dynamically creating columns, use specific column for name, if required
-        */
+       * If dynamically creating columns, use specific column for name, if required
+       */
       name?: TableColumn,
       /**
-        * If dynamically creating columns, use specific column for id, if required
-        */
+       * If dynamically creating columns, use specific column for id, if required
+       */
       id?: TableColumn
       /**
-        * If dynamically creating columns, use specific column for namespace, if required
-        */
+       * If dynamically creating columns, use specific column for namespace, if required
+       */
       namespace: TableColumn,
       /**
-        * If dynamically creating columns, use specific column for age, if required
-        */
+       * If dynamically creating columns, use specific column for age, if required
+       */
       age: TableColumn,
     },
     pagination: boolean

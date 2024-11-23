@@ -7,8 +7,15 @@ import SteveModel from './steve-class';
 import HybridModel, { cleanHybridResources } from './hybrid-class';
 import { urlFor } from '@shell/plugins/dashboard-store/getters';
 import { normalizeType } from '@shell/plugins/dashboard-store/normalize';
-import pAndNFiltering from '@shell/utils/projectAndNamespaceFiltering.utils';
+import pAndNFiltering from '@shell/plugins/steve/projectAndNamespaceFiltering.utils';
 import { parse } from '@shell/utils/url';
+import { splitObjectPath } from '@shell/utils/string';
+import { parseType } from '@shell/models/schema';
+import {
+  STEVE_AGE_COL,
+  STEVE_ID_COL, STEVE_LIST_GROUPS, STEVE_NAMESPACE_COL, STEVE_STATE_COL
+} from '@shell/config/pagination-table-headers';
+import { createHeaders } from '@shell/store/type-map.utils';
 
 export const STEVE_MODEL_TYPES = {
   STEVE:   'steve',
@@ -25,10 +32,15 @@ const GC_IGNORE_TYPES = {
 const steveRegEx = new RegExp('(/v1)|(\/k8s\/clusters\/[a-z0-9-]+\/v1)');
 
 export default {
-  urlOptions: () => (url, opt) => {
+  urlOptions: () => (url, opt, schema) => {
     opt = opt || {};
     const parsedUrl = parse(url);
     const isSteve = steveRegEx.test(parsedUrl.path);
+
+    if ( opt.labelSelector ) {
+      url += `${ url.includes('?') ? '&' : '?' }labelSelector=${ opt.labelSelector }`;
+    }
+    // End: labelSelector
 
     // Filter
     if ( opt.filter ) {
@@ -55,58 +67,59 @@ export default {
 
         url += `${ nextStringConnector }${ filterStrings.join('&') }`;
       });
-    }
 
-    // `opt.namespaced` is either
-    // - a string representing a single namespace - add restriction to the url
-    // - an array of namespaces or projects - add restriction as a param
-    const namespaceProjectFilter = pAndNFiltering.checkAndCreateParam(opt);
+      // `opt.namespaced` is either
+      // - a string representing a single namespace - add restriction to the url
+      // - an array of namespaces or projects - add restriction as a param
+      const namespaceProjectFilter = pAndNFiltering.checkAndCreateParam(opt);
 
-    if (namespaceProjectFilter) {
-      url += `${ (url.includes('?') ? '&' : '?') + namespaceProjectFilter }`;
+      if (namespaceProjectFilter) {
+        url += `${ (url.includes('?') ? '&' : '?') + namespaceProjectFilter }`;
+      }
+      // End: Filter
+
+      // Limit
+      const limit = opt.limit;
+
+      if ( limit ) {
+        url += `${ url.includes('?') ? '&' : '?' }limit=${ limit }`;
+      }
+      // End: Limit
+
+      // Sort
+      // Steve's sort options supports multi-column sorting and column specific sort orders, not implemented yet #9341
+      const sortBy = opt.sortBy;
+      const orderBy = opt.sortOrder;
+
+      if ( sortBy ) {
+        if (isSteve) {
+          url += `${ url.includes('?') ? '&' : '?' }sort=${ (orderBy === 'desc' ? '-' : '') + encodeURI(sortBy) }`;
+        } else {
+          url += `${ url.includes('?') ? '&' : '?' }sort=${ encodeURI(sortBy) }`;
+          if ( orderBy ) {
+            url += `${ url.includes('?') ? '&' : '?' }order=${ encodeURI(orderBy) }`;
+          }
+        }
+      }
+      // End: Sort
     }
-    // End: Filter
 
     // Exclude
     // excludeFields should be an array of strings representing the paths of the fields to exclude
     // only works on Steve but is ignored without error by Norman
     if (isSteve) {
-      if (Array.isArray(opt?.excludeFields)) {
-        opt.excludeFields = [...opt.excludeFields, 'metadata.managedFields'];
-      } else {
-        opt.excludeFields = ['metadata.managedFields'];
+      if (!Array.isArray(opt?.excludeFields)) {
+        const excludeFields = ['metadata.managedFields'];
+
+        // for some resources, we might want to include fields, excluded by default.
+        opt.excludeFields = Array.isArray(opt?.omitExcludeFields) ? excludeFields.filter((f) => !f.includes(opt.omitExcludeFields)) : excludeFields;
       }
+
       const excludeParamsString = opt.excludeFields.map((field) => `exclude=${ field }`).join('&');
 
       url += `${ url.includes('?') ? '&' : '?' }${ excludeParamsString }`;
     }
     // End: Exclude
-
-    // Limit
-    const limit = opt.limit;
-
-    if ( limit ) {
-      url += `${ url.includes('?') ? '&' : '?' }limit=${ limit }`;
-    }
-    // End: Limit
-
-    // Sort
-    // Steve's sort options supports multi-column sorting and column specific sort orders, not implemented yet #9341
-    const sortBy = opt.sortBy;
-    const orderBy = opt.sortOrder;
-
-    if ( sortBy ) {
-      if (isSteve) {
-        url += `${ url.includes('?') ? '&' : '?' }sort=${ (orderBy === 'desc' ? '-' : '') + encodeURI(sortBy) }`;
-      } else {
-        url += `${ url.includes('?') ? '&' : '?' }sort=${ encodeURI(sortBy) }`;
-        if ( orderBy ) {
-          url += `${ url.includes('?') ? '&' : '?' }order=${ encodeURI(orderBy) }`;
-        }
-      }
-    }
-
-    // End: Sort
 
     return url;
   },
@@ -117,10 +130,30 @@ export default {
     // `namespaced` is either
     // - a string representing a single namespace - add restriction to the url
     // - an array of namespaces or projects - add restriction as a param
-    if (opt?.namespaced && !pAndNFiltering.isApplicable(opt)) {
-      const parts = url.split('/');
+    if (!opt?.url && opt?.namespaced && !pAndNFiltering.isApplicable(opt)) {
+      // Update path to include `namespace`, but take into account
+      // - if there is an id
+      // - if there are query params
 
-      url = `${ parts.join('/') }/${ opt.namespaced }`;
+      // Construct a url so query params / fragments are avoided
+      const urlObj = new URL(url);
+      const path = urlObj.pathname;
+
+      if (!!path?.length && path[path.length - 1] === '/') {
+        urlObj.pathname = path.substring(0, path.length - 1);
+      }
+      const parts = urlObj.pathname.split('/');
+
+      if (id) {
+        // namespace should go before the id in the path
+        parts.splice(parts.length - 1, 0, opt.namespaced);
+        urlObj.pathname = parts.join('/');
+      } else {
+        // namespace should go at the end of the path
+        urlObj.pathname = `${ urlObj.pathname.split('/').join('/') }/${ opt.namespaced }`;
+      }
+
+      url = urlObj.toString();
     }
 
     return url;
@@ -162,9 +195,9 @@ export default {
 
   cleanResource: () => (existing, data) => {
     /**
-   * Resource counts are contained within a single 'count' resource with a 'counts' field that is a map of resource types
-   * When counts are updated through the websocket, only the resources that changed are sent so we can't load the new 'count' resource into the store as we would another resource
-   */
+     * Resource counts are contained within a single 'count' resource with a 'counts' field that is a map of resource types
+     * When counts are updated through the websocket, only the resources that changed are sent so we can't load the new 'count' resource into the store as we would another resource
+     */
     if (data?.type === COUNT && existing) {
       data.counts = { ...existing.counts, ...data.counts };
 
@@ -202,6 +235,90 @@ export default {
     }
 
     return cache.generation;
+  },
+
+  /**
+   * Checks the steve schema resourceFields for the given path
+   */
+  pathExistsInSchema: (state, getters) => (type, path) => {
+    const schema = getters.schemaFor(type);
+
+    if (schema.requiresResourceFields && !schema.hasResourceFields) {
+      console.warn(`pathExistsInSchema requires schema ${ schema.id } to have resources fields via schema definition but none were found. has the schema 'fetchResourceFields' been called?`); // eslint-disable-line no-console
+
+      return false;
+    }
+
+    const schemaDefinitions = schema.requiresResourceFields ? schema.schemaDefinitions : null;
+    const parts = splitObjectPath(path);
+    let schemaOrSchemaDefinition = schema;
+
+    // Iterate down the parts (properties) until there are no parts left (success) or the path cannot be found (failure)
+    while ( parts.length ) {
+      const key = parts.shift();
+
+      const field = schemaOrSchemaDefinition.resourceFields?.[key];
+
+      type = field?.type;
+
+      if ( !type ) {
+        return false;
+      }
+
+      if ( parts.length ) {
+        type = parseType(type, field).pop(); // Get the main part of array[map[something]] => something
+
+        schemaOrSchemaDefinition = schemaDefinitions ? schemaDefinitions?.[type] : getters.schemaFor(type);
+
+        if ( !schema ) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  },
+
+  /*
+   * Override the vanilla type-map headersFor. This allows custom columns
+   */
+  headersFor: (state, getters, rootState, rootGetters) => ({ getters: typeMapGetters, state: typeMapState }, { schema, pagination }) => {
+    if (!pagination ) {
+      return;
+    }
+
+    return createHeaders({
+      state: typeMapState, getters: typeMapGetters, rootGetters
+    }, {
+      headers:     typeMapState.paginationHeaders,
+      typeOptions: typeMapGetters['optionsFor'](schema, true),
+      schema,
+      columns:     {
+        state:     STEVE_STATE_COL,
+        namespace: STEVE_NAMESPACE_COL,
+        age:       STEVE_AGE_COL,
+        id:        STEVE_ID_COL
+      }
+    });
+  },
+
+  /**
+   * Override the vanilla type-map optionsFor. This allows custom list values
+   */
+  optionsFor: () => (ctx, { schema, pagination, opts }) => {
+    if (pagination) {
+      // As headers are hardcoded each list should have specific default sort option
+      // This avoids the sortable table adding both name and id (which when combined with group would result in 3 sort args, which isn't supported)
+      const steveOpts = { listMandatorySort: [] };
+
+      if (!opts.listGroupsWillOverride && schema.attributes.namespaced) {
+        // There's no pre-configured settings... and we're paginating... so use pagination specific groups
+        steveOpts.listGroups = STEVE_LIST_GROUPS;
+        steveOpts.listGroupsWillOverride = true;
+      }
+
+      return steveOpts;
+    }
   },
 
 };

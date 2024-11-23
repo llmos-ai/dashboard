@@ -11,7 +11,7 @@ import { ucFirst } from '@shell/utils/string';
 import { KEY } from '@shell/utils/platform';
 import { getVersionInfo } from '@shell/utils/version';
 import { SETTING } from '@shell/config/settings';
-import { getProductFromRoute } from '@shell/middleware/authenticated';
+import { getProductFromRoute } from '@shell/utils/router';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
 
 export default {
@@ -593,6 +593,7 @@ export default {
 .theme-dark .body .option  {
   &:hover .cluster-name .description,
   &.router-link-active .cluster-name .description,
+  &.nuxt-link-active .cluster-name .description,
   &.active-menu-link .cluster-name .description {
     color: var(--side-menu-desc) !important;
   }
@@ -774,7 +775,7 @@ $option-height: $icon-size + $option-padding + $option-padding;
         fill: var(--link);
       }
 
-      &.router-link-active, &.active-menu-link {
+      &.router-link-active, &.active-menu-link, &.nuxt-link-active {
         background: var(--primary-hover-bg);
         color: var(--primary-hover-text);
 

@@ -118,7 +118,7 @@ export const ML_LIST_WORKLOAD_TYPES = { ...ML_WORKLOAD_TYPES };
 
 export const VIRTUAL_TYPES = { NAMESPACES: 'namespaces' };
 
-export const DEFAULT_WORKSPACE = 'default';
+export const DEFAULT_WORKSPACE = 'llmos-system';
 
 // nvidia CRDs
 export const NVIDIA = {

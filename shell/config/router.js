@@ -96,7 +96,7 @@ export const routerOptions = {
     name:      'c-cluster-llmos'
   }, {
     path:      '/c/:cluster/monitoring',
-    component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/index.vue')),
+    component: () => interopDefault(import('../pages/c/_cluster/monitoring/index.vue' /* webpackChunkName: "pages/c/_cluster/monitoring/index" */)),
     name:      'c-cluster-monitoring'
   }, {
     path:      '/c/:cluster/settings',
@@ -142,6 +142,10 @@ export const routerOptions = {
     path:      '/c/:cluster/monitoring/monitor/:namespace/:id?',
     component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/monitor/_namespace/_id.vue')),
     name:      'c-cluster-monitoring-monitor-namespace-id'
+  }, {
+    path:      '/c/:cluster/monitoring/alertmanagerconfig/:alertmanagerconfigid',
+    component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/alertmanagerconfig/_alertmanagerconfigid/index.vue')),
+    name:      'c-cluster-monitoring-alertmanagerconfig-alertmanagerconfigid'
   }, {
     path:      '/c/:cluster/monitoring/alertmanagerconfig/:alertmanagerconfigid/receiver',
     component: () => interopDefault(import('@shell/pages/c/_cluster/monitoring/alertmanagerconfig/_alertmanagerconfigid/receiver.vue')),

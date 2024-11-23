@@ -27,6 +27,8 @@ let store = {};
   resolveStoreModules(require('../store/resource-fetch.js'), 'resource-fetch.js');
   resolveStoreModules(require('../store/type-map.js'), 'type-map.js');
   resolveStoreModules(require('../store/wm.js'), 'wm.js');
+  resolveStoreModules(require('../store/customisation.js'), 'customisation.js');
+  resolveStoreModules(require('../store/cru-resource.ts'), 'cru-resource.ts');
 
   // If the environment supports hot reloading...
 
@@ -42,6 +44,8 @@ let store = {};
       '../store/resource-fetch.js',
       '../store/type-map.js',
       '../store/wm.js',
+      '../store/customisation.js',
+      '../store/cru-resource.ts',
     ], () => {
       // Update `root.modules` with the latest definitions.
       updateModules();
