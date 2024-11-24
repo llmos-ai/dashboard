@@ -28,7 +28,7 @@ import { BLANK_CLUSTER } from '@shell/store';
 const SET_LOGIN_ACTION = 'set-as-login';
 
 export default {
-
+  name:       'DefaultLayout',
   components: {
     PromptRemove,
     PromptModal,

@@ -1,7 +1,6 @@
 <script lang="ts">
-import Vue from 'vue';
-import { mapGetters } from 'vuex';
-import ResourceTable from '@shell/components/ResourceTable';
+import { defineComponent } from 'vue';
+import ResourceTable from '@shell/components/ResourceTable.vue';
 import { SECRET } from '@shell/config/types';
 import { NAME as NAME_COL, NAMESPACE as NAMESPACE_COL, AGE, STATE } from '@shell/config/table-headers';
 import Secret, { TYPES } from '@shell/models/secret';
@@ -19,7 +18,7 @@ interface Data {
   }
 }
 
-export default Vue.extend<Data, any, any, any>({
+export default defineComponent({
   components: {
     ResourceTable, Banner, BadgeState
   },
@@ -97,9 +96,7 @@ export default Vue.extend<Data, any, any, any>({
   },
 
   computed: {
-    ...mapGetters(['isAllNamespaces']),
-
-    expiredData() {
+    expiredData(): any {
       let expiring = 0;
       let expired = 0;
 
@@ -114,11 +111,9 @@ export default Vue.extend<Data, any, any, any>({
         }
       }
 
-      const filterWarning = !this.isAllNamespaces ? this.t('secret.certificate.warnings.filtered') : '';
-
       return {
-        expiring: expiring ? this.t('secret.certificate.warnings.expiring', { count: expiring, filtered: !this.isAllNamespaces }) + filterWarning : '',
-        expired:  expired ? this.t('secret.certificate.warnings.expired', { count: expired, filtered: !this.isAllNamespaces }) + filterWarning : '',
+        expiring: expiring ? this.t('secret.certificate.warnings.expiring', { count: expiring }) : '',
+        expired:  expired ? this.t('secret.certificate.warnings.expired', { count: expired }) : '',
       };
     }
   },
@@ -135,6 +130,7 @@ export default Vue.extend<Data, any, any, any>({
   <div>
     <Banner
       v-if="expiredData.expiring"
+      data-testid="cert-expiring-banner"
       color="warning"
       :label="expiredData.expiring"
     />
@@ -150,6 +146,7 @@ export default Vue.extend<Data, any, any, any>({
       :rows="certs"
       :paging-label="'secret.certificate.paging'"
       :paging-params="pagingParams"
+      :ignore-filter="true"
     >
       <template #col:certState="{row}">
         <td>

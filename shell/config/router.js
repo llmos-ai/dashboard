@@ -205,6 +205,13 @@ export function createRouter(config) {
       to = normalizeURL(to);
     }
 
+    // console.log("debug route", to)
+    // if (typeof to === 'object') {
+    //   if (to.name.startsWith('c-cluster') && !to.params.cluster) {
+    //     to.params.cluster = 'local';
+    //   }
+    // }
+
     return resolve(to, current, append);
   };
 
