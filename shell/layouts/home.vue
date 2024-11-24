@@ -9,7 +9,7 @@ import Inactivity from '@shell/components/Inactivity';
 import { mapState, mapGetters } from 'vuex';
 
 export default {
-
+  name:       'HomeLayout',
   components: {
     Header,
     FixedBanner,

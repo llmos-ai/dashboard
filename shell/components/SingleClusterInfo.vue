@@ -1,7 +1,7 @@
 <script>
 import ResourceSummary from '@shell/components/ResourceSummary';
 import {
-  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS, PVC, ML_WORKLOAD_TYPES, CEPH,
+  NAMESPACE, MANAGEMENT, NODE, COUNT, LLMOS, PVC, ML_WORKLOAD_TYPES, CEPH, EVENT, SECRET,
 } from '@shell/config/types';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
 import { allHash, setPromiseResult } from '@shell/utils/promise';
@@ -16,6 +16,10 @@ import { canViewGrafanaLink } from '@shell/utils/monitoring';
 import { NODE_ARCHITECTURE } from '@shell/config/labels-annotations';
 import capitalize from 'lodash/capitalize';
 import TabTitle from '@shell/components/TabTitle.vue';
+import Certificates from '@shell/components/Certificates.vue';
+import EventsTable from '@shell/pages/c/_cluster/llmos/EventsTable.vue';
+import { NAME as LLMOS_PRODUCT } from '@shell/config/product/llmos';
+import AlertTable from '@shell/components/AlertTable';
 
 const CLUSTER_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-cluster-nodes-1/llmos-cluster-nodes?orgId=1';
 const CLUSTER_METRICS_SUMMARY_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-cluster-1/llmos-cluster?orgId=1';
@@ -36,6 +40,9 @@ export default {
     Tabbed,
     Banner,
     TabTitle,
+    EventsTable,
+    AlertTable,
+    Certificates,
   },
 
   async fetch() {
@@ -100,6 +107,9 @@ export default {
       showClusterGPUMetrics: false,
       canViewGpuDevices:     false,
       canViewCeph:           false,
+      selectedTab:           '',
+      LLMOS,
+      ML_WORKLOAD_TYPES,
       CLUSTER_METRICS_SUMMARY_URL,
       CLUSTER_METRICS_DETAIL_URL,
       CLUSTER_GPU_METRICS_DETAIL_URL,
@@ -107,6 +117,9 @@ export default {
   },
 
   beforeDestroy() {
+    // Remove the data and stop watching resources that were fetched in this page
+    // Events in particular can lead to change messages having to be processed when we are no longer interested in events
+    this.$store.dispatch('cluster/forgetType', EVENT);
     // Remove the data and stop watching resources that were fetched in this page
     this.$store.dispatch('cluster/forgetType', MANAGEMENT.SETTING);
     this.$store.dispatch('cluster/forgetType', MANAGEMENT.MANAGED_ADDON);
@@ -121,14 +134,6 @@ export default {
   computed: {
     clusterCounts() {
       return this.$store.getters['cluster/all'](COUNT);
-    },
-
-    ML_WORKLOAD_TYPES() {
-      return ML_WORKLOAD_TYPES;
-    },
-
-    LLMOS() {
-      return LLMOS;
     },
 
     canAccessNodes() {
@@ -203,7 +208,7 @@ export default {
       return !!this.cluster?.spec?.description;
     },
 
-    hasMetricsTabs() {
+    hasMonitoring() {
       return this.canViewMetrics && ( this.showClusterMetrics || this.showClusterGPUMetrics);
     },
 
@@ -268,7 +273,36 @@ export default {
         }, 'html'),
       };
     },
+
+    allEventsLink() {
+      return {
+        name:   'c-cluster-product-resource',
+        params: {
+          product:  LLMOS_PRODUCT,
+          resource: EVENT,
+          cluster:  this.currentCluster.id
+        }
+      };
+    },
+
+    allSecretsLink() {
+      return {
+        name:   'c-cluster-product-resource',
+        params: {
+          product:  LLMOS_PRODUCT,
+          resource: SECRET,
+          cluster:  this.currentCluster.id
+        }
+      };
+    }
   },
+
+  methods: {
+    // Events/Alerts tab changed
+    tabChange(neu) {
+      this.selectedTab = neu?.selectedName;
+    },
+  }
 };
 </script>
 
@@ -377,13 +411,13 @@ export default {
       </div>
     </div>
 
-    <div v-if="hasMetricsTabs">
-      <h3>Monitoring</h3>
-      <Tabbed class="mt-15">
+    <div class="mt-30 mb-20">
+      <Tabbed @changed="tabChange">
         <Tab
+          v-if="hasMonitoring"
           name="cluster-metrics"
           :label="t('clusterIndexPage.sections.clusterMetrics.label')"
-          :weight="99"
+          :weight="4"
         >
           <template #default="props">
             <DashboardMetrics
@@ -396,9 +430,10 @@ export default {
         </Tab>
 
         <Tab
+          v-if="hasMonitoring"
           name="cluster-gpu-metrics"
           :label="t('clusterIndexPage.sections.clusterGpuMetrics.label')"
-          :weight="98"
+          :weight="3"
         >
           <template #default="props">
             <DashboardMetrics
@@ -408,6 +443,40 @@ export default {
               graph-height="825px"
             />
           </template>
+        </Tab>
+        <Tab
+          name="cluster-events"
+          :label="t('clusterIndexPage.sections.events.label')"
+          :weight="2"
+        >
+          <template #default="props">
+            <span class="events-table-link">
+              <router-link :to="allEventsLink">
+                <span>{{ t('glance.eventsTable') }}</span>
+              </router-link>
+            </span>
+            <EventsTable v-if="props.active" />
+          </template>
+        </Tab>
+        <Tab
+          v-if="hasMonitoring"
+          name="cluster-alerts"
+          :label="t('clusterIndexPage.sections.alerts.label')"
+          :weight="1"
+        >
+          <AlertTable v-if="selectedTab === 'cluster-alerts'" />
+        </Tab>
+        <Tab
+          name="cluster-certs"
+          :label="t('clusterIndexPage.sections.certs.label')"
+          :weight="1"
+        >
+          <span class="cert-table-link">
+            <router-link :to="allSecretsLink">
+              <span>{{ t('glance.secretsTable') }}</span>
+            </router-link>
+          </span>
+          <Certificates v-if="selectedTab === 'cluster-certs'" />
         </Tab>
       </Tabbed>
     </div>

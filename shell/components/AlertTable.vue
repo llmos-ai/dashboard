@@ -5,6 +5,7 @@ import SortableTable from '@shell/components/SortableTable';
 import { ENDPOINTS } from '@shell/config/types';
 import { mapGetters } from 'vuex';
 import { MONITORING_NAMESPACE } from '@shell/utils/monitoring';
+
 const ALERTMANAGER_POLL_RATE_MS = 30000;
 const MAX_FAILURES = 2;
 
