@@ -120,14 +120,6 @@ export default {
     // Remove the data and stop watching resources that were fetched in this page
     // Events in particular can lead to change messages having to be processed when we are no longer interested in events
     this.$store.dispatch('cluster/forgetType', EVENT);
-    // Remove the data and stop watching resources that were fetched in this page
-    this.$store.dispatch('cluster/forgetType', MANAGEMENT.SETTING);
-    this.$store.dispatch('cluster/forgetType', MANAGEMENT.MANAGED_ADDON);
-    if (this.canViewNodes || this.canViewGpuDevices) {
-      this.$store.dispatch('cluster/forgetType', NODE);
-      this.$store.dispatch('cluster/forgetType', LLMOS.GPUDEVICE);
-    }
-
     clearInterval(this.interval);
   },
 
@@ -212,6 +204,10 @@ export default {
       return this.canViewMetrics && ( this.showClusterMetrics || this.showClusterGPUMetrics);
     },
 
+    showClusterTools() {
+      return isAdminUser(this.$store.getters);
+    },
+
     dashboardIcon() {
       return require(`~shell/assets/images/providers/llm.svg`);
     },
@@ -294,6 +290,13 @@ export default {
           cluster:  this.currentCluster.id
         }
       };
+    },
+
+    clusterToolsLink() {
+      return {
+        name:   'c-cluster-llmos-tools',
+        params: { cluster: this.currentCluster.id }
+      };
     }
   },
 
@@ -352,6 +355,14 @@ export default {
         /></span>
       </div>
       <div :style="{'flex':1}" />
+      <div v-if="showClusterTools">
+        <nuxt-link
+          :to="clusterToolsLink"
+          class="cluster-tools-link"
+        >
+          <span>{{ t('nav.clusterTools') }}</span>
+        </nuxt-link>
+      </div>
     </div>
 
     <div
@@ -451,9 +462,9 @@ export default {
         >
           <template #default="props">
             <span class="events-table-link">
-              <router-link :to="allEventsLink">
+              <nuxt-link :to="allEventsLink">
                 <span>{{ t('glance.eventsTable') }}</span>
-              </router-link>
+              </nuxt-link>
             </span>
             <EventsTable v-if="props.active" />
           </template>
@@ -472,9 +483,9 @@ export default {
           :weight="1"
         >
           <span class="cert-table-link">
-            <router-link :to="allSecretsLink">
+            <nuxt-link :to="allSecretsLink">
               <span>{{ t('glance.secretsTable') }}</span>
-            </router-link>
+            </nuxt-link>
           </span>
           <Certificates v-if="selectedTab === 'cluster-certs'" />
         </Tab>

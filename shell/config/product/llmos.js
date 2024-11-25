@@ -35,6 +35,7 @@ export function init(store) {
     weightGroup,
     headers,
     ignoreType,
+    mapType,
   } = DSL(store, NAME);
 
   product({
@@ -295,15 +296,31 @@ export function init(store) {
     weight: 100,
   });
 
+  virtualType({
+    labelKey:   `typeLabel."${ LLMOS.TOOL }"`,
+    group:      'advanced',
+    name:       LLMOS.TOOL,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-llmos-tools`,
+      params: { resource: LLMOS.TOOL }
+    },
+    exact:  false,
+    weight: 100,
+  });
+
   basicType(
     [
       MANAGEMENT.MANAGED_ADDON,
       NAMESPACE,
       SECRET,
       CONFIG_MAP,
+      LLMOS.TOOL,
     ],
     'advanced',
   );
+
+  mapType(LLMOS.TOOL, store.getters['i18n/t'](`typeLabel.${ LLMOS.TOOL }`, { count: 2 }));
 
   weightGroup('gpuManagement', 100, true);
   weightGroup('llmosStorage', 99, true);

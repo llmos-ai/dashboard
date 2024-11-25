@@ -28,14 +28,13 @@ export default {
       const VERSION = {
         name:  'version',
         label: 'Version',
-        value: 'spec.version',
+        value: 'version',
       };
 
       const DESCRIPTION = {
         name:  'description',
         label: 'Description',
         value: 'description',
-        width: 600,
       };
 
       const ENABLED = {

@@ -103,6 +103,10 @@ export const routerOptions = {
     component: () => interopDefault(import('../pages/c/_cluster/settings/index.vue' /* webpackChunkName: "pages/c/_cluster/settings/index" */)),
     name:      'c-cluster-settings'
   }, {
+    path:      '/c/:cluster/llmos/tools',
+    component: () => interopDefault(import('@shell/pages/c/_cluster/llmos/tools/index.vue')),
+    name:      'c-cluster-llmos-tools'
+  }, {
     path:      '/c/:cluster/explorer/EventsTable',
     component: () => interopDefault(import('../pages/c/_cluster/explorer/EventsTable.vue' /* webpackChunkName: "pages/c/_cluster/explorer/EventsTable" */)),
     name:      'c-cluster-explorer-EventsTable'

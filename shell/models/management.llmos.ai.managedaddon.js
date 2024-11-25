@@ -2,9 +2,13 @@ import SteveModel from '@shell/plugins/steve/steve-class';
 import { DESCRIPTION } from '@shell/config/labels-annotations';
 import Vue from 'vue';
 import { set } from '@shell/utils/object';
+import { _EDIT, ENABLED, MODE } from '@shell/config/query-params';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 export const systemAddonLabel = 'llmos.ai/system-addon';
 export const addonAllowEditLabel = 'llmos.ai/system-addon-allow-edit';
+
+const upperCaseWords = ['llmos', 'gpu'];
 
 export default class ManagedAddon extends SteveModel {
   applyDefaults() {
@@ -49,8 +53,8 @@ export default class ManagedAddon extends SteveModel {
     const enableHistory = this.spec.enabled;
 
     try {
-      this.spec.enabled = !this.spec.enabled;
-      this.goToEdit();
+      // this.spec.enabled = !this.spec.enabled;
+      this.goToEdit({ [ENABLED]: !this.spec.enabled });
     } catch (err) {
       this.spec.enabled = enableHistory;
       this.$dispatch('growl/fromError', {
@@ -67,7 +71,7 @@ export default class ManagedAddon extends SteveModel {
   get stateColor() {
     const state = this.stateDisplay;
 
-    if (state === 'Ready' && this.stateReady) {
+    if ((state === 'Deployed' || state === 'Ready') && this.stateReady) {
       return 'text-success';
     } else if (state === 'Disabled') {
       return 'text-darker';
@@ -88,7 +92,7 @@ export default class ManagedAddon extends SteveModel {
     }
 
     if (this.stateReady) {
-      return 'Ready';
+      return 'Deployed';
     }
 
     return out;
@@ -106,5 +110,54 @@ export default class ManagedAddon extends SteveModel {
 
   get allowDisable() {
     return (this.labels[systemAddonLabel] !== 'true' || this.labels[addonAllowEditLabel] === 'true') && super.canUpdate;
+  }
+
+  get logo() {
+    let src = null;
+
+    try {
+      src = require(`@shell/assets/images/pl/${ this.metadata.name }.svg`);
+    } catch (e) {
+      return null;
+    }
+
+    return src;
+  }
+
+  get version() {
+    // Ensure the version always starts with 'v'
+    return this.spec.version.startsWith('v') ? this.spec.version : `v${ this.spec.version }`;
+  }
+
+  get formatName() {
+    return this.metadata.name
+      .split('-')
+      .map((word) => {
+        if (upperCaseWords.includes(word)) {
+          return word.toUpperCase();
+        }
+
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(); // Capitalize other words
+      })
+      .join(' ');
+  }
+
+  get editUrl() {
+    const query = {
+      [MODE]:    _EDIT,
+      [ENABLED]: 'true',
+    };
+
+    return {
+      name:   'c-cluster-product-resource-namespace-id',
+      params: {
+        product:   LLMOS,
+        cluster:   this.currentRoute()?.params?.cluster || 'local',
+        resource:  this.type,
+        namespace: this.namespace,
+        id:        this.metadata.name,
+      },
+      query,
+    };
   }
 }

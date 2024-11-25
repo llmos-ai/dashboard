@@ -76,3 +76,6 @@ export const CLOUD_CREDENTIAL = 'cloud';
 export const PROJECT_ID = 'projectId';
 export const NAMESPACE_ID = 'namespaceId';
 export const FLAT_VIEW = 'flatView';
+
+// Managed Addon
+export const ENABLED = 'enabled';

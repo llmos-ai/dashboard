@@ -84,8 +84,8 @@ export default {
     const metadata = this.value.metadata;
     const enabled = this.$route.query.enabled;
 
-    if (enabled === 'true') {
-      spec.enabled = true;
+    if (enabled !== '') {
+      spec.enabled = enabled === 'true';
     }
 
     const defaultValuesContentJson = jsyaml.load(spec.defaultValuesContent);
