@@ -7,7 +7,6 @@ import { Checkbox } from '@components/Form/Checkbox';
 import YamlEditor from '@shell/components/YamlEditor.vue';
 import { allHash } from '@shell/utils/promise';
 import { EVENT } from '@shell/config/types';
-import Vue from 'vue';
 import { _EDIT } from '@shell/config/query-params';
 import { systemAddonLabel } from '@shell/models/management.llmos.ai.managedaddon';
 
@@ -52,11 +51,11 @@ export default {
     const enabled = this.$route.query.enabled;
 
     if (!spec.valuesContent && spec.defaultValuesContent !== '') {
-      Vue.set(spec, 'valuesContent', spec.defaultValuesContent);
+      spec.valuesContent = spec.defaultValuesContent;
     }
 
-    if (enabled === 'true') {
-      Vue.set(spec, 'enabled', true);
+    if (enabled !== undefined) {
+      spec.enabled = enabled === 'true';
     }
 
     return { spec, metadata };

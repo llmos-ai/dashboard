@@ -11,6 +11,8 @@ export const SYSTEM_NAMESPACE = 'management.llmos.ai/system-namespace';
 export const DESCRIPTION = 'field.llmos.ai/description';
 export const CONTAINER_DEFAULT_RESOURCE_LIMIT = 'field.llmos.ai/containerDefaultResourceLimit';
 export const NODE_ARCHITECTURE = 'kubernetes.io/arch';
+export const CLUSTER_TOOLS = 'llmos.ai/cluster-tools';
+export const SYSTEM_ADDON_ALLOW_EDIT = 'llmos.ai/system-addon-allow-edit';
 
 export const KUBERNETES = {
   SERVICE_ACCOUNT_UID:  'kubernetes.io/service-account.uid',

@@ -742,6 +742,7 @@ catalog:
     header: Cluster Tools
     noTools: "No Cluster Tools found"
     action:
+      disable: Disable
       install: Install
       upgrade: Upgrade/Edit
       edit: Edit
@@ -6003,6 +6004,11 @@ typeLabel:
       other { Nvidia Drivers }
     }
   # LLMOS Types
+  llmos.tool : |-
+    {count, plural,
+      one { Cluster Tool }
+      other { Cluster Tools }
+    }
   llmos.ai.volume: |-
     {count, plural,
       one { Volume }

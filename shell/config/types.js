@@ -103,6 +103,7 @@ export const LLMOS = {
   GPUDEVICE: 'gpustack.llmos.ai.gpudevice',
   VOLUME:    'llmos.ai.volume',
   CHAT:      'chat',
+  TOOL:      'llmos.tool',
 };
 
 export const ML_WORKLOAD = 'ml_workload';
