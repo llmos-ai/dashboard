@@ -5,10 +5,7 @@ import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import YamlEditor from '@shell/components/YamlEditor.vue';
-import { allHash } from '@shell/utils/promise';
-import { EVENT } from '@shell/config/types';
-import { _EDIT } from '@shell/config/query-params';
-import { systemAddonLabel } from '@shell/models/management.llmos.ai.managedaddon';
+import ManagedAddonMixin from '@shell/edit/management.llmos.ai.managedaddon/mixin/addon';
 
 export default {
   name:       'EditGenericAddon',
@@ -20,129 +17,7 @@ export default {
     Checkbox,
     LabeledInput,
   },
-  props: {
-    value: {
-      type:     Object,
-      required: true,
-    },
-
-    mode: {
-      type:     String,
-      required: true
-    },
-    registerBeforeHook: {
-      type:     Function,
-      required: true,
-    },
-  },
-  async fetch() {
-    const inStore = this.$store.getters['currentProduct'].inStore;
-
-    await allHash({ events: this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }) });
-  },
-
-  beforeDestroy() {
-    this.$store.dispatch('cluster/forgetType', EVENT);
-  },
-
-  data() {
-    const spec = this.value.spec;
-    const metadata = this.value.metadata;
-    const enabled = this.$route.query.enabled;
-
-    if (!spec.valuesContent && spec.defaultValuesContent !== '') {
-      spec.valuesContent = spec.defaultValuesContent;
-    }
-
-    if (enabled !== undefined) {
-      spec.enabled = enabled === 'true';
-    }
-
-    return { spec, metadata };
-  },
-
-  computed: {
-    eventOverride() {
-      if (this.isEdit) {
-        return;
-      }
-
-      const events = this.$store.getters[`cluster/all`](EVENT);
-
-      return events.filter((event) => {
-        if (event.involvedObject?.uid === this.value?.metadata?.uid) {
-          return true;
-        }
-
-        if (event.involvedObject?.name.includes(`helm-install-${ this.value.metadata?.name }`)) {
-          return true;
-        }
-
-        return false;
-      }).map((event) => {
-        return {
-          reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),
-          message:   event.message || this.t('generic.unknown'),
-          date:      event.lastTimestamp || event.firstTimestamp || event.metadata.creationTimestamp,
-          eventType: event.eventType
-        };
-      });
-    },
-
-    isEdit() {
-      return this.mode === _EDIT;
-    },
-
-    allowEdit() {
-      return this.isEdit && !this.isSystemAddon;
-    },
-
-    isSystemAddon() {
-      return this.value.metadata?.annotations?.[systemAddonLabel] === 'true';
-    }
-  },
-
-  created() {
-    if (this.registerBeforeHook) {
-      this.registerBeforeHook(this.willSave, 'willSave');
-    }
-  },
-
-  methods: {
-    willSave() {
-      this.errors = [];
-
-      if (this.spec.chart === '') {
-        this.errors.push(this.t('validation.required', { key: 'Chart Name' }, true));
-      }
-
-      if (this.spec.version === '') {
-        this.errors.push(this.t('validation.required', { key: 'Version' }, true));
-      }
-
-      if (this.spec.repo === '' ) {
-        this.errors.push(this.t('validation.required', { key: 'Repo' }, true));
-      }
-
-      if (!this.validChartRepo(this.spec.repo)) {
-        this.errors.push(this.t('validation.invalidChartRepo', { key: 'Repo' }, true));
-      }
-
-      if (this.errors.length > 0) {
-        return Promise.reject(this.errors);
-      }
-
-      if (this.spec.valuesContent === this.spec.defaultValuesContent) {
-        this.spec.valuesContent = null;
-      }
-    },
-
-    validChartRepo(url) {
-      const pattern = /^(http?|https?|git):\/\/.+$/;
-
-      return pattern.test(url);
-    },
-  }
+  mixins: [ManagedAddonMixin],
 };
 </script>
 
@@ -152,7 +27,7 @@ export default {
       :value="value"
       :namespaced="true"
       :mode="mode"
-      description-disabled
+      :description-disabled="!allowEdit"
     />
 
     <ResourceTabs
@@ -161,8 +36,7 @@ export default {
       :need-conditions="false"
       :need-related="false"
       :side-tabs="true"
-      :eventOverride="eventOverride"
-      :useOverrideEvents="true"
+      :override-events="customEvents"
       :mode="mode"
     >
       <Tab
@@ -185,7 +59,7 @@ export default {
               v-model="spec.repo"
               label="Chart Repo"
               required
-              :disabled="allowEdit"
+              :disabled="!allowEdit"
               :mode="mode"
             />
           </div>
@@ -195,7 +69,7 @@ export default {
               v-model="spec.chart"
               label="Chart Name"
               required
-              :disabled="allowEdit"
+              :disabled="!allowEdit"
               :mode="mode"
             />
           </div>
@@ -207,7 +81,7 @@ export default {
               v-model="spec.version"
               label="Version"
               required
-              :disabled="allowEdit"
+              :disabled="!allowEdit"
               :mode="mode"
             />
           </div>

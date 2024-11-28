@@ -8,7 +8,9 @@ export default {
   components: { SortableTable },
 
   async fetch() {
-    this.events = await fetchClusterResources(this.$store, EVENT);
+    const events = await fetchClusterResources(this.$store, EVENT);
+
+    this.events = events.filter((e) => e._type === 'Warning');
   },
 
   data() {

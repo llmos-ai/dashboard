@@ -173,7 +173,7 @@ function getGpuType(resources: object): string {
   if (resources.gpuType) {
     return resources.gpuType;
   }
-  if (resources.limits[NVIDIA.GPU]) {
+  if (resources.limits && resources.limits[NVIDIA.GPU]) {
     return NVIDIA.Name;
   }
 }

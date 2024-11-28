@@ -53,7 +53,6 @@ export default class ManagedAddon extends SteveModel {
     const enableHistory = this.spec.enabled;
 
     try {
-      // this.spec.enabled = !this.spec.enabled;
       this.goToEdit({ [ENABLED]: !this.spec.enabled });
     } catch (err) {
       this.spec.enabled = enableHistory;

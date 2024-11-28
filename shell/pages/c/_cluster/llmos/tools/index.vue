@@ -5,7 +5,7 @@ import { ENABLED } from '@shell/config/query-params';
 import LazyImage from '@shell/components/LazyImage';
 import TabTitle from '@shell/components/TabTitle';
 import { MANAGEMENT } from '@shell/config/types';
-import { CLUSTER_TOOLS, DESCRIPTION, SYSTEM_ADDON_ALLOW_EDIT} from '@shell/config/labels-annotations';
+import { CLUSTER_TOOLS, DESCRIPTION, SYSTEM_ADDON_ALLOW_EDIT } from '@shell/config/labels-annotations';
 import { allHash } from '@shell/utils/promise';
 import BadgeStateFormatter from '@shell/components/formatter/BadgeStateFormatter.vue';
 
@@ -35,8 +35,8 @@ export default {
 
     clusterAddons() {
       return this.addons.filter((addon) => {
-        return addon.metadata.labels[CLUSTER_TOOLS] === 'true'
-          && addon.metadata.labels[SYSTEM_ADDON_ALLOW_EDIT] === 'true'
+        return addon.metadata.labels[CLUSTER_TOOLS] === 'true' &&
+          addon.metadata.labels[SYSTEM_ADDON_ALLOW_EDIT] === 'true';
       });
     },
   },
