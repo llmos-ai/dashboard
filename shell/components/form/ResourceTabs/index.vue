@@ -37,6 +37,12 @@ export default {
         return {};
       }
     },
+    overrideEvents: {
+      type:    Array,
+      default: () => {
+        return [];
+      }
+    },
     // create-edit-view mode
     mode: {
       type:    String,
@@ -132,6 +138,10 @@ export default {
       ];
     },
     events() {
+      if (this.overrideEvents.length > 0) {
+        return this.overrideEvents;
+      }
+
       return this.allEvents.filter((event) => {
         return event.involvedObject?.uid === this.value?.metadata?.uid;
       }).map((event) => {

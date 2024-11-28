@@ -33,7 +33,9 @@ export default {
   },
 
   async fetch() {
-    await allHash({ events: this.$store.dispatch('cluster/findAll', { type: EVENT }) });
+    if (!this.isEdit) {
+      await allHash({ events: this.$store.dispatch('cluster/findAll', { type: EVENT }) });
+    }
     // loading secondary resources without UI blocking
     this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
   },
@@ -67,7 +69,7 @@ export default {
   },
 
   computed: {
-    eventOverride() {
+    customEvents() {
       const events = this.$store.getters[`cluster/all`](EVENT);
 
       return events.filter((event) => {
@@ -182,8 +184,7 @@ export default {
       :need-conditions="false"
       :need-related="false"
       :side-tabs="true"
-      :eventOverride="eventOverride"
-      :useOverrideEvents="true"
+      :override-events="customEvents"
       :mode="mode"
     >
       <Tab

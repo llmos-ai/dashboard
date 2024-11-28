@@ -2321,9 +2321,9 @@ monitoring:
         label: 补充密文
       existing: 选择现有的配置密文
       info: |
-        <span class="text-bold">创建默认配置</span>。在部署这个 Chart 时，将在<pre class='inline-block m-0'>monitoring-system</pre> 命名空间中创建一个包含 Alertmanager 配置的密文，名称为<pre class='inline-block m-0'>alertmanager-llmos-monitoring-alertmanager</pre>。默认情况下，在卸载或升级此 Chart 时，此密文均不会被修改。<br />
+        <span class="text-bold">创建默认配置</span>。在部署这个 Chart 时，将在<pre class='inline-block m-0'>llmos-monitoring-system</pre> 命名空间中创建一个包含 Alertmanager 配置的密文，名称为<pre class='inline-block m-0'>alertmanager-llmos-monitoring-alertmanager</pre>。默认情况下，在卸载或升级此 Chart 时，此密文均不会被修改。<br />
         部署这个 Chart 之后，你需要在 UI 中编辑密文，从而添加 Alertmanager 用于发送告警的自定义通知配置。<br /> <br />
-        <span class="text-bold">选择一个现有的配置密文</span>：你必须指定一个存在于<pre class='inline-block m-0'>monitoring-system</pre>命名空间内的密文。如果命名空间不存在，你将无法选择现有的密钥。
+        <span class="text-bold">选择一个现有的配置密文</span>：你必须指定一个存在于<pre class='inline-block m-0'>llmos-monitoring-system</pre>命名空间内的密文。如果命名空间不存在，你将无法选择现有的密钥。
       label: Alertmanager 密文
       new: 创建默认配置
       radio:
@@ -2340,7 +2340,7 @@ monitoring:
     placeholder: 选择集群类型
   createDefaultRoles:
     label: 创建默认 Monitoring 集群角色
-    tip: '创建分配给用户的<code>monitoring-admin</code>，<code>monitoring-edit</code>，和<code>monitoring-view</code> ClusterRoles，为其使用 Monitoring Chart 安装的 CRD 提供权限。'
+    tip: '创建分配给用户的<code>llmos-monitoring-admin</code>，<code>llmos-monitoring-edit</code>，和<code>llmos-monitoring-view</code> ClusterRoles，为其使用 Monitoring Chart 安装的 CRD 提供权限。'
   etcdNodeDirectory:
     label: ETCD 节点证书目录
     tooltip: '如果集群的 ETCD 节点使用 RancherOS，请把这个选项设置为<pre class=''inline-block m-0''>/opt/rke/etc/kubernetes/ssl</pre>。不支持需要指定多个证书目录的混合环境（例如，由 RancherOS 和 Ubuntu 主机组成的 ETCD Plane）。'

@@ -19,7 +19,7 @@ export default {
       const name = this.value.metadata.name;
 
       try {
-        return require(`./${ name }.vue`).default;
+        return require(`./${ name }/index.vue`).default;
       } catch {
         return require(`./generic.vue`).default;
       }

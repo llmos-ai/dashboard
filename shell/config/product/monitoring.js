@@ -5,7 +5,7 @@ import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 export const NAME = 'monitoring';
 export const ADDON_NAME = 'llmos-monitoring';
-export const ADDON_NAMESPACE = 'llmos-system';
+export const ADDON_NAMESPACE = 'llmos-monitoring-system';
 
 export function init(store) {
   const {

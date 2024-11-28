@@ -12,12 +12,12 @@ import jsyaml from 'js-yaml';
 import UnitInput from '@shell/components/form/UnitInput.vue';
 import KeyValue from '@shell/components/form/KeyValue.vue';
 import DataPool from '@shell/components/DataPool.vue';
-import { _VIEW } from '@shell/config/query-params';
 import merge from 'lodash/merge';
 import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
 import { FlatResources } from '@shell/utils/container-resource';
 import { cleanUp } from '@shell/utils/object';
 import ArrayListGrouped from '@shell/components/form/ArrayListGrouped.vue';
+import ManagedAddonMixin from '@shell/edit/management.llmos.ai.managedaddon/mixin/addon';
 
 const TAB_WEIGHT_MAP = {
   basic:      99,
@@ -43,7 +43,8 @@ export default {
     LabeledInput,
     ToggleSwitch,
   },
-  props: {
+  mixins: [ManagedAddonMixin],
+  props:  {
     value: {
       type:     Object,
       required: true,
@@ -60,10 +61,11 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const hash = await allHash({
-      events: this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }),
-      nodes:  this.$store.dispatch(`${ inStore }/findAll`, { type: NODE }),
-    });
+    const hash = await allHash({ nodes: this.$store.dispatch(`${ inStore }/findAll`, { type: NODE }) });
+
+    if (this.isView) {
+      this.events = await this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT });
+    }
 
     // Set default mon and mgr count by node count
     if (!this.spec.valuesContent || this.spec.valuesContent === '') {
@@ -84,7 +86,7 @@ export default {
     const metadata = this.value.metadata;
     const enabled = this.$route.query.enabled;
 
-    if (enabled !== '') {
+    if (enabled !== undefined) {
       spec.enabled = enabled === 'true';
     }
 
@@ -124,41 +126,14 @@ export default {
       tabWeightMap: TAB_WEIGHT_MAP,
       defaultValuesContentJson,
       valuesContentJson,
+      options:      [
+        { label: 'true', value: true },
+        { label: 'false', value: false }
+      ]
     };
   },
 
   computed: {
-    eventOverride() {
-      const events = this.$store.getters[`cluster/all`](EVENT);
-
-      return events.filter((event) => {
-        if (event.involvedObject?.uid === this.value?.metadata?.uid) {
-          return true;
-        }
-
-        if (event.involvedObject?.name.includes(`helm-install-${ this.value.metadata?.name }`)) {
-          return true;
-        }
-
-        return false;
-      }).map((event) => {
-        return {
-          reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),
-          message:   event.message || this.t('generic.unknown'),
-          date:      event.lastTimestamp || event.firstTimestamp || event.metadata.creationTimestamp,
-          eventType: event.eventType
-        };
-      });
-    },
-
-    options() {
-      return [{ label: 'true', value: true }, { label: 'false', value: false }];
-    },
-
-    isView() {
-      return this.mode === _VIEW;
-    },
-
     containerResourceList() {
       const resources = this.valuesContentJson.cephClusterSpec.resources;
       const resourceList = [];
@@ -183,12 +158,6 @@ export default {
         this.$set(this.valuesContentJson.cephFileSystems[0].spec.metadataServer, 'resources', cleanUp(out));
       }
     },
-  },
-
-  created() {
-    if (this.registerBeforeHook) {
-      this.registerBeforeHook(this.willSave, 'willSave');
-    }
   },
 
   methods: {
@@ -228,12 +197,6 @@ export default {
       }
     },
 
-    validChartRepo(url) {
-      const pattern = /^(http?|https?|git):\/\/.+$/;
-
-      return pattern.test(url);
-    },
-
     convertResourceListToObject() {
       const arrayList = this.containerResourceList;
       const out = {};
@@ -254,7 +217,7 @@ export default {
       :value="value"
       :namespaced="true"
       :mode="mode"
-      description-disabled
+      :description-disabled="!allowEdit"
     />
 
     <ResourceTabs
@@ -263,7 +226,7 @@ export default {
       :need-conditions="false"
       :need-related="false"
       :side-tabs="true"
-      :eventOverride="eventOverride"
+      :override-events="customEvents"
       :useOverrideEvents="true"
       :mode="mode"
     >

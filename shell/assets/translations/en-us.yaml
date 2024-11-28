@@ -118,6 +118,7 @@ generic:
     addVolume: Add Volume
     storageClass: Storage Class
   tabs:
+    general: General
     basic: Basics
     advanced: Advanced
     addons: Add-On Config
@@ -2512,9 +2513,9 @@ monitoring:
         label: Additional Secrets
       existing: Choose an existing config secret
       info: |
-        <span class="text-bold">Create default config</span>:<br>A Secret containing your Alertmanager Config will be created in the <pre class='inline-block m-0'>monitoring-system</pre> namespace on deploying this chart under the name <pre class='inline-block m-0'>alertmanager-llmos-monitoring-alertmanager</pre>. By default, this Secret will never be modified on an uninstall or upgrade of this chart. <br /><br />
+        <span class="text-bold">Create default config</span>:<br>A Secret containing your Alertmanager Config will be created in the <pre class='inline-block m-0'>llmos-monitoring-system</pre> namespace on deploying this chart under the name <pre class='inline-block m-0'>alertmanager-llmos-monitoring-alertmanager</pre>. By default, this Secret will never be modified on an uninstall or upgrade of this chart. <br /><br />
         Once you have deployed this chart, you should edit the Secret via the UI in order to add your custom notification configurations that will be used by Alertmanager to send alerts. <br /> <br />
-        <span class="text-bold">Choose an existing config secret</span>:<br>You must specify a Secret that exists in the <pre class='inline-block m-0'>monitoring-system</pre> namespace. If the namespace does not exist, you will not be able to select an existing secret.
+        <span class="text-bold">Choose an existing config secret</span>:<br>You must specify a Secret that exists in the <pre class='inline-block m-0'>llmos-monitoring-system</pre> namespace. If the namespace does not exist, you will not be able to select an existing secret.
       label: Alertmanager Secret
       new: Create default config
       radio:
@@ -2531,7 +2532,7 @@ monitoring:
     placeholder: Select cluster type
   createDefaultRoles:
     label: Create Default Monitoring Cluster Roles
-    tip: 'Creates <code>monitoring-admin</code>, <code>monitoring-edit</code>, and <code>monitoring-view</code> ClusterRoles that can be assigned to users to provide permissions to CRDs installed by the Monitoring chart.'
+    tip: 'Creates <code>llmos-monitoring-admin</code>, <code>llmos-monitoring-edit</code>, and <code>llmos-monitoring-view</code> ClusterRoles that can be assigned to users to provide permissions to CRDs installed by the Monitoring chart.'
   etcdNodeDirectory:
     label: etcd Node Certificate Directory
     tooltip: 'For clusters that use RancherOS for the etcd nodes, this option should be set to <pre class=''inline-block m-0''>/opt/rke/etc/kubernetes/ssl</pre>. Hybrid environments that require specifying multiple certificate directories (e.g. an etcd plane composed of both RancherOS and Ubuntu hosts) are not supported.'
@@ -2569,7 +2570,7 @@ monitoring:
         label: Starts At
     linkedList:
       config:
-        description: Monitoring Addon Config
+        description: LLMOS Monitoring Config
         label: Config
       alertManager:
         description: Active Alerts
