@@ -2304,9 +2304,9 @@ membershipEditor:
 
 monitoring:
   accessModes:
-    many: 多次读写
-    once: 一次读写
-    readOnlyMany: 多次只读
+    many: 多读多写
+    once: 单独单读
+    readOnlyMany: 多读单写
   aggregateDefaultRoles:
     label: 聚合为默认 Kubernetes 角色
     tip: '将标签添加到 Monitoring Chart 部署的 ClusterRoles 上，以<a target="_blank" rel="noopener nofollow noreferrer" href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles">聚合到相应的默认 K8s 进行管理、编辑和查看 ClusterRoles</a>。'
@@ -5795,6 +5795,11 @@ typeLabel:
       other { Nvidia 驱动 }
     }
   # LLMOS types label
+  llmos.tool : |-
+    {count, plural,
+      one { 系统工具 }
+      other { 系统工具 }
+    }
   llmos.ai.volume: |-
     {count, plural,
       one { 存储卷 }
@@ -6352,6 +6357,34 @@ managedAddon:
       禁用 {name} 组件将删除当前Ceph 集群所创建的所有信息和数据，删除的数据📊将不可恢复，是否继续禁用？
     generic: |-
       禁用 {name} 组件将会删除当前组件所包含的所有信息和数据，是否继续禁用？
+  tabs:
+    deviceManager: Device Manager
+    gpuOperator: GPU Operator
+    scheduler: Scheduler 管理
+  llmosGPUStack:
+    gpuOperator:
+      title: NVIDIA GPU Operator 配置
+    vGPU:
+      title: vGPU 配置
+      enable: 启用 vGPU
+    nodeSchedulingPolicy:
+      name: 节点调度策略
+    gpuSchedulingPolicy:
+      name: GPU调度策略
+      tooltip:  尽可能将任务分配到相同(Binpack)或不同(Spread)的GPU节点
+    deviceSplitCount:
+      label: 最大 vGPU 数量/设备
+      description: 单个 GPU 设备最多可分配的 vGPU 任务数量
+  tools:
+    header: Cluster Tools
+    noTools: "No Cluster Tools found"
+    action:
+      disable: 禁用
+      install: 安装
+      upgrade: 升级/编辑
+      edit: 编辑
+      remove: 删除
+      manage: 管理
 
 storage:
   addParameters: 添加参数

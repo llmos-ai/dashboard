@@ -6576,6 +6576,34 @@ managedAddon:
       You are attempting to disable the {name}. This will remove the Ceph cluster and all data on it. Are you sure you want to continue?
     generic: |-
       Are you sure you want to disable {name}?
+  tabs:
+    deviceManager: Device Manager
+    gpuOperator: GPU Operator
+    scheduler: Scheduler
+  llmosGPUStack:
+    gpuOperator:
+      title: NVIDIA GPU Operator Configs
+    vGPU:
+      title: vGPU Configs
+      enable: Enable vGPU
+    nodeSchedulingPolicy:
+      name: Node Scheduling Policy
+    gpuSchedulingPolicy:
+      name: GPU Scheduling Policy
+      tooltip:  Allocate tasks to the same or different GPU node as much as possible
+    deviceSplitCount:
+      label: vGPU Count/Device
+      description: Maximum vGPU tasks can be allocated to a single GPU device
+  tools:
+    header: Cluster Tools
+    noTools: "No Cluster Tools found"
+    action:
+      disable: Disable
+      install: Install
+      upgrade: Upgrade/Edit
+      edit: Edit
+      remove: Remove
+      manage: Manage
 
 storage:
   addParameters: Add Parameters

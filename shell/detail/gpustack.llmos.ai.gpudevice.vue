@@ -118,7 +118,7 @@ export default {
 
       return this.pods.filter((pod) => {
         // Skip pods without the specified annotation
-        if (!pod.annotations?.['hami.io/vgpu-node']) {
+        if (!pod.annotations?.['hami.io/vgpu-node'] && !pod.annotations?.['hami.io/bind-time']) {
           return false;
         }
 
