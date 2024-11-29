@@ -306,7 +306,7 @@ export function init(store) {
       params: { resource: LLMOS.TOOL }
     },
     exact:  false,
-    weight: 100,
+    weight: 101,
   });
 
   basicType(

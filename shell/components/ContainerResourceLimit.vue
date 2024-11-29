@@ -102,10 +102,7 @@ export default {
       this.limitsVGpuMem = limitsVGpuMem;
       this.limitsVGpuCores = limitsVGpuCores;
 
-      if (gpuType) {
-        this.podSpec.runtimeClassName = this.podSpec.runtimeClassName || gpuType;
-        this.limitsGpu = limitsGpu || 1;
-      }
+      this.podSpec.runtimeClassName = gpuType;
     }
   },
 
@@ -144,6 +141,10 @@ export default {
       if (!this.enableVGpu) {
         this.limitsVGpuMem = undefined;
         this.limitsVGpuCores = undefined;
+      }
+
+      if (this.gpuType === 'nvidia') {
+        this.limitsGpu = this.limitsGpu || 1;
       }
 
       const {
@@ -336,6 +337,7 @@ export default {
       >
         <span class="col span-6">
           <UnitInput
+            v-if="enableVGpu"
             v-model="limitsVGpuMem"
             required
             :placeholder="t('containerResourceLimit.vGPUMemPlaceholder')"
@@ -347,6 +349,7 @@ export default {
         </span>
         <span class="col span-6">
           <UnitInput
+            v-if="enableVGpu"
             v-model="limitsVGpuCores"
             :placeholder="t('containerResourceLimit.vGPUCoresPlaceholder')"
             :label="t('containerResourceLimit.vGPUCores')"

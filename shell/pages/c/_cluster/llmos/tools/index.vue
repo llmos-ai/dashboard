@@ -59,7 +59,7 @@ export default {
   <Loading v-if="$fetchState.pending" />
   <div v-else>
     <h1>
-      <TabTitle>{{ t('catalog.tools.header') }}</TabTitle>
+      <TabTitle>{{ t('typeLabel."llmos.tool"', {count: 2}) }}</TabTitle>
     </h1>
 
     <div class="grid">
@@ -108,20 +108,20 @@ export default {
         <div class="action">
           <template v-if="addon.blocked">
             <button
-              v-clean-html="t('catalog.tools.action.install')"
+              v-clean-html="t('managedAddon.tools.action.install')"
               disabled="true"
               class="btn btn-sm role-primary"
             />
           </template>
           <template v-else-if="addon.spec.enabled">
             <button
-              v-clean-html="t('catalog.tools.action.disable')"
+              v-clean-html="t('managedAddon.tools.action.disable')"
               class="btn btn-sm role-secondary"
               @click="disable(addon)"
             />
             <nuxt-link :to="addon.editUrl">
               <button
-                v-clean-html="t('catalog.tools.action.edit')"
+                v-clean-html="t('managedAddon.tools.action.edit')"
                 class="btn btn-sm role-secondary"
               />
             </nuxt-link>
@@ -129,7 +129,7 @@ export default {
           <template v-else>
             <nuxt-link :to="addon.editUrl">
               <button
-                v-clean-html="t('catalog.tools.action.install')"
+                v-clean-html="t('managedAddon.tools.action.install')"
                 class="btn btn-sm role-primary"
               />
             </nuxt-link>
