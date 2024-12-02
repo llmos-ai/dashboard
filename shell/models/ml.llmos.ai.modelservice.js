@@ -25,7 +25,7 @@ export default class ModelService extends MlWorkload {
             containers:       [
               {
                 args:  [],
-                image: 'vllm/vllm-openai:v0.6.3',
+                image: '',
                 name:  'server',
                 ports: [
                   {

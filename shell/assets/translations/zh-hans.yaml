@@ -275,7 +275,7 @@ home:
   glance:
     version: 版本
     created: 创建时间
-    architecture: 架构
+    architecture: 系统架构
 about:
   title: 简介
   versions:
@@ -5797,8 +5797,8 @@ typeLabel:
   # LLMOS types label
   llmos.tool : |-
     {count, plural,
-      one { 系统工具 }
-      other { 系统工具 }
+      one { 集群工具 }
+      other { 集群工具 }
     }
   llmos.ai.volume: |-
     {count, plural,
@@ -5990,6 +5990,7 @@ advancedSettings:
     'log-level': '设置API的日志级别。'
     'upgrade-check-enabled': '启用升级检查。'
     'upgrade-check-url': '升级检查 URL。'
+    'model-service-default-image': 'LLMOS 模型服务的默认 API Serving 镜像'
   editHelp:
     'ui-banners': 此设置使用包含 3 个根参数的 JSON 对象，分别是<code>banner</code>、<code>showHeader</code>和<code>showFooter</code>。<code>banner</code> 是包含 <code>textColor</code>，<code>background</code>和<code>text</code>的对象，其中<code>textColor</code> 和 <code>background</code>的值可以是任何有效的 CSS 颜色值。
   enum:

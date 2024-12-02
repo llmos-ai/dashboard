@@ -46,20 +46,20 @@ export default {
         },
         {
           enabled:     false,
-          group:       'grafana',
-          iconSrc:     grafanaSrc,
-          label:       'monitoring.overview.linkedList.grafana.label',
-          description: 'monitoring.overview.linkedList.grafana.description',
-          link:        '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy',
-        },
-        {
-          enabled:     false,
           group:       'prometheus',
           iconSrc:     prometheusSrc,
           label:       'monitoring.overview.linkedList.prometheusPromQl.label',
           description:
             'monitoring.overview.linkedList.prometheusPromQl.description',
           link: '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-prometheus:9090/proxy/graph',
+        },
+        {
+          enabled:     false,
+          group:       'grafana',
+          iconSrc:     grafanaSrc,
+          label:       'monitoring.overview.linkedList.grafana.label',
+          description: 'monitoring.overview.linkedList.grafana.description',
+          link:        '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy',
         },
         {
           enabled:     false,
@@ -125,7 +125,7 @@ export default {
     <div>
       <div class="create-resource-container">
         <div class="subtypes-container">
-          <a
+          <nuxt-link
             v-for="fel in externalLinks"
             :key="fel.label"
             v-clean-tooltip="
@@ -135,6 +135,7 @@ export default {
             :disabled="!fel.enabled"
             :target="fel.internal ? '_self' : '_blank'"
             rel="noopener noreferrer"
+            :to="fel.link"
             :class="{ 'subtype-banner': true, disabled: !fel.enabled }"
           >
             <div class="subtype-content">
@@ -161,7 +162,7 @@ export default {
                 </span>
               </div>
             </div>
-          </a>
+          </nuxt-link>
         </div>
       </div>
     </div>

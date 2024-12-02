@@ -43,6 +43,7 @@ export default {
   created() {
     this.value.value = this.value.value || this.value.default;
     this.enumOptions = this.setting?.kind === 'enum' ? this.setting.options.map((id) => ({
+      // i18n-uses advancedSettings.enum.*
       label: `advancedSettings.enum.${ this.value.id }.${ id }`,
       value: id,
     })) : [];
@@ -76,6 +77,10 @@ export default {
 
     showLocalhostWarning() {
       return isServerUrl(this.value.id) && isLocalhost(this.value.value);
+    },
+
+    showWarningBanner() {
+      return this.setting?.warning;
     },
 
     validationPassed() {
@@ -140,6 +145,13 @@ export default {
     @finish="saveSettings"
     @cancel="done"
   >
+    <Banner
+      v-if="showWarningBanner"
+      color="warning"
+      :label="t(`advancedSettings.warnings.${ setting.warning }`)"
+      data-testid="advanced_settings_warning_banner"
+    />
+
     <h4>{{ description }}</h4>
 
     <h5
@@ -151,6 +163,7 @@ export default {
     <div class="edit-change mt-20">
       <h5 v-t="'advancedSettings.edit.changeSetting'" />
       <button
+        data-testid="advanced_settings_use_default"
         :disabled="!canReset"
         type="button"
         class="btn role-primary"
@@ -164,6 +177,7 @@ export default {
       v-if="showLocalhostWarning"
       color="warning"
       :label="t('validation.setting.serverUrl.localhost')"
+      data-testid="setting-serverurl-localhost-warning"
     />
 
     <Banner
@@ -171,6 +185,7 @@ export default {
       :key="i"
       color="error"
       :label="err"
+      data-testid="setting-error-banner"
     />
 
     <div class="mt-20">
@@ -232,16 +247,16 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  .edit-change {
-    align-items: center;
-    display: flex;
+.edit-change {
+  align-items: center;
+  display: flex;
 
-    > h5 {
-      flex: 1;
-    }
+  > h5 {
+    flex: 1;
   }
+}
 
-  ::v-deep .edit-help code {
-    padding: 1px 5px;
-  }
+::v-deep .edit-help code {
+  padding: 1px 5px;
+}
 </style>
