@@ -7,7 +7,7 @@ import Tabbed from '@shell/components/Tabbed';
 import Tab from '@shell/components/Tabbed/Tab';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import Conditions from '@shell/components/form/Conditions';
-import { EVENT } from '@shell/config/types';
+import { EVENT, MANAGEMENT, ML_WORKLOAD_TYPES } from '@shell/config/types';
 import SortableTable from '@shell/components/SortableTable';
 import { _VIEW } from '@shell/config/query-params';
 import RelatedResources from '@shell/components/RelatedResources';
@@ -143,7 +143,19 @@ export default {
       }
 
       return this.allEvents.filter((event) => {
-        return event.involvedObject?.uid === this.value?.metadata?.uid;
+        switch (this.value.type) {
+        case ML_WORKLOAD_TYPES.NOTEBOOK:
+          return event.involvedObject?.uid === this.value?.metadata?.uid ||
+              event.involvedObject?.name.includes(`notebook-${ this.value.metadata?.name }`);
+        case ML_WORKLOAD_TYPES.MODEL_SERVICE:
+          return event.involvedObject?.uid === this.value?.metadata?.uid ||
+              event.involvedObject?.name.includes(`modelservice-${ this.value.metadata?.name }`);
+        case MANAGEMENT.MANAGED_ADDON:
+          return event.involvedObject?.uid === this.value?.metadata?.uid ||
+              event.involvedObject?.name.includes(`helm-install-${ this.value.metadata?.name }`);
+        default:
+          return event.involvedObject?.uid === this.value?.metadata?.uid;
+        }
       }).map((event) => {
         return {
           reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),

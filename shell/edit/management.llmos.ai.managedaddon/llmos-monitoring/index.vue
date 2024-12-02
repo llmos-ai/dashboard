@@ -5,7 +5,7 @@ import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import { allHash } from '@shell/utils/promise';
-import { EVENT, PVC, SECRET, STORAGE_CLASS } from '@shell/config/types';
+import { PVC, SECRET, STORAGE_CLASS } from '@shell/config/types';
 import jsyaml from 'js-yaml';
 import merge from 'lodash/merge';
 import { MONITORING_NAMESPACE } from '@shell/utils/monitoring';
@@ -62,12 +62,7 @@ export default {
         opt:  { namespaced: MONITORING_NAMESPACE }
       }),
     };
-
     const hash = await allHash(hashPromises);
-
-    if (this.isView) {
-      this.events = await this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT });
-    }
 
     this.storageClasses = hash.storageClasses;
     this.pvcs = hash.pvcs;
@@ -110,7 +105,6 @@ export default {
       pvcs:                  [],
       monitoringSecrets:     [],
       storageClasses:        [],
-      events:                [],
       weights,
       accessModes:           [
         {
@@ -197,7 +191,6 @@ export default {
       :need-conditions="false"
       :need-related="false"
       :side-tabs="true"
-      :override-events="customEvents"
       :mode="mode"
     >
       <Tab

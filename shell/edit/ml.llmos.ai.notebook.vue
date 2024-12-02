@@ -2,8 +2,8 @@
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkloadMixin from '@shell/mixins/llmos/ml-workload';
-import { MANAGEMENT, EVENT } from '@shell/config/types';
-import { allHash } from '@shell/utils/promise';
+import { MANAGEMENT } from '@shell/config/types';
+import { SETTING } from '@shell/config/settings';
 
 export default {
   name:   'Notebook',
@@ -23,10 +23,7 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    await allHash({
-      events:   this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT }),
-      settings: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING })
-    });
+    this.notebookImagesSetting = await this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.DEFAULT_NOTEBOOK_IMAGES);
 
     // don't block UI for these resources
     this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
@@ -35,7 +32,10 @@ export default {
   data() {
     const notebookType = this.value.metadata.labels['ml.llmos.ai/notebook-type'];
 
-    return { notebookType };
+    return {
+      notebookType,
+      notebookImagesSetting: null,
+    };
   },
 
   created() {
@@ -43,24 +43,6 @@ export default {
   },
 
   computed: {
-    eventOverride() {
-      const events = this.$store.getters[`cluster/all`](EVENT);
-
-      return events.filter((event) => {
-        if (event.involvedObject?.uid === this.value?.metadata?.uid ||
-            event.involvedObject?.name.includes(`notebook-${ this.value.metadata?.name }`)) {
-          return true;
-        }
-      }).map((event) => {
-        return {
-          reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),
-          message:   event.message || this.t('generic.unknown'),
-          date:      event.lastTimestamp || event.firstTimestamp || event.metadata.creationTimestamp,
-          eventType: event.eventType
-        };
-      });
-    },
-
     notebookTypeOptions() {
       return [{
         label: 'Jupyter Notebook',
@@ -75,12 +57,11 @@ export default {
     },
 
     notebookImages() {
-      const notebookImages = this.$store.getters['management/all'](MANAGEMENT.SETTING).find((setting) => setting.id === 'default-notebook-images');
-      let imagesString = notebookImages?.value;
-
-      if (!notebookImages.value) {
-        imagesString = notebookImages.default;
+      if (!this.notebookImagesSetting) {
+        return [];
       }
+
+      const imagesString = this.notebookImagesSetting?.value || this.notebookImagesSetting.default;
 
       let images = JSON.parse(imagesString);
 
@@ -194,8 +175,6 @@ export default {
         :need-conditions="false"
         :need-related="false"
         :side-tabs="true"
-        :event-override="eventOverride"
-        :use-override-events="true"
         :mode="mode"
       >
         <Tab

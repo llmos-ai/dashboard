@@ -5,7 +5,7 @@ import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import { allHash } from '@shell/utils/promise';
-import { EVENT, NODE } from '@shell/config/types';
+import { NODE } from '@shell/config/types';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import { ToggleSwitch } from '@components/Form/ToggleSwitch';
 import jsyaml from 'js-yaml';
@@ -62,10 +62,6 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const hash = await allHash({ nodes: this.$store.dispatch(`${ inStore }/findAll`, { type: NODE }) });
-
-    if (this.isView) {
-      this.events = await this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT });
-    }
 
     // Set default mon and mgr count by node count
     if (!this.spec.valuesContent || this.spec.valuesContent === '') {
@@ -226,8 +222,6 @@ export default {
       :need-conditions="false"
       :need-related="false"
       :side-tabs="true"
-      :override-events="customEvents"
-      :useOverrideEvents="true"
       :mode="mode"
     >
       <Tab

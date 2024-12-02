@@ -1,4 +1,3 @@
-import { EVENT } from '@shell/config/types';
 import { _VIEW } from '@shell/config/query-params';
 import { systemAddonLabel } from '@shell/models/management.llmos.ai.managedaddon';
 import jsyaml from 'js-yaml';
@@ -20,20 +19,6 @@ export default {
     },
   },
 
-  async fetch() {
-    const inStore = this.$store.getters['currentProduct'].inStore;
-
-    if (this.isView) {
-      this.events = await this.$store.dispatch(`${ inStore }/findAll`, { type: EVENT });
-    }
-  },
-
-  beforeDestroy() {
-    if (this.isView) {
-      this.$store.dispatch('cluster/forgetType', EVENT);
-    }
-  },
-
   data() {
     const spec = this.value.spec;
     const enabled = this.$route.query.enabled;
@@ -46,38 +31,10 @@ export default {
       spec.valuesContent = spec.defaultValuesContent;
     }
 
-    return {
-      spec,
-      events: [],
-    };
+    return { spec };
   },
 
   computed: {
-    customEvents() {
-      if (!this.isView || this.events?.length < 1) {
-        return;
-      }
-
-      return this.events.filter((event) => {
-        if (event.involvedObject?.uid === this.value?.metadata?.uid) {
-          return true;
-        }
-
-        if (event.involvedObject?.name.includes(`helm-install-${ this.value.metadata?.name }`)) {
-          return true;
-        }
-
-        return false;
-      }).map((event) => {
-        return {
-          reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),
-          message:   event.message || this.t('generic.unknown'),
-          date:      event.lastTimestamp || event.firstTimestamp || event.metadata.creationTimestamp,
-          eventType: event.eventType
-        };
-      });
-    },
-
     isView() {
       return this.mode === _VIEW;
     },
