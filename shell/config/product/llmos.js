@@ -9,7 +9,7 @@ import {
   SECRET,
   CONFIG_MAP,
   MANAGEMENT,
-  ML_WORKLOAD_TYPES, CEPH, NVIDIA
+  ML_WORKLOAD_TYPES, CEPH, NVIDIA,
 } from '@shell/config/types';
 
 import {
@@ -297,6 +297,7 @@ export function init(store) {
   });
 
   virtualType({
+    ifHaveType: NODE,
     labelKey:   `typeLabel."${ LLMOS.TOOL }"`,
     group:      'advanced',
     name:       LLMOS.TOOL,

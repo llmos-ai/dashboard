@@ -48,6 +48,7 @@ export const SETTING = {
   LOG_LEVEL:                            'log-level',
   UPGRADE_CHECK_ENABLED:                'upgrade-check-enabled',
   UPGRADE_CHECK_URL:                    'upgrade-check-url',
+  MODEL_SERVICE_DEFAULT_IMAGE:          'model-service-default-image',
 
   UI_SOURCE:         'ui-source',
   UI_INDEX:          'ui-index',
@@ -107,9 +108,10 @@ export const ALLOWED_SETTINGS: GlobalSetting = {
     kind:    'enum',
     options: ['info', 'debug', 'trace']
   },
-  [SETTING.PL]:                    { canReset: true },
-  [SETTING.UPGRADE_CHECK_ENABLED]: { kind: 'boolean', canReset: true },
-  [SETTING.UPGRADE_CHECK_URL]:     { kind: 'url' },
+  [SETTING.PL]:                          { canReset: true },
+  [SETTING.UPGRADE_CHECK_ENABLED]:       { kind: 'boolean' },
+  [SETTING.UPGRADE_CHECK_URL]:           { kind: 'url' },
+  [SETTING.MODEL_SERVICE_DEFAULT_IMAGE]: { kind: 'string' }
 };
 
 /**

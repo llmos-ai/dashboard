@@ -2,10 +2,11 @@
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkload from '@shell/mixins/llmos/ml-workload';
-import { EVENT } from '@shell/config/types';
+import { EVENT, MANAGEMENT } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
 import { SvcOptions } from '@shell/config/constants';
 import { mergeEnvs } from '@shell/utils/merge';
+import { SETTING } from '@shell/config/settings';
 
 export default {
   name:   'ModelService',
@@ -33,9 +34,20 @@ export default {
   },
 
   async fetch() {
+    const inStore = this.$store.getters['currentProduct'].inStore;
+
+    await allHash({ settings: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }) });
+
     if (!this.isEdit) {
-      await allHash({ events: this.$store.dispatch('cluster/findAll', { type: EVENT }) });
+      this.events = await this.$store.dispatch('cluster/findAll', { type: EVENT });
     }
+
+    if (!this.container.image) {
+      const msDefaultImage = this.$store.getters['cluster/byId'](MANAGEMENT.SETTING, SETTING.MODEL_SERVICE_DEFAULT_IMAGE);
+
+      this.container.image = msDefaultImage?.value || msDefaultImage.default;
+    }
+
     // loading secondary resources without UI blocking
     this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
   },
@@ -44,6 +56,7 @@ export default {
     const excludeEnvs = [
       'HUGGING_FACE_HUB_TOKEN',
       'HF_ENDPOINT',
+      'VLLM_USE_MODELSCOPE',
     ];
 
     this.initializeModelService();
@@ -63,16 +76,22 @@ export default {
       hfEndpoint = { name: 'HF_ENDPOINT', value: '' };
     }
 
+    const useModelScope = container.env.find((env) => env.name === 'VLLM_USE_MODELSCOPE');
+    const modelSource = useModelScope ? 'ModelScope' : 'HuggingFace';
+
     return {
-      hfToken, hfEndpoint, excludeEnvs
+      hfToken,
+      hfEndpoint,
+      excludeEnvs,
+      modelSource,
+      events:        [],
+      sourceOptions: ['HuggingFace', 'ModelScope']
     };
   },
 
   computed: {
     customEvents() {
-      const events = this.$store.getters[`cluster/all`](EVENT);
-
-      return events.filter((event) => {
+      return this.events.filter((event) => {
         if (event.involvedObject?.uid === this.value?.metadata?.uid) {
           return true;
         }
@@ -157,6 +176,19 @@ export default {
     mergeEnvs() {
       const huggingFaceEnv = [this.hfToken, this.hfEndpoint];
 
+      // Set use `VLLM_USE_MODELSCOPE` env to true
+      if (this.modelSource === 'ModelScope') {
+        this.$set(this.container, 'env', [
+          {
+            name:  'VLLM_USE_MODELSCOPE',
+            value: 'true',
+          },
+        ]);
+      } else {
+        // remove the `VLLM_USE_MODELSCOPE` env
+        this.container.env = this.container.env.filter((env) => env.name !== 'VLLM_USE_MODELSCOPE');
+      }
+
       this.container.env = mergeEnvs(this.container.env, huggingFaceEnv);
     }
   },
@@ -194,6 +226,16 @@ export default {
         :weight="tabWeightMap.general"
       >
         <div class="row">
+          <div class="col span-6 mb-10">
+            <LabeledSelect
+              v-model="modelSource"
+              label="Source"
+              :options="sourceOptions"
+              :mode="mode"
+              required
+            />
+          </div>
+
           <div class="col span-6">
             <LabeledInput
               v-model="spec.model"
@@ -206,6 +248,9 @@ export default {
               :placeholder="t('modelService.modelPlaceholder')"
             />
           </div>
+        </div>
+
+        <div class="row mb-20">
           <div class="col span-6">
             <LabeledInput
               v-model="spec.servedModelName"
@@ -216,9 +261,6 @@ export default {
               :tooltip="t('modelService.modelNamePlaceholder')"
             />
           </div>
-        </div>
-
-        <div class="row mb-20">
           <div class="col span-6">
             <slot name="command">
               <ShellInput
