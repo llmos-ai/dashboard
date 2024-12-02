@@ -11,7 +11,7 @@ import { allHash } from '@shell/utils/promise';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { ANNOTATIONS } from '@shell/config/labels-annotations';
 import {
-  CONFIG_MAP, NODE, PVC, RUNTIME_CLASS, SECRET, SERVICE_ACCOUNT
+  CONFIG_MAP, MANAGEMENT, NODE, PVC, RUNTIME_CLASS, SECRET, SERVICE_ACCOUNT
 } from '@shell/config/types';
 import { Checkbox } from '@components/Form/Checkbox';
 import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
@@ -22,6 +22,7 @@ import { TYPES as SECRET_TYPES } from '@shell/models/secret';
 import ResourceManager from '@shell/mixins/resource-manager';
 import { MONITORING_GRAFANA_PATH } from '@shell/utils/monitoring';
 import { mergeEnvs, mergeObjectValueFromArrayEnv } from '@shell/utils/merge';
+import { SETTING } from '@shell/config/settings';
 
 export const RAY_DEFAULT_MONITORING_CONFIG = {
   RAY_GRAFANA_IFRAME_HOST: '',
@@ -54,6 +55,12 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const hash = await allHash({ defaultConfig: this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' }) });
+
+    if (!this.spec.rayVersion) {
+      const rayDefaultVersion = await this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.RAY_CLUSTER_DEFAULT_VERSION);
+
+      this.spec.rayVersion = rayDefaultVersion?.value || rayDefaultVersion.default;
+    }
 
     this.defaultConfig = hash.defaultConfig;
 
@@ -239,6 +246,10 @@ export default {
       this.errors = [];
       this.update();
 
+      if (this.spec.rayVersion === '') {
+        this.errors.push(this.t('validation.required', { key: 'Ray Version' }, true));
+      }
+
       if (this.headGroupContainer.resources?.requests?.memory === '' ||
           this.defaultWorkerPodTemplateSpec.resources?.requests?.memory === '') {
         this.errors.push(this.t('validation.required', { key: 'Memory' }, true));
@@ -310,33 +321,6 @@ export default {
       }
 
       this.headGroupContainer.env = mergeEnvs(this.headGroupContainer.env, monitoringEnv);
-
-      // merge envs the arrays and ensure unique names
-      // const mergedEnvs = [...this.headGroupContainer.env, ...monitoringEnv].reduce((acc, current) => {
-      //   // Check if the current object has a valid value or typed keyRef value
-      //   const hasValidName = current.name !== undefined && current.name !== '';
-      //   const hasValidValue = current.value !== undefined && current.value !== '';
-      //   const hasValidSecretKeyRef = current.valueFrom && current.valueFrom.secretKeyRef && current.valueFrom.secretKeyRef.name !== '' && current.valueFrom.secretKeyRef.key !== '';
-      //   const hasValidConfigMapKeyRef = current.valueFrom && current.valueFrom.configMapKeyRef && current.valueFrom.configMapKeyRef.name !== '' && current.valueFrom.configMapKeyRef.key !== '';
-      //   const hasValidResourceField = current.valueFrom && current.valueFrom.resourceFieldRef && current.valueFrom.resourceFieldRef.resource !== '';
-      //   const hasValidFieldRef = current.valueFrom && current.valueFrom.fieldRef && current.valueFrom.fieldRef.fieldPath !== '';
-      //
-      //   // If the object has valid data, proceed
-      //   if (hasValidName && (hasValidValue || hasValidSecretKeyRef || hasValidConfigMapKeyRef || hasValidResourceField || hasValidFieldRef)) {
-      //     // Check if the name already exists in the accumulator
-      //     const existingIndex = acc.findIndex((item) => item.name === current.name);
-      //
-      //     if (existingIndex > -1) {
-      //       // Merge or replace the existing object
-      //       acc[existingIndex] = { ...acc[existingIndex], ...current };
-      //     } else {
-      //       // Add the new object if the name does not exist
-      //       acc.push(current);
-      //     }
-      //   }
-      //
-      //   return acc;
-      // }, []);
     }
   },
 };

@@ -2,8 +2,7 @@
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkload from '@shell/mixins/llmos/ml-workload';
-import { EVENT, MANAGEMENT } from '@shell/config/types';
-import { allHash } from '@shell/utils/promise';
+import { MANAGEMENT } from '@shell/config/types';
 import { SvcOptions } from '@shell/config/constants';
 import { mergeEnvs } from '@shell/utils/merge';
 import { SETTING } from '@shell/config/settings';
@@ -36,14 +35,8 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    await allHash({ settings: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }) });
-
-    if (!this.isEdit) {
-      this.events = await this.$store.dispatch('cluster/findAll', { type: EVENT });
-    }
-
     if (!this.container.image) {
-      const msDefaultImage = this.$store.getters['cluster/byId'](MANAGEMENT.SETTING, SETTING.MODEL_SERVICE_DEFAULT_IMAGE);
+      const msDefaultImage = await this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.MODEL_SERVICE_DEFAULT_IMAGE);
 
       this.container.image = msDefaultImage?.value || msDefaultImage.default;
     }
@@ -87,29 +80,6 @@ export default {
       events:        [],
       sourceOptions: ['HuggingFace', 'ModelScope']
     };
-  },
-
-  computed: {
-    customEvents() {
-      return this.events.filter((event) => {
-        if (event.involvedObject?.uid === this.value?.metadata?.uid) {
-          return true;
-        }
-
-        if (event.involvedObject?.name.includes(`modelservice-${ this.value.metadata?.name }`)) {
-          return true;
-        }
-
-        return false;
-      }).map((event) => {
-        return {
-          reason:    (`${ event.reason || this.t('generic.unknown') }${ event.count > 1 ? ` (${ event.count })` : '' }`).trim(),
-          message:   event.message || this.t('generic.unknown'),
-          date:      event.lastTimestamp || event.firstTimestamp || event.metadata?.creationTimestamp,
-          eventType: event.eventType
-        };
-      });
-    },
   },
 
   watch: {
@@ -181,7 +151,7 @@ export default {
         this.$set(this.container, 'env', [
           {
             name:  'VLLM_USE_MODELSCOPE',
-            value: 'true',
+            value: 'True',
           },
         ]);
       } else {
@@ -216,7 +186,6 @@ export default {
       :need-conditions="false"
       :need-related="false"
       :side-tabs="true"
-      :override-events="customEvents"
       :mode="mode"
     >
       <Tab

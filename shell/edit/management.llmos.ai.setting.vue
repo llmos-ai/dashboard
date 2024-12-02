@@ -41,6 +41,9 @@ export default {
   },
 
   created() {
+    if (this.value.value === undefined) {
+      this.$set(this.value, 'value', this.value.default);
+    }
     this.value.value = this.value.value || this.value.default;
     this.enumOptions = this.setting?.kind === 'enum' ? this.setting.options.map((id) => ({
       // i18n-uses advancedSettings.enum.*

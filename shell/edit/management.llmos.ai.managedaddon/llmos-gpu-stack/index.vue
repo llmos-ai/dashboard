@@ -135,7 +135,6 @@ export default {
       :need-conditions="false"
       :need-related="false"
       :side-tabs="true"
-      :override-events="customEvents"
       :mode="mode"
     >
       <Tab

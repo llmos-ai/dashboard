@@ -16,7 +16,7 @@ export default class RayCluster extends MlWorkload {
         }
       },
       spec: {
-        rayVersion:        '2.35.0',
+        rayVersion:        '',
         autoscalerOptions: {
           idleTimeoutSeconds: 600,
           resources:          {

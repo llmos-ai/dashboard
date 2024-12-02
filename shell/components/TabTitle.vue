@@ -47,7 +47,7 @@ export default {
           const productName = this.$store.getters['i18n/withFallback'](`product.${ this.currentProduct.name }`, null, null);
 
           if (productName) {
-            breadcrumb.unshift(productName);
+            // breadcrumb.unshift(productName);
           }
         }
       }
