@@ -36,15 +36,18 @@ export default class NoteBook extends MlWorkload {
                   },
                   {
                     mountPath: '/dev/shm',
-                    name:      'dshm'
+                    name:      'dshm',
                   }
                 ]
               }
             ],
             volumes: [
               {
-                emptyDir: { medium: 'Memory' },
-                name:     'dshm'
+                emptyDir: {
+                  medium: 'Memory',
+                  sizeLimit: '1024Mi'
+                },
+                name:     'dshm',
               }
             ]
           }
