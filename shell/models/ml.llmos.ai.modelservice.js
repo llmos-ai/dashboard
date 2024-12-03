@@ -63,10 +63,10 @@ export default class ModelService extends MlWorkload {
             volumes: [
               {
                 emptyDir: {
-                  medium: 'Memory',
+                  medium:    'Memory',
                   sizeLimit: '16384Mi'
                 },
-                name:     'dshm',
+                name: 'dshm',
               }
             ]
           }
@@ -92,7 +92,7 @@ export default class ModelService extends MlWorkload {
   }
 
   get modelName() {
-    return this.spec.servedModelName.length > 0 ? this.spec.servedModelName : this.spec.model;
+    return this.spec.servedModelName?.length > 0 ? this.spec.servedModelName : this.spec.model;
   }
 
   get details() {

@@ -6314,6 +6314,9 @@ mlWorkload:
       modelName: 模型名称
   titles:
     tokenMetrics: Token 指标
+  promptRemove:
+    title: '选择要删除的卷：'
+    deleteAll: 删除全部
 
 ray:
   cluster:
