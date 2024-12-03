@@ -44,10 +44,10 @@ export default class NoteBook extends MlWorkload {
             volumes: [
               {
                 emptyDir: {
-                  medium: 'Memory',
+                  medium:    'Memory',
                   sizeLimit: '1024Mi'
                 },
-                name:     'dshm',
+                name: 'dshm',
               }
             ]
           }

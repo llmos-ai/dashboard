@@ -91,5 +91,6 @@ export const SYSTEM_LABELS = [
 export const ANNOTATIONS = {
   VOLUME_CLAIM_TEMPLATE:  'llmos.ai/volume-claim-templates',
   MONITORING_ENABLED:     'llmos.ai/monitoring-enabled',
+  ON_DELETE_VOLUMES:      'llmos.ai/on-delete-volumes',
   RAY_CLUSTER_FT_ENABLED: 'ray.io/ft-enabled',
 };
