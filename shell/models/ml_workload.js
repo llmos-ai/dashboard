@@ -19,7 +19,7 @@ export default class MlWorkload extends MLWorkloadService {
       total:   1,
     });
 
-    insertAt(out, 2, {
+    insertAt(out, 5, {
       action:   'redeploy',
       label:    this.t('action.redeploy'),
       icon:     'icon icon-refresh',

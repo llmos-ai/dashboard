@@ -62,8 +62,11 @@ export default class ModelService extends MlWorkload {
             ],
             volumes: [
               {
-                emptyDir: { medium: 'Memory' },
-                name:     'dshm'
+                emptyDir: {
+                  medium: 'Memory',
+                  sizeLimit: '16384Mi'
+                },
+                name:     'dshm',
               }
             ]
           }
