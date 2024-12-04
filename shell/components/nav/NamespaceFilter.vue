@@ -660,6 +660,12 @@ export default {
         return [];
       }
 
+      const user = this.$store.getters['auth/user'];
+
+      if (user && user.status?.isAdmin) {
+        return [];
+      }
+
       return [ALL_USER];
     },
 
