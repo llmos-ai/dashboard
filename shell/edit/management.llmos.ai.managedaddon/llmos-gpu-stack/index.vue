@@ -215,49 +215,19 @@ export default {
             v-model="valuesContent.gpuOperator.enabled"
             label="Enable NVIDIA GPU Operator"
             :mode="mode"
+            disabled
           />
         </div>
 
         <h3>{{ t('managedAddon.llmosGPUStack.vGPU.title') }}</h3>
-        <div class="row mb-20">
-          <Checkbox
-            v-model="valuesContent.hami.enabled"
-            label="Enable vGPU "
-            :mode="mode"
-          />
-        </div>
-
-        <div v-if="valuesContent.hami.enabled">
+        <div>
           <div class="row mb-20">
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="valuesContent.hami.devicePlugin.deviceSplitCount"
+                v-model="valuesContent.devicePlugin.splitCount"
                 :label="t('managedAddon.llmosGPUStack.deviceSplitCount.label')"
                 :tooltip="t('managedAddon.llmosGPUStack.deviceSplitCount.description')"
                 :mode="mode"
-                required
-              />
-            </div>
-          </div>
-          <div class="row mb-20">
-            <div class="col span-6 mb-10">
-              <LabeledSelect
-                v-model="valuesContent.hami.scheduler.defaultSchedulerPolicy.nodeSchedulerPolicy"
-                :label="t('managedAddon.llmosGPUStack.nodeSchedulingPolicy.name')"
-                :options="schedulingOptions"
-                :tooltip="t('managedAddon.llmosGPUStack.gpuSchedulingPolicy.tooltip')"
-                :mode="mode"
-                required
-              />
-            </div>
-
-            <div class="col span-6 mb-10">
-              <LabeledSelect
-                v-model="valuesContent.hami.scheduler.defaultSchedulerPolicy.gpuSchedulerPolicy"
-                :label="t('managedAddon.llmosGPUStack.gpuSchedulingPolicy.name')"
-                :options="schedulingOptions"
-                :mode="mode"
-                :tooltip="t('managedAddon.llmosGPUStack.gpuSchedulingPolicy.tooltip')"
                 required
               />
             </div>

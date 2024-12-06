@@ -15,7 +15,7 @@ import {
 } from '@shell/config/types';
 import { Checkbox } from '@components/Form/Checkbox';
 import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
-import { FlatResources, GPU_KEY } from '@shell/utils/container-resource';
+import { FlatResources, hasGPUResources, VolcanoScheduler } from '@shell/utils/container-resource';
 import { cleanUp, clone, isEmpty } from '@shell/utils/object';
 import EnvVars from '@shell/components/form/EnvVars.vue';
 import { TYPES as SECRET_TYPES } from '@shell/models/secret';
@@ -292,11 +292,10 @@ export default {
 
       // set rayVersion
       if (this.spec.rayVersion) {
-        const nvidiaGpuLimit = this.defaultWorkerPodTemplateSpec.containers[0]?.resources?.limits?.[GPU_KEY];
-
         this.headGroupContainer.image = `rayproject/ray:${ this.spec.rayVersion }`;
-        if (nvidiaGpuLimit > 0) {
+        if (hasGPUResources(this.defaultWorkerPodTemplateSpec.containers)) {
           this.defaultWorkerPodTemplateSpec.containers[0].image = `rayproject/ray:${ this.spec.rayVersion }-gpu`;
+          this.defaultWorkerPodTemplateSpec.schedulerName = VolcanoScheduler;
         } else {
           this.defaultWorkerPodTemplateSpec.containers[0].image = `rayproject/ray:${ this.spec.rayVersion }`;
         }

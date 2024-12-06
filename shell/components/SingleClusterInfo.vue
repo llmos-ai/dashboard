@@ -405,14 +405,14 @@ export default {
           resource="node"
         />
         <ResourceSummary
-          v-if="canAccessNamespaces"
-          :cluster="currentCluster.id"
-          resource="namespace"
-        />
-        <ResourceSummary
           v-if="canAccessGPUDevices"
           :cluster="currentCluster.id"
           :resource="LLMOS.GPUDEVICE"
+        />
+        <ResourceSummary
+          v-if="canAccessNamespaces"
+          :cluster="currentCluster.id"
+          resource="namespace"
         />
         <ResourceSummary
           v-if="canAccessPVC"
