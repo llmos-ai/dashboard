@@ -1,12 +1,13 @@
-export const GPU_KEY = 'nvidia.com/gpu';
 export const DefaultGPURuntimeClass = 'nvidia';
+export const VolcanoScheduler = 'volcano';
 
 export const NVIDIA = {
   Name:           'nvidia',
-  GPU:            'nvidia.com/gpu', // 1, each GPU is allocated 1 GPU.
-  GPUMem:         'nvidia.com/gpumem', // 1024, each GPU allocates 1024MB of memory.
-  GPUMemPercent:  'nvidia.com/gpumem-percentage', // 50, each GPU allocates 50% of its memory.
-  GPUCores:       'nvidia.com/gpucores', // 50, each GPU allocates 50% device cores.
+  // GPU:            'nvidia.com/gpu', // 1, each GPU is allocated 1 GPU.
+  vGPU:           'volcano.sh/vgpu-number', // 1, each GPU is allocated 1 vGPU.
+  vGPUMem:        'volcano.sh/vgpu-memory', // 1024, each GPU allocates 1024MB of memory.
+  vGPUMemPercent: 'volcano.sh/vgpu-memory-percentage', // 50, each GPU allocates 50% of its memory.
+  vGPUCores:      'volcano.sh/vgpu-cores', // 50, each GPU allocates 50% device cores.
   AnnoDeviceType: 'nvidia.com/use-gputype', // "A100, V100", each GPU allocates the specified type.
   AnnoDeviceUUID: 'nvidia.com/use-gpuuid',
 };
@@ -14,7 +15,7 @@ export const Accelerators = [
   {
     label: 'Nvidia',
     value: NVIDIA.Name,
-    key:   NVIDIA.GPU,
+    key:   NVIDIA.vGPU,
   }];
 
 export const ASCEND = {
@@ -47,7 +48,7 @@ export const FlatResources = {
     const {
       cpu: limitsCpu,
       memory: limitsMemory,
-      [GPU_KEY]: limitsGpu,
+      [NVIDIA.vGPU]: limitsGpu,
     } = limits;
     const { cpu: requestsCpu, memory: requestsMemory } = requests;
 
@@ -57,8 +58,8 @@ export const FlatResources = {
     if (gpuType) {
       switch (gpuType) {
       case NVIDIA.Name:
-        limitsVGpuMem = limits[NVIDIA.GPUMem];
-        limitsVGpuCores = limits[NVIDIA.GPUCores];
+        limitsVGpuMem = limits[NVIDIA.vGPUMem];
+        limitsVGpuCores = limits[NVIDIA.vGPUCores];
         break;
       default:
         console.error('FlatResources: unknown gpuType', gpuType); // eslint-disable-line no-console
@@ -104,12 +105,13 @@ export const FlatResources = {
         memory: requestsMemory,
       },
       limits: {
-        cpu:       limitsCpu,
-        memory:    limitsMemory,
-        [GPU_KEY]: limitsGpu,
+        cpu:    limitsCpu,
+        memory: limitsMemory,
+        // [GPU_KEY]: limitsGpu,
         ...(gpuType === NVIDIA.Name ? {
-          [NVIDIA.GPUMem]:   limitsVGpuMem,
-          [NVIDIA.GPUCores]: limitsVGpuCores,
+          [NVIDIA.vGPU]:      limitsGpu,
+          [NVIDIA.vGPUMem]:   limitsVGpuMem,
+          [NVIDIA.vGPUCores]: limitsVGpuCores,
         } : {})
       },
       gpuType,
@@ -121,23 +123,20 @@ export const FlatResources = {
   validateGPU(podSpec: object): object {
     const container = podSpec.containers[0];
     const containerResources = container.resources;
-    const nvidiaGpuLimit = container.resources.limits?.[GPU_KEY];
+    const nvidiaGpuLimit = container.resources.limits?.[NVIDIA.vGPU];
 
     if (nvidiaGpuLimit > 0) {
-      containerResources.requests = containerResources.requests || {};
-      containerResources.requests[GPU_KEY] = nvidiaGpuLimit;
-
       if (!podSpec.runtimeClassName || podSpec.runtimeClassName === '') {
         podSpec.runtimeClassName = DefaultGPURuntimeClass;
       }
     } else {
       delete podSpec.runtimeClassName;
+      delete podSpec.schedulerName;
     }
 
     if (!nvidiaIsValid(nvidiaGpuLimit)) {
       try {
-        delete containerResources.requests[GPU_KEY];
-        delete containerResources.limits[GPU_KEY];
+        delete containerResources.limits[NVIDIA.vGPU];
 
         if (Object.keys(containerResources.limits).length === 0) {
           delete containerResources.limits;
@@ -173,11 +172,17 @@ function getGpuType(resources: object): string {
   if (resources.gpuType) {
     return resources.gpuType;
   }
-  if (resources.limits && resources.limits[NVIDIA.GPU]) {
+  if (resources.limits && resources.limits[NVIDIA.vGPU]) {
     return NVIDIA.Name;
   }
 }
 
-export function hasGPUResources(resources: object): boolean {
-  return !!resources?.limits?.[NVIDIA.GPU];
+export function hasGPUResources(containers: object): boolean {
+  for (const container of containers) {
+    if (container.resources?.limits?.[NVIDIA.GPU] || container?.resources?.limits?.[NVIDIA.vGPU]) {
+      return true;
+    }
+  }
+
+  return false;
 }

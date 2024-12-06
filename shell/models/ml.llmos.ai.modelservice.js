@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { set } from '@shell/utils/object';
 import MlWorkload from '@shell/models/ml_workload';
+import { NVIDIA } from '@shell/utils/container-resource';
 
 export default class ModelService extends MlWorkload {
   applyDefaults() {
@@ -38,14 +39,13 @@ export default class ModelService extends MlWorkload {
                 ],
                 resources: {
                   requests: {
-                    cpu:              '4',
-                    memory:           '10Gi',
-                    'nvidia.com/gpu': '1'
+                    cpu:    '4',
+                    memory: '10Gi',
                   },
                   limits: {
-                    cpu:              '4',
-                    memory:           '10Gi',
-                    'nvidia.com/gpu': '1'
+                    cpu:           '4',
+                    memory:        '10Gi',
+                    [NVIDIA.vGPU]: '1'
                   }
                 },
                 volumeMounts: [

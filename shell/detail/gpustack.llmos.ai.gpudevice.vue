@@ -21,6 +21,7 @@ import CopyToClipboardText from '@shell/components/CopyToClipboardText.vue';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
 import DashboardMetrics from '@shell/components/DashboardMetrics.vue';
 import { allDashboardsExist } from '@shell/utils/grafana';
+import { hasGPUResources } from '@shell/utils/container-resource';
 
 const GPU_DEVICE_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-gpu-device-1/llmos-gpu-device?orgId=1';
 
@@ -117,13 +118,12 @@ export default {
       }
 
       return this.pods.filter((pod) => {
-        // Skip pods without the specified annotation
-        if (!pod.annotations?.['hami.io/vgpu-node'] && !pod.annotations?.['hami.io/bind-time']) {
+        if ((pod.spec.nodeName !== this.value.status.nodeName) || !hasGPUResources(pod.spec.containers)) {
           return false;
         }
 
         const devPod = this.value.status.pods.find((devPod) => {
-          const [namespace, name] = devPod.name.split(':');
+          const [namespace, name] = devPod.name.split('/');
 
           return namespace && name &&
             pod.metadata.namespace === namespace &&

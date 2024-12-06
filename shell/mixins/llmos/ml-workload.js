@@ -31,7 +31,7 @@ import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import Resource from '@shell/plugins/dashboard-store/resource-class';
-import { FlatResources } from '@shell/utils/container-resource';
+import { FlatResources, NVIDIA, VolcanoScheduler } from '@shell/utils/container-resource';
 import { PullPolicyOptions, SvcOptions } from '@shell/config/constants';
 
 const TAB_WEIGHT_MAP = {
@@ -41,8 +41,6 @@ const TAB_WEIGHT_MAP = {
   labels:         96,
   nodeScheduling: 90,
 };
-
-const GPU_KEY = 'nvidia.com/gpu';
 
 // LLMOS Workload handle the common logic of statefulSet pod spec template
 export default {
@@ -318,18 +316,12 @@ export default {
 
       if (container) {
         const containerResources = container.resources;
-        const nvidiaGpuLimit =
-            container.resources?.limits?.[GPU_KEY];
-
-        if (nvidiaGpuLimit > 0) {
-          containerResources.requests = containerResources.requests || {};
-          containerResources.requests[GPU_KEY] = nvidiaGpuLimit;
-        }
+        const nvidiaGpuLimit = container.resources?.limits?.[NVIDIA.vGPU];
 
         if (!this.nvidiaIsValid(nvidiaGpuLimit)) {
           try {
-            delete containerResources.requests[GPU_KEY];
-            delete containerResources.limits[GPU_KEY];
+            // delete containerResources.requests[NVIDIA.vGPU];
+            delete containerResources.limits[NVIDIA.vGPU];
 
             if (Object.keys(containerResources.limits).length === 0) {
               delete containerResources.limits;
@@ -341,6 +333,9 @@ export default {
               delete container.resources;
             }
           } catch {}
+        } else {
+          // Set default scheduler to volcano
+          this.podTemplateSpec.schedulerName = VolcanoScheduler;
         }
       }
 
