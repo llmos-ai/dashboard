@@ -50,6 +50,7 @@ export const SETTING = {
   UPGRADE_CHECK_URL:                    'upgrade-check-url',
   MODEL_SERVICE_DEFAULT_IMAGE:          'model-service-default-image',
   RAY_CLUSTER_DEFAULT_VERSION:          'ray-cluster-default-version',
+  MANAGED_ADDON_CONFIGS:                'managed-addon-configs',
 
   UI_SOURCE:         'ui-source',
   UI_INDEX:          'ui-index',

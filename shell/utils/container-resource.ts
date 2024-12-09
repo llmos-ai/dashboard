@@ -3,7 +3,7 @@ export const VolcanoScheduler = 'volcano';
 
 export const NVIDIA = {
   Name:           'nvidia',
-  // GPU:            'nvidia.com/gpu', // 1, each GPU is allocated 1 GPU.
+  GPU:            'nvidia.com/gpu', // 1, each GPU is allocated 1 GPU.
   vGPU:           'volcano.sh/vgpu-number', // 1, each GPU is allocated 1 vGPU.
   vGPUMem:        'volcano.sh/vgpu-memory', // 1024, each GPU allocates 1024MB of memory.
   vGPUMemPercent: 'volcano.sh/vgpu-memory-percentage', // 50, each GPU allocates 50% of its memory.
@@ -107,7 +107,6 @@ export const FlatResources = {
       limits: {
         cpu:    limitsCpu,
         memory: limitsMemory,
-        // [GPU_KEY]: limitsGpu,
         ...(gpuType === NVIDIA.Name ? {
           [NVIDIA.vGPU]:      limitsGpu,
           [NVIDIA.vGPUMem]:   limitsVGpuMem,
@@ -179,7 +178,7 @@ function getGpuType(resources: object): string {
 
 export function hasGPUResources(containers: object): boolean {
   for (const container of containers) {
-    if (container.resources?.limits?.[NVIDIA.GPU] || container?.resources?.limits?.[NVIDIA.vGPU]) {
+    if (container.resources?.limits?.[NVIDIA.vGPU] || container?.resources?.limits?.[NVIDIA.GPU]) {
       return true;
     }
   }
