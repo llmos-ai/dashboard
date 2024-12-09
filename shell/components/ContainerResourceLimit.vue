@@ -2,11 +2,14 @@
 import UnitInput from '@shell/components/form/UnitInput';
 import { CONTAINER_DEFAULT_RESOURCE_LIMIT } from '@shell/config/labels-annotations';
 import { cleanUp } from '@shell/utils/object';
-import { _VIEW } from '@shell/config/query-params';
+import { _EDIT, _VIEW, ENABLED, MODE } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import { RadioGroup } from '@components/Form/Radio';
 import { ToggleSwitch } from '@components/Form/ToggleSwitch';
 import { Accelerators, NVIDIA } from '@shell/utils/container-resource';
+import { MANAGEMENT } from '@shell/config/types';
+import { SETTING } from '@shell/config/settings';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 export default {
   components: {
@@ -64,6 +67,13 @@ export default {
     }
   },
 
+  async fetch() {
+    const inStore = this.$store.getters['currentProduct'].inStore;
+    const addonConfig = await this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.MANAGED_ADDON_CONFIGS });
+
+    this.addonConfigs = JSON.parse(addonConfig.value);
+  },
+
   data() {
     const {
       limitsCpu, limitsMemory, requestsCpu, requestsMemory, limitsGpu, gpuType, limitsVGpuMem, limitsVGpuCores,
@@ -84,6 +94,7 @@ export default {
       nvidia:       NVIDIA,
       accelerators: Accelerators,
       enableVGpu,
+      addonConfigs: null,
       radioStyle:   'display: flex; gap: 10px; align-items: center;',
     };
   },
@@ -127,6 +138,35 @@ export default {
       });
 
       return opts;
+    },
+
+    gpuStackEnabled() {
+      if (this.addonConfigs) {
+        const gpuStack = this.addonConfigs.AddonConfigs.find((addonConfig) => addonConfig.name === 'llmos-gpu-stack');
+
+        return gpuStack.enabled && gpuStack.status === 'Complete';
+      } else {
+        return false;
+      }
+    },
+
+    gpuStackAddonLink() {
+      const query = {
+        [MODE]:    _EDIT,
+        [ENABLED]: 'true',
+      };
+
+      return {
+        name:   'c-cluster-product-resource-namespace-id',
+        params: {
+          product:   LLMOS,
+          cluster:   'local',
+          resource:  MANAGEMENT.MANAGED_ADDON,
+          namespace: 'llmos-gpu-stack-system',
+          id:        'llmos-gpu-stack',
+        },
+        query,
+      };
     }
   },
 
@@ -198,7 +238,6 @@ export default {
         namespace.setAnnotation(CONTAINER_DEFAULT_RESOURCE_LIMIT, JSON.stringify(out));
       }
     },
-
   },
 };
 </script>
@@ -282,83 +321,110 @@ export default {
     </div>
 
     <div v-if="handleGpuLimit">
-      <div class="row mb-20">
-        <span class="col span-12">
-          <RadioGroup
-            v-model="gpuType"
-            name="gpuType"
-            :mode="mode"
-            :label="t('accelerator.label')"
-            :options="accelerators"
-            :rstyle="radioStyle"
-            @input="updateLimits"
-          />
-        </span>
-      </div>
-
-      <div class="row mb-20">
-        <span class="col span-6">
-          <UnitInput
-            v-model="limitsGpu"
-            :placeholder="t('containerResourceLimit.gpuPlaceholder')"
-            :label="t('containerResourceLimit.limitsGpu')"
-            :mode="mode"
-            :base-unit="t('suffix.gpus')"
-            data-testid="gpu-limit"
-            @input="updateLimits"
-          />
-        </span>
-        <span class="col span-6">
-          <LabeledSelect
-            v-model="podSpec.runtimeClassName"
-            label="Runtime Class"
-            :options="runtimeClassOptions"
-            :mode="mode"
-            :clearable="true"
-            @input="updateBeforeSave"
-          />
-        </span>
-      </div>
-
-      <h4> {{ t('accelerator.vgpu.title') }} </h4>
-      <div class="row mb-20">
-        <div class="col span-6">
-          <ToggleSwitch
-            v-model="enableVGpu"
-            name="label-vgpu-toggle"
-            :on-label="t('accelerator.vgpu.enableLabel')"
-            @input="updateLimits"
-          />
+      <h3> {{ t('accelerator.label') }}</h3>
+      <div v-if="!gpuStackEnabled">
+        <div class="gpu-banner">
+          <span class="warning">
+            GPU operator is not installed, click
+            <nuxt-link :to="gpuStackAddonLink">here</nuxt-link>
+            to enable it now.
+          </span>
         </div>
       </div>
-      <div
-        v-if="enableVGpu"
-        class="row mb-20"
-      >
-        <span class="col span-6">
-          <UnitInput
-            v-if="enableVGpu"
-            v-model="limitsVGpuMem"
-            required
-            :placeholder="t('containerResourceLimit.vGPUMemPlaceholder')"
-            :label="t('containerResourceLimit.vGPUMem')"
-            :mode="mode"
-            :base-unit="t('suffix.mib')"
-            @input="updateLimits"
-          />
-        </span>
-        <span class="col span-6">
-          <UnitInput
-            v-if="enableVGpu"
-            v-model="limitsVGpuCores"
-            :placeholder="t('containerResourceLimit.vGPUCoresPlaceholder')"
-            :label="t('containerResourceLimit.vGPUCores')"
-            :mode="mode"
-            :base-unit="t('suffix.percent')"
-            @input="updateLimits"
-          />
-        </span>
+      <div v-else>
+        <div class="row mb-20">
+          <span class="col span-12">
+            <RadioGroup
+              v-model="gpuType"
+              name="gpuType"
+              :mode="mode"
+              :options="accelerators"
+              :rstyle="radioStyle"
+              @input="updateLimits"
+            />
+          </span>
+        </div>
+
+        <div class="row mb-20">
+          <span class="col span-6">
+            <UnitInput
+              v-model="limitsGpu"
+              :placeholder="t('containerResourceLimit.gpuPlaceholder')"
+              :label="t('containerResourceLimit.limitsGpu')"
+              :mode="mode"
+              :base-unit="t('suffix.gpus')"
+              data-testid="gpu-limit"
+              @input="updateLimits"
+            />
+          </span>
+          <span class="col span-6">
+            <LabeledSelect
+              v-model="podSpec.runtimeClassName"
+              label="Runtime Class"
+              :options="runtimeClassOptions"
+              :mode="mode"
+              :clearable="true"
+              @input="updateBeforeSave"
+            />
+          </span>
+        </div>
+
+        <h4> {{ t('accelerator.vgpu.title') }} </h4>
+        <div class="row mb-20">
+          <div class="col span-6">
+            <ToggleSwitch
+              v-model="enableVGpu"
+              name="label-vgpu-toggle"
+              :on-label="t('accelerator.vgpu.enableLabel')"
+              @input="updateLimits"
+            />
+          </div>
+        </div>
+        <div
+          v-if="enableVGpu"
+          class="row mb-20"
+        >
+          <span class="col span-6">
+            <UnitInput
+              v-if="enableVGpu"
+              v-model="limitsVGpuMem"
+              required
+              :placeholder="t('containerResourceLimit.vGPUMemPlaceholder')"
+              :label="t('containerResourceLimit.vGPUMem')"
+              :mode="mode"
+              :base-unit="t('suffix.mib')"
+              @input="updateLimits"
+            />
+          </span>
+          <span class="col span-6">
+            <UnitInput
+              v-if="enableVGpu"
+              v-model="limitsVGpuCores"
+              :placeholder="t('containerResourceLimit.vGPUCoresPlaceholder')"
+              :label="t('containerResourceLimit.vGPUCores')"
+              :mode="mode"
+              :base-unit="t('suffix.percent')"
+              @input="updateLimits"
+            />
+          </span>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style lang='scss' scoped>
+$left-border-size: 4px;
+.gpu-banner {
+  padding: 10px;
+  transition: all 0.2s ease;
+  line-height: 20px;
+  width: 100%;
+  border-left: solid $left-border-size transparent;
+  display: flex;
+  gap: 3px;
+  background: var(--warning-banner-bg);
+  border-color: var(--warning);
+}
+
+</style>

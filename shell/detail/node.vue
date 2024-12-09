@@ -59,10 +59,12 @@ export default {
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
-    const hash = {
-      pods:       this.$store.dispatch(`${ inStore }/findAll`, { type: POD }),
-      gpuDevices: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.GPUDEVICE })
-    };
+    const hash = { pods: this.$store.dispatch(`${ inStore }/findAll`, { type: POD }) };
+
+    this.canViewGpuDevices = this.$store.getters[`${ inStore }/schemaFor`](LLMOS.GPUDEVICE);
+    if (this.canViewGpuDevices) {
+      hash.gpuDevices = this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.GPUDEVICE });
+    }
 
     await allHash(hash);
 
@@ -79,6 +81,12 @@ export default {
   data() {
     const podSchema = this.$store.getters['cluster/schemaFor'](POD);
     const gpuDeviceSchema = this.$store.getters['cluster/schemaFor'](LLMOS.GPUDEVICE);
+
+    let gpuDeviceTableHeaders;
+
+    if (gpuDeviceSchema) {
+      gpuDeviceTableHeaders = this.$store.getters['type-map/headersFor'](gpuDeviceSchema);
+    }
 
     return {
       metrics:          { cpu: 0, memory: 0 },
@@ -103,14 +111,15 @@ export default {
         VALUE,
         EFFECT
       ],
-      podTableHeaders:       this.$store.getters['type-map/headersFor'](podSchema),
-      gpuDeviceTableHeaders: this.$store.getters['type-map/headersFor'](gpuDeviceSchema),
+      podTableHeaders:   this.$store.getters['type-map/headersFor'](podSchema),
+      gpuDeviceTableHeaders,
       NODE_METRICS_DETAIL_URL,
       NODE_METRICS_SUMMARY_URL,
       NODE_GPU_METRICS_SUMMARY_URL,
       NODE_GPU_METRICS_DETAIL_URL,
-      showMetrics:           false,
-      tabWeightMap:          TAB_WEIGHT_MAP,
+      showMetrics:       false,
+      canViewGpuDevices: false,
+      tabWeightMap:      TAB_WEIGHT_MAP,
     };
   },
 
@@ -168,6 +177,10 @@ export default {
     },
 
     nodeGpus() {
+      if (!this.canViewGpuDevices) {
+        return [];
+      }
+
       return this.$store.getters['cluster/all'](LLMOS.GPUDEVICE).filter((gpu) => gpu.status.nodeName === this.value.name);
     },
 

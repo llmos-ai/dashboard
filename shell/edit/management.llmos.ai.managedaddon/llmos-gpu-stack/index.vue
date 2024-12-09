@@ -9,7 +9,6 @@ import merge from 'lodash/merge';
 import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
 import { FlatResources } from '@shell/utils/container-resource';
 import { cleanUp } from '@shell/utils/object';
-import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import jsyaml from 'js-yaml';
 
 const weights = {
@@ -22,7 +21,6 @@ const weights = {
 export default {
   name:       'EditGenericAddon',
   components: {
-    LabeledSelect,
     ContainerResourceLimit,
     ResourceTabs,
     Tab,
