@@ -2,7 +2,9 @@
 import ResourceTable from '@shell/components/ResourceTable';
 import Loading from '@shell/components/Loading';
 import { allHash } from '@shell/utils/promise';
-import { STATE, AGE, VENDOR, DEVICE_NAME } from '@shell/config/table-headers';
+import {
+  STATE, AGE, VENDOR, DEVICE_NAME, DEVICE_INDEX, VRAM_ALLOCATED
+} from '@shell/config/table-headers';
 import { LLMOS, NODE as NODE_TYPE, POD } from '@shell/config/types';
 import CopyToClipboard from '@shell/components/CopyToClipboard.vue';
 
@@ -41,28 +43,10 @@ export default {
         label: 'Device ID',
         value: 'status.uuid',
       };
-      // const VENDOR = {
-      //   name:  'vendor',
-      //   label: 'Vendor',
-      //   value: 'status.vendor',
-      // };
-
-      // const DEVICE_NAME = {
-      //   name:  'device_name',
-      //   label: 'Device Name',
-      //   value: 'status.devName',
-      // };
-
       const VGPU = {
         name:  'vgpu',
         label: 'vGPU',
         value: 'vGPUCount',
-      };
-
-      const VRAM_USAGE = {
-        name:     'vram_usage',
-        labelKey: 'tableHeaders.vramUsage',
-        value:    'vramAllocated',
       };
 
       const NODE = {
@@ -80,8 +64,9 @@ export default {
         NODE,
         VENDOR,
         DEVICE_NAME,
+        DEVICE_INDEX,
         VGPU,
-        VRAM_USAGE,
+        VRAM_ALLOCATED,
         AGE
       ];
 

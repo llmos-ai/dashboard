@@ -36,7 +36,7 @@ generic:
   links: Links
   loading: Loading&hellip;
   members: Members
-  na: n/a
+  na: N/A
   name: Name
   never: Never
   none: None
@@ -4611,6 +4611,7 @@ tableHeaders:
   duration: Duration
   diskState: Disk State
   deviceName: Device Name
+  deviceIndex: Index
   drivers: Drivers
   distinguisherMethod: Distinguisher Method
   effect: Effect
@@ -4707,7 +4708,7 @@ tableHeaders:
   vendor: Vendor
   visit: Visit
   cores: CUDA Cores
-  vramUsage: VRAM (Request/Total)
+  vramAllocated: VRAM (Request/Total)
   rbac:
     create: Create
     delete: Delete

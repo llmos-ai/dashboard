@@ -3,7 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import Tag from '@shell/components/Tag';
 import { Banner } from '@components/Banner';
 import {
-  STATE, NAME, ROLES, INTERNAL_EXTERNAL_IP, CPU, RAM, AGE, KUBE_NODE_OS, GPU_DEVICE
+  STATE, NAME, ROLES, INTERNAL_EXTERNAL_IP, CPU, RAM, AGE, KUBE_NODE_OS, GPU_DEVICE, VRAM_USAGE
 } from '@shell/config/table-headers';
 import metricPoller from '@shell/mixins/metric-poller';
 
@@ -118,6 +118,10 @@ export default {
           ...RAM,
           breakpoint: COLUMN_BREAKPOINTS.LAPTOP,
           getValue:   (row) => row.ramUsagePercentage
+        }, {
+          ...VRAM_USAGE,
+          breakpoint: COLUMN_BREAKPOINTS.LAPTOP,
+          getValue:   (row) => row.vramUsagePercentage
         }];
 
       headers.push(AGE);

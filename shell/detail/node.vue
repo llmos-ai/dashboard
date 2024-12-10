@@ -8,7 +8,7 @@ import {
   IMAGE_SIZE,
   KEY,
   SIMPLE_NAME,
-  VALUE,
+  VALUE
 } from '@shell/config/table-headers';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import { LLMOS, METRIC, POD } from '@shell/config/types';
@@ -199,6 +199,15 @@ export default {
       return formatSi(value, formatOptions);
     },
 
+    vramFormatter(value) {
+      const formatOptions = {
+        addSuffix: false,
+        increment: 1024,
+      };
+
+      return formatSi(value, formatOptions);
+    },
+
     mapToStatus(isOk) {
       return isOk ? 'success' : 'error';
     },
@@ -251,7 +260,7 @@ export default {
         :message="t('node.detail.glance.kubelet')"
       />
     </div>
-    <div class="mt-20 resources">
+    <div class="mt-20 resource-gauges">
       <ConsumptionGauge
         :resource-name="t('node.detail.glance.consumptionGauge.cpu')"
         :capacity="value.cpuCapacity"
@@ -263,6 +272,14 @@ export default {
         :used="value.ramUsage"
         :units="memoryUnits"
         :number-formatter="memoryFormatter"
+      />
+      <ConsumptionGauge
+        v-if="hasGPUs"
+        :resource-name="t('node.detail.glance.consumptionGauge.vram')"
+        :capacity="value.vramCapacity"
+        :used="value.vramUsage"
+        units="GiB"
+        :number-formatter="vramFormatter"
       />
       <ConsumptionGauge
         :resource-name="t('node.detail.glance.consumptionGauge.pods')"
@@ -384,13 +401,4 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.resources {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  & > * {
-    width: 30%;
-  }
-}
 </style>

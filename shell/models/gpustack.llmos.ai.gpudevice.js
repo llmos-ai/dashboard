@@ -1,5 +1,5 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
-import { parseSi, roundToDecimal } from '@shell/utils/units';
+import { parseSi, roundToDecimal, VRAM_PARSE_RULES } from '@shell/utils/units';
 
 export default class GPUDevice extends SteveModel {
   get vGPUCount() {
@@ -12,34 +12,20 @@ export default class GPUDevice extends SteveModel {
   }
 
   get vramUsageValue() {
-    let count = 0;
-
-    if (!this.status?.pods) {
-      return 0;
-    }
-
-    for (const pod of this.status?.pods) {
-      count += pod.memReq;
-    }
-
-    return count;
-  }
-
-  get vram() {
-    return parseSi(`${ this.status?.vram }Gi`);
+    return this.status?.vramUsed;
   }
 
   get vramUsage() {
-    return parseSi(`${ this.vramUsageValue }Mi`);
+    return parseSi(this.vramUsageValue.toString(), VRAM_PARSE_RULES.format);
   }
 
   get vramCapacity() {
-    return parseSi(`${ this.status?.vram }Mi`);
+    return parseSi(this.status?.vram.toString(), VRAM_PARSE_RULES.format);
   }
 
   get vramAllocated() {
     const amountTemplateValues = {
-      used:  roundToDecimal((this.vramUsageValue / 1024) || 0, 2),
+      used:  roundToDecimal((this.vramUsageValue / 1024) || 0, 1),
       total: roundToDecimal((this.status.vram / 1024) || 0, 1),
       unit:  'GiB'
     };

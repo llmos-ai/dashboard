@@ -11,7 +11,7 @@ import {
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import { POD } from '@shell/config/types';
 import createEditView from '@shell/mixins/create-edit-view';
-import { formatSi, exponentNeeded, UNITS, parseSi } from '@shell/utils/units';
+import { formatSi, parseSi } from '@shell/utils/units';
 import { mapGetters } from 'vuex';
 import Loading from '@shell/components/Loading';
 import metricPoller from '@shell/mixins/metric-poller';
@@ -93,11 +93,6 @@ export default {
 
   computed: {
     ...mapGetters(['currentCluster']),
-    memoryUnits() {
-      const exponent = exponentNeeded(this.value.vramUsage, 1024);
-
-      return `${ UNITS[exponent] }iB`;
-    },
 
     deviceHealthyStatus() {
       return this.mapToStatus(this.value.status?.health);
@@ -246,7 +241,7 @@ export default {
         :resource-name="t('gpuDevice.detail.consumptionGauge.vram')"
         :capacity="value.vramCapacity"
         :used="value.vramUsage"
-        :units="memoryUnits"
+        units="GiB"
         :number-formatter="vramFormatter"
       />
     </div>
