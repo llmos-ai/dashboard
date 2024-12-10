@@ -132,7 +132,7 @@ export default {
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 10px;
+      gap: 5px;
       align-self: baseline;
 
     }
@@ -140,7 +140,7 @@ export default {
     .percentage {
       font-weight: bold;
       i {
-        margin-right: 10px;
+        margin-right: 5px;
       }
     }
   }

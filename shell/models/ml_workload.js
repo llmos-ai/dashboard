@@ -2,9 +2,10 @@ import { insertAt } from '@shell/utils/array';
 import { POD, WORKLOAD_TYPES, ML_WORKLOAD_TYPES } from '@shell/config/types';
 import { convertSelectorObj, matching, matches } from '@shell/utils/selector';
 import MLWorkloadService from '@shell/models/ml_workload.service';
-import { formatSi, parseSi } from '@shell/utils/units';
+import { formatSi, parseSi, VRAM_PARSE_RULES } from '@shell/utils/units';
 import { set } from '@shell/utils/object';
 import { TIMESTAMP } from '@shell/config/labels-annotations';
+import { NVIDIA } from '@shell/utils/container-resource';
 
 export default class MlWorkload extends MLWorkloadService {
   // remove clone as yaml/edit as yaml until API supported
@@ -233,7 +234,7 @@ export default class MlWorkload extends MLWorkloadService {
 
   get vgpu() {
     const totalVGPU = this.containers.reduce((sum, container) => {
-      return sum + (container.resources?.limits['nvidia.com/gpu'] || 0);
+      return sum + (container.resources?.limits[NVIDIA.vGPU] || 0);
     }, 0);
 
     return totalVGPU > 0 ? formatSi(totalVGPU) : 'N/A';
@@ -241,11 +242,9 @@ export default class MlWorkload extends MLWorkloadService {
 
   get vram() {
     const totalVRAM = this.containers.reduce((sum, container) => {
-      return sum + (container.resources?.limits['nvidia.com/gpumem'] || 0);
+      return sum + (container.resources?.limits[NVIDIA.vGPUMem] || 0);
     }, 0);
 
-    return totalVRAM > 0 ? formatSi(totalVRAM, {
-      increment: 1024, startingExponent: 2, suffix: 'i'
-    }) : 'N/A';
+    return !totalVRAM ? 'N/A' : formatSi(parseSi(totalVRAM), VRAM_PARSE_RULES.format);
   }
 }

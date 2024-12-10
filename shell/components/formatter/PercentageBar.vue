@@ -23,7 +23,7 @@ export default {
   },
   computed: {
     percentage() {
-      return Number.parseFloat(this.value);
+      return Number.parseFloat(Number.parseFloat(this.value).toFixed(1));
     }
   }
 };

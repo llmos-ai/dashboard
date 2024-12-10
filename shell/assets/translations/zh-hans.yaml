@@ -2829,7 +2829,7 @@ node:
     glance:
       consumptionGauge:
         used: 已使用
-        amount: "已使用 {total} {unit} 中的 {used}"
+        amount: "{used}/{total} {unit}"
         cpu: CPU
         memory: 内存
         pods: Pod
@@ -4417,6 +4417,7 @@ tableHeaders:
   drivers: 驱动
   distinguisherMethod: 区分方法
   deviceName: 设备名称
+  deviceIndex: 设备号
   effect: 效果
   endpoints: 端点
   firstSeen: 首次出现时间
@@ -4507,9 +4508,9 @@ tableHeaders:
   queueLengthLimit: 队列长度限制
   ram: 内存（RAM）
   vram: 显存（VRAM）
-  vramUsage: 显存 (已分配/总量)
+  vramAllocated: 显存 (已分配/总量)
   vgpu: vGPU
-  vendor: GPU 厂商
+  vendor: 厂商
   cores: CUDA 算力限制
   rbac:
     create: Create
@@ -6429,7 +6430,7 @@ gpuDevice:
       key:
         status: 显卡状态
         uuid: 显卡 ID
-        vendor: 品牌
+        vendor: 厂商
         devName: 显卡名称
         vRAM: 显存
         vGPU: vGPU

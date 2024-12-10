@@ -806,6 +806,24 @@ export const VRAM = {
   value:    'vram',
 };
 
+export const VRAM_ALLOCATED = {
+  name:     'vram_allocated',
+  labelKey: 'tableHeaders.vramAllocated',
+  sort:     'vramAllocated',
+  search:   false,
+  value:    'vramAllocated',
+};
+
+export const VRAM_USAGE = {
+  name:      'vram_usage',
+  labelKey:  'tableHeaders.vram',
+  sort:      'vramUsage',
+  search:    false,
+  value:     'vramUsagePercentage',
+  formatter: 'PercentageBar',
+  width:     120,
+};
+
 export const VGPU = {
   name:     'vgpu',
   labelKey: 'tableHeaders.vgpu',
@@ -915,4 +933,12 @@ export const RAY_VERSION = {
   labelKey: 'tableHeaders.clusterVersion',
   sort:     ['spec.rayVersion'],
   value:    'spec.rayVersion',
+};
+
+export const DEVICE_INDEX = {
+  name:     'device-index',
+  labelKey: 'tableHeaders.deviceIndex',
+  sort:     'device-index',
+  search:   false,
+  value:    'status.index',
 };

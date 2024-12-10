@@ -95,6 +95,10 @@ export function parseSi(inValue, opt) {
   let [, valStr, unit, incStr] = inValue.match(/^([0-9.-]+)\s*([^0-9.-]?)([^0-9.-]?)/);
   const val = parseFloat(valStr);
 
+  if (!unit && opt.unit) {
+    unit = opt.unit;
+  }
+
   if ( !unit ) {
     return val;
   }
@@ -145,6 +149,15 @@ export const MEMORY_PARSE_RULES = {
       suffix:           'iB',
     }
   }
+};
+
+export const VRAM_PARSE_RULES = {
+  format: {
+    increment:        1024,
+    startingExponent: 2,
+    suffix:           'iB',
+    unit:             'M',
+  },
 };
 
 export function createMemoryFormat(n) {

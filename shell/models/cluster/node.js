@@ -1,11 +1,12 @@
 import { formatPercent } from '@shell/utils/string';
 import { NODE_ROLES, RKE, SYSTEM_LABELS } from '@shell/config/labels-annotations.js';
-import { METRIC, POD } from '@shell/config/types';
-import { parseSi } from '@shell/utils/units';
+import { LLMOS, METRIC, POD } from '@shell/config/types';
+import { parseSi, VRAM_PARSE_RULES } from '@shell/utils/units';
 import findLast from 'lodash/findLast';
 
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { LOCAL } from '@shell/config/query-params';
+import { NVIDIA } from '@shell/utils/container-resource';
 
 export default class ClusterNode extends SteveModel {
   get _availableActions() {
@@ -221,6 +222,35 @@ export default class ClusterNode extends SteveModel {
 
   get ramReservedPercentage() {
     return ((this.ramUsage * 100) / this.ramReserved).toString();
+  }
+
+  get vramCapacity() {
+    return parseSi(this.status.allocatable[NVIDIA.vGPUMem]?.toString(), VRAM_PARSE_RULES.format);
+  }
+
+  get vramUsage() {
+    if ( !this.vramCapacity ) {
+      return '0';
+    }
+    const gpuDevices = this.$rootGetters['cluster/all'](LLMOS.GPUDEVICE) || [];
+
+    if ( gpuDevices.length < 1 ) {
+      return '0';
+    }
+
+    const vramUsage = gpuDevices.reduce((acc, gpu) => {
+      return acc + gpu.status?.vramUsed;
+    }, 0);
+
+    return parseSi(vramUsage.toString(), VRAM_PARSE_RULES.format);
+  }
+
+  get vramUsagePercentage() {
+    if ( !this.vramCapacity ) {
+      return '0';
+    }
+
+    return ((this.vramUsage * 100) / this.vramCapacity).toString();
   }
 
   get podUsage() {
