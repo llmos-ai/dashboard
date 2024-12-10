@@ -3,7 +3,6 @@ import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkload from '@shell/mixins/llmos/ml-workload';
 import { MANAGEMENT } from '@shell/config/types';
-import { SvcOptions } from '@shell/config/constants';
 import { mergeEnvs } from '@shell/utils/merge';
 import { SETTING } from '@shell/config/settings';
 
@@ -12,9 +11,8 @@ export default {
   mixins: [CreateEditView, FormValidation, LLMOSWorkload],
   props:  {
     value: {
-      type:       Object,
-      required:   true,
-      svcOptions: SvcOptions,
+      type:     Object,
+      required: true,
     },
 
     mode: {
@@ -40,9 +38,6 @@ export default {
 
       this.container.image = msDefaultImage?.value || msDefaultImage.default;
     }
-
-    // loading secondary resources without UI blocking
-    this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
   },
 
   data() {
@@ -80,25 +75,6 @@ export default {
       events:        [],
       sourceOptions: ['HuggingFace', 'ModelScope']
     };
-  },
-
-  watch: {
-    async 'value.metadata.namespace'(neu) {
-      if (this.isNamespaceNew) {
-        // we don't need to re-fetch namespace specific (or non-namespace specific) resources when the namespace hasn't been created yet
-        return;
-      }
-      this.secondaryResourceData.namespace = neu;
-      // Fetch resources that are namespace specific, we don't need to re-fetch non-namespaced resources on namespace change
-      this.resourceManagerFetchSecondaryResources(this.secondaryResourceData, true);
-    },
-
-    isNamespaceNew(neu, old) {
-      if (!old && neu) {
-        // As the namespace is new any resource that's been fetched with a namespace is now invalid
-        this.resourceManagerClearSecondaryResources(this.secondaryResourceData, true);
-      }
-    },
   },
 
   created() {
