@@ -24,9 +24,6 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     this.notebookImagesSetting = await this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.DEFAULT_NOTEBOOK_IMAGES);
-
-    // don't block UI for these resources
-    this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
   },
 
   data() {
@@ -183,8 +180,8 @@ export default {
           class="bordered-table"
           :weight="tabWeightMap.general"
         >
-          <div class="row">
-            <div class="col span-6 mb-10">
+          <div class="row mb-20">
+            <div class="col span-6">
               <LabeledSelect
                 v-model="notebookType"
                 label="Type"
@@ -207,20 +204,40 @@ export default {
               />
             </div>
           </div>
-
           <AdvancedSection
-            class="col span-12 advanced"
+            class="advanced"
             :mode="mode"
           >
-            <div class="col span-6">
-              <LabeledSelect
-                v-model="spec.serviceType"
-                :mode="mode"
-                :options="svcOptions"
-                :label="t('workload.networking.networkMode.label')"
-                :placeholder="t('workload.networking.networkMode.placeholder')"
-                @input="update"
-              />
+            <div class="row mb-10">
+              <div class="col span-12">
+                <h3>{{ t('workload.container.titles.env') }}</h3>
+                <EnvVars
+                  :mode="mode"
+                  :config-maps="namespacedConfigMaps"
+                  :secrets="namespacedSecrets"
+                  :value="container"
+                  :loading="isLoadingSecondaryResources"
+                  class="mb-20"
+                />
+              </div>
+            </div>
+
+            <div class="mb-10">
+              <div class="row">
+                <h4>{{ t('workload.networking.networkMode.label') }}</h4>
+              </div>
+              <div class="row">
+                <div class="col span-6">
+                  <LabeledSelect
+                    v-model="spec.serviceType"
+                    :mode="mode"
+                    :options="svcOptions"
+                    :label="t('workload.networking.networkMode.label')"
+                    :placeholder="t('workload.networking.networkMode.placeholder')"
+                    @input="update"
+                  />
+                </div>
+              </div>
             </div>
           </AdvancedSection>
         </Tab>
