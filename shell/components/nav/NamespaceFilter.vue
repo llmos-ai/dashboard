@@ -663,6 +663,11 @@ export default {
       const user = this.$store.getters['auth/user'];
 
       if (user && user.status?.isAdmin) {
+        this.$store.dispatch('prefs/set', {
+          key:   NAMESPACE_FILTERS,
+          value: { local: [] }
+        });
+
         return [];
       }
 
