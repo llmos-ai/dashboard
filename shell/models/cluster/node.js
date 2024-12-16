@@ -225,6 +225,10 @@ export default class ClusterNode extends SteveModel {
   }
 
   get vramCapacity() {
+    if (!this.status?.allocatable?.[NVIDIA.vGPUMem]) {
+      return 0;
+    }
+
     return parseSi(this.status.allocatable[NVIDIA.vGPUMem]?.toString(), VRAM_PARSE_RULES.format);
   }
 
@@ -239,7 +243,9 @@ export default class ClusterNode extends SteveModel {
     }
 
     const vramUsage = gpuDevices.reduce((acc, gpu) => {
-      return acc + gpu.status?.vramUsed;
+      const vramUsed = gpu.status?.vramUsed || 0;
+
+      return acc + vramUsed;
     }, 0);
 
     return parseSi(vramUsage.toString(), VRAM_PARSE_RULES.format);
@@ -248,6 +254,10 @@ export default class ClusterNode extends SteveModel {
   get vramUsagePercentage() {
     if ( !this.vramCapacity ) {
       return '0';
+    }
+
+    if (this.vramUsage === 0) {
+      return 0;
     }
 
     return ((this.vramUsage * 100) / this.vramCapacity).toString();

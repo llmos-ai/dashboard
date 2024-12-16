@@ -18,6 +18,20 @@ export default {
     LabeledInput,
   },
   mixins: [ManagedAddonMixin],
+  data() {
+    const spec = this.value.spec;
+    const enabled = this.$route.query.enabled;
+
+    if (enabled !== undefined) {
+      spec.enabled = enabled.toString() === 'true';
+    }
+
+    if (!spec.valuesContent && spec.defaultValuesContent?.length > 0) {
+      spec.valuesContent = spec.defaultValuesContent;
+    }
+
+    return { spec };
+  }
 };
 </script>
 

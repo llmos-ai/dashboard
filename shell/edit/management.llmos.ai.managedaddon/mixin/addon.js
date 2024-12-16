@@ -19,21 +19,6 @@ export default {
     },
   },
 
-  data() {
-    const spec = this.value.spec;
-    const enabled = this.$route.query.enabled;
-
-    if (enabled !== undefined) {
-      spec.enabled = enabled === 'true';
-    }
-
-    if (!spec.valuesContent && spec.defaultValuesContent?.length > 0) {
-      spec.valuesContent = spec.defaultValuesContent;
-    }
-
-    return { spec };
-  },
-
   computed: {
     isView() {
       return this.mode === _VIEW;
