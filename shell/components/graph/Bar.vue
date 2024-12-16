@@ -58,24 +58,24 @@ export default {
 
 <style lang="scss" scoped>
 .bar {
-    $height: 15px;
+  $height: 15px;
 
-    width: 100%;
-    height: $height;
-    border-radius: math.div($height, 2);
-    overflow: hidden;
-    position: relative;
+  width: 100%;
+  height: $height;
+  border-radius: math.div($height, 2);
+  overflow: hidden;
+  position: relative;
 
-    .indicator {
-        height: 100%;
-    }
+  .indicator {
+    height: 100%;
+  }
 
-    .slice {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background-color: var(--body-bg);
-    }
+  .slice {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--body-bg);
+  }
 }
 </style>

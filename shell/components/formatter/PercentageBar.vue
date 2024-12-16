@@ -9,7 +9,7 @@ export default {
   components: { PercentageBarComponent },
   props:      {
     value: {
-      type:    String,
+      type:    [String, Number],
       default: ''
     },
     row: {
@@ -30,12 +30,20 @@ export default {
 </script>
 
 <template>
-  <p v-if="!value || value === '0'">
-    {{ t('generic.na') }}
-  </p>
-  <PercentageBarComponent
-    v-else
-    :value="percentage"
-    :show-percentage="true"
-  />
+  <span>
+    <p v-if="typeof value === 'number' && value == 0">
+      <PercentageBarComponent
+        :value="percentage"
+        :show-percentage="true"
+      />
+    </p>
+    <p v-else-if="!value || value === '0' || value === 'n/a' ">
+      {{ t('generic.na') }}
+    </p>
+    <PercentageBarComponent
+      v-else
+      :value="percentage"
+      :show-percentage="true"
+    />
+  </span>
 </template>

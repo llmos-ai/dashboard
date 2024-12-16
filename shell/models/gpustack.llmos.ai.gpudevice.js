@@ -16,10 +16,18 @@ export default class GPUDevice extends SteveModel {
   }
 
   get vramUsage() {
+    if (!this.vramUsageValue) {
+      return 0;
+    }
+
     return parseSi(this.vramUsageValue.toString(), VRAM_PARSE_RULES.format);
   }
 
   get vramCapacity() {
+    if (!this.status?.vram) {
+      return 0;
+    }
+
     return parseSi(this.status?.vram.toString(), VRAM_PARSE_RULES.format);
   }
 

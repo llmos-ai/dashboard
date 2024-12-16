@@ -75,7 +75,7 @@ export default {
     const enabled = this.$route.query.enabled;
 
     if (enabled !== undefined) {
-      spec.enabled = enabled === 'true';
+      spec.enabled = enabled.toString() === 'true';
     }
 
     const defaultValuesContent = jsyaml.load(spec.defaultValuesContent);

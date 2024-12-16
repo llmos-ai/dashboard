@@ -23,6 +23,8 @@ import ResourceManager from '@shell/mixins/resource-manager';
 import { MONITORING_GRAFANA_PATH } from '@shell/utils/monitoring';
 import { mergeEnvs, mergeObjectValueFromArrayEnv } from '@shell/utils/merge';
 import { SETTING } from '@shell/config/settings';
+import { _EDIT, ENABLED, MODE } from '@shell/config/query-params';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 export const RAY_DEFAULT_MONITORING_CONFIG = {
   RAY_GRAFANA_IFRAME_HOST: '',
@@ -54,7 +56,10 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const hash = await allHash({ defaultConfig: this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' }) });
+    const hash = await allHash({
+      defaultConfig: this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' }),
+      addonConfig:   this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.MANAGED_ADDON_CONFIGS }),
+    });
 
     if (!this.spec.rayVersion) {
       const rayDefaultVersion = await this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.RAY_CLUSTER_DEFAULT_VERSION);
@@ -63,6 +68,9 @@ export default {
     }
 
     this.defaultConfig = hash.defaultConfig;
+    if (this.addonConfigs) {
+      this.addonConfigs = JSON.parse(hash.addonConfig.value);
+    }
 
     // don't block UI for these resources
     await this.resourceManagerFetchSecondaryResources(this.secondaryResourceData); // non-blocking
@@ -95,6 +103,7 @@ export default {
       defaultWorkerPodTemplateSpec,
       monitoringConfig,
       RAY_DEFAULT_MONITORING_CONFIG,
+      addonConfigs:    null,
 
       secondaryResourceData: this.secondaryResourceDataConfig(),
       namespacedConfigMaps:  [],
@@ -148,6 +157,35 @@ export default {
       set(neu) {
         this.value.metadata.annotations[ANNOTATIONS.RAY_CLUSTER_FT_ENABLED] = `${ neu }`;
       }
+    },
+
+    monitoringEnabled() {
+      if (this.addonConfigs) {
+        const moni = this.addonConfigs.AddonConfigs.find((addonConfig) => addonConfig.name === 'llmos-monitoring');
+
+        return moni.enabled && moni.status === 'Complete';
+      } else {
+        return false;
+      }
+    },
+
+    monitoringAddonLink() {
+      const query = {
+        [MODE]:    _EDIT,
+        [ENABLED]: 'true',
+      };
+
+      return {
+        name:   'c-cluster-product-resource-namespace-id',
+        params: {
+          product:   LLMOS,
+          cluster:   'local',
+          resource:  MANAGEMENT.MANAGED_ADDON,
+          namespace: 'llmos-monitoring-system',
+          id:        'llmos-monitoring',
+        },
+        query,
+      };
     },
 
     enableMonitoring: {
@@ -354,18 +392,6 @@ export default {
         class="bordered-table"
         :weight="101"
       >
-        <div class="row mb-20">
-          <div class="col span-6">
-            <LabeledInput
-              v-model="value.spec.rayVersion"
-              label="Cluster Ray Version"
-              required
-              :mode="mode"
-              @input="update"
-            />
-          </div>
-        </div>
-
         <h3>AutoScaler Options</h3>
         <div class="row mb-20">
           <div class="col span-6">
@@ -425,27 +451,38 @@ export default {
             </span>
           </div>
         </div>
-        <div
-          v-if="enableMonitoring"
-          class="row mb-20"
-        >
-          <div class="col span-6">
-            <LabeledInput
-              v-model="monitoringConfig.RAY_GRAFANA_IFRAME_HOST"
-              :label="t('ray.monitoring.grafana.iframe')"
-              required
-              :mode="mode"
-              @input="update"
-            />
+        <div v-if="enableMonitoring">
+          <div
+            v-if="!monitoringEnabled"
+            class="row mb-20"
+          >
+            <div class="text-banner">
+              <span class="warning">
+                LLMOS monitoring is not installed, click
+                <nuxt-link :to="monitoringAddonLink">here</nuxt-link>
+                to enable it now.
+              </span>
+            </div>
           </div>
-          <div class="col span-6">
-            <LabeledInput
-              v-model="monitoringConfig.RAY_GRAFANA_HOST"
-              :label="t('ray.monitoring.grafana.host')"
-              required
-              :mode="mode"
-              @input="update"
-            />
+          <div class="row mb-20">
+            <div class="col span-6">
+              <LabeledInput
+                v-model="monitoringConfig.RAY_GRAFANA_IFRAME_HOST"
+                :label="t('ray.monitoring.grafana.iframe')"
+                required
+                :mode="mode"
+                @input="update"
+              />
+            </div>
+            <div class="col span-6">
+              <LabeledInput
+                v-model="monitoringConfig.RAY_GRAFANA_HOST"
+                :label="t('ray.monitoring.grafana.host')"
+                required
+                :mode="mode"
+                @input="update"
+              />
+            </div>
           </div>
         </div>
 
@@ -471,6 +508,18 @@ export default {
           <h3 class="mb-10">
             {{ t('generic.tabs.advanced') }}
           </h3>
+          <div class="row mb-20">
+            <div class="col span-6">
+              <LabeledInput
+                v-model="value.spec.rayVersion"
+                label="Cluster Ray Version"
+                required
+                :mode="mode"
+                @input="update"
+              />
+            </div>
+          </div>
+
           <div class="row mb-20">
             <div class="col span-6">
               <Checkbox
@@ -598,5 +647,17 @@ export default {
     font-size: small;
     padding: 1px;
   }
+}
+
+.text-banner {
+  padding: 10px;
+  transition: all 0.2s ease;
+  line-height: 20px;
+  width: 100%;
+  border-left: solid 4px transparent;
+  display: flex;
+  gap: 3px;
+  background: var(--warning-banner-bg);
+  border-color: var(--warning);
 }
 </style>
