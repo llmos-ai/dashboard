@@ -57,8 +57,9 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const hash = await allHash({
-      defaultConfig: this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' }),
-      addonConfig:   this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.MANAGED_ADDON_CONFIGS }),
+      defaultConfig:       this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' }),
+      addonConfigs:         this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.MANAGED_ADDON_CONFIGS }),
+      systemImageRegistry: this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY }),
     });
 
     if (!this.spec.rayVersion) {
@@ -67,9 +68,15 @@ export default {
       this.spec.rayVersion = rayDefaultVersion?.value || rayDefaultVersion.default;
     }
 
+    if (hash.systemImageRegistry.value) {
+      this.systemImageRegistry = hash.systemImageRegistry.value;
+    } else {
+      this.systemImageRegistry = 'ghcr.io';
+    }
+
     this.defaultConfig = hash.defaultConfig;
-    if (this.addonConfigs) {
-      this.addonConfigs = JSON.parse(hash.addonConfig.value);
+    if (hash.addonConfigs.value) {
+      this.addonConfigs = JSON.parse(hash.addonConfigs.value);
     }
 
     // don't block UI for these resources
@@ -91,9 +98,9 @@ export default {
     const monitoringConfig = this.initMonitoringConfig(headGroupContainer);
 
     return {
-      defaultConfig:   {},
-      runtimeClasses:  [],
-      savePvcHookName: 'savePvcHook',
+      defaultConfig:       {},
+      runtimeClasses:      [],
+      savePvcHookName:     'savePvcHook',
       spec,
       autoScaleOptions,
       headGroupSpec,
@@ -103,7 +110,8 @@ export default {
       defaultWorkerPodTemplateSpec,
       monitoringConfig,
       RAY_DEFAULT_MONITORING_CONFIG,
-      addonConfigs:    null,
+      addonConfigs:        null,
+      systemImageRegistry: '',
 
       secondaryResourceData: this.secondaryResourceDataConfig(),
       namespacedConfigMaps:  [],
@@ -162,7 +170,6 @@ export default {
     monitoringEnabled() {
       if (this.addonConfigs) {
         const moni = this.addonConfigs.AddonConfigs.find((addonConfig) => addonConfig.name === 'llmos-monitoring');
-
         return moni.enabled && moni.status === 'Complete';
       } else {
         return false;
@@ -312,6 +319,7 @@ export default {
       } else {
         this.headGroupSpec.rayStartParams['num-cpus'] = '0';
       }
+      this.headGroupSpec.template.spec.schedulerName = VolcanoScheduler;
 
       const annotations = {
         ...this.value.metadata.annotations,
@@ -330,13 +338,13 @@ export default {
 
       // set rayVersion
       if (this.spec.rayVersion) {
-        this.headGroupContainer.image = `rayproject/ray:${ this.spec.rayVersion }`;
+        this.headGroupContainer.image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }`;
         if (hasGPUResources(this.defaultWorkerPodTemplateSpec.containers)) {
-          this.defaultWorkerPodTemplateSpec.containers[0].image = `rayproject/ray:${ this.spec.rayVersion }-gpu`;
-          this.defaultWorkerPodTemplateSpec.schedulerName = VolcanoScheduler;
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored/rayproject-ray:${ this.spec.rayVersion }-gpu`;
         } else {
-          this.defaultWorkerPodTemplateSpec.containers[0].image = `rayproject/ray:${ this.spec.rayVersion }`;
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }`;
         }
+        this.defaultWorkerPodTemplateSpec.schedulerName = VolcanoScheduler;
       }
 
       this.value.setAnnotations(annotations);

@@ -85,6 +85,7 @@ export default {
     :groupable="true"
     :rows="rows"
     key-field="_key"
+    :namespaced="false"
     v-on="$listeners"
   >
     <template #col:uuid="{row}">

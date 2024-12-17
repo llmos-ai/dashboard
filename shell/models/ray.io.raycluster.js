@@ -10,10 +10,7 @@ export default class RayCluster extends MlWorkload {
       metadata:   {
         name:        '',
         namespace:   '',
-        annotations: {
-          'llmos.ai/volume-claim-templates': '[]',
-          'ray.io/ft-enabled':               'true',
-        }
+        annotations: { 'ray.io/ft-enabled': 'true' },
       },
       spec: {
         rayVersion:        '',
