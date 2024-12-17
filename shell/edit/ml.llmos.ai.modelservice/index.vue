@@ -5,6 +5,7 @@ import LLMOSWorkload from '@shell/mixins/llmos/ml-workload';
 import { MANAGEMENT } from '@shell/config/types';
 import { mergeEnvs } from '@shell/utils/merge';
 import { SETTING } from '@shell/config/settings';
+import { allHash } from '@shell/utils/promise';
 
 export default {
   name:   'ModelService',
@@ -32,11 +33,16 @@ export default {
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
+    const hash = await allHash({
+      modelServiceDefaultImage: this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.MODEL_SERVICE_DEFAULT_IMAGE),
+      systemImageRegistry:      this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY }),
+    });
 
     if (!this.container.image) {
-      const msDefaultImage = await this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.MODEL_SERVICE_DEFAULT_IMAGE);
+      const msDefaultImage = hash.modelServiceDefaultImage.value || hash.modelServiceDefaultImage.default;
+      const registry = hash.systemImageRegistry?.value || 'ghcr.io';
 
-      this.container.image = msDefaultImage?.value || msDefaultImage.default;
+      this.container.image = this.processImageString(msDefaultImage, registry);
     }
   },
 
@@ -136,6 +142,26 @@ export default {
       }
 
       this.container.env = mergeEnvs(this.container.env, huggingFaceEnv);
+    },
+
+    processImageString(imageString, customRegistry) {
+      // Check if the image contains a registry
+      const regex = /^([a-zA-Z0-9._-]+\/)?([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+):([a-zA-Z0-9._-]+)$/;
+
+      const match = imageString.match(regex);
+
+      if (match) {
+        const registry = match[1]; // First group is the optional registry part
+
+        // If a registry is present, return the string as is
+        if (registry) {
+          return imageString;
+        } else {
+          // Prepend custom registry if missing
+          return `${ customRegistry }/${ imageString }`;
+        }
+      }
+      throw new Error('Invalid image string format.');
     }
   },
 };
