@@ -5992,6 +5992,7 @@ advancedSettings:
     'upgrade-check-enabled': '启用升级检查。'
     'upgrade-check-url': '升级检查 URL。'
     'model-service-default-image': 'LLMOS 模型服务的默认 API Serving 镜像'
+    'global-system-image-registry': '系统组件镜像仓库地址 (e.g., myregistry.com:5000)'
   editHelp:
     'ui-banners': 此设置使用包含 3 个根参数的 JSON 对象，分别是<code>banner</code>、<code>showHeader</code>和<code>showFooter</code>。<code>banner</code> 是包含 <code>textColor</code>，<code>background</code>和<code>text</code>的对象，其中<code>textColor</code> 和 <code>background</code>的值可以是任何有效的 CSS 颜色值。
   enum:

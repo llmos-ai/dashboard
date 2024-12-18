@@ -58,7 +58,7 @@ export default {
 
     const hash = await allHash({
       defaultConfig:       this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' }),
-      addonConfigs:         this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.MANAGED_ADDON_CONFIGS }),
+      addonConfigs:        this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.MANAGED_ADDON_CONFIGS }),
       systemImageRegistry: this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY }),
     });
 
@@ -170,6 +170,7 @@ export default {
     monitoringEnabled() {
       if (this.addonConfigs) {
         const moni = this.addonConfigs.AddonConfigs.find((addonConfig) => addonConfig.name === 'llmos-monitoring');
+
         return moni.enabled && moni.status === 'Complete';
       } else {
         return false;
