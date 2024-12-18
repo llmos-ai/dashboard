@@ -16,6 +16,7 @@ export default class ModelService extends MlWorkload {
       },
       spec: {
         replicas:        1,
+        modelRegistry:   'huggingface',
         model:           '',
         servedModelName: '',
         serviceType:     'ClusterIP',
@@ -50,8 +51,8 @@ export default class ModelService extends MlWorkload {
                 },
                 volumeMounts: [
                   {
-                    mountPath: '/root/.cache/huggingface',
-                    name:      'hf-dir'
+                    mountPath: '/root/.cache',
+                    name:      'model-dir'
                   },
                   {
                     mountPath: '/dev/shm',
@@ -73,7 +74,7 @@ export default class ModelService extends MlWorkload {
         },
         volumeClaimTemplates: [
           {
-            metadata: { name: 'hf-dir' },
+            metadata: { name: 'model-dir' },
             spec:     {
               accessModes: ['ReadWriteOnce'],
               resources:   { requests: { storage: '20Gi' } },

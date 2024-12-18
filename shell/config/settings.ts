@@ -102,7 +102,9 @@ export const ALLOWED_SETTINGS: GlobalSetting = {
   [SETTING.AUTH_USER_SESSION_MAX_TTL_MINUTES]: { kind: 'integer' },
   [SETTING.SERVER_URL]:                        { kind: 'url', canReset: true },
   [SETTING.UI_INDEX]:                          {},
+  [SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY]:      { kind: 'string' },
   [SETTING.DEFAULT_NOTEBOOK_IMAGES]:           { kind: 'multiline', canReset: true },
+  [SETTING.MODEL_SERVICE_DEFAULT_IMAGE]:       { kind: 'string' },
   [SETTING.UI_SOURCE]:                         {
     kind:    'enum',
     options: ['auto', 'external', 'bundled']
@@ -111,10 +113,9 @@ export const ALLOWED_SETTINGS: GlobalSetting = {
     kind:    'enum',
     options: ['info', 'debug', 'trace']
   },
-  [SETTING.PL]:                          { canReset: true },
-  [SETTING.UPGRADE_CHECK_ENABLED]:       { kind: 'boolean' },
-  [SETTING.UPGRADE_CHECK_URL]:           { kind: 'url' },
-  [SETTING.MODEL_SERVICE_DEFAULT_IMAGE]: { kind: 'string' }
+  [SETTING.PL]:                    { canReset: true },
+  [SETTING.UPGRADE_CHECK_ENABLED]: { kind: 'boolean' },
+  [SETTING.UPGRADE_CHECK_URL]:     { kind: 'url' },
 };
 
 /**

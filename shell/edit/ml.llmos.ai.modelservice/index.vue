@@ -42,7 +42,9 @@ export default {
       const msDefaultImage = hash.modelServiceDefaultImage.value || hash.modelServiceDefaultImage.default;
       const registry = hash.systemImageRegistry?.value || 'ghcr.io';
 
-      this.container.image = this.processImageString(msDefaultImage, registry);
+      const image = this.processImageString(msDefaultImage, registry);
+
+      this.container.image = image;
     }
   },
 
@@ -70,16 +72,16 @@ export default {
       hfEndpoint = { name: 'HF_ENDPOINT', value: '' };
     }
 
-    const useModelScope = container.env.find((env) => env.name === 'VLLM_USE_MODELSCOPE');
-    const modelSource = useModelScope ? 'ModelScope' : 'HuggingFace';
-
     return {
       hfToken,
       hfEndpoint,
       excludeEnvs,
-      modelSource,
       events:        [],
-      sourceOptions: ['HuggingFace', 'ModelScope']
+      sourceOptions: [
+        { label: 'HuggingFace', value: 'huggingface' },
+        { label: 'ModelScope', value: 'modelscope' },
+        { label: 'Local', value: 'local' }
+      ]
     };
   },
 
@@ -127,19 +129,6 @@ export default {
 
     mergeEnvs() {
       const huggingFaceEnv = [this.hfToken, this.hfEndpoint];
-
-      // Set use `VLLM_USE_MODELSCOPE` env to true
-      if (this.modelSource === 'ModelScope') {
-        this.$set(this.container, 'env', [
-          {
-            name:  'VLLM_USE_MODELSCOPE',
-            value: 'True',
-          },
-        ]);
-      } else {
-        // remove the `VLLM_USE_MODELSCOPE` env
-        this.container.env = this.container.env.filter((env) => env.name !== 'VLLM_USE_MODELSCOPE');
-      }
 
       this.container.env = mergeEnvs(this.container.env, huggingFaceEnv);
     },
@@ -199,7 +188,7 @@ export default {
         <div class="row">
           <div class="col span-6 mb-10">
             <LabeledSelect
-              v-model="modelSource"
+              v-model="spec.modelRegistry"
               label="Source"
               :options="sourceOptions"
               :mode="mode"

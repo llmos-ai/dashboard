@@ -93,6 +93,13 @@ export default class MlWorkload extends MLWorkloadService {
     set(this.metadata, 'annotations', annotations);
 
     this.save();
+
+    // Delete all pods which is not running
+    const pods = this.pods || [];
+
+    for (const pod of pods) {
+      pod.remove();
+    }
     this.$dispatch('growl/success', { message: `${ this.kind } ${ this.name } has been successfully redeployed.` }, { root: true });
   }
 
