@@ -341,7 +341,7 @@ export default {
       if (this.spec.rayVersion) {
         this.headGroupContainer.image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }`;
         if (hasGPUResources(this.defaultWorkerPodTemplateSpec.containers)) {
-          this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored/rayproject-ray:${ this.spec.rayVersion }-gpu`;
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }-gpu`;
         } else {
           this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }`;
         }

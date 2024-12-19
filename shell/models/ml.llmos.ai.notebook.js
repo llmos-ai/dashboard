@@ -8,11 +8,13 @@ export default class NoteBook extends MlWorkload {
       apiVersion: 'ml.llmos.ai/v1',
       kind:       'Notebook',
       metadata:   {
-        name:      '',
-        namespace: '',
-        labels:    { 'ml.llmos.ai/notebook-type': 'jupyter' },
+        name:        '',
+        namespace:   '',
+        labels:      { 'ml.llmos.ai/notebook-type': 'jupyter' },
+        annotations: {},
       },
       spec: {
+        replicas: 1,
         template: {
           spec: {
             containers: [
