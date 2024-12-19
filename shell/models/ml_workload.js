@@ -4,21 +4,38 @@ import { convertSelectorObj, matching, matches } from '@shell/utils/selector';
 import MLWorkloadService from '@shell/models/ml_workload.service';
 import { formatSi, parseSi, VRAM_PARSE_RULES } from '@shell/utils/units';
 import { set } from '@shell/utils/object';
-import { TIMESTAMP } from '@shell/config/labels-annotations';
+import { ANNOTATIONS, TIMESTAMP } from '@shell/config/labels-annotations';
 import { NVIDIA } from '@shell/utils/container-resource';
 
 export default class MlWorkload extends MLWorkloadService {
   // remove clone as yaml/edit as yaml until API supported
   get _availableActions() {
+    const type = this._type ? this._type : this.type;
     let out = super._availableActions;
 
-    insertAt(out, 1, {
+    insertAt(out, 0, {
       action:  'openShell',
       enabled: !!this.links.view,
       icon:    'icon icon-fw icon-chevron-right',
       label:   this.t('action.openShell'),
       total:   1,
     });
+
+    if (type !== ML_WORKLOAD_TYPES.RAY_CLUSTER) {
+      insertAt(out, 1, {
+        action:  'pause',
+        label:   this.t('asyncButton.pause.action'),
+        icon:    'icon icon-pause',
+        enabled: !!this.links.update && !this.isPaused
+      });
+
+      insertAt(out, 1, {
+        action:  'resume',
+        label:   this.t('asyncButton.resume.action'),
+        icon:    'icon icon-play',
+        enabled: !!this.links.update && this.isPaused
+      });
+    }
 
     insertAt(out, 5, {
       action:   'redeploy',
@@ -200,7 +217,42 @@ export default class MlWorkload extends MLWorkloadService {
       return 'in-progress';
     }
 
+    if ( this.isPaused ) {
+      return 'paused';
+    }
+
     return super.state;
+  }
+
+  get isPaused() {
+    return this.metadata.annotations?.[ANNOTATIONS.RESOURCE_STOPPED] || this.spec.replicas === 0;
+  }
+
+  pause() {
+    if (!this.metadata.annotations) {
+      set(this, 'metadata.annotations', {});
+    }
+    this.metadata.annotations[ANNOTATIONS.RESOURCE_STOPPED] = 'true';
+    this.save();
+  }
+
+  resume() {
+    delete this.metadata.annotations[ANNOTATIONS.RESOURCE_STOPPED];
+    this.save();
+  }
+
+  async scaleDown() {
+    const newScale = this.spec.replicas - 1;
+
+    if (newScale >= 0) {
+      set(this.spec, 'replicas', newScale);
+      await this.save();
+    }
+  }
+
+  async scaleUp() {
+    set(this.spec, 'replicas', this.spec.replicas + 1);
+    await this.save();
   }
 
   siOptions() {
