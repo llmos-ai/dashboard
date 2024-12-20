@@ -103,7 +103,7 @@ export const ALLOWED_SETTINGS: GlobalSetting = {
   [SETTING.SERVER_URL]:                        { kind: 'url', canReset: true },
   [SETTING.UI_INDEX]:                          {},
   [SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY]:      { kind: 'string' },
-  [SETTING.DEFAULT_NOTEBOOK_IMAGES]:           { kind: 'multiline', canReset: true },
+  [SETTING.DEFAULT_NOTEBOOK_IMAGES]:           { kind: 'json', canReset: true },
   [SETTING.MODEL_SERVICE_DEFAULT_IMAGE]:       { kind: 'string' },
   [SETTING.UI_SOURCE]:                         {
     kind:    'enum',

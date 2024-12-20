@@ -134,7 +134,7 @@ export default {
         </div>
         <div
           v-else
-          class="settings-value"
+          class="settings-value mb-5"
         >
           <pre v-if="setting.kind === 'json'">{{ setting.json }}</pre>
           <pre v-else-if="setting.kind === 'multiline'">{{ setting.data.value || setting.data.default }}</pre>
