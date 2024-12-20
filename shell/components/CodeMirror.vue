@@ -91,7 +91,6 @@ export default {
   },
 
   methods: {
-
     focus() {
       if ( this.$refs.codeMirrorRef ) {
         this.$refs.codeMirrorRef.codemirror.focus();
