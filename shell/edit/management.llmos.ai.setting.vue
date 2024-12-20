@@ -13,6 +13,7 @@ import FormValidation from '@shell/mixins/form-validation';
 import { setBrand } from '@shell/config/private-label';
 import { keyBy, mapValues } from 'lodash';
 import { isLocalhost, isServerUrl } from '@shell/utils/validators/setting';
+import CodeMirror from '@shell/components/CodeMirror.vue';
 
 export default {
   components: {
@@ -21,13 +22,21 @@ export default {
     LabeledSelect,
     RadioGroup,
     TextAreaAutoGrow,
-    Banner
+    Banner,
+    CodeMirror,
   },
 
   mixins: [CreateEditView, FormValidation],
 
   data() {
     const t = this.$store.getters['i18n/t'];
+
+    const cmOptions = {
+      mode: {
+        name: 'javascript',
+        json: true
+      }
+    };
 
     return {
       setting:        ALLOWED_SETTINGS[this.value.id],
@@ -37,6 +46,7 @@ export default {
       canReset:       false,
       errors:         [],
       fvFormRuleSets: [],
+      cmOptions,
     };
   },
 
@@ -45,6 +55,12 @@ export default {
       this.$set(this.value, 'value', this.value.default);
     }
     this.value.value = this.value.value || this.value.default;
+    if (this.setting?.kind === 'json') {
+      const jsonVal = JSON.parse(this.value.value);
+
+      this.value.value = JSON.stringify(jsonVal, null, 2);
+    }
+
     this.enumOptions = this.setting?.kind === 'enum' ? this.setting.options.map((id) => ({
       // i18n-uses advancedSettings.enum.*
       label: `advancedSettings.enum.${ this.value.id }.${ id }`,
@@ -129,7 +145,11 @@ export default {
       }
 
       this.value.value = this.value.default;
-    }
+    },
+
+    onInput(value) {
+      this.value.value = value;
+    },
   }
 };
 </script>
@@ -214,13 +234,21 @@ export default {
           :options="['true', 'false']"
         />
       </div>
-      <div v-else-if="setting.kind === 'multiline' || setting.kind === 'json'">
+      <div v-else-if="setting.kind === 'multiline'">
         <TextAreaAutoGrow
           v-model="value.value"
           data-testid="input-setting-json"
           :required="true"
           :rules="fvGetAndReportPathRules('value')"
           :min-height="254"
+        />
+      </div>
+      <div v-else-if="setting.kind === 'json'">
+        <CodeMirror
+          ref="cm"
+          :value="value.value"
+          :options="cmOptions"
+          @onInput="onInput"
         />
       </div>
       <div v-else-if="setting.kind === 'integer'">
