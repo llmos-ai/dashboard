@@ -110,6 +110,12 @@ export default class Pod extends WorkloadService {
   }
 
   openLogs(containerName = this.defaultContainerName) {
+    let container = containerName;
+    const initContainer = this.status?.initContainerStatuses?.find((c) => !c.ready);
+
+    if (initContainer) {
+      container = initContainer.name;
+    }
     this.$dispatch('wm/open', {
       id:        `${ this.id }-logs`,
       label:     this.nameDisplay,
@@ -117,7 +123,7 @@ export default class Pod extends WorkloadService {
       component: 'ContainerLogs',
       attrs:     {
         pod:              this,
-        initialContainer: containerName
+        initialContainer: container
       }
     }, { root: true });
   }

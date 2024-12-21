@@ -842,6 +842,7 @@ cluster:
       windowsDeprecatedForRKE1: Windows support is being deprecated for RKE1. We suggest migrating to RKE2.
       insecure: "Insecure: Select this to skip TLS verification if your server has a self-signed certificate."
       skipDownloadBinary: "Skip Download Binary: select this if you already have the LLMOS binary installed in the `/usr/local/bin/llmos` path."
+      useMirror: "Use CN mirror"
       moreConfigs: |-
         <b>Note</b>: You can refer to the <a href="https://llmos.1block.ai/docs/installation/" target="_blank">installation documentation</a> for more configuration options.
   credential:
