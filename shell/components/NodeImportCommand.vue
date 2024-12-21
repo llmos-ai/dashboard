@@ -59,6 +59,7 @@ export default {
       serverUrl:          '',
       installationScript: 'curl -sfL https://get-llmos.1block.ai |',
       skipDownloadBinary: false,
+      useMirror:          false,
       llmosConfig:        {},
     };
   },
@@ -140,6 +141,7 @@ EOF`;
 
         out.push(`--token ${ decodedToken }`);
       }
+      if (this.useMirror) out.push('--mirror cn');
 
       if (this.server) out.push('--role server');
 
@@ -279,8 +281,13 @@ EOF`;
       </CopyCode>
       <Checkbox
         v-model="skipDownloadBinary"
-        class="row"
+        class="row mb-5"
         label-key="cluster.custom.registrationCommand.skipDownloadBinary"
+      />
+      <Checkbox
+        v-model="useMirror"
+        class="row"
+        label-key="cluster.custom.registrationCommand.useMirror"
       />
       <h5 class="row mt-20">
         <t

@@ -227,7 +227,7 @@ export default {
                 v-model="container.args"
                 :mode="mode"
                 :label="t('workload.container.command.args')"
-                :placeholder="t('generic.placeholder', {text: '--dtype=half, --cpu-offload-gb=10'}, true)"
+                :placeholder="t('generic.placeholder', {text: '--dtype=half --cpu-offload-gb=10'}, true)"
                 @input="update"
               />
             </slot>
