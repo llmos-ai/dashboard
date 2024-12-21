@@ -614,7 +614,7 @@ cluster:
       windowsDeprecatedForRKE1: RKE1 已弃用 Windows 支持。建议你迁移到 RKE2。
       insecure: "不安全：如果你的服务器具有自签名证书，选择此项以跳过 TLS 验证。"
       skipDownloadBinary: 如果你已经在 `/usr/local/bin/llmos` 中安装了 LLMOS 二进制文件，并且想要跳过下载步骤
-#        You can refer to the installation <a href="https://llmos.1block.ai/docs/installation/" target="_blank">documentation</a> for more detailed configuration options.
+      useMirror: "使用国内加速镜像"
       moreConfigs: |-
         <b>注意</b>: 你可以参考<a href="https://llmos.1block.ai/docs/installation/" target="_blank">安装文档</a>了解更多配置选项。
   credential:
