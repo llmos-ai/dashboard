@@ -85,7 +85,6 @@ export default {
       newReceiverType:      null,
       receiverActions:      [],
       receiverOptions,
-      // receiverTypes:        RECEIVERS_TYPES,
       selectedReceiverName: '',
       selectedRowValue:     null,
       view:                 _VIEW,
@@ -103,15 +102,6 @@ export default {
     },
   },
   methods: {
-
-    // translateReceiverTypes() {
-    //   return this.receiverTypes.map((receiverType) => {
-    //     return {
-    //       ...receiverType,
-    //       label: this.t(receiverType.label)
-    //     };
-    //   });
-    // },
     getReceiverDetailLink(receiverData) {
       if (receiverData && receiverData.name) {
         return this.value.getReceiverDetailLink(receiverData.name);

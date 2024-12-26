@@ -78,9 +78,9 @@ export default {
         { url: `/api/v1/namespaces/${ this.monitoringNamespace }/services/http:${ this.alertServiceEndpoint }:9093/proxy/api/v2/alerts` }
       );
 
-      if (alertsEvents.data) {
-        this.allAlerts = alertsEvents.data;
-      }
+      this.allAlerts = alertsEvents.filter((alert) => {
+        return alert.labels.severity === 'warning' || alert.labels.severity === 'critical';
+      });
     },
 
     async fetchDeps() {

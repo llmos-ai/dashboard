@@ -1,6 +1,21 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
+import { MONITORING_NAMESPACE } from '@shell/utils/monitoring';
+import Vue from 'vue';
 
 export default class PodMonitor extends SteveModel {
+  applyDefaults() {
+    if (this.spec) {
+      return this.spec;
+    }
+
+    const metadata = {
+      namespace: MONITORING_NAMESPACE,
+      labels:    { release: 'llmos-monitoring' }
+    };
+
+    Vue.set(this, 'metadata', metadata);
+  }
+
   get _detailLocation() {
     const id = this.id?.replace(/.*\//, '');
 
