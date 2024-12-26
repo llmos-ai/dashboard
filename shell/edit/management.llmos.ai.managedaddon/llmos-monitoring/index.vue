@@ -5,14 +5,14 @@ import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import { Checkbox } from '@components/Form/Checkbox';
 import { allHash } from '@shell/utils/promise';
-import { PVC, SECRET, STORAGE_CLASS } from '@shell/config/types';
+import { MANAGEMENT, PVC, STORAGE_CLASS } from '@shell/config/types';
 import jsyaml from 'js-yaml';
 import merge from 'lodash/merge';
-import { MONITORING_NAMESPACE } from '@shell/utils/monitoring';
 import Prometheus from '@shell/edit/management.llmos.ai.managedaddon/llmos-monitoring/prometheus/index';
 import Grafana from '@shell/edit/management.llmos.ai.managedaddon/llmos-monitoring/grafana/index';
 import Alerting from '@shell/edit/management.llmos.ai.managedaddon/llmos-monitoring/alerting/index';
 import ManagedAddonMixin from '@shell/edit/management.llmos.ai.managedaddon/mixin/addon';
+import { SETTING } from '@shell/config/settings';
 
 const weights = {
   basic:      5,
@@ -54,19 +54,15 @@ export default {
 
     // Fetch all the resources required for all the tabs asyncronously up front
     const hashPromises = {
-      pvcs:              this.$store.dispatch(`${ inStore }/findAll`, { type: PVC }),
-      storageClasses:    this.$store.dispatch(`${ inStore }/findAll`, { type: STORAGE_CLASS }),
-      // Used in Alerting tab
-      monitoringSecrets: this.$store.dispatch(`${ inStore }/findAll`, {
-        type: SECRET,
-        opt:  { namespaced: MONITORING_NAMESPACE }
-      }),
+      pvcs:           this.$store.dispatch(`${ inStore }/findAll`, { type: PVC }),
+      storageClasses: this.$store.dispatch(`${ inStore }/findAll`, { type: STORAGE_CLASS }),
+      serverUrl:      this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.SERVER_URL }),
     };
     const hash = await allHash(hashPromises);
 
     this.storageClasses = hash.storageClasses;
     this.pvcs = hash.pvcs;
-    this.monitoringSecrets = hash.monitoringSecrets;
+    this.valuesContent.global.llmos.url = hash.serverUrl?.value;
   },
 
   data() {
@@ -103,9 +99,9 @@ export default {
       defaultValuesContent,
       disableAggregateRoles: false,
       pvcs:                  [],
-      monitoringSecrets:     [],
       storageClasses:        [],
       weights,
+      serverUrl:             '',
       accessModes:           [
         {
           id:    'ReadWriteOnce',
@@ -311,7 +307,6 @@ export default {
           <Alerting
             v-model="valuesContent"
             :mode="mode"
-            :monitoringSecrets="monitoringSecrets"
           />
         </div>
       </Tab>

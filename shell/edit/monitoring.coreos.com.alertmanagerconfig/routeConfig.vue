@@ -32,6 +32,10 @@ export default {
     this.$set(this.value, 'matchers', this.value.matchers || []);
     this.$set(this.value, 'groupBy', this.value.groupBy || []);
 
+    if (!this.value.receiver && this.receiverOptions.length > 0) {
+      this.$set(this.value, 'receiver', this.receiverOptions[0]);
+    }
+
     return {
       isView:     _VIEW,
       matchTypes: [

@@ -186,19 +186,6 @@ export default {
     receiverNameDisabled() {
       return this.$route.query.mode === _VIEW;
     },
-    fvExtraRules() {
-      return {
-        duplicateName: () => {
-          const receiversArray = this.alertmanagerConfigResource.spec.receivers;
-          const receiverNamesArray = receiversArray.map((R) => R.name);
-          const receiversSet = new Set(receiverNamesArray);
-
-          if (receiversArray.length !== receiversSet.size) {
-            return this.$store.getters['i18n/t']('monitoring.alerting.validation.duplicatedReceiverName', { name: this.value.name });
-          }
-        }
-      };
-    }
   },
 
   watch: {
@@ -250,10 +237,6 @@ export default {
 
     redirectAfterCancel() {
       this.$router.push(this.alertmanagerConfigResource._detailLocation);
-    },
-
-    createAddOptions(receiverType) {
-      return receiverType.addOptions.map();
     },
 
     setError(err) {

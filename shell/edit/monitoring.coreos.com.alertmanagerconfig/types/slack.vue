@@ -4,10 +4,82 @@ import { Checkbox } from '@components/Form/Checkbox';
 import { Banner } from '@components/Banner';
 import SimpleSecretSelector from '@shell/components/form/SimpleSecretSelector';
 import { _CREATE, _VIEW } from '@shell/config/query-params';
+import CodeMirror from '@shell/components/CodeMirror.vue';
+
+export const DEFAULT_TEMPLATE = `{{- define "slack.llmos.text" -}}
+{{ template "llmos.text_multiple" . }}
+{{- end -}}
+{{- define "llmos.text_multiple" -}}
+*[GROUP - Details]*
+One or more alarms in this group have triggered a notification.
+{{- if gt (len .GroupLabels.Values) 0 }}
+*Group Labels:*
+  {{- range .GroupLabels.SortedPairs }}
+  • *{{ .Name }}:* \`{{ .Value }}\`
+  {{- end }}
+{{- end }}
+{{- if .ExternalURL }}
+*Link to AlertManager:* {{ .ExternalURL }}
+{{- end }}
+{{- range .Alerts }}
+{{ template "llmos.text_single" . }}
+{{- end }}
+{{- end -}}
+{{- define "llmos.text_single" -}}
+{{- if .Labels.alertname }}
+*[ALERT - {{ .Labels.alertname }}]*
+{{- else }}
+*[ALERT]*
+{{- end }}
+{{- if .Labels.severity }}
+*Severity:* \`{{ .Labels.severity }}\`
+{{- end }}
+{{- if .Labels.cluster }}
+*Cluster:*  {{ .Labels.cluster }}
+{{- end }}
+{{- if .Annotations.summary }}
+*Summary:* {{ .Annotations.summary }}
+{{- end }}
+{{- if .Annotations.message }}
+*Message:* {{ .Annotations.message }}
+{{- end }}
+{{- if .Annotations.description }}
+*Description:* {{ .Annotations.description }}
+{{- end }}
+{{- if .Annotations.runbook_url }}
+*Runbook URL:* <{{ .Annotations.runbook_url }}|:spiral_note_pad:>
+{{- end }}
+{{- with .Labels }}
+{{- with .Remove (stringSlice "alertname" "severity" "cluster") }}
+{{- if gt (len .) 0 }}
+*Additional Labels:*
+  {{- range .SortedPairs }}
+  • *{{ .Name }}:* \`{{ .Value }}\`
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- with .Annotations }}
+{{- with .Remove (stringSlice "summary" "message" "description" "runbook_url") }}
+{{- if gt (len .) 0 }}
+*Additional Annotations:*
+  {{- range .SortedPairs }}
+  • *{{ .Name }}:* \`{{ .Value }}\`
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}
+{{ template "slack.llmos.text" . }}
+`;
 
 export default {
   components: {
-    Banner, Checkbox, LabeledInput, SimpleSecretSelector
+    CodeMirror,
+    Banner,
+    Checkbox,
+    LabeledInput,
+    SimpleSecretSelector,
   },
   props: {
     mode: {
@@ -31,7 +103,7 @@ export default {
       this.$set(
         this.value,
         'text',
-        this.value.text || '{{ template "slack.rancher.text" . }}'
+        this.value.text || DEFAULT_TEMPLATE,
       );
     }
 
@@ -77,7 +149,11 @@ export default {
           name: ''
         };
       }
-    }
+    },
+
+    onInput(val) {
+      this.value.text = val;
+    },
   }
 };
 </script>
@@ -133,12 +209,29 @@ export default {
         />
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-10">
       <Checkbox
         v-model="value.sendResolved"
         :mode="mode"
         label="Enable send resolved alerts"
       />
+    </div>
+    <p class="mb-5">
+      Text Template:
+    </p>
+    <div class="mb-10">
+      <div class="col col-12">
+        <CodeMirror
+          ref="cm"
+          :value="value.text"
+          :options="{
+            mode: 'yaml',
+            lineNumbers: true,
+            lineWrapping: true,
+          }"
+          @onInput="onInput"
+        />
+      </div>
     </div>
   </div>
 </template>
