@@ -177,7 +177,6 @@ export default {
               v-for="permission in customPermissionsUpdate"
               :key="permission.key"
             >
-              123
               <Checkbox
                 v-model="permission.value"
                 :disabled="permission.locked"
