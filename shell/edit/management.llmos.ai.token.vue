@@ -149,7 +149,7 @@ export default {
       let ttl = 0;
 
       if (units === 'max') {
-        ttl = this.maxTTL * 60 * 1000;
+        ttl = this.maxTTL * 60;
       } else if ( units !== 'never' ) {
         const now = day();
         const expiry = day().add(increment, units);

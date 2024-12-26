@@ -25,7 +25,7 @@ export default {
     this.canChangePassword = await this.calcCanChangePassword();
 
     if (this.apiKeySchema) {
-      this.rows = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.TOKEN });
+      this.rows = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.TOKEN } );
     }
 
     // Get server url setting
