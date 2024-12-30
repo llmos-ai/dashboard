@@ -112,6 +112,8 @@ export default {
         this.llmosConfig.token = decodedToken;
       }
 
+      if (this.useMirror) this.llmosConfig.mirror = 'cn';
+
       // Determine role based on server presence
       this.llmosConfig.role = this.server ? 'server' : 'agent';
 
