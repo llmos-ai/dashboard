@@ -243,9 +243,13 @@ export default class ClusterNode extends SteveModel {
     }
 
     const vramUsage = gpuDevices.reduce((acc, gpu) => {
-      const vramUsed = gpu.status?.vramUsed || 0;
+      if (gpu.status.nodeName === this.name) {
+        const vramUsed = gpu.status?.vramUsed || 0;
 
-      return acc + vramUsed;
+        return acc + vramUsed;
+      }
+
+      return acc;
     }, 0);
 
     return parseSi(vramUsage.toString(), VRAM_PARSE_RULES.format);
