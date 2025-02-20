@@ -257,7 +257,7 @@ module.exports = function(dir, _appConfig) {
     '/v1':     configHelper.proxyWsOpts(api), // Management Steve API
     '/api-ui': configHelper.proxyOpts(api), // Browser API UI
     '/meta':   configHelper.proxyMetaOpts(api), // Browser API UI
-    '/v1-*':   configHelper.proxyOpts(api), // SAML, KDM, etc
+    '/v1-*':   configHelper.proxyOpts(api), // SAML, KDM, etc,
   };
 
   // HAR File support - load network responses from the specified .har file and use those rather than communicating to the Rancher server
@@ -346,7 +346,8 @@ module.exports = function(dir, _appConfig) {
             @import "~shell/assets/styles/base/_functions.scss";
             @import "~shell/assets/styles/base/_mixins.scss";
           `
-        }
+        },
+        postcss: { config: { path: path.resolve(__dirname, '../') } },
       }
     },
 

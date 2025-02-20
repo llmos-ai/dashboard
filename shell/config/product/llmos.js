@@ -37,6 +37,9 @@ import {
 
 export const NAME = 'llmos';
 
+export const PLAY_GROUND = 'Playground';
+export const CHAT = 'chat';
+
 export function init(store) {
   const {
     product,
@@ -60,11 +63,11 @@ export function init(store) {
     iconHeader:          require(`@shell/assets/images/pl/llm.svg`),
   });
 
+  basicType([NODE]);
   configureType(NODE, {
     isCreatable: true, isEditable: true, createButtonLabel: 'import'
   });
 
-  basicType([NODE]);
   virtualType({
     ifHaveType: NODE,
     labelKey:   'typeLabel."node"',
@@ -138,6 +141,34 @@ export function init(store) {
     ML_WORKLOAD_TYPES.MODEL_SERVICE,
   ]);
 
+  // playground
+  basicType(
+    [CHAT],
+    PLAY_GROUND
+  );
+  configureType(CHAT, {
+    isCreatable: false, isEditable: true, showListMasthead: false
+  });
+  virtualType({
+    labelKey: 'typeLabel.chat',
+    group:    PLAY_GROUND,
+    name:     CHAT,
+    route:    {
+      name:   `c-cluster-product-resource`,
+      params: { resource: CHAT }
+    },
+    exact: false,
+  });
+
+  // nvidia pages
+  basicType(
+    [
+      NVIDIA.CLUSTER_POLICY,
+      LLMOS.GPUDEVICE,
+    ],
+    'gpuManagement'
+  );
+
   virtualType({
     ifHaveType: NVIDIA.CLUSTER_POLICY,
     labelKey:   'typeLabel."nvidia.com.clusterpolicy"',
@@ -169,15 +200,6 @@ export function init(store) {
     exact:  false,
     weight: 201,
   });
-
-  // nvidia pages
-  basicType(
-    [
-      NVIDIA.CLUSTER_POLICY,
-      LLMOS.GPUDEVICE,
-    ],
-    'gpuManagement'
-  );
 
   // volume management tab
   configureType(LLMOS.VOLUME, {
@@ -335,9 +357,10 @@ export function init(store) {
   mapType(LLMOS.TOOL, store.getters['i18n/t'](`typeLabel.${ LLMOS.TOOL }`, { count: 2 }));
 
   weightGroup('gpuManagement', 100, true);
-  weightGroup('llmosStorage', 99, true);
-  weightGroup('monitoring', 98, true);
-  weightGroup('advanced', 97, true);
+  weightGroup('playground', 90, true);
+  weightGroup('llmosStorage', 80, true);
+  weightGroup('monitoring', 70, true);
+  weightGroup('advanced', 60, true);
 
   headers(ML_WORKLOAD_TYPES.RAY_CLUSTER, [STATE, NAME_COL, NAMESPACE_COL, ACCESS_URL, RAY_VERSION, CPU_LIMIT, MEMORY_LIMIT, API_URL, VGPU, VRAM, AGE, WORKLOAD_HEALTH_SCALE]);
   headers(ML_WORKLOAD_TYPES.NOTEBOOK, [STATE, NAME_COL, NAMESPACE_COL, VISIT, NOTEBOOK_TYPE, CPU_LIMIT, MEMORY_LIMIT, VGPU, VRAM, AGE, WORKLOAD_HEALTH_SCALE]);

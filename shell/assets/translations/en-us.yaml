@@ -5684,6 +5684,10 @@ typeLabel:
     {count, plural,
       one { Cloud Credential }
       other { Cloud Credentials }
+  chat: |-
+    {count, plural,
+      one { Chat }
+      other { Chat }
     }
   endpoints: |-
     {count, plural,

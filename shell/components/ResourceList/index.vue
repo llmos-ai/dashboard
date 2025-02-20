@@ -183,7 +183,9 @@ export default {
       {{ t('resourceList.nsFiltering') }}
     </template>
   </IconMessage>
-  <div v-else>
+  <div
+    v-else
+  >
     <Masthead
       v-if="showMasthead"
       :type-display="customTypeDisplay"
@@ -204,14 +206,16 @@ export default {
       :location="extensionLocation"
     />
 
-    <div v-if="hasListComponent">
+    <template
+      v-if="hasListComponent"
+    >
       <component
         :is="listComponent"
         :incremental-loading-indicator="showIncrementalLoadingIndicator"
         :rows="rows"
         v-bind="$data"
       />
-    </div>
+    </template>
     <ResourceTable
       v-else
       :schema="schema"

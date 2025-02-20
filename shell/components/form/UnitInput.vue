@@ -100,6 +100,11 @@ export default {
       default: null
     },
 
+    native: {
+      type:    Boolean,
+      default: false
+    },
+
     tooltip: {
       type:    [String, Object],
       default: null
@@ -203,6 +208,9 @@ export default {
         out = out === null ? null : `${ inputValue }${ this.unit }`;
       } else if ( this.outputAs === 'string' ) {
         out = out === null ? '' : `${ inputValue }`;
+      } else if (this.native) {
+        // do nothing
+        out = parseFloat(out);
       } else if (out) {
         out = this.unit ? parseSi(`${ out }${ this.unit }`) : parseInt(out);
       }
