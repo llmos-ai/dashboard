@@ -47,3 +47,23 @@ export function streamingSupported() {
 
   return supported;
 }
+
+export function modelStreamJson(url, opt, onData) {
+  opt = opt || {};
+  opt.method = opt.method || 'get';
+  opt.headers = opt.headers || {};
+  opt.headers.accept = 'application/json';
+
+  return fetch(url, opt)
+    .then((res) => {
+      if (res.status >= 400) {
+        const out = { message: 'Error Streaming' };
+
+        out.response = res;
+
+        return Promise.reject(out);
+      }
+
+      return res.body.getReader();
+    });
+}

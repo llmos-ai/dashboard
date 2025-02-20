@@ -50,6 +50,10 @@ export default Vue.extend({
       type:    Boolean,
       default: false,
     },
+    hasDivider: {
+      type:    Boolean,
+      default: true,
+    }
   }
 });
 </script>
@@ -69,7 +73,7 @@ export default Vue.extend({
           {{ title }}
         </slot>
       </div>
-      <hr>
+      <hr v-if="hasDivider">
       <div
         class="card-body"
         data-testid="card-body-slot"

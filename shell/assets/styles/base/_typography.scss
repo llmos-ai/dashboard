@@ -10,28 +10,29 @@ H1, H2, H3, H4, H5, H6 {
   margin: 0 0 10px 0;
 }
 
+// we should't use h* to set text font-size
 H1 {
-  font-size: 24px;
+  font-size: 24px !important;
 }
 
 H2 {
-  font-size: 21px;
+  font-size: 21px !important;
 }
 
 H3 {
-  font-size: 18px;
+  font-size: 18px !important;
 }
 
 H4 {
-  font-size: 16px;
+  font-size: 16px !important;
 }
 
 H5 {
-  font-size: 14px;
+  font-size: 14px !important;
 }
 
 H6 {
-  font-size: 12px;
+  font-size: 12px !important;
   text-transform: uppercase;
 }
 

@@ -128,17 +128,6 @@ module.exports = {
       }
     },
 
-    // Harvester
-    {
-      files: ['**/{harvester,harvester-manager}/**/*.{js,ts,vue}'],
-      rules: {
-        // Warnings
-        '@typescript-eslint/explicit-module-boundary-types': 'off',
-        'vue/html-self-closing':                             'off',
-        'vue/no-v-html':                                     'error',
-      }
-    },
-
     // Cypress PO
     {
       files: ['**/po/**/*.{js,ts,vue}'],

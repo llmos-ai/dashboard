@@ -90,6 +90,11 @@ export default (
     delay: {
       type:    Number,
       default: 0
+    },
+
+    customStyle: {
+      type:    Object,
+      default: () => ({})
     }
   },
 
@@ -285,6 +290,7 @@ export default (
         :value="value"
         :placeholder="_placeholder"
         autocapitalize="off"
+        :style="customStyle"
         :class="{ conceal: type === 'multiline-password' }"
         @input="onInput($event)"
         @focus="onFocus"
