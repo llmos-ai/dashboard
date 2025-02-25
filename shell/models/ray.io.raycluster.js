@@ -30,6 +30,7 @@ export default class RayCluster extends MlWorkload {
         },
         enableInTreeAutoscaling: true,
         headGroupSpec:           {
+          serviceType:    'NodePort',
           rayStartParams: {
             'num-cpus':       '0',
             'redis-password': '$REDIS_PASSWORD'

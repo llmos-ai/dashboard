@@ -23,17 +23,19 @@ export default class MlWorkload extends MLWorkloadService {
 
     if (type !== ML_WORKLOAD_TYPES.RAY_CLUSTER) {
       insertAt(out, 1, {
-        action:  'pause',
-        label:   this.t('asyncButton.pause.action'),
-        icon:    'icon icon-pause',
-        enabled: !!this.links.update && !this.isPaused
+        action:   'pause',
+        label:    this.t('asyncButton.pause.action'),
+        icon:     'icon icon-pause',
+        enabled:  !!this.links.update && !this.isPaused,
+        bulkable: true,
       });
 
       insertAt(out, 1, {
-        action:  'resume',
-        label:   this.t('asyncButton.resume.action'),
-        icon:    'icon icon-play',
-        enabled: !!this.links.update && this.isPaused
+        action:   'resume',
+        label:    this.t('asyncButton.resume.action'),
+        icon:     'icon icon-play',
+        enabled:  !!this.links.update && this.isPaused,
+        bulkable: true,
       });
     }
 

@@ -3,7 +3,7 @@ import SteveModel from '@shell/plugins/steve/steve-class';
 import { SETTING } from '@shell/config/settings';
 
 export const TYPE_TO_SVC_PORT_NAME_MAPPING = {
-  [ML_WORKLOAD_TYPES.RAY_CLUSTER]:   'dashboard',
+  [ML_WORKLOAD_TYPES.RAY_CLUSTER]:   'client',
   [ML_WORKLOAD_TYPES.NOTEBOOK]:      'http',
   [ML_WORKLOAD_TYPES.MODEL_SERVICE]: 'http',
 };
@@ -33,12 +33,13 @@ export default class MLWorkloadService extends SteveModel {
     const url = new URL(serverURL);
     const portName = TYPE_TO_SVC_PORT_NAME_MAPPING[this.type];
     const port = svc.spec.ports.find((p) => p.name === portName);
+    const protocol = this.type === ML_WORKLOAD_TYPES.RAY_CLUSTER ? 'ray' : 'http';
 
     switch (svc.spec.type) {
     case 'NodePort':
-      return `http://${ url.hostname }:${ port.nodePort }`;
+      return `${ protocol }://${ url.hostname }:${ port.nodePort }`;
     case 'LoadBalancer':
-      return `http://${ url.hostname }:${ port.port }`;
+      return `${ protocol }://${ url.hostname }:${ port.port }`;
     default:
       return `${ window.location.origin }/api/v1/namespaces/${ svc.metadata.namespace }/services/${ svc.metadata.name }:${ port.name }/proxy`;
     }
