@@ -112,12 +112,12 @@ export default {
   >
     <template #col:access="{row}">
       <td>
-        <n-link
+        <router-link
           class="icon"
           :to="{ name: `c-cluster-product-resource-namespace-id-${dashboardName}`, params: { clusterName: row.name, resource: row.type, namespace: row.namespace, id: row.metadata?.name }}"
         >
           Manage <i class="icon icon-external-link" />
-        </n-link>
+        </router-link>
       </td>
     </template>
   </ResourceTable>

@@ -52,7 +52,7 @@ export default {
 <template>
   <div class="taints">
     <KeyValue
-      v-model="localValue"
+      v-model:value="localValue"
       :title="t('tableHeaders.taints')"
       :mode="mode"
       :as-map="false"
@@ -71,11 +71,11 @@ export default {
 
       <template #col:effect="{row, queueUpdate}">
         <Select
-          v-model="row.effect"
+          v-model:value="row.effect"
           :options="effectOptions"
           :disabled="disabled"
           class="compact-select"
-          @input="queueUpdate"
+          @update:value="queueUpdate"
         />
       </template>
     </KeyValue>

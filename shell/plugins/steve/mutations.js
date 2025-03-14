@@ -1,5 +1,5 @@
-import { addObject } from '@shell/utils/array';
-import { NAMESPACE, POD, SCHEMA } from '@shell/config/types';
+import { addObject } from "@shell/utils/array";
+import { NAMESPACE, POD, SCHEMA } from "@shell/config/types";
 import {
   forgetType,
   resetStore,
@@ -8,12 +8,11 @@ import {
   remove,
   batchChanges,
   replace,
-  loadAdd
-} from '@shell/plugins/dashboard-store/mutations';
-import { perfLoadAll } from '@shell/plugins/steve/performanceTesting';
-import Vue from 'vue';
-import { classify } from '@shell/plugins/dashboard-store/classify';
-import SteveSchema from '@shell/models/steve-schema';
+  loadAdd,
+} from "@shell/plugins/dashboard-store/mutations";
+import { perfLoadAll } from "@shell/plugins/steve/performanceTesting";
+import { classify } from "@shell/plugins/dashboard-store/classify";
+import SteveSchema from "@shell/models/steve-schema";
 
 function registerNamespace(state, namespace) {
   let cache = state.podsByNamespace[namespace];
@@ -21,10 +20,10 @@ function registerNamespace(state, namespace) {
   if (!cache) {
     cache = {
       list: [],
-      map:  new Map()
+      map: new Map(),
     };
 
-    Vue.set(state.podsByNamespace, namespace, cache);
+    state.podsByNamespace[namespace] = cache;
   }
 
   return cache;
@@ -43,7 +42,8 @@ function updatePodsByNamespaceCache(state, ctx, pods, loadAll) {
 
   // Go through all of the pods and populate cache by namespace
   pods.forEach((entry) => {
-    const classyResource = state.types[POD].map.get(entry.id) || classify(ctx, entry);
+    const classyResource =
+      state.types[POD].map.get(entry.id) || classify(ctx, entry);
 
     const cache = registerNamespace(state, classyResource.namespace); // Raw entry.namespace doesn't exist, so use classy
     const existing = cache.map.get(entry.id);
@@ -69,7 +69,7 @@ function cleanPodsByNamespaceCache(state, resource) {
     if (cache) {
       const inList = cache.list.findIndex((p) => p.id === resource.id);
 
-      if ( inList >= 0 ) {
+      if (inList >= 0) {
         cache.list.splice(inList, 1);
       }
       cache.map.delete(resource.id);
@@ -85,21 +85,24 @@ export default {
     batchChanges(state, { ctx, batch });
 
     if (batch[POD]) {
-      const newAndChangedPods = Object.entries(batch[POD]).reduce((pods, [id, pod]) => {
-        if (pod.id) {
-          // resource.create and resource.change
-          pods.push(pod);// must NOT be same reference from store
-        } else {
-          // resource.remove (note - we've already lost the resource in the store, so pass through mocked one)
-          cleanPodsByNamespaceCache(state, {
-            id,
-            type:      POD,
-            namespace: id.substring(0, id.indexOf('/'))
-          });
-        }
+      const newAndChangedPods = Object.entries(batch[POD]).reduce(
+        (pods, [id, pod]) => {
+          if (pod.id) {
+            // resource.create and resource.change
+            pods.push(pod); // must NOT be same reference from store
+          } else {
+            // resource.remove (note - we've already lost the resource in the store, so pass through mocked one)
+            cleanPodsByNamespaceCache(state, {
+              id,
+              type: POD,
+              namespace: id.substring(0, id.indexOf("/")),
+            });
+          }
 
-        return pods;
-      }, []);
+          return pods;
+        },
+        []
+      );
 
       updatePodsByNamespaceCache(state, ctx, newAndChangedPods, false);
     }
@@ -117,22 +120,23 @@ export default {
     }
   },
 
-  loadAll(state, {
-    type,
-    data,
-    ctx,
-    skipHaveAll,
-    namespace,
-    revision,
-    pagination
-  }) {
+  loadAll(
+    state,
+    { type, data, ctx, skipHaveAll, namespace, revision, pagination }
+  ) {
     // Performance testing in dev and when env var is set
     if (process.env.dev && !!process.env.perfTest) {
       data = perfLoadAll(type, data);
     }
 
     const proxies = loadAll(state, {
-      type, data, ctx, skipHaveAll, namespace, revision, pagination
+      type,
+      data,
+      ctx,
+      skipHaveAll,
+      namespace,
+      revision,
+      pagination,
     });
 
     // If we loaded a set of pods, then update the podsByNamespace cache
@@ -152,7 +156,7 @@ export default {
   },
 
   forgetType(state, type) {
-    if ( forgetType(state, type) ) {
+    if (forgetType(state, type)) {
       Object.keys(state.inError).forEach((key) => {
         if (key.startsWith(type)) {
           delete state.inError[key];
@@ -166,7 +170,7 @@ export default {
 
     resetStore(state, this.commit);
 
-    this.commit(`${ state.config.namespace }/resetSubscriptions`);
+    this.commit(`${state.config.namespace}/resetSubscriptions`);
 
     // Clear the podsByNamespace cache
     state.podsByNamespace = {};
@@ -192,7 +196,9 @@ export default {
 
   loadAdd(state, { type, data: allLatest, ctx }) {
     loadAdd(state, {
-      type, data: allLatest, ctx
+      type,
+      data: allLatest,
+      ctx,
     });
 
     if (allLatest.length && allLatest[0].type === POD) {
@@ -204,5 +210,5 @@ export default {
     remove(state, obj, this.getters);
 
     cleanPodsByNamespaceCache(state, obj);
-  }
+  },
 };

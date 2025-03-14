@@ -164,7 +164,7 @@ export default {
         return;
       }
       if (!this.value.metadata.annotations) {
-        this.$set(this.value.metadata, 'annotations', {});
+        this.value.metadata['annotations'] = {};
       }
       this.value.metadata.annotations[DESCRIPTION] = this.description;
     },
@@ -177,7 +177,7 @@ export default {
     <div class="pl-10 pr-10">
       <LabeledInput
         key="description"
-        v-model="description"
+        v-model:value="description"
         :placeholder="t('accountAndKeys.apiKeys.add.description.placeholder')"
         label-key="accountAndKeys.apiKeys.add.description.label"
         mode="edit"
@@ -190,20 +190,20 @@ export default {
 
       <div class="ml-10">
         <RadioGroup
-          v-model="form.expiryType"
+          v-model:value="form.expiryType"
           :options="expiryOptions"
           class="mr-20"
           name="expiryGroup"
         />
         <div class="ml-20 mt-10 expiry">
           <input
-            v-model="form.customExpiry"
+            v-model:value="form.customExpiry"
             :disabled="form.expiryType !== 'custom'"
             type="number"
             :mode="mode"
           >
           <Select
-            v-model="form.customExpiryUnits"
+            v-model:value="form.customExpiryUnits"
             :disabled="form.expiryType !== 'custom'"
             :options="expiryUnitsOptions"
             :clearable="false"

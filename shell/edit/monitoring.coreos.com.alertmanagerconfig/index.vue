@@ -31,20 +31,29 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
     const alertmanagerConfigId = this.value.id;
 
-    const { receiverSchema, routeSchema } = await fetchAlertManagerConfigSpecs(this.$store);
+    const { receiverSchema, routeSchema } = await fetchAlertManagerConfigSpecs(
+      this.$store
+    );
 
     this.receiverSchema = receiverSchema;
     this.routeSchema = routeSchema;
 
     if (alertmanagerConfigId) {
-      const alertmanagerConfigResource = await this.$store.dispatch(`${ inStore }/find`, { type: MONITORING.ALERTMANAGER_CONFIG, id: alertmanagerConfigId });
+      const alertmanagerConfigResource = await this.$store.dispatch(
+        `${inStore}/find`,
+        { type: MONITORING.ALERTMANAGER_CONFIG, id: alertmanagerConfigId }
+      );
 
       this.alertmanagerConfigId = alertmanagerConfigId;
       this.alertmanagerConfigResource = alertmanagerConfigResource;
-      this.alertmanagerConfigDetailRoute = alertmanagerConfigResource?._detailLocation;
+      this.alertmanagerConfigDetailRoute =
+        alertmanagerConfigResource?._detailLocation;
 
-      const alertmanagerConfigActions = alertmanagerConfigResource.availableActions;
-      const receiverActions = alertmanagerConfigResource.getReceiverActions(alertmanagerConfigActions);
+      const alertmanagerConfigActions =
+        alertmanagerConfigResource.availableActions;
+      const receiverActions = alertmanagerConfigResource.getReceiverActions(
+        alertmanagerConfigActions
+      );
 
       this.receiverActions = receiverActions;
     }
@@ -54,47 +63,48 @@ export default {
     this.value.applyDefaults();
 
     const defaultReceiverValues = {};
-    const receiverOptions = (this.value?.spec?.receivers || []).map((receiver) => receiver.name);
+    const receiverOptions = (this.value?.spec?.receivers || []).map(
+      (receiver) => receiver.name
+    );
 
     return {
-      actionMenuTargetElement:  null,
-      actionMenuTargetEvent:    null,
-      config:                   _CONFIG,
-      create:                   _CREATE,
-      createReceiverLink:       this.value.getCreateReceiverRoute(),
+      actionMenuTargetElement: null,
+      actionMenuTargetEvent: null,
+      config: _CONFIG,
+      create: _CREATE,
+      createReceiverLink: this.value.getCreateReceiverRoute(),
       defaultReceiverValues,
       receiverActionMenuIsOpen: false,
-      receiverTableHeaders:     [
+      receiverTableHeaders: [
         {
-          name:          'name',
-          labelKey:      'tableHeaders.name',
-          value:         'name',
-          sort:          ['nameSort'],
-          formatter:     'LinkDetail',
+          name: 'name',
+          labelKey: 'tableHeaders.name',
+          value: 'name',
+          sort: ['nameSort'],
+          formatter: 'LinkDetail',
           canBeVariable: true,
         },
         {
-          name:          'type',
-          labelKey:      'tableHeaders.type',
-          value:         'name',
-          formatter:     'ReceiverIcons',
+          name: 'type',
+          labelKey: 'tableHeaders.type',
+          value: 'name',
+          formatter: 'ReceiverIcons',
           canBeVariable: true,
-        }
+        },
         // Add more columns
       ],
-      newReceiverType:      null,
-      receiverActions:      [],
+      newReceiverType: null,
+      receiverActions: [],
       receiverOptions,
       selectedReceiverName: '',
-      selectedRowValue:     null,
-      view:                 _VIEW,
+      selectedRowValue: null,
+      view: _VIEW,
     };
   },
 
   computed: {
-
     editorMode() {
-      if ( this.mode === _VIEW ) {
+      if (this.mode === _VIEW) {
         return EDITOR_MODES.VIEW_CODE;
       }
 
@@ -130,7 +140,10 @@ export default {
         // We use a plus sign as the delimiter to separate the
         // name because the plus is not an allowed character in
         // Kubernetes names.
-        this.selectedReceiverName = targetElement.id.split('+').slice(2).join('');
+        this.selectedReceiverName = targetElement.id
+          .split('+')
+          .slice(2)
+          .join('');
 
         this.toggleReceiverActionMenu();
       } else {
@@ -140,13 +153,23 @@ export default {
     goToEdit() {
       // 'goToEdit' is the exact name of an action for AlertmanagerConfig
       // and this method executes the action.
-      this.$router.push(this.alertmanagerConfigResource.getEditReceiverConfigRoute(this.selectedReceiverName, _EDIT));
+      this.$router.push(
+        this.alertmanagerConfigResource.getEditReceiverConfigRoute(
+          this.selectedReceiverName,
+          _EDIT
+        )
+      );
     },
 
     goToEditYaml() {
       // 'goToEditYaml' is the exact name of an action for AlertmanagerConfig
       // and this method executes the action.
-      this.$router.push(this.alertmanagerConfigResource.getEditReceiverYamlRoute(this.selectedReceiverName, _EDIT));
+      this.$router.push(
+        this.alertmanagerConfigResource.getEditReceiverYamlRoute(
+          this.selectedReceiverName,
+          _EDIT
+        )
+      );
     },
     promptRemove() {
       // 'promptRemove' is the exact name of an action for AlertmanagerConfig
@@ -155,16 +178,18 @@ export default {
       const nameOfReceiverToDelete = this.selectedReceiverName;
       // Remove it from the configuration of the parent AlertmanagerConfig
       // resource.
-      const existingReceivers = this.alertmanagerConfigResource.spec.receivers || [];
+      const existingReceivers =
+        this.alertmanagerConfigResource.spec.receivers || [];
       const receiversMinusDeletedItem = existingReceivers.filter((receiver) => {
         return receiver.name !== nameOfReceiverToDelete;
       });
 
-      this.alertmanagerConfigResource.spec.receivers = receiversMinusDeletedItem;
+      this.alertmanagerConfigResource.spec.receivers =
+        receiversMinusDeletedItem;
       // After saving the AlertmanagerConfig, the resource has been deleted.
       this.alertmanagerConfigResource.save(...arguments);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -179,22 +204,18 @@ export default {
     :resource="value"
     :subtypes="[]"
     :cancel-event="true"
-    @error="e=>errors = e"
+    @error="(e) => (errors = e)"
     @finish="save"
     @cancel="done"
   >
     <NameNsDescription
-      v-model="value"
+      v-model:value="value"
       :mode="mode"
       :namespaced="isNamespaced"
     />
 
     <Tabbed>
-      <Tab
-        :label="t('monitoring.route.label')"
-        :weight="1"
-        name="route"
-      >
+      <Tab :label="t('monitoring.route.label')" :weight="1" name="route">
         <RouteConfig
           :value="value.spec.route"
           :mode="mode"
@@ -216,24 +237,30 @@ export default {
           @clickedActionButton="setActionMenuState"
         >
           <template #header-button>
-            <router-link
-              v-if="createReceiverLink && createReceiverLink.name"
-              :to="mode !== create ? createReceiverLink : {}"
-            >
-              <button
-                class="btn role-primary"
-                :disabled="mode === create"
-                :tooltip="t('monitoring.alertmanagerConfig.disabledReceiverButton')"
-                data-testid="v2-monitoring-add-receiver"
+            <div class="mt-10">
+              <router-link
+                v-if="createReceiverLink && createReceiverLink.name"
+                :to="mode !== create ? createReceiverLink : {}"
               >
-                {{ t('monitoring.receiver.addReceiver') }}
-                <i
-                  v-if="mode === create"
-                  v-clean-tooltip="t('monitoring.alertmanagerConfig.disabledReceiverButton')"
-                  class="icon icon-info"
-                />
-              </button>
-            </router-link>
+                <a-button
+                  type="primary"
+                  :disabled="mode === create"
+                  :tooltip="
+                    t('monitoring.alertmanagerConfig.disabledReceiverButton')
+                  "
+                  data-testid="v2-monitoring-add-receiver"
+                >
+                  {{ t('monitoring.receiver.addReceiver') }}
+                  <i
+                    v-if="mode === create"
+                    v-clean-tooltip="
+                      t('monitoring.alertmanagerConfig.disabledReceiverButton')
+                    "
+                    class="icon icon-info"
+                  />
+                </a-button>
+              </router-link>
+            </div>
           </template>
         </ResourceTable>
       </Tab>
@@ -253,21 +280,21 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  h3 {
-    margin-top: 2em;
+h3 {
+  margin-top: 2em;
+}
+input {
+  margin-top: 1em;
+}
+.route {
+  &[real-mode='view'] .label {
+    color: var(--input-label);
   }
-  input {
-    margin-top: 1em;
-  }
-  .route {
-    &[real-mode=view] .label {
-      color: var(--input-label);
-    }
-  }
-  button {
-    margin-left: 0.5em;
-  }
-  a:hover {
-      text-decoration: none;
-  }
+}
+button {
+  margin-left: 0.5em;
+}
+a:hover {
+  text-decoration: none;
+}
 </style>

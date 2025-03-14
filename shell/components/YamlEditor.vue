@@ -9,45 +9,45 @@ import FileDiff from './FileDiff';
 export const EDITOR_MODES = {
   EDIT_CODE: 'EDIT_CODE',
   VIEW_CODE: 'VIEW_CODE',
-  DIFF_CODE: 'DIFF_CODE'
+  DIFF_CODE: 'DIFF_CODE',
 };
 
 export default {
   components: {
     CodeMirror,
-    FileDiff
+    FileDiff,
   },
   props: {
     editorMode: {
-      type:    String,
+      type: String,
       default: EDITOR_MODES.EDIT_CODE,
       validator(value) {
         return Object.values(EDITOR_MODES).includes(value);
-      }
+      },
     },
 
     asObject: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
 
     initialYamlValues: {
-      type:    [String, Object],
+      type: [String, Object],
       default: '',
     },
 
     scrolling: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
     },
 
     value: {
-      type:    [String, Object],
+      type: [String, Object],
       default: '',
     },
 
     hidePreviewButtons: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
 
@@ -56,15 +56,15 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type:    String,
-      default: 'yaml-editor'
+      type: String,
+      default: 'yaml-editor',
     },
 
     // Allow the editor to be disabled
     disabled: {
-      type:    Boolean,
-      default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
@@ -72,19 +72,19 @@ export default {
     let curValue;
     let original;
 
-    if ( this.asObject ) {
+    if (this.asObject) {
       curValue = saferDump(value);
     } else {
       curValue = value || '';
     }
 
-    if ( this.asObject && initialYamlValues) {
+    if (this.asObject && initialYamlValues) {
       original = saferDump(initialYamlValues);
     } else {
       original = initialYamlValues;
     }
 
-    if ( isEmpty(original) ) {
+    if (isEmpty(original)) {
       original = value;
     }
 
@@ -97,7 +97,7 @@ export default {
 
       const gutters = [];
 
-      if ( !readOnly ) {
+      if (!readOnly) {
         gutters.push('CodeMirror-lint-markers');
       }
 
@@ -106,14 +106,14 @@ export default {
       return {
         readOnly,
         gutters,
-        mode:            'yaml',
-        lint:            !readOnly,
-        lineNumbers:     !readOnly,
+        mode: 'yaml',
+        lint: !readOnly,
+        lineNumbers: !readOnly,
         styleActiveLine: true,
-        tabSize:         2,
-        indentWithTabs:  false,
-        cursorBlinkRate: ( readOnly ? -1 : 530 ),
-        extraKeys:       {
+        tabSize: 2,
+        indentWithTabs: false,
+        cursorBlinkRate: readOnly ? -1 : 530,
+        extraKeys: {
           'Ctrl-Space': 'autocomplete',
 
           Tab: (cm) => {
@@ -128,7 +128,7 @@ export default {
 
           'Shift-Tab': (cm) => {
             cm.indentSelection('subtract');
-          }
+          },
         },
         // @TODO find a better way to display the outline
         // foldOptions: {
@@ -148,7 +148,9 @@ export default {
     diffMode: mapPref(DIFF),
 
     showCodeEditor() {
-      return [EDITOR_MODES.EDIT_CODE, EDITOR_MODES.VIEW_CODE].includes(this.editorMode);
+      return [EDITOR_MODES.EDIT_CODE, EDITOR_MODES.VIEW_CODE].includes(
+        this.editorMode
+      );
     },
   },
 
@@ -162,26 +164,26 @@ export default {
 
   methods: {
     focus() {
-      if ( this.$refs.cm ) {
+      if (this.$refs.cm) {
         this.$refs.cm.focus();
       }
     },
 
     refresh() {
-      if ( this.$refs.cm ) {
+      if (this.$refs.cm) {
         this.$refs.cm.refresh();
       }
     },
 
     onInput(value) {
-      if ( !this.asObject ) {
+      if (!this.asObject) {
         this.$emit('input', ...arguments);
       }
 
       try {
         const parsed = jsyaml.load(value);
 
-        if ( this.asObject ) {
+        if (this.asObject) {
           this.$emit('input', parsed);
         } else {
           this.$emit('newObject', parsed);
@@ -202,37 +204,29 @@ export default {
     updateValue(value) {
       this.curValue = value;
       this.$refs.cm.updateValue(value);
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
   <div class="yaml-editor">
     <div class="text-right">
-      <span
+      <a-space
         v-if="isPreview && !hidePreviewButtons"
         v-trim-whitespace
-        class="btn-group btn-sm diff-mode"
+        class="mt-10"
       >
-        <button
-          type="button"
-          class="btn btn-sm bg-default"
-          :class="{'active': diffMode !== 'split'}"
-          @click="diffMode='unified'"
-        >Unified</button>
-        <button
-          type="button"
-          class="btn btn-sm bg-default"
-          :class="{'active': diffMode === 'split'}"
-          @click="diffMode='split'"
-        >Split</button>
-      </span>
+        <a-radio-group v-model:value="diffMode" size="small">
+          <a-radio-button value="unified">Unified</a-radio-button>
+          <a-radio-button value="split">Split</a-radio-button>
+        </a-radio-group>
+      </a-space>
     </div>
     <CodeMirror
       v-if="showCodeEditor"
       ref="cm"
-      :class="{fill: true, scrolling: scrolling}"
+      :class="{ fill: true, scrolling: scrolling }"
       :value="curValue"
       :options="codeMirrorOptions"
       :disabled="disabled"
@@ -243,7 +237,7 @@ export default {
     />
     <FileDiff
       v-else
-      :class="{fill: true, scrolling: scrolling}"
+      :class="{ fill: true, scrolling: scrolling }"
       :filename="'.yaml'"
       :side-by-side="diffMode === 'split'"
       :orig="original"
@@ -262,7 +256,7 @@ export default {
     flex: 1;
   }
 
-  ::v-deep .code-mirror  {
+  :deep() .code-mirror {
     position: relative;
 
     .CodeMirror {
@@ -271,14 +265,6 @@ export default {
         background-color: var(--yaml-editor-bg);
       }
     }
-  }
-
-  .diff-mode {
-    background-color: var(--diff-header-bg);
-    padding: 5px 5px;
-
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
   }
 
   .d2h-file-wrapper {

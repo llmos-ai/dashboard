@@ -1,10 +1,12 @@
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 import { _VIEW } from '@shell/config/query-params';
-import AsyncButton, { AsyncButtonCallback } from '@shell/components/AsyncButton.vue';
+import AsyncButton, {
+  AsyncButtonCallback,
+} from '@shell/components/AsyncButton.vue';
 import Banner from '@components/Banner/Banner.vue';
 
-export default Vue.extend({
+export default defineComponent({
   components: { AsyncButton, Banner },
 
   props: {
@@ -13,19 +15,19 @@ export default Vue.extend({
      * passed to asyncButton to determine lables of the button
      */
     mode: {
-      type:     String,
+      type: String,
       required: true,
     },
 
     errors: {
-      type:    Array,
+      type: Array,
       default: null,
     },
 
     disableSave: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
-    }
+    },
   },
 
   computed: {
@@ -41,22 +43,16 @@ export default Vue.extend({
 
     done() {
       this.$emit('done');
-    }
-  }
+    },
+  },
 });
 </script>
 <template>
   <div v-if="!isView">
     <div class="spacer-small" />
 
-    <div
-      v-for="(err,idx) in errors"
-      :key="idx"
-    >
-      <Banner
-        color="error"
-        :label="err"
-      />
+    <div v-for="(err, idx) in errors" :key="idx">
+      <Banner color="error" :label="err" />
     </div>
     <div class="buttons">
       <div class="left">
@@ -64,19 +60,16 @@ export default Vue.extend({
       </div>
       <div class="right">
         <slot name="cancel">
-          <button
-            type="button"
-            class="btn role-secondary"
-            @click="done"
-          >
+          <a-button @click="done">
             <t k="generic.cancel" />
-          </button>
+          </a-button>
         </slot>
         <slot name="middle" />
         <slot name="save">
           <AsyncButton
             v-if="!isView"
             :mode="mode"
+            type="primary"
             :disabled="disableSave"
             @click="save"
           />
@@ -87,28 +80,30 @@ export default Vue.extend({
   </div>
 </template>
 
-<style lang='scss'>
-  .buttons {
-    display: grid;
-    grid-template-areas:  "left right";
-    grid-template-columns: "min-content auto";
+<style lang="scss">
+.buttons {
+  display: grid;
+  grid-template-areas: 'left right';
+  grid-template-columns: 'min-content auto';
 
-    .left {
-      grid-area: left;
-      text-align: left;
+  .left {
+    grid-area: left;
+    text-align: left;
 
-      .btn, button {
-        margin: 0 $column-gutter 0 0;
-      }
-    }
-
-    .right {
-      grid-area: right;
-      text-align: right;
-
-      .btn, button {
-        margin: 0 0 0 $column-gutter;
-      }
+    .btn,
+    button {
+      margin: 0 $column-gutter 0 0;
     }
   }
+
+  .right {
+    grid-area: right;
+    text-align: right;
+
+    .btn,
+    button {
+      margin: 0 0 0 $column-gutter;
+    }
+  }
+}
 </style>

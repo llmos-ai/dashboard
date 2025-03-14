@@ -1,5 +1,4 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
-import Vue from 'vue';
 import { set } from '@shell/utils/object';
 
 export default class CephFileSystem extends SteveModel {
@@ -41,7 +40,7 @@ export default class CephFileSystem extends SteveModel {
       }
     };
 
-    Vue.set(this, 'metadata', value.metadata);
+    this['metadata'] = value.metadata;
     set(this, 'spec', this.spec || value.spec);
   }
 

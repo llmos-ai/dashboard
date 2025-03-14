@@ -1,12 +1,8 @@
-<script>
+<script setup>
+import { useStore } from "vuex";
 
-export default {
-  layout: 'unauthenticated',
-
-  async asyncData({ redirect, store, router }) {
-    await store.dispatch('auth/logout', null, { root: true });
-  }
-};
+const store = useStore();
+await store.dispatch("auth/logout", { force: true }, { root: true });
 </script>
 
 <template>
@@ -16,11 +12,3 @@ export default {
     </div>
   </main>
 </template>
-<style lang="scss" scoped>
-  main > div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-</style>

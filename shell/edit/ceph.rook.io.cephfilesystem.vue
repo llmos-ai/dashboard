@@ -103,7 +103,7 @@ export default {
           },
         };
 
-        this.$set(this.spec.metadataServer, 'resources', cleanUp(out));
+        this.spec.metadataServer['resources'] = cleanUp(out);
       },
     },
   },
@@ -164,7 +164,7 @@ export default {
         />
 
         <ResourceTabs
-          v-model="value"
+          v-model:value="value"
           class="mt-15"
           :need-conditions="false"
           :need-related="false"
@@ -179,17 +179,17 @@ export default {
             <div class="row">
               <div class="col span-6 mb-10">
                 <Checkbox
-                  v-model="spec.preserveFilesystemOnDelete"
+                  v-model:value="spec.preserveFilesystemOnDelete"
                   label="Preserve Filesystem On Delete"
                   :mode="mode"
                   tooltip="Data will be deleted permanently if preserveFilesystemOnDelete is not enabled"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
             </div>
 
             <ArrayListGrouped
-              v-model="spec.dataPools"
+              v-model:value="spec.dataPools"
               class="mb-20"
               :mode="mode"
               :default-add-value="{ ...defaultDataPool }"
@@ -214,12 +214,12 @@ export default {
             <div class="row">
               <div class="col span-6 mb-10">
                 <UnitInput
-                  v-model="spec.metadataPool.replicated.size"
+                  v-model:value="spec.metadataPool.replicated.size"
                   :hide-unit="true"
                   label="Replicas Per Failure Domain"
                   required
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
             </div>
@@ -229,31 +229,31 @@ export default {
             <div class="row">
               <div class="col span-6 mb-10">
                 <UnitInput
-                  v-model="spec.metadataServer.activeCount"
+                  v-model:value="spec.metadataServer.activeCount"
                   :hide-unit="true"
                   label="Active Count"
                   required
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
               <div class="col span-6 mb-10">
                 <Checkbox
-                  v-model="spec.metadataServer.activeStandby"
+                  v-model:value="spec.metadataServer.activeStandby"
                   label="Enable Active Standby"
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
             </div>
 
             <div class="mb-20">
               <ContainerResourceLimit
-                v-model="flatResources"
+                v-model:value="flatResources"
                 :mode="mode"
                 :show-tip="false"
                 :handle-gpu-limit="false"
-                @input="update"
+                @update:value="update"
               />
             </div>
           </Tab>

@@ -1,56 +1,56 @@
-import SteveModel from '@shell/plugins/steve/steve-class';
-import { insertAt } from '@shell/utils/array';
-import { POD } from '@shell/config/types';
-import Vue from 'vue';
-import { set } from '@shell/utils/object';
+import SteveModel from "@shell/plugins/steve/steve-class";
+import { insertAt } from "@shell/utils/array";
+import { POD } from "@shell/config/types";
+
+import { set } from "@shell/utils/object";
 
 export default class CephCluster extends SteveModel {
   applyDefaults() {
     const value = {
-      apiVersion: 'ceph.rook.io/v1',
-      kind:       'CephCluster',
-      metadata:   {
-        name:        '',
-        labels:      {},
+      apiVersion: "ceph.rook.io/v1",
+      kind: "CephCluster",
+      metadata: {
+        name: "",
+        labels: {},
         annotations: {},
       },
       spec: {
-        cephVersion:     { image: 'quay.io/ceph/ceph:v18.2.4' },
-        dataDirHostPath: '/var/lib/rook',
-        mon:             {
-          count:                3,
+        cephVersion: { image: "quay.io/ceph/ceph:v18.2.4" },
+        dataDirHostPath: "/var/lib/rook",
+        mon: {
+          count: 3,
           allowMultiplePerNode: false,
         },
-        mgr:          { count: 1 },
+        mgr: { count: 1 },
         logCollector: {
-          enabled:     true,
-          maxLogSize:  '500M',
-          periodicity: '12h',
+          enabled: true,
+          maxLogSize: "500M",
+          periodicity: "12h",
         },
         storage: {
-          useAllNodes:   true,
+          useAllNodes: true,
           useAllDevices: true,
-          failureDomain: 'host',
-        }
-      }
+          failureDomain: "host",
+        },
+      },
     };
 
-    Vue.set(this, 'metadata', value.metadata);
-    set(this, 'spec', this.spec || value.spec);
+    this["metadata"] = value.metadata;
+    set(this, "spec", this.spec || value.spec);
   }
 
   get _availableActions() {
     let out = super._availableActions;
 
     insertAt(out, 0, {
-      action:  'openToolbox',
+      action: "openToolbox",
       enabled: !!this.links.view,
-      icon:    'icon icon-fw icon-chevron-right',
-      label:   this.t('action.openToolbox'),
-      total:   1,
+      icon: "icon icon-fw icon-chevron-right",
+      label: this.t("action.openToolbox"),
+      total: 1,
     });
 
-    const toFilter = ['cloneYaml'];
+    const toFilter = ["cloneYaml"];
 
     out = out.filter((action) => {
       if (!toFilter.includes(action.action)) {
@@ -64,32 +64,41 @@ export default class CephCluster extends SteveModel {
   async openToolbox() {
     const pods = await this.matchingToolbox();
 
-    for ( const pod of pods ) {
-      if ( pod.isRunning ) {
+    for (const pod of pods) {
+      if (pod.isRunning) {
         pod.openShell();
 
         return;
       }
     }
 
-    this.$dispatch('growl/error', {
-      title:   'Unavailable',
-      message: 'There are no running pods to execute a shell in.'
-    }, { root: true });
+    this.$dispatch(
+      "growl/error",
+      {
+        title: "Unavailable",
+        message: "There are no running pods to execute a shell in.",
+      },
+      { root: true }
+    );
   }
 
   async matchingToolbox() {
-    const all = await this.$dispatch('findAll', { type: POD });
+    const all = await this.$dispatch("findAll", { type: POD });
 
     return all.filter((pod) => {
-      if (pod.metadata.namespace === this.metadata.namespace && pod.labels['app'] === 'rook-ceph-tools') {
+      if (
+        pod.metadata.namespace === this.metadata.namespace &&
+        pod.labels["app"] === "rook-ceph-tools"
+      ) {
         return pod;
       }
     });
   }
 
   get isLLMOSRelease() {
-    return this.annotations?.['meta.helm.sh/release-name'] === 'llmos-ceph-cluster';
+    return (
+      this.annotations?.["meta.helm.sh/release-name"] === "llmos-ceph-cluster"
+    );
   }
 
   get canDelete() {

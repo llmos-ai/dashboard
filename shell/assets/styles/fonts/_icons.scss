@@ -1,7 +1,8 @@
 
 @use "sass:math";
 
-@import "~rancher-icons/style.scss";
+// @import "~rancher-icons/style.scss";
+@import "@rancher/icons/style.scss";
 
 // 加载iconfont
 @import "./iconfont/iconfont.scss";

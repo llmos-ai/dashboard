@@ -11,13 +11,13 @@ export default {
 
   props: {
     linkOptions: {
-      type:    Object,
+      type: Object,
       default: () => {
         return {};
       },
     },
     isSupportPage: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
   },
@@ -25,7 +25,12 @@ export default {
   mixins: [Closeable],
 
   async fetch() {
-    this.links = await fetchLinks(this.$store, false, this.isSupportPage, (str) => this.t(str));
+    this.links = await fetchLinks(
+      this.$store,
+      false,
+      this.isSupportPage,
+      (str) => this.t(str)
+    );
   },
 
   data() {
@@ -33,12 +38,12 @@ export default {
   },
 
   computed: {
-    ...mapGetters('i18n', [
-      'selectedLocaleLabel'
-    ]),
+    ...mapGetters('i18n', ['selectedLocaleLabel']),
 
     hasOptions() {
-      return !!Object.keys(this.options).length || !!Object.keys(this.$slots).length;
+      return (
+        !!Object.keys(this.options).length || !!Object.keys(this.$slots).length
+      );
     },
 
     options() {
@@ -50,7 +55,7 @@ export default {
           options.push({
             key,
             label: this.t(key),
-            value: this.linkOptions[key]
+            value: this.linkOptions[key],
           });
         });
 
@@ -69,7 +74,7 @@ export default {
       }
 
       return all;
-    }
+    },
   },
   methods: {
     show() {
@@ -77,111 +82,64 @@ export default {
     },
     close() {
       this.$modal.hide('wechat-modal');
-    }
+    },
   },
 };
 </script>
 
 <template>
   <div v-if="hasOptions">
-    <SimpleBox
-      :pref="pref"
-      :pref-key="prefKey"
-    >
+    <SimpleBox :pref="pref" :pref-key="prefKey">
       <template #title>
         <h2>
           {{ t('customLinks.displayTitle') }}
         </h2>
       </template>
-      <div
-        v-for="link in options"
-        :key="link.label"
-        class="support-link"
-      >
-        <n-link
-          v-if="link.value.startsWith('/') "
-          :to="link.value"
+      <div v-for="(link, i) in options" :key="i" class="support-link">
+        <router-link v-if="link.value.startsWith('/')" :to="link.value">
+          {{ link.label }}
+        </router-link>
+        <a-button
+          v-else
+          type="link"
+          rel="noopener noreferrer nofollow"
+          :href="link.value"
+          target="_blank"
         >
           {{ link.label }}
-        </n-link>
-        <a
-          v-else
-          :href="link.value"
-          rel="noopener noreferrer nofollow"
-          target="_blank"
-        > {{ link.label }} </a>
+        </a-button>
       </div>
       <slot />
-      <div
-        v-if="selectedLocaleLabel === t('locale.zh-hans')"
-        class="support-link"
-      >
-        <a
-          class="link"
-          @click="show"
-        >
-          {{ t('footer.wechat.title') }}
-        </a>
-      </div>
     </SimpleBox>
-    <modal
-      name="wechat-modal"
-      height="auto"
-      :width="640"
-    >
-      <div class="wechat-modal">
-        <h1>{{ t('footer.wechat.modalText') }}</h1>
-        <h1>{{ t('footer.wechat.modalText2') }}</h1>
-        <div class="qr-img" />
-        <div>
-          <button
-            class="btn role-primary"
-            @click="close"
-          >
-            {{ t('generic.close') }}
-          </button>
-        </div>
-      </div>
-    </modal>
   </div>
 </template>
 
-<style lang='scss' scoped>
-  h2 {
-    display: flex;
-    align-items: center;
+<style lang="scss" scoped>
+h2 {
+  display: flex;
+  align-items: center;
 
-    i {
-      font-size: 12px;
-      margin-left: 5px;
-    }
+  i {
+    font-size: 12px;
+    margin-left: 5px;
   }
-  .support-link:not(:last-child) {
-    margin-bottom: 15px;
-  }
+}
 
-  .wechat-modal {
-    margin: 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+.link {
+  cursor: pointer;
+}
 
-  .link {
-    cursor: pointer;
-  }
+.btn {
+  margin: 20px auto 0;
+}
 
-  .btn {
-    margin: 20px auto 0;
-  }
-
-  .qr-img {
-    //background-image: url('../assets/images/wechat-qr-code.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center center;
-    height: 128px;
-    width: 128px;
-    margin: 15px auto 10px;
-  }
+.qr-img {
+  //background-image: url('../assets/images/wechat-qr-code.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  height: 128px;
+  width: 128px;
+  margin: 15px auto 10px;
+}
 </style>

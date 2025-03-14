@@ -44,11 +44,11 @@ export default {
   watch: {
     type(neu) {
       if (neu === 'Replicated') {
-        this.$set(this.data, 'replicated', { size: 3 });
-        this.$delete(this.data, 'erasureCoded');
+        this.data['replicated'] = { size: 3 };
+        delete this.data['erasureCoded'];
       } else {
-        this.$set(this.data, 'erasureCoded', { dataChunks: 2, codingChunks: 1 });
-        this.$delete(this.data, 'replicated');
+        this.data['erasureCoded'] = { dataChunks: 2, codingChunks: 1 };
+        delete this.data['replicated'];
       }
     }
   }
@@ -64,7 +64,7 @@ export default {
     >
       <div class="col span-6 mb-10">
         <LabeledInput
-          v-model="data.name"
+          v-model:value="data.name"
           label="Name"
           required
           :disabled="isView"
@@ -73,7 +73,7 @@ export default {
 
       <div class="col span-6 mb-10">
         <LabeledSelect
-          v-model="data.failureDomain"
+          v-model:value="data.failureDomain"
           label="Failure Domain"
           :options="['host', 'osd']"
           :disabled="isView"
@@ -85,7 +85,7 @@ export default {
     <div class="row">
       <div class="col span-6 mb-10">
         <LabeledSelect
-          v-model="type"
+          v-model:value="type"
           label="Type"
           :options="['Replicated', 'Erasure Coded']"
           required
@@ -98,7 +98,7 @@ export default {
         class="col span-6 mb-10"
       >
         <LabeledSelect
-          v-model="data.failureDomain"
+          v-model:value="data.failureDomain"
           label="Failure Domain"
           :options="['host', 'osd']"
           :disabled="isView"
@@ -111,7 +111,7 @@ export default {
         class="col span-6 mb-10"
       >
         <UnitInput
-          v-model="data.replicated.size"
+          v-model:value="data.replicated.size"
           :hide-unit="true"
           label="Replicas Per Failure Domain"
           required
@@ -126,7 +126,7 @@ export default {
     >
       <div class="col span-6 mb-10">
         <UnitInput
-          v-model="data.replicated.size"
+          v-model:value="data.replicated.size"
           :hide-unit="true"
           label="Replicas Per Failure Domain"
           required
@@ -140,7 +140,7 @@ export default {
     >
       <div class="col span-6 mb-10">
         <UnitInput
-          v-model="data.erasureCoded.dataChunks"
+          v-model:value="data.erasureCoded.dataChunks"
           :hide-unit="true"
           label="Data Chunks"
           :disabled="isView"
@@ -150,7 +150,7 @@ export default {
 
       <div class="col span-6 mb-10">
         <UnitInput
-          v-model="data.erasureCoded.codingChunks"
+          v-model:value="data.erasureCoded.codingChunks"
           :hide-unit="true"
           label="Coding Chunks"
           :disabled="isView"

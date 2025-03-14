@@ -1,5 +1,8 @@
 import { findBy, insertAt } from '@shell/utils/array';
-import { TIMESTAMP, CATTLE_PUBLIC_ENDPOINTS } from '@shell/config/labels-annotations';
+import {
+  TIMESTAMP,
+  CATTLE_PUBLIC_ENDPOINTS,
+} from '@shell/config/labels-annotations';
 import { WORKLOAD_TYPES, SERVICE, POD } from '@shell/config/types';
 import { get, set } from '@shell/utils/object';
 import day from 'dayjs';
@@ -9,13 +12,13 @@ import WorkloadService from '@shell/models/workload.service';
 
 export const defaultContainer = {
   imagePullPolicy: 'Always',
-  name:            'container-0',
+  name: 'container-0',
   securityContext: {
-    runAsNonRoot:             false,
-    readOnlyRootFilesystem:   false,
-    privileged:               false,
+    runAsNonRoot: false,
+    readOnlyRootFilesystem: false,
+    privileged: false,
     allowPrivilegeEscalation: false,
-  }
+  },
 };
 export default class Workload extends WorkloadService {
   // remove clone as yaml/edit as yaml until API supported
@@ -27,51 +30,51 @@ export default class Workload extends WorkloadService {
     const index = editYaml ? out.indexOf(editYaml) : 0;
 
     insertAt(out, index, {
-      action:  'addSidecar',
-      label:   this.t('action.addSidecar'),
-      icon:    'icon icon-plus',
+      action: 'addSidecar',
+      label: this.t('action.addSidecar'),
+      icon: 'icon icon-plus',
       enabled: !!this.links.update,
     });
 
     if (type !== WORKLOAD_TYPES.JOB && type !== WORKLOAD_TYPES.CRON_JOB) {
       insertAt(out, 0, {
-        action:  'toggleRollbackModal',
-        label:   this.t('action.rollback'),
-        icon:    'icon icon-history',
+        action: 'toggleRollbackModal',
+        label: this.t('action.rollback'),
+        icon: 'icon icon-history',
         enabled: !!this.links.update,
       });
 
       insertAt(out, 0, {
-        action:   'redeploy',
-        label:    this.t('action.redeploy'),
-        icon:     'icon icon-refresh',
-        enabled:  !!this.links.update,
+        action: 'redeploy',
+        label: this.t('action.redeploy'),
+        icon: 'icon icon-refresh',
+        enabled: !!this.links.update,
         bulkable: true,
       });
 
       insertAt(out, 0, {
-        action:  'pause',
-        label:   this.t('asyncButton.pause.action'),
-        icon:    'icon icon-pause',
-        enabled: !!this.links.update && !this.spec?.paused
+        action: 'pause',
+        label: this.t('asyncButton.pause.action'),
+        icon: 'icon icon-pause',
+        enabled: !!this.links.update && !this.spec?.paused,
       });
 
       insertAt(out, 0, {
-        action:  'resume',
-        label:   this.t('asyncButton.resume.action'),
-        icon:    'icon icon-play',
-        enabled: !!this.links.update && this.spec?.paused === true
+        action: 'resume',
+        label: this.t('asyncButton.resume.action'),
+        icon: 'icon icon-play',
+        enabled: !!this.links.update && this.spec?.paused === true,
       });
     }
 
-    insertAt(out, 0, { divider: true }) ;
+    insertAt(out, 0, { divider: true });
 
     insertAt(out, 0, {
-      action:  'openShell',
+      action: 'openShell',
       enabled: !!this.links.view,
-      icon:    'icon icon-fw icon-chevron-right',
-      label:   this.t('action.openShell'),
-      total:   1,
+      icon: 'icon icon-fw icon-chevron-right',
+      label: this.t('action.openShell'),
+      total: 1,
     });
 
     const toFilter = ['cloneYaml'];
@@ -94,10 +97,14 @@ export default class Workload extends WorkloadService {
           spec: {
             template: {
               spec: {
-                restartPolicy: 'Never', containers: [{ imagePullPolicy: 'Always', name: 'container-0' }], initContainers: []
-              }
-            }
-          }
+                restartPolicy: 'Never',
+                containers: [
+                  { imagePullPolicy: 'Always', name: 'container-0' },
+                ],
+                initContainers: [],
+              },
+            },
+          },
         };
       }
     } else {
@@ -108,10 +115,11 @@ export default class Workload extends WorkloadService {
       if (!spec.template) {
         spec.template = {
           spec: {
-            restartPolicy:  this.type === WORKLOAD_TYPES.JOB ? 'Never' : 'Always',
-            containers:     [{ ...defaultContainer }],
-            initContainers: []
-          }
+            restartPolicy:
+              this.type === WORKLOAD_TYPES.JOB ? 'Never' : 'Always',
+            containers: [{ ...defaultContainer }],
+            initContainers: [],
+          },
         };
       }
       if (!spec.selector) {
@@ -121,17 +129,10 @@ export default class Workload extends WorkloadService {
     vm.$set(this, 'spec', spec);
   }
 
-  toggleRollbackModal( workload = this ) {
-    this.$dispatch('promptModal', {
-      componentProps: { workload },
-      component:      'RollbackWorkloadDialog'
-    });
-  }
-
-  async rollBackWorkload( cluster, workload, type, rollbackRequestData ) {
+  async rollBackWorkload(cluster, workload, type, rollbackRequestData) {
     const rollbackRequestBody = JSON.stringify(rollbackRequestData);
 
-    if ( Array.isArray( workload ) ) {
+    if (Array.isArray(workload)) {
       throw new TypeError(this.t('promptRollback.multipleWorkloadError'));
     }
     const namespace = workload.metadata.namespace;
@@ -145,7 +146,9 @@ export default class Workload extends WorkloadService {
      * To see an example request body, run:
      * kubectl rollout undo deployment/[deployment name] --to-revision=[revision number] -v=8
      */
-    await this.patch(rollbackRequestBody, { url: `/k8s/clusters/${ cluster.id }/apis/apps/v1/namespaces/${ namespace }/${ type }/${ workloadName }` });
+    await this.patch(rollbackRequestBody, {
+      url: `/k8s/clusters/${cluster.id}/apis/apps/v1/namespaces/${namespace}/${type}/${workloadName}`,
+    });
   }
 
   pause() {
@@ -173,7 +176,7 @@ export default class Workload extends WorkloadService {
   }
 
   get state() {
-    if ( this.spec?.paused === true ) {
+    if (this.spec?.paused === true) {
       return 'paused';
     }
 
@@ -183,18 +186,22 @@ export default class Workload extends WorkloadService {
   async openShell() {
     const pods = await this.matchingPods();
 
-    for ( const pod of pods ) {
-      if ( pod.isRunning ) {
+    for (const pod of pods) {
+      if (pod.isRunning) {
         pod.openShell();
 
         return;
       }
     }
 
-    this.$dispatch('growl/error', {
-      title:   'Unavailable',
-      message: 'There are no running pods to execute a shell in.'
-    }, { root: true });
+    this.$dispatch(
+      'growl/error',
+      {
+        title: 'Unavailable',
+        message: 'There are no running pods to execute a shell in.',
+      },
+      { root: true }
+    );
   }
 
   addSidecar() {
@@ -220,7 +227,10 @@ export default class Workload extends WorkloadService {
   }
 
   get hasSidecars() {
-    const podTemplateSpec = this.type === WORKLOAD_TYPES.CRON_JOB ? this?.spec?.jobTemplate?.spec?.template?.spec : this.spec?.template?.spec;
+    const podTemplateSpec =
+      this.type === WORKLOAD_TYPES.CRON_JOB
+        ? this?.spec?.jobTemplate?.spec?.template?.spec
+        : this.spec?.template?.spec;
 
     const { containers = [], initContainers = [] } = podTemplateSpec;
 
@@ -230,66 +240,69 @@ export default class Workload extends WorkloadService {
   get customValidationRules() {
     const type = this._type ? this._type : this.type;
 
-    const podSpecPath = type === WORKLOAD_TYPES.CRON_JOB ? 'spec.jobTemplate.spec.template.spec' : 'spec.template.spec';
+    const podSpecPath =
+      type === WORKLOAD_TYPES.CRON_JOB
+        ? 'spec.jobTemplate.spec.template.spec'
+        : 'spec.template.spec';
     const out = [
       {
-        nullable:       false,
-        path:           'metadata.name',
-        required:       true,
+        nullable: false,
+        path: 'metadata.name',
+        required: true,
         translationKey: 'generic.name',
-        type:           'subDomain',
+        type: 'subDomain',
       },
       {
-        nullable:   false,
-        path:       'spec',
-        required:   true,
-        type:       'object',
+        nullable: false,
+        path: 'spec',
+        required: true,
+        type: 'object',
         validators: ['containerImages'],
       },
       {
-        nullable:   true,
-        path:       `${ podSpecPath }.affinity`,
-        type:       'object',
+        nullable: true,
+        path: `${podSpecPath}.affinity`,
+        type: 'object',
         validators: ['podAffinity'],
-      }
+      },
     ];
 
     switch (type) {
-    case WORKLOAD_TYPES.DEPLOYMENT:
-    case WORKLOAD_TYPES.REPLICA_SET:
-      out.push( {
-        nullable:       false,
-        path:           'spec.replicas',
-        required:       true,
-        type:           'number',
-        translationKey: 'workload.replicas'
-      });
-      break;
-    case WORKLOAD_TYPES.STATEFUL_SET:
-      out.push({
-        nullable:       false,
-        path:           'spec.replicas',
-        required:       true,
-        type:           'number',
-        translationKey: 'workload.replicas'
-      });
-      out.push({
-        nullable:       false,
-        path:           'spec.serviceName',
-        required:       true,
-        type:           'string',
-        translationKey: 'workload.serviceName'
-      });
-      break;
-    case WORKLOAD_TYPES.CRON_JOB:
-      out.push( {
-        nullable:       false,
-        path:           'spec.schedule',
-        required:       true,
-        type:           'string',
-        validators:     ['cronSchedule'],
-        translationKey: 'workload.cronSchedule'
-      });
+      case WORKLOAD_TYPES.DEPLOYMENT:
+      case WORKLOAD_TYPES.REPLICA_SET:
+        out.push({
+          nullable: false,
+          path: 'spec.replicas',
+          required: true,
+          type: 'number',
+          translationKey: 'workload.replicas',
+        });
+        break;
+      case WORKLOAD_TYPES.STATEFUL_SET:
+        out.push({
+          nullable: false,
+          path: 'spec.replicas',
+          required: true,
+          type: 'number',
+          translationKey: 'workload.replicas',
+        });
+        out.push({
+          nullable: false,
+          path: 'spec.serviceName',
+          required: true,
+          type: 'string',
+          translationKey: 'workload.serviceName',
+        });
+        break;
+      case WORKLOAD_TYPES.CRON_JOB:
+        out.push({
+          nullable: false,
+          path: 'spec.schedule',
+          required: true,
+          type: 'string',
+          validators: ['cronSchedule'],
+          translationKey: 'workload.cronSchedule',
+        });
     }
 
     return out;
@@ -308,13 +321,16 @@ export default class Workload extends WorkloadService {
   }
 
   get ready() {
-    const readyReplicas = Math.max(0, (this.status?.replicas || 0) - (this.status?.unavailableReplicas || 0));
+    const readyReplicas = Math.max(
+      0,
+      (this.status?.replicas || 0) - (this.status?.unavailableReplicas || 0)
+    );
 
     if (this.type === WORKLOAD_TYPES.DAEMON_SET) {
       return readyReplicas;
     }
 
-    return `${ readyReplicas }/${ this.desired }`;
+    return `${readyReplicas}/${this.desired}`;
   }
 
   get unavailable() {
@@ -331,22 +347,22 @@ export default class Workload extends WorkloadService {
 
     const detailItem = {
       endpoint: {
-        label:     'Endpoints',
-        content:   this.endpoint,
-        formatter: 'WorkloadDetailEndpoints'
+        label: 'Endpoints',
+        content: this.endpoint,
+        formatter: 'WorkloadDetailEndpoints',
       },
       ready: {
-        label:   'Ready',
-        content: this.ready
+        label: 'Ready',
+        content: this.ready,
       },
       upToDate: {
-        label:   'Up-to-date',
-        content: this.upToDate
+        label: 'Up-to-date',
+        content: this.upToDate,
       },
       available: {
-        label:   'Available',
-        content: this.available
-      }
+        label: 'Available',
+        content: this.available,
+      },
     };
 
     if (type === WORKLOAD_TYPES.JOB) {
@@ -354,11 +370,11 @@ export default class Workload extends WorkloadService {
       const FACTORS = [60, 60, 24];
       const LABELS = ['sec', 'min', 'hour', 'day'];
 
-      if ( startTime ) {
+      if (startTime) {
         out.push({
-          label:         'Started',
-          content:       startTime,
-          formatter:     'LiveDate',
+          label: 'Started',
+          content: startTime,
+          formatter: 'LiveDate',
           formatterOpts: { addSuffix: true },
         });
       }
@@ -372,71 +388,78 @@ export default class Workload extends WorkloadService {
 
         let i = 0;
 
-        while ( diff >= FACTORS[i] && i < FACTORS.length ) {
+        while (diff >= FACTORS[i] && i < FACTORS.length) {
           diff /= FACTORS[i];
           i++;
         }
 
-        if ( diff < 5 ) {
+        if (diff < 5) {
           label = Math.floor(diff * 10) / 10;
         } else {
           label = Math.floor(diff);
         }
 
-        label += ` ${ this.t(`unit.${ LABELS[i] }`, { count: label }) } `;
+        label += ` ${this.t(`unit.${LABELS[i]}`, { count: label })} `;
         label = label.trim();
 
         out.push({ label: 'Duration', content: label });
       }
-    } else if ( type === WORKLOAD_TYPES.CRON_JOB ) {
+    } else if (type === WORKLOAD_TYPES.CRON_JOB) {
       out.push({
-        label:     'Last Scheduled Time',
-        content:   this?.status?.lastScheduleTime,
-        formatter: 'LiveDate'
+        label: 'Last Scheduled Time',
+        content: this?.status?.lastScheduleTime,
+        formatter: 'LiveDate',
       });
     }
 
-    out.push( {
-      label:     'Image',
-      content:   this.imageNames,
-      formatter: 'PodImages'
+    out.push({
+      label: 'Image',
+      content: this.imageNames,
+      formatter: 'PodImages',
     });
 
     switch (type) {
-    case WORKLOAD_TYPES.DEPLOYMENT:
-      out.push(detailItem.ready, detailItem.upToDate, detailItem.available, SEPARATOR, detailItem.endpoint);
-      break;
-    case WORKLOAD_TYPES.DAEMON_SET:
-      out.push(detailItem.ready, SEPARATOR, detailItem.endpoint);
-      break;
-    case WORKLOAD_TYPES.REPLICA_SET:
-      out.push(detailItem.ready, SEPARATOR, detailItem.endpoint);
-      break;
-    case WORKLOAD_TYPES.STATEFUL_SET:
-      out.push(detailItem.ready, SEPARATOR, detailItem.endpoint);
-      break;
-    case WORKLOAD_TYPES.REPLICATION_CONTROLLER:
-      out.push(detailItem.ready, SEPARATOR, detailItem.endpoint);
-      break;
-    case WORKLOAD_TYPES.JOB:
-      out.push(detailItem.endpoint);
-      break;
-    case WORKLOAD_TYPES.CRON_JOB:
-      out.push(detailItem.endpoint);
-      break;
-    case POD:
-      out.push(detailItem.ready);
-      break;
-    default: break;
+      case WORKLOAD_TYPES.DEPLOYMENT:
+        out.push(
+          detailItem.ready,
+          detailItem.upToDate,
+          detailItem.available,
+          SEPARATOR,
+          detailItem.endpoint
+        );
+        break;
+      case WORKLOAD_TYPES.DAEMON_SET:
+        out.push(detailItem.ready, SEPARATOR, detailItem.endpoint);
+        break;
+      case WORKLOAD_TYPES.REPLICA_SET:
+        out.push(detailItem.ready, SEPARATOR, detailItem.endpoint);
+        break;
+      case WORKLOAD_TYPES.STATEFUL_SET:
+        out.push(detailItem.ready, SEPARATOR, detailItem.endpoint);
+        break;
+      case WORKLOAD_TYPES.REPLICATION_CONTROLLER:
+        out.push(detailItem.ready, SEPARATOR, detailItem.endpoint);
+        break;
+      case WORKLOAD_TYPES.JOB:
+        out.push(detailItem.endpoint);
+        break;
+      case WORKLOAD_TYPES.CRON_JOB:
+        out.push(detailItem.endpoint);
+        break;
+      case POD:
+        out.push(detailItem.ready);
+        break;
+      default:
+        break;
     }
 
     return out;
   }
 
   redeploy() {
-    const now = (new Date()).toISOString().replace(/\.\d+Z$/, 'Z');
+    const now = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
 
-    if ( !this.spec.template.metadata ) {
+    if (!this.spec.template.metadata) {
       set(this.spec.template, 'metadata', {});
     }
 
@@ -452,8 +475,12 @@ export default class Workload extends WorkloadService {
   async getPortsWithServiceType() {
     const ports = [];
 
-    this.containers.forEach((container) => ports.push(...(container.ports || [])));
-    (this.initContainers || []).forEach((container) => ports.push(...(container.ports || [])));
+    this.containers.forEach((container) =>
+      ports.push(...(container.ports || []))
+    );
+    (this.initContainers || []).forEach((container) =>
+      ports.push(...(container.ports || []))
+    );
 
     // Only get services owned if we can access the service resource
     const canAccessServices = this.$getters['schemaFor'](SERVICE);
@@ -465,22 +492,26 @@ export default class Workload extends WorkloadService {
     if (services.length) {
       services.forEach((svc) => {
         switch (svc.spec.type) {
-        case 'ClusterIP':
-          clusterIPServicePorts.push(...(svc?.spec?.ports || []));
-          break;
-        case 'LoadBalancer':
-          loadBalancerServicePorts.push(...(svc?.spec?.ports || []));
-          break;
-        case 'NodePort':
-          nodePortServicePorts.push(...(svc?.spec?.ports || []));
-          break;
-        default:
-          break;
+          case 'ClusterIP':
+            clusterIPServicePorts.push(...(svc?.spec?.ports || []));
+            break;
+          case 'LoadBalancer':
+            loadBalancerServicePorts.push(...(svc?.spec?.ports || []));
+            break;
+          case 'NodePort':
+            nodePortServicePorts.push(...(svc?.spec?.ports || []));
+            break;
+          default:
+            break;
         }
       });
     }
     ports.forEach((port) => {
-      const name = port.name ? port.name : `${ port.containerPort }${ port.protocol.toLowerCase() }${ port.hostPort || port._listeningPort || '' }`;
+      const name = port.name
+        ? port.name
+        : `${port.containerPort}${port.protocol.toLowerCase()}${
+            port.hostPort || port._listeningPort || ''
+          }`;
 
       port.name = name;
 
@@ -498,7 +529,8 @@ export default class Workload extends WorkloadService {
 
           return;
         }
-      } if (nodePortServicePorts.length) {
+      }
+      if (nodePortServicePorts.length) {
         const portSpec = findBy(nodePortServicePorts, 'name', name);
 
         if (portSpec) {
@@ -508,7 +540,8 @@ export default class Workload extends WorkloadService {
 
           return;
         }
-      } if (clusterIPServicePorts.length) {
+      }
+      if (clusterIPServicePorts.length) {
         if (findBy(clusterIPServicePorts, 'name', name)) {
           port._serviceType = 'ClusterIP';
         }
@@ -523,9 +556,11 @@ export default class Workload extends WorkloadService {
 
     if (this.metadata?.ownerReferences) {
       for (const owner of this.metadata.ownerReferences) {
-        const have = (`${ owner.apiVersion.replace(/\/.*/, '') }.${ owner.kind }`).toLowerCase();
+        const have = `${owner.apiVersion.replace(/\/.*/, '')}.${
+          owner.kind
+        }`.toLowerCase();
 
-        if ( types.includes(have) ) {
+        if (types.includes(have)) {
           return true;
         }
       }
@@ -548,7 +583,9 @@ export default class Workload extends WorkloadService {
 
   get pods() {
     const relationships = this.metadata?.relationships || [];
-    const podRelationship = relationships.filter((relationship) => relationship.toType === POD)[0];
+    const podRelationship = relationships.filter(
+      (relationship) => relationship.toType === POD
+    )[0];
 
     if (podRelationship) {
       const pods = this.$getters['podsByNamespace'](this.metadata.namespace);
@@ -562,7 +599,7 @@ export default class Workload extends WorkloadService {
   }
 
   get podGauges() {
-    const out = { };
+    const out = {};
 
     if (!this.pods) {
       return out;
@@ -576,7 +613,7 @@ export default class Workload extends WorkloadService {
       } else {
         out[stateDisplay] = {
           color: stateColor.replace('text-', ''),
-          count: 1
+          count: 1,
         };
       }
     });
@@ -590,7 +627,9 @@ export default class Workload extends WorkloadService {
       return undefined;
     }
 
-    return (get(this, 'metadata.relationships') || []).filter((relationship) => relationship.toType === WORKLOAD_TYPES.JOB);
+    return (get(this, 'metadata.relationships') || []).filter(
+      (relationship) => relationship.toType === WORKLOAD_TYPES.JOB
+    );
   }
 
   get jobs() {
@@ -598,14 +637,18 @@ export default class Workload extends WorkloadService {
       return undefined;
     }
 
-    return this.jobRelationships.map((obj) => {
-      return this.$getters['byId'](WORKLOAD_TYPES.JOB, obj.toId );
-    }).filter((x) => !!x);
+    return this.jobRelationships
+      .map((obj) => {
+        return this.$getters['byId'](WORKLOAD_TYPES.JOB, obj.toId);
+      })
+      .filter((x) => !!x);
   }
 
   get jobGauges() {
     const out = {
-      succeeded: { color: 'success', count: 0 }, running: { color: 'info', count: 0 }, failed: { color: 'error', count: 0 }
+      succeeded: { color: 'success', count: 0 },
+      running: { color: 'info', count: 0 },
+      failed: { color: 'error', count: 0 },
     };
 
     if (this.type === WORKLOAD_TYPES.CRON_JOB) {
@@ -630,7 +673,11 @@ export default class Workload extends WorkloadService {
   }
 
   get currentRevisionNumber() {
-    if (this.ownedByWorkload || this.kind === 'Job' || this.kind === 'CronJob') {
+    if (
+      this.ownedByWorkload ||
+      this.kind === 'Job' ||
+      this.kind === 'CronJob'
+    ) {
       return undefined;
     }
     if (this.kind === 'Deployment') {
@@ -643,7 +690,9 @@ export default class Workload extends WorkloadService {
 
   async matchingPods() {
     const all = await this.$dispatch('findAll', { type: POD });
-    const allInNamespace = all.filter((pod) => pod.metadata.namespace === this.metadata.namespace);
+    const allInNamespace = all.filter(
+      (pod) => pod.metadata.namespace === this.metadata.namespace
+    );
 
     const selector = convertSelectorObj(this.spec.selector);
 

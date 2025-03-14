@@ -151,7 +151,7 @@ export default {
       set(neu) {
         const out = FlatResources.set(neu);
 
-        this.$set(this.valuesContentJson.cephFileSystems[0].spec.metadataServer, 'resources', cleanUp(out));
+        this.valuesContentJson.cephFileSystems[0].spec.metadataServer['resources'] = cleanUp(out);
       }
     },
   },
@@ -217,7 +217,7 @@ export default {
     />
 
     <ResourceTabs
-      v-model="value"
+      v-model:value="value"
       class="mt-15"
       :need-conditions="false"
       :need-related="false"
@@ -233,7 +233,7 @@ export default {
         <h4>Enable Chart</h4>
         <div class="row mb-20">
           <Checkbox
-            v-model="spec.enabled"
+            v-model:value="spec.enabled"
             label="Enabled"
             :mode="mode"
           />
@@ -242,7 +242,7 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <labeledInput
-              v-model="spec.repo"
+              v-model:value="spec.repo"
               label="Chart Repo"
               required
               disabled
@@ -252,7 +252,7 @@ export default {
 
           <div class="col span-6">
             <LabeledInput
-              v-model="spec.chart"
+              v-model:value="spec.chart"
               label="Chart Name"
               required
               disabled
@@ -264,7 +264,7 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <labeledInput
-              v-model="spec.version"
+              v-model:value="spec.version"
               label="Version"
               required
               disabled
@@ -284,7 +284,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="defaultValuesContentJson.cephClusterSpec.cephVersion.image"
+                v-model:value="defaultValuesContentJson.cephClusterSpec.cephVersion.image"
                 label="Ceph Image"
                 :mode="mode"
                 disabled
@@ -294,7 +294,7 @@ export default {
 
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="defaultValuesContentJson.cephClusterSpec.dataDirHostPath"
+                v-model:value="defaultValuesContentJson.cephClusterSpec.dataDirHostPath"
                 label="Data Dir Host Path"
                 :mode="mode"
                 disabled
@@ -306,7 +306,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <UnitInput
-                v-model="valuesContentJson.cephClusterSpec.mgr.count"
+                v-model:value="valuesContentJson.cephClusterSpec.mgr.count"
                 label="Manager Replicas"
                 :mode="mode"
                 :min="1"
@@ -318,7 +318,7 @@ export default {
 
             <div class="col span-6 mb-10">
               <ToggleSwitch
-                v-model="valuesContentJson.cephClusterSpec.mgr.allowMultiplePerNode"
+                v-model:value="valuesContentJson.cephClusterSpec.mgr.allowMultiplePerNode"
                 name="label-system-toggle"
                 :on-label="t('ceph.labels.multiMgrPerNode')"
               />
@@ -329,7 +329,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <UnitInput
-                v-model="valuesContentJson.cephClusterSpec.mon.count"
+                v-model:value="valuesContentJson.cephClusterSpec.mon.count"
                 label="Mon Replicas"
                 :mode="mode"
                 :min="1"
@@ -340,7 +340,7 @@ export default {
             </div>
             <div class="col span-6 mb-10">
               <ToggleSwitch
-                v-model="valuesContentJson.cephClusterSpec.mon.allowMultiplePerNode"
+                v-model:value="valuesContentJson.cephClusterSpec.mon.allowMultiplePerNode"
                 name="label-system-toggle"
                 :on-label="t('ceph.labels.multiMonPerNode')"
               />
@@ -352,7 +352,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <LabeledSelect
-                v-model="valuesContentJson.cephClusterSpec.storage.useAllNodes"
+                v-model:value="valuesContentJson.cephClusterSpec.storage.useAllNodes"
                 label="Use All Nodes"
                 :options="options"
                 :mode="mode"
@@ -362,7 +362,7 @@ export default {
 
             <div class="col span-6 mb-10">
               <LabeledSelect
-                v-model="valuesContentJson.cephClusterSpec.storage.useAllDevices"
+                v-model:value="valuesContentJson.cephClusterSpec.storage.useAllDevices"
                 label="Use All Devices"
                 :options="options"
                 :mode="mode"
@@ -373,7 +373,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="valuesContentJson.cephClusterSpec.storage.deviceFilter"
+                v-model:value="valuesContentJson.cephClusterSpec.storage.deviceFilter"
                 label="Device Filter"
                 placeholder="e.g., ^nvme*"
                 :mode="mode"
@@ -385,7 +385,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <ToggleSwitch
-                v-model="valuesContentJson.cephClusterSpec.logCollector.enabled"
+                v-model:value="valuesContentJson.cephClusterSpec.logCollector.enabled"
                 name="label-system-toggle"
                 :on-label="t('ceph.labels.enableLogCollector')"
               />
@@ -397,7 +397,7 @@ export default {
           >
             <div class="col span-6 mb-10">
               <UnitInput
-                v-model="valuesContentJson.cephClusterSpec.logCollector.maxLogSize"
+                v-model:value="valuesContentJson.cephClusterSpec.logCollector.maxLogSize"
                 label="Max Log Size"
                 :input-exponent="2"
                 :placeholder="500"
@@ -407,7 +407,7 @@ export default {
             </div>
             <div class="col span-6 mb-10">
               <LabeledSelect
-                v-model="valuesContentJson.cephClusterSpec.logCollector.periodicity"
+                v-model:value="valuesContentJson.cephClusterSpec.logCollector.periodicity"
                 label="Log Rotation Period"
                 :options="['hourly', 'daily', 'weekly', 'monthly']"
                 :mode="mode"
@@ -425,7 +425,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <Checkbox
-                v-model="valuesContentJson.cephBlockPools[0].storageClass.isDefault"
+                v-model:value="valuesContentJson.cephBlockPools[0].storageClass.isDefault"
                 label="Set Block Storage as Default StorageClass"
                 :mode="mode"
               />
@@ -435,7 +435,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <LabeledSelect
-                v-model="valuesContentJson.cephBlockPools[0].spec.failureDomain"
+                v-model:value="valuesContentJson.cephBlockPools[0].spec.failureDomain"
                 label="Failure Domain"
                 :options="['host', 'osd']"
                 required
@@ -445,7 +445,7 @@ export default {
 
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="valuesContentJson.cephBlockPools[0].spec.deviceClass"
+                v-model:value="valuesContentJson.cephBlockPools[0].spec.deviceClass"
                 label="Device Class"
                 :mode="mode"
               />
@@ -456,7 +456,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <UnitInput
-                v-model="valuesContentJson.cephBlockPools[0].spec.replicated.size"
+                v-model:value="valuesContentJson.cephBlockPools[0].spec.replicated.size"
                 :hide-unit="true"
                 label="Replicas Per Failure Domain"
                 required
@@ -469,7 +469,7 @@ export default {
           <br>
           <h3>Parameters</h3>
           <KeyValue
-            v-model="valuesContentJson.cephBlockPools[0].spec.parameters"
+            v-model:value="valuesContentJson.cephBlockPools[0].spec.parameters"
             :add-label="t('storage.addParameters')"
             :read-allowed="false"
             :mode="mode"
@@ -485,7 +485,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <Checkbox
-                v-model="valuesContentJson.cephFileSystems[0].preserveFilesystemOnDelete"
+                v-model:value="valuesContentJson.cephFileSystems[0].preserveFilesystemOnDelete"
                 label="Preserve Filesystem On Delete"
                 :mode="mode"
                 tooltip="Data will be deleted permanently if preserveFilesystemOnDelete is not enabled"
@@ -494,7 +494,7 @@ export default {
 
             <div class="col span-6 mb-10">
               <Checkbox
-                v-model="valuesContentJson.cephFileSystems[0].storageClass.isDefault"
+                v-model:value="valuesContentJson.cephFileSystems[0].storageClass.isDefault"
                 label="Set FS as Default StorageClass"
                 :mode="mode"
               />
@@ -514,7 +514,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <UnitInput
-                v-model="valuesContentJson.cephFileSystems[0].spec.metadataPool.replicated.size"
+                v-model:value="valuesContentJson.cephFileSystems[0].spec.metadataPool.replicated.size"
                 :hide-unit="true"
                 label="Replicas Per Failure Domain"
                 required
@@ -529,7 +529,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <UnitInput
-                v-model="valuesContentJson.cephFileSystems[0].spec.metadataServer.activeCount"
+                v-model:value="valuesContentJson.cephFileSystems[0].spec.metadataServer.activeCount"
                 :hide-unit="true"
                 label="Active Count"
                 :min="1"
@@ -539,7 +539,7 @@ export default {
             </div>
             <div class="col span-6 mb-10">
               <Checkbox
-                v-model="valuesContentJson.cephFileSystems[0].spec.metadataServer.activeStandby"
+                v-model:value="valuesContentJson.cephFileSystems[0].spec.metadataServer.activeStandby"
                 label="Enable Active Standby"
                 :mode="mode"
               />
@@ -548,7 +548,7 @@ export default {
 
           <div class="mb-20">
             <ContainerResourceLimit
-              v-model="metadataServerResources"
+              v-model:value="metadataServerResources"
               :pod-spec="valuesContentJson.cephFileSystems[0].spec.metadataServer.spec"
               :mode="mode"
               :show-tip="false"
@@ -573,7 +573,7 @@ export default {
               <span class="row ceph-resource-title">{{ t(`ceph.name.${props.row.value.name}`) }}</span>
               <div class="mb-20">
                 <ContainerResourceLimit
-                  v-model="props.row.value.resources"
+                  v-model:value="props.row.value.resources"
                   :mode="mode"
                   :show-tip="false"
                 />

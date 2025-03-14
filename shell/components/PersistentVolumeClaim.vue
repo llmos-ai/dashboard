@@ -47,17 +47,17 @@ export default {
 
     this.storageClasses = hash.storageClasses;
     this.persistentVolumes = hash.persistentVolumes;
-    this.$set(this.spec, 'storageClassName', (this.spec.storageClassName || this.defaultStorageClassName));
+    this.spec['storageClassName'] = (this.spec.storageClassName || this.defaultStorageClassName);
   },
 
   data() {
     const spec = this.value.spec;
 
     if (!this.value.metadata) {
-      this.$set(this.value, 'metadata', {});
+      this.value['metadata'] = {};
     }
 
-    this.$set(this.value.spec, 'accessModes', this.value.spec.accessModes || []);
+    this.value.spec['accessModes'] = this.value.spec.accessModes || [];
 
     return {
       storageClasses:    [],
@@ -132,8 +132,8 @@ export default {
     },
 
     updatePV(pv) {
-      this.$set(this.spec, 'volumeName', pv.metadata.name);
-      this.$set(this.spec, 'storageClassName', (pv.spec.storageClassName || ''));
+      this.spec['volumeName'] = pv.metadata.name;
+      this.spec['storageClassName'] = (pv.spec.storageClassName || '');
       this.spec.resources.requests.storage = pv?.spec?.capacity?.storage;
     },
 
@@ -157,19 +157,19 @@ export default {
     <!--    <div class="row mb-10">-->
     <!--      <div class="col span-6">-->
     <!--        <LabeledInput-->
-    <!--          v-model="value.metadata.name"-->
+    <!--          v-model:value="value.metadata.name"-->
     <!--          :mode="mode"-->
     <!--          :label="t('persistentVolumeClaim.name')"-->
     <!--          :required="true"-->
     <!--          :disabled="mode === 'edit'"-->
-    <!--          @input="$emit('input', value)"-->
+    <!--          @update:value="$emit('input', value)"-->
     <!--        />-->
     <!--      </div>-->
     <!--    </div>-->
     <div class="row mb-10">
       <div class="col span-6">
         <RadioGroup
-          v-model="isCreatePV"
+          v-model:value="isCreatePV"
           name="isCreatePV"
           :options="[true, false]"
           :disabled="mode === 'edit'"
@@ -180,7 +180,7 @@ export default {
       <div class="col span-6">
         <LabeledSelect
           v-if="isCreatePV"
-          v-model="spec.storageClassName"
+          v-model:value="spec.storageClassName"
           data-testid="storage-class-name"
           :mode="mode"
           :required="true"
@@ -197,7 +197,7 @@ export default {
           :disabled="mode === 'edit'"
           :label="t('persistentVolumeClaim.volumes')"
           :options="availablePVs"
-          @input="updatePV"
+          @update:value="updatePV"
         />
       </div>
     </div>
@@ -217,21 +217,21 @@ export default {
             :value="value.spec.accessModes.includes('ReadWriteOnce')"
             :label="t('persistentVolumeClaim.accessModesOptions.singleNodeRW')"
             :disabled="mode === 'edit'"
-            @input="e=>updateMode('ReadWriteOnce', e)"
+            @update:value="e=>updateMode('ReadWriteOnce', e)"
           />
           <Checkbox
             :mode="mode"
             :value="value.spec.accessModes.includes('ReadOnlyMany')"
             :label="t('persistentVolumeClaim.accessModesOptions.manyNodeR')"
             :disabled="mode === 'edit'"
-            @input="e=>updateMode('ReadOnlyMany', e)"
+            @update:value="e=>updateMode('ReadOnlyMany', e)"
           />
           <Checkbox
             :mode="mode"
             :value="value.spec.accessModes.includes('ReadWriteMany')"
             :label="t('persistentVolumeClaim.accessModesOptions.manyNodeRW')"
             :disabled="mode === 'edit'"
-            @input="e=>updateMode('ReadWriteMany', e)"
+            @update:value="e=>updateMode('ReadWriteMany', e)"
           />
         </div>
       </div>
@@ -240,7 +240,7 @@ export default {
         class="col span-6"
       >
         <UnitInput
-          v-model="spec.resources.requests.storage"
+          v-model:value="spec.resources.requests.storage"
           :mode="mode"
           :label="t('persistentVolumeClaim.capacity')"
           :increment="1024"

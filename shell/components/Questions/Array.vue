@@ -18,8 +18,7 @@ export default {
   <div class="row">
     <div class="col span-6">
       <ArrayList
-        :key="question.variable"
-        v-model="value"
+        v-model:value="value"
         :title="question.label"
         :mode="mode"
         :disabled="disabled"

@@ -194,7 +194,7 @@ export default {
       <div class="row mb-20">
         <div class="col span-6">
           <LabeledInput
-            v-model="uiPLSetting.value"
+            v-model:value="uiPLSetting.value"
             :label="t('branding.uiPL.label')"
             :mode="mode"
             :maxlength="100"
@@ -210,7 +210,7 @@ export default {
 
       <div class="row mt-10 mb-20">
         <Checkbox
-          v-model="customizeLogo"
+          v-model:value="customizeLogo"
           :label="t('branding.logos.useCustom')"
           :mode="mode"
         />
@@ -230,7 +230,7 @@ export default {
               :mode="mode"
               accept="image/jpeg,image/png,image/svg+xml"
               @error="setError"
-              @input="updateLogo($event, 'uiLogoLight')"
+              @update:value="updateLogo($event, 'uiLogoLight')"
             />
           </div>
           <SimpleBox
@@ -254,7 +254,7 @@ export default {
               :mode="mode"
               accept="image/jpeg,image/png,image/svg+xml"
               @error="setError"
-              @input="updateLogo($event, 'uiLogoDark')"
+              @update:value="updateLogo($event, 'uiLogoDark')"
             />
           </div>
           <SimpleBox
@@ -279,7 +279,7 @@ export default {
 
       <div class="row mt-10 mb-20">
         <Checkbox
-          v-model="customizeFavicon"
+          v-model:value="customizeFavicon"
           :label="t('branding.favicon.useCustom')"
           :mode="mode"
         />
@@ -299,7 +299,7 @@ export default {
               :mode="mode"
               accept="image/jpeg,image/png,image/svg+xml"
               @error="setError"
-              @input="updateLogo($event, 'uiFavicon')"
+              @update:value="updateLogo($event, 'uiFavicon')"
             />
           </div>
           <SimpleBox v-if="uiFavicon">
@@ -320,7 +320,7 @@ export default {
       </label>
       <div class="row mt-20">
         <Checkbox
-          v-model="customizeColor"
+          v-model:value="customizeColor"
           :label="t('branding.color.useCustom')"
           :mode="mode"
         />
@@ -330,7 +330,7 @@ export default {
         class="row mt-20 mb-20"
       >
         <ColorInput
-          v-model="uiColor"
+          v-model:value="uiColor"
           component-testid="primary"
         />
       </div>
@@ -343,7 +343,7 @@ export default {
       </label>
       <div class="row mt-20">
         <Checkbox
-          v-model="customizeLinkColor"
+          v-model:value="customizeLinkColor"
           :label="t('branding.linkColor.useCustom')"
           :mode="mode"
         />
@@ -353,7 +353,7 @@ export default {
         class="row mt-20 mb-20"
       >
         <ColorInput
-          v-model="uiLinkColor"
+          v-model:value="uiLinkColor"
           class="col"
           component-testid="link"
         />
@@ -364,9 +364,8 @@ export default {
         </span>
       </div>
     </div>
-    <template v-for="err in errors">
+    <template  v-for="(err, i) in errors" :key="i" >
       <Banner
-        :key="err"
         color="error"
         :label="err"
       />
@@ -396,7 +395,7 @@ export default {
     display: flex;
     flex-direction: column;
 
-    ::v-deep.simple-box {
+    :deep().simple-box {
         position: relative;
         flex: 1;
         max-height: 120px;

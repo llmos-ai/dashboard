@@ -1,8 +1,11 @@
 <script>
 import AsyncButton from '@shell/components/AsyncButton';
+import AppModal, { DEFAULT_ITERABLE_NODE_SELECTOR } from '@shell/components/AppModal.vue';
 
 export default {
-  components: { AsyncButton },
+  emits: ['okay', 'closed'],
+
+  components: { AsyncButton, AppModal },
 
   props: {
     name: {
@@ -18,6 +21,22 @@ export default {
     mode: {
       type:    String,
       default: '',
+    },
+
+    /**
+     * forcefully set return focus element based on this selector
+     */
+    returnFocusSelector: {
+      type:    String,
+      default: '',
+    },
+
+    /**
+     * will return focus to the first iterable node of this container select
+     */
+    returnFocusFirstIterableNodeSelector: {
+      type:    String,
+      default: DEFAULT_ITERABLE_NODE_SELECTOR,
     }
   },
 
@@ -43,7 +62,6 @@ export default {
 
     closeDialog(result) {
       if (!this.closed) {
-        this.$modal.hide(this.name);
         this.$emit('closed', result);
         this.closed = true;
       }
@@ -53,11 +71,15 @@ export default {
 </script>
 
 <template>
-  <modal
+  <app-modal
+    v-if="!closed"
     :name="name"
     height="auto"
     :scrollable="true"
-    @closed="closeDialog(false)"
+    :trigger-focus-trap="true"
+    :return-focus-selector="returnFocusSelector"
+    :return-focus-first-iterable-node-selector="returnFocusFirstIterableNodeSelector"
+    @close="closeDialog(false)"
     @before-open="beforeOpen"
   >
     <div class="modal-dialog">
@@ -90,7 +112,7 @@ export default {
         </div>
       </div>
     </div>
-  </modal>
+  </app-modal>
 </template>
 
 <style lang="scss" scoped>

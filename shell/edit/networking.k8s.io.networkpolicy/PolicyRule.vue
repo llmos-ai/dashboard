@@ -59,7 +59,7 @@ export default {
           />
         </h2>
         <ArrayListGrouped
-          v-model="value[targetKey]"
+          v-model:value="value[targetKey]"
           :add-label="t(`networkpolicy.rules.${type}.add`)"
           :default-add-value="{}"
           :mode="mode"
@@ -67,7 +67,7 @@ export default {
           <template #default="props">
             <PolicyRuleTarget
               ref="lastTarget"
-              v-model="props.row.value"
+              v-model:value="props.row.value"
               :mode="mode"
               :type="type"
               :namespace="namespace"
@@ -88,7 +88,7 @@ export default {
           />
         </h2>
         <ArrayListGrouped
-          v-model="value.ports"
+          v-model:value="value.ports"
           :add-label="t('networkpolicy.rules.addPort')"
           :default-add-value="{}"
           :mode="mode"
@@ -96,7 +96,7 @@ export default {
           <template #default="props">
             <PolicyRulePort
               ref="lastPort"
-              v-model="props.row.value"
+              v-model:value="props.row.value"
               :mode="mode"
             />
           </template>

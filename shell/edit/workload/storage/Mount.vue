@@ -4,28 +4,30 @@ import { Checkbox } from '@components/Form/Checkbox';
 import { mapGetters } from 'vuex';
 import { removeObject } from '@shell/utils/array';
 export default {
-  name:       'Mount',
+  name: 'Mount',
   components: { LabeledInput, Checkbox },
-  props:      {
+  props: {
     mode: {
-      type:    String,
-      default: 'create'
+      type: String,
+      default: 'create',
     },
 
     // volume name
     name: {
-      type:    String,
-      default: ''
+      type: String,
+      default: '',
     },
 
     container: {
-      type:     Object,
-      required: true
-    }
+      type: Object,
+      required: true,
+    },
   },
 
   data() {
-    const volumeMounts = (this.container.volumeMounts || []).filter((mount) => mount.name === this.name);
+    const volumeMounts = (this.container.volumeMounts || []).filter(
+      (mount) => mount.name === this.name
+    );
 
     return { volumeMounts };
   },
@@ -34,13 +36,15 @@ export default {
 
   watch: {
     volumeMounts(neu) {
-      this.container.volumeMounts = (this.container.volumeMounts || []).filter((mount) => mount.name && (mount.name !== this.name));
+      this.container.volumeMounts = (this.container.volumeMounts || []).filter(
+        (mount) => mount.name && mount.name !== this.name
+      );
       this.container.volumeMounts.push(...neu);
     },
 
     name(neu) {
       this.updateMountNames(neu);
-    }
+    },
   },
 
   created() {
@@ -62,17 +66,14 @@ export default {
       this.volumeMounts.forEach((mount) => {
         mount.name = name;
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
   <div>
-    <div
-      v-if="volumeMounts.length"
-      class="mount-headers"
-    >
+    <div v-if="volumeMounts.length" class="mount-headers">
       <span>
         {{ t('workload.storage.mountPoint') }}
         <span class="text-error">*</span>
@@ -85,33 +86,23 @@ export default {
       </span>
       <span />
     </div>
-    <div
-      v-for="(volumeMount, i) in volumeMounts"
-      :key="i"
-      class="mount-rows"
-    >
+    <div v-for="(volumeMount, i) in volumeMounts" :key="i" class="mount-rows">
       <div>
         <LabeledInput
           :id="`mount-path-${i}`"
-          v-model="volumeMount.mountPath"
+          v-model:value="volumeMount.mountPath"
           :mode="mode"
         />
       </div>
       <div>
-        <LabeledInput
-          v-model="volumeMount.subPath"
-          :mode="mode"
-        />
+        <LabeledInput v-model:value="volumeMount.subPath" :mode="mode" />
       </div>
       <div class="read-only">
-        <Checkbox
-          v-model="volumeMount.readOnly"
-          :mode="mode"
-        />
+        <Checkbox v-model:value="volumeMount.readOnly" :mode="mode" />
       </div>
       <div class="remove">
         <button
-          v-if="mode!=='view'"
+          v-if="mode !== 'view'"
           id="remove-mount"
           type="button"
           class="btn btn-sm role-link"
@@ -122,21 +113,16 @@ export default {
       </div>
     </div>
     <div class="row">
-      <button
-        v-if="mode!=='view'"
-        id="add-mount"
-        type="button"
-        class="btn role-tertiary"
-        @click="add()"
-      >
+      <a-button v-if="mode !== 'view'" id="add-mount" @click="add()">
         {{ t('workload.storage.addMount') }}
-      </button>
+      </a-button>
     </div>
   </div>
 </template>
 
-<style lang='scss'>
-.mount-headers, .mount-rows{
+<style lang="scss">
+.mount-headers,
+.mount-rows {
   display: grid;
   grid-template-columns: 42% 42% 5% auto;
   grid-gap: $column-gutter;

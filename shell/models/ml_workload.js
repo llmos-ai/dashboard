@@ -69,10 +69,14 @@ export default class MlWorkload extends MLWorkloadService {
       }
     }
 
-    this.$dispatch('growl/error', {
-      title:   'Unavailable',
-      message: 'There are no running pods to execute a shell in.'
-    }, { root: true });
+    this.$dispatch(
+      'growl/error',
+      {
+        title:   'Unavailable',
+        message: 'There are no running pods to execute a shell in.',
+      },
+      { root: true }
+    );
   }
 
   get available() {
@@ -83,11 +87,11 @@ export default class MlWorkload extends MLWorkloadService {
     return [
       {
         label:   this.t('mlWorkload.detail.detailTop.cpu'),
-        content: this.cpuLimit
+        content: this.cpuLimit,
       },
       {
         label:   this.t('mlWorkload.detail.detailTop.memory'),
-        content: this.memoryLimit
+        content: this.memoryLimit,
       },
       {
         label:   this.t('mlWorkload.detail.detailTop.vgpu'),
@@ -96,13 +100,14 @@ export default class MlWorkload extends MLWorkloadService {
       {
         label:   this.t('mlWorkload.detail.detailTop.vram'),
         content: this.vram,
-      }];
+      },
+    ];
   }
 
   redeploy() {
-    const now = (new Date()).toISOString().replace(/\.\d+Z$/, 'Z');
+    const now = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
 
-    if ( !this.metadata ) {
+    if (!this.metadata) {
       set(this, 'metadata', {});
     }
 
@@ -119,7 +124,11 @@ export default class MlWorkload extends MLWorkloadService {
     for (const pod of pods) {
       pod.remove();
     }
-    this.$dispatch('growl/success', { message: `${ this.kind } ${ this.name } has been successfully redeployed.` }, { root: true });
+    this.$dispatch(
+      'growl/success',
+      { message: `${ this.kind } ${ this.name } has been successfully redeployed.` },
+      { root: true }
+    );
   }
 
   get warnDeletionMessage() {
@@ -159,7 +168,7 @@ export default class MlWorkload extends MLWorkloadService {
       } else {
         out[stateDisplay] = {
           color: stateColor.replace('text-', ''),
-          count: 1
+          count: 1,
         };
       }
     });
@@ -169,7 +178,9 @@ export default class MlWorkload extends MLWorkloadService {
 
   async matchingPods() {
     const all = await this.$dispatch('findAll', { type: POD });
-    const allInNamespace = all.filter((pod) => pod.metadata.namespace === this.metadata.namespace);
+    const allInNamespace = all.filter(
+      (pod) => pod.metadata.namespace === this.metadata.namespace
+    );
 
     const selector = convertSelectorObj(this.podSelector);
 
@@ -188,8 +199,8 @@ export default class MlWorkload extends MLWorkloadService {
       return {
         matchLabels: {
           'app.kubernetes.io/name': 'kuberay',
-          'ray.io/cluster':         this.name
-        }
+          'ray.io/cluster':         this.name,
+        },
       };
     default:
       return this.metadata?.labels;
@@ -197,7 +208,10 @@ export default class MlWorkload extends MLWorkloadService {
   }
 
   get ready() {
-    const readyReplicas = Math.max(0, (this.status?.replicas || 0) - (this.status?.unavailableReplicas || 0));
+    const readyReplicas = Math.max(
+      0,
+      (this.status?.replicas || 0) - (this.status?.unavailableReplicas || 0)
+    );
 
     if (this.type === WORKLOAD_TYPES.DAEMON_SET) {
       return readyReplicas;
@@ -219,7 +233,7 @@ export default class MlWorkload extends MLWorkloadService {
       return 'in-progress';
     }
 
-    if ( this.isPaused ) {
+    if (this.isPaused) {
       return 'paused';
     }
 
@@ -227,7 +241,10 @@ export default class MlWorkload extends MLWorkloadService {
   }
 
   get isPaused() {
-    return this.metadata.annotations?.[ANNOTATIONS.RESOURCE_STOPPED] || this.spec.replicas === 0;
+    return (
+      this.metadata.annotations?.[ANNOTATIONS.RESOURCE_STOPPED] ||
+      this.spec.replicas === 0
+    );
   }
 
   pause() {
@@ -268,7 +285,9 @@ export default class MlWorkload extends MLWorkloadService {
     let containers = this.spec.template?.spec?.containers || [];
 
     if (this.type === ML_WORKLOAD_TYPES.RAY_CLUSTER) {
-      containers = containers.concat(this.spec.headGroupSpec.template.spec.containers || []);
+      containers = containers.concat(
+        this.spec.headGroupSpec.template.spec.containers || []
+      );
       this.spec.workerGroupSpecs.forEach((worker) => {
         containers = containers.concat(worker.template.spec.containers || []);
       });

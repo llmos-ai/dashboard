@@ -9,18 +9,25 @@
   "eslint.format.enable": true,
   "eslint.run": "onSave",
   "eslint.packageManager": "yarn",
-  "eslint.validate": ["vue","html","javascript","typescript"],
+  "eslint.validate": [
+    "vue",
+    "html",
+    "javascript",
+    "typescript"
+  ],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.workingDirectories": ["./", "./pkg/rancher-components/"],
+  "eslint.workingDirectories": [
+    "./",
+    "./pkg/rancher-components/"
+  ],
   "javascript.preferences.importModuleSpecifier": "non-relative",
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "cSpell.words": [
     "apiserver",
     "autoscroll",
     "cacerts",
-    "CAPI",
     "chainable",
     "clusterroletemplatebindings",
     "Codecov",

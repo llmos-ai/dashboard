@@ -5,6 +5,7 @@ import { fetchClusterResources } from '@shell/pages/c/_cluster/explorer/explorer
 export default {
   layout: 'rayDashboard',
   async asyncData({ route, redirect, store }) {
+    // TODO: fetch
     const services = await fetchClusterResources(store, SERVICE);
     const id = route.params.id;
     const namespace = route.params.namespace;
@@ -24,6 +25,13 @@ export default {
     return {
       services,
       dashboardUrl,
+    };
+  },
+
+  data() {
+    return {
+      services: [],
+      dashboardUrl: '',
     };
   },
 };

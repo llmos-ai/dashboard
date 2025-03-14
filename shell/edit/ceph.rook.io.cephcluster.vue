@@ -77,7 +77,7 @@ export default {
       />
 
       <ResourceTabs
-        v-model="value"
+        v-model:value="value"
         class="mt-15"
         :need-conditions="false"
         :need-related="false"
@@ -93,7 +93,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="spec.cephVersion.image"
+                v-model:value="spec.cephVersion.image"
                 label="Ceph Image"
                 :mode="mode"
                 required
@@ -102,7 +102,7 @@ export default {
 
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="spec.dataDirHostPath"
+                v-model:value="spec.dataDirHostPath"
                 label="Data Dir Host Path"
                 :mode="mode"
                 required
@@ -113,7 +113,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <UnitInput
-                v-model="spec.mgr.count"
+                v-model:value="spec.mgr.count"
                 label="Manager Replicas"
                 :mode="mode"
                 :min="1"
@@ -124,7 +124,7 @@ export default {
 
             <div class="col span-6 mb-10">
               <ToggleSwitch
-                v-model="spec.mgr.allowMultiplePerNode"
+                v-model:value="spec.mgr.allowMultiplePerNode"
                 name="label-system-toggle"
                 :on-label="t('ceph.labels.multiMgrPerNode')"
               />
@@ -135,7 +135,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <UnitInput
-                v-model="spec.mon.count"
+                v-model:value="spec.mon.count"
                 label="Mon Replicas"
                 :mode="mode"
                 :min="1"
@@ -145,7 +145,7 @@ export default {
             </div>
             <div class="col span-6 mb-10">
               <ToggleSwitch
-                v-model="spec.mon.allowMultiplePerNode"
+                v-model:value="spec.mon.allowMultiplePerNode"
                 name="label-system-toggle"
                 :disabled="isView"
                 :on-label="t('ceph.labels.multiMonPerNode')"
@@ -158,7 +158,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <LabeledSelect
-                v-model="spec.storage.useAllNodes"
+                v-model:value="spec.storage.useAllNodes"
                 label="Use All Nodes"
                 :options="options"
                 :mode="mode"
@@ -167,7 +167,7 @@ export default {
 
             <div class="col span-6 mb-10">
               <LabeledSelect
-                v-model="spec.storage.useAllDevices"
+                v-model:value="spec.storage.useAllDevices"
                 label="Use All Devices"
                 :options="options"
                 :mode="mode"
@@ -177,7 +177,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="spec.storage.deviceFilter"
+                v-model:value="spec.storage.deviceFilter"
                 label="Device Filter"
                 :mode="mode"
               />
@@ -195,7 +195,7 @@ export default {
           <div class="row">
             <div class="col span-6 mb-10">
               <ToggleSwitch
-                v-model="spec.logCollector.enabled"
+                v-model:value="spec.logCollector.enabled"
                 name="label-system-toggle"
                 :on-label="t('ceph.labels.enableLogCollector')"
               />
@@ -210,7 +210,7 @@ export default {
               class="col span-6 mb-10"
             >
               <UnitInput
-                v-model="spec.logCollector.maxLogSize"
+                v-model:value="spec.logCollector.maxLogSize"
                 label="Max Log Size"
                 :input-exponent="2"
                 :placeholder="500"
@@ -220,7 +220,7 @@ export default {
             </div>
             <div class="col span-6 mb-10">
               <LabeledSelect
-                v-model="spec.logCollector.periodicity"
+                v-model:value="spec.logCollector.periodicity"
                 label="Log Rotation Period"
                 :options="['hourly', 'daily', 'weekly', 'monthly']"
                 :mode="mode"

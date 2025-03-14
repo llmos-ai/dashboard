@@ -1,6 +1,5 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { MONITORING_NAMESPACE } from '@shell/utils/monitoring';
-import Vue from 'vue';
 
 export default class PrometheusRule extends SteveModel {
   applyDefaults() {
@@ -13,7 +12,7 @@ export default class PrometheusRule extends SteveModel {
       labels:    { release: 'llmos-monitoring' }
     };
 
-    Vue.set(this, 'metadata', metadata);
+    this.metadata = metadata;
   }
 
   get _availableActions() {

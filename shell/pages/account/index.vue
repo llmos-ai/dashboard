@@ -16,20 +16,31 @@ import { AGE, STATE } from '@shell/config/table-headers';
 const API_ENDPOINT = '/v1';
 
 export default {
-  layout:     'plain',
+  layout: 'plain',
   components: {
-    CopyToClipboardText, BackLink, Banner, PromptChangePassword, Loading, ResourceTable, Principal
+    CopyToClipboardText,
+    BackLink,
+    Banner,
+    PromptChangePassword,
+    Loading,
+    ResourceTable,
+    Principal,
   },
   mixins: [BackRoute],
   async fetch() {
     this.canChangePassword = await this.calcCanChangePassword();
 
     if (this.apiKeySchema) {
-      this.rows = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.TOKEN } );
+      this.rows = await this.$store.dispatch('management/findAll', {
+        type: MANAGEMENT.TOKEN,
+      });
     }
 
     // Get server url setting
-    const serverUrlSetting = await this.$store.dispatch('management/find', { type: MANAGEMENT.SETTING, id: SETTING.SERVER_URL });
+    const serverUrlSetting = await this.$store.dispatch('management/find', {
+      type: MANAGEMENT.SETTING,
+      id: SETTING.SERVER_URL,
+    });
 
     this.serverUrlSetting = serverUrlSetting?.value;
   },
@@ -38,8 +49,8 @@ export default {
     const principalId = this.$store.getters['auth/principalId'];
 
     return {
-      serverUrlSetting:  null,
-      rows:              [],
+      serverUrlSetting: null,
+      rows: [],
       canChangePassword: false,
       principalId,
     };
@@ -52,9 +63,10 @@ export default {
       const isApiKey = (key) => {
         const labels = key.labels;
         const expired = key.status?.isExpired;
-        const current = key.labels['auth.management.llmos.ai/is-current'] === 'true';
+        const current =
+          key.labels['auth.management.llmos.ai/is-current'] === 'true';
 
-        return ( !expired || !labels ) && !current;
+        return (!expired || !labels) && !current;
       };
 
       return !this.rows ? [] : this.rows.filter(isApiKey);
@@ -62,30 +74,24 @@ export default {
 
     apiKeyheaders() {
       const NAME = {
-        name:  'name',
+        name: 'name',
         label: 'Access Key',
-        value: 'name'
+        value: 'name',
       };
       const DESCRIPTION = {
-        name:  'description',
+        name: 'description',
         label: 'Description',
-        value: 'description'
+        value: 'description',
       };
 
       const EXPIRES = {
-        name:      'expires',
-        label:     'Expires',
-        value:     'expiresAt',
+        name: 'expires',
+        label: 'Expires',
+        value: 'expiresAt',
         formatter: 'LiveDate',
       };
 
-      const headers = [
-        STATE,
-        NAME,
-        DESCRIPTION,
-        EXPIRES,
-        AGE
-      ];
+      const headers = [STATE, NAME, DESCRIPTION, EXPIRES, AGE];
 
       return headers;
     },
@@ -94,12 +100,12 @@ export default {
       let url = this.serverUrlSetting;
 
       // If the URL is relative, add on the current base URL from the browser
-      if ( url.indexOf('http') !== 0 ) {
-        url = `${ window.location.origin }/${ url.replace(/^\/+/, '') }`;
+      if (url.indexOf('http') !== 0) {
+        url = `${window.location.origin}/${url.replace(/^\/+/, '')}`;
       }
 
       // URL must end in a single slash
-      url = `${ url.replace(/\/+$/, '') }/`;
+      url = `${url.replace(/\/+$/, '')}/`;
 
       return url;
     },
@@ -108,7 +114,7 @@ export default {
       const base = this.apiUrlBase;
       const path = API_ENDPOINT.replace(/^\/+/, '');
 
-      return `${ base }${ path }`;
+      return `${base}${path}`;
     },
 
     apiKeySchema() {
@@ -127,7 +133,10 @@ export default {
 
     principal() {
       const principalId = this.$store.getters['auth/principalId'];
-      const principal = this.$store.getters['management/byId'](MANAGEMENT.USER, principalId);
+      const principal = this.$store.getters['management/byId'](
+        MANAGEMENT.USER,
+        principalId
+      );
 
       if (!principal) {
         console.error('Failed to find principal with id: ', principalId); // eslint-disable-line no-console
@@ -153,8 +162,8 @@ export default {
 
       const users = await this.$store.dispatch('management/findAll', {
         type: MANAGEMENT.USER,
-        opt:  {
-          url:  `/v1/${ MANAGEMENT.USER }?me=true`,
+        opt: {
+          url: `/v1/${MANAGEMENT.USER}?me=true`,
           load: _MULTI,
         },
       });
@@ -165,7 +174,7 @@ export default {
 
       return false;
     },
-  }
+  },
 };
 </script>
 
@@ -177,47 +186,39 @@ export default {
 
     <h2 v-t="'accountAndKeys.account.title'" />
     <div class="account">
-      <Principal
-        :value="loggedInUser"
-        :use-muted="false"
-        :show-labels="true"
-      />
+      <Principal :value="loggedInUser" :use-muted="false" :show-labels="true" />
       <div>
-        <button
+        <a-button
           v-if="canChangePassword"
-          type="button"
-          class="btn role-primary"
+          type="primary"
           data-testid="account_change_password"
           @click="$refs.promptChangePassword.show(true)"
         >
-          {{ t("accountAndKeys.account.change") }}
-        </button>
+          {{ t('accountAndKeys.account.change') }}
+        </a-button>
       </div>
     </div>
     <PromptChangePassword ref="promptChangePassword" />
 
-    <hr>
+    <hr />
     <div class="keys-header">
       <div>
         <h2 v-t="'accountAndKeys.apiKeys.title'" />
         <div class="api-url">
-          <span>{{ t("accountAndKeys.apiKeys.apiEndpoint") }}</span>
+          <span>{{ t('accountAndKeys.apiKeys.apiEndpoint') }}</span>
           <CopyToClipboardText :text="apiUrl" />
         </div>
       </div>
-      <button
+      <a-button
         v-if="apiKeySchema"
-        class="btn role-primary add mb-20"
+        type="primary"
         data-testid="account_create_api_keys"
         @click="addKey"
       >
         {{ t('accountAndKeys.apiKeys.add.label') }}
-      </button>
+      </a-button>
     </div>
-    <div
-      v-if="apiKeySchema"
-      class="keys"
-    >
+    <div v-if="apiKeySchema" class="keys">
       <ResourceTable
         :schema="apiKeySchema"
         :rows="apiKeys"
@@ -230,44 +231,41 @@ export default {
       />
     </div>
     <div v-else>
-      <Banner
-        color="warning"
-        :label="t('accountAndKeys.apiKeys.notAllowed')"
-      />
+      <Banner color="warning" :label="t('accountAndKeys.apiKeys.notAllowed')" />
     </div>
   </div>
 </template>
 
-<style lang='scss' scoped>
-  hr {
-    margin: 20px 0;
-  }
+<style lang="scss" scoped>
+hr {
+  margin: 20px 0;
+}
 
-  .account {
-    display: flex;
-    justify-content: space-between
-  }
+.account {
+  display: flex;
+  justify-content: space-between;
+}
 
-  .keys-header {
-    display: flex;
-    div {
-      flex: 1;
-    }
+.keys-header {
+  display: flex;
+  div {
+    flex: 1;
   }
+}
 
-  .keys {
-    display: flex;
-    flex-direction: column;
-    .add {
-      align-self: flex-end;
-    }
+.keys {
+  display: flex;
+  flex-direction: column;
+  .add {
+    align-self: flex-end;
   }
+}
 
-  .api-url {
-    display: flex;
+.api-url {
+  display: flex;
 
-    > span {
-      margin-right: 6px;
-    }
+  > span {
+    margin-right: 6px;
   }
+}
 </style>

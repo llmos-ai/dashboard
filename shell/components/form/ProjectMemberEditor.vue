@@ -3,7 +3,6 @@ import CreateEditView from '@shell/mixins/create-edit-view';
 import SelectPrincipal from '@shell/components/auth/SelectPrincipal';
 import { MANAGEMENT } from '@shell/config/types';
 import Loading from '@shell/components/Loading';
-import { Card } from '@components/Card';
 import { RadioGroup } from '@components/Form/Radio';
 import { Checkbox } from '@components/Form/Checkbox';
 import { DESCRIPTION } from '@shell/config/labels-annotations';
@@ -11,7 +10,6 @@ import DOMPurify from 'dompurify';
 
 export default {
   components: {
-    Card,
     Checkbox,
     Loading,
     RadioGroup,
@@ -22,19 +20,21 @@ export default {
 
   props: {
     value: {
-      type:     Object,
-      required: true
+      type: Object,
+      required: true,
     },
 
     useTwoColumnsForCustom: {
-      type:    Boolean,
-      default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
   async fetch() {
     const [, roleTemplates] = await Promise.all([
       this.$store.dispatch('management/findAll', { type: MANAGEMENT.USER }),
-      this.$store.dispatch('management/findAll', { type: MANAGEMENT.ROLE_TEMPLATE }),
+      this.$store.dispatch('management/findAll', {
+        type: MANAGEMENT.ROLE_TEMPLATE,
+      }),
     ]);
 
     this.roleTemplates = roleTemplates;
@@ -44,47 +44,56 @@ export default {
 
     return {
       customPermissions: [],
-      roleTemplates:     [],
+      roleTemplates: [],
     };
   },
   computed: {
     customRoles() {
-      return this.roleTemplates
-        .filter((role) => {
-          return !role.spec.builtin && !role.spec.locked;
-        });
+      return this.roleTemplates.filter((role) => {
+        return !role.spec.builtin && !role.spec.locked;
+      });
     },
 
     options() {
       return [
         {
-          label:       this.t('projectMembers.projectPermissions.owner.label'),
-          description: this.t('projectMembers.projectPermissions.owner.description'),
-          value:       'owner'
+          label: this.t('projectMembers.projectPermissions.owner.label'),
+          description: this.t(
+            'projectMembers.projectPermissions.owner.description'
+          ),
+          value: 'owner',
         },
         {
-          label:       this.t('projectMembers.projectPermissions.readOnly.label'),
-          description: this.t('projectMembers.projectPermissions.readOnly.description'),
-          value:       'read-only'
+          label: this.t('projectMembers.projectPermissions.readOnly.label'),
+          description: this.t(
+            'projectMembers.projectPermissions.readOnly.description'
+          ),
+          value: 'read-only',
         },
         {
-          label:       this.t('projectMembers.projectPermissions.custom.label'),
-          description: this.t('projectMembers.projectPermissions.custom.description'),
-          value:       'custom'
-        }
+          label: this.t('projectMembers.projectPermissions.custom.label'),
+          description: this.t(
+            'projectMembers.projectPermissions.custom.description'
+          ),
+          value: 'custom',
+        },
       ];
     },
 
     customPermissionsUpdate() {
       this.customPermissions = this.customRoles.map((role) => ({
-        description: this.purifyOption(role.description || role.metadata?.annotations?.[DESCRIPTION] || this.t('projectMembers.projectPermissions.noDescription')),
-        key:         this.purifyOption(role.id),
-        label:       this.purifyOption(role.id),
-        value:       false,
+        description: this.purifyOption(
+          role.description ||
+            role.metadata?.annotations?.[DESCRIPTION] ||
+            this.t('projectMembers.projectPermissions.noDescription')
+        ),
+        key: this.purifyOption(role.id),
+        label: this.purifyOption(role.id),
+        value: false,
       }));
 
       return this.customPermissions;
-    }
+    },
   },
   watch: {
     'value.permissionGroup'(newPermissionGroup) {
@@ -95,18 +104,18 @@ export default {
       deep: true,
       handler() {
         this.setRoleTemplateIds(this.value.permissionGroup);
-      }
-    }
+      },
+    },
   },
   methods: {
     onAdd(principalId) {
-      this.$set(this.value, 'principalId', principalId);
+      this.value['principalId'] = principalId;
     },
 
     setRoleTemplateIds(permissionGroup) {
       const roleTemplateIds = this.getRoleTemplateIds(permissionGroup);
 
-      this.$set(this.value, 'roleTemplateIds', roleTemplateIds);
+      this.value['roleTemplateIds'] = roleTemplateIds;
     },
 
     getRoleTemplateIds(permissionGroup) {
@@ -128,10 +137,9 @@ export default {
     },
     purifyOption(option) {
       return DOMPurify.sanitize(option, { ALLOWED_TAGS: ['span'] });
-    }
-  }
+    },
+  },
 };
-
 </script>
 
 <template>
@@ -148,11 +156,7 @@ export default {
         />
       </div>
     </div>
-    <Card
-      class="m-0"
-      :show-highlight-border="false"
-      :show-actions="false"
-    >
+    <a-card class="m-0" :show-actions="false">
       <template v-slot:title>
         <div class="type-title">
           <h3>{{ t('projectMembers.projectPermissions.label') }}</h3>
@@ -161,48 +165,45 @@ export default {
           </div>
         </div>
       </template>
-      <template v-slot:body>
-        <RadioGroup
-          v-model="value.permissionGroup"
-          :options="options"
-          name="permission-group"
-        />
-        <div
-          v-if="value.permissionGroup === 'custom'"
-          class="custom-permissions ml-20 mt-10"
-          :class="{'two-column': useTwoColumnsForCustom}"
-        >
-          <div v-if="customRoles.length > 0">
-            <div
-              v-for="permission in customPermissionsUpdate"
-              :key="permission.key"
-            >
-              <Checkbox
-                v-model="permission.value"
-                :disabled="permission.locked"
-                class="mb-5"
-                :label="permission.label"
-              />
-              <i
-                v-if="permission.locked"
-                v-clean-tooltip="permission.tooltip"
-                class="icon icon-lock icon-fw"
-              />
-            </div>
-          </div>
-          <div v-else>
-            <small>{{ t('projectMembers.projectPermissions.noCustomRoles') }}</small>
+      <RadioGroup
+        v-model:value="value.permissionGroup"
+        :options="options"
+        name="permission-group"
+      />
+      <div
+        v-if="value.permissionGroup === 'custom'"
+        class="custom-permissions ml-20 mt-10"
+        :class="{ 'two-column': useTwoColumnsForCustom }"
+      >
+        <div v-if="customRoles.length > 0">
+          <div v-for="(permission, i) in customPermissionsUpdate" :key="i">
+            <Checkbox
+              v-model:value="permission.value"
+              :disabled="permission.locked"
+              class="mb-5"
+              :label="permission.label"
+            />
+            <i
+              v-if="permission.locked"
+              v-clean-tooltip="permission.tooltip"
+              class="icon icon-lock icon-fw"
+            />
           </div>
         </div>
-      </template>
-    </Card>
+        <div v-else>
+          <small>{{
+            t('projectMembers.projectPermissions.noCustomRoles')
+          }}</small>
+        </div>
+      </div>
+    </a-card>
   </div>
 </template>
 <style lang="scss" scoped>
 $detailSize: 11px;
 
-::v-deep .type-description {
-    font-size: $detailSize;
+:deep() .type-description {
+  font-size: $detailSize;
 }
 
 label.radio {
@@ -216,7 +217,7 @@ label.radio {
     grid-template-columns: 1fr 1fr;
   }
 
-  ::v-deep .checkbox-label {
+  :deep() .checkbox-label {
     margin-right: 0;
   }
 }

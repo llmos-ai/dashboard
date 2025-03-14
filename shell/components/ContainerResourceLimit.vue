@@ -265,7 +265,7 @@ export default {
     <div class="row mb-20">
       <span class="col span-6">
         <UnitInput
-          v-model="requestsCpu"
+          v-model:value="requestsCpu"
           :placeholder="t('containerResourceLimit.cpuPlaceholder')"
           :label="t('containerResourceLimit.requestsCpu')"
           :mode="mode"
@@ -273,12 +273,12 @@ export default {
           :output-modifier="true"
           :base-unit="t('suffix.cpus')"
           data-testid="cpu-reservation"
-          @input="updateLimits"
+          @update:value="updateLimits"
         />
       </span>
       <span class="col span-6">
         <UnitInput
-          v-model="requestsMemory"
+          v-model:value="requestsMemory"
           :placeholder="t('containerResourceLimit.memPlaceholder')"
           :label="t('containerResourceLimit.requestsMemory')"
           :mode="mode"
@@ -286,7 +286,7 @@ export default {
           :increment="1024"
           :output-modifier="true"
           data-testid="memory-reservation"
-          @input="updateLimits"
+          @update:value="updateLimits"
         />
       </span>
     </div>
@@ -294,7 +294,7 @@ export default {
     <div class="row mb-20">
       <span class="col span-6">
         <UnitInput
-          v-model="limitsCpu"
+          v-model:value="limitsCpu"
           :placeholder="t('containerResourceLimit.cpuPlaceholder')"
           :label="t('containerResourceLimit.limitsCpu')"
           :mode="mode"
@@ -302,12 +302,12 @@ export default {
           :output-modifier="true"
           :base-unit="t('suffix.cpus')"
           data-testid="cpu-limit"
-          @input="updateLimits"
+          @update:value="updateLimits"
         />
       </span>
       <span class="col span-6">
         <UnitInput
-          v-model="limitsMemory"
+          v-model:value="limitsMemory"
           :placeholder="t('containerResourceLimit.memPlaceholder')"
           :label="t('containerResourceLimit.limitsMemory')"
           :mode="mode"
@@ -315,7 +315,7 @@ export default {
           :increment="1024"
           :output-modifier="true"
           data-testid="memory-limit"
-          @input="updateLimits"
+          @update:value="updateLimits"
         />
       </span>
     </div>
@@ -326,7 +326,7 @@ export default {
         <div class="gpu-banner">
           <span class="warning">
             GPU operator is not installed, click
-            <nuxt-link :to="gpuStackAddonLink">here</nuxt-link>
+            <router-link :to="gpuStackAddonLink">here</router-link>
             to enable it now.
           </span>
         </div>
@@ -335,12 +335,12 @@ export default {
         <div class="row mb-20">
           <span class="col span-12">
             <RadioGroup
-              v-model="gpuType"
+              v-model:value="gpuType"
               name="gpuType"
               :mode="mode"
               :options="accelerators"
               :rstyle="radioStyle"
-              @input="updateLimits"
+              @update:value="updateLimits"
             />
           </span>
         </div>
@@ -348,23 +348,23 @@ export default {
         <div class="row mb-20">
           <span class="col span-6">
             <UnitInput
-              v-model="limitsGpu"
+              v-model:value="limitsGpu"
               :placeholder="t('containerResourceLimit.gpuPlaceholder')"
               :label="t('containerResourceLimit.limitsGpu')"
               :mode="mode"
               :base-unit="t('suffix.gpus')"
               data-testid="gpu-limit"
-              @input="updateLimits"
+              @update:value="updateLimits"
             />
           </span>
           <span class="col span-6">
             <LabeledSelect
-              v-model="podSpec.runtimeClassName"
+              v-model:value="podSpec.runtimeClassName"
               label="Runtime Class"
               :options="runtimeClassOptions"
               :mode="mode"
               :clearable="true"
-              @input="updateBeforeSave"
+              @update:value="updateBeforeSave"
             />
           </span>
         </div>
@@ -373,10 +373,10 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <ToggleSwitch
-              v-model="enableVGpu"
+              v-model:value="enableVGpu"
               name="label-vgpu-toggle"
               :on-label="t('accelerator.vgpu.enableLabel')"
-              @input="updateLimits"
+              @update:value="updateLimits"
             />
           </div>
         </div>
@@ -387,24 +387,24 @@ export default {
           <span class="col span-6">
             <UnitInput
               v-if="enableVGpu"
-              v-model="limitsVGpuMem"
+              v-model:value="limitsVGpuMem"
               required
               :placeholder="t('containerResourceLimit.vGPUMemPlaceholder')"
               :label="t('containerResourceLimit.vGPUMem')"
               :mode="mode"
               :base-unit="t('suffix.mib')"
-              @input="updateLimits"
+              @update:value="updateLimits"
             />
           </span>
           <span class="col span-6">
             <UnitInput
               v-if="enableVGpu"
-              v-model="limitsVGpuCores"
+              v-model:value="limitsVGpuCores"
               :placeholder="t('containerResourceLimit.vGPUCoresPlaceholder')"
               :label="t('containerResourceLimit.vGPUCores')"
               :mode="mode"
               :base-unit="t('suffix.percent')"
-              @input="updateLimits"
+              @update:value="updateLimits"
             />
           </span>
         </div>

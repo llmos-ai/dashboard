@@ -4,19 +4,19 @@ export default {
 
   props: {
     size: {
-      type:    String,
-      default: '' // possible values are xs, sm, lg. empty is default .btn
+      type: String,
+      default: '', // possible values are xs, sm, lg. empty is default .btn
     },
     // whether this is a button and dropdown (default) or dropdown that looks like a button/dropdown
     dualAction: {
-      type:    Boolean,
-      default: true
+      type: Boolean,
+      default: true,
     },
 
     disableButton: {
-      type:    Boolean,
-      default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -25,67 +25,68 @@ export default {
       let out;
 
       switch (size) {
-      case '':
-        out = 'btn';
-        break;
-      case 'xs':
-        out = 'btn btn-xs';
-        break;
-      case 'sm':
-        out = 'btn btn-sm';
-        break;
-      case 'lg':
-        out = 'btn btn-lg';
-        break;
-      default:
+        case '':
+          out = 'btn';
+          break;
+        case 'xs':
+          out = 'btn btn-xs';
+          break;
+        case 'sm':
+          out = 'btn btn-sm';
+          break;
+        case 'lg':
+          out = 'btn btn-lg';
+          break;
+        default:
       }
 
       return out;
-    }
+    },
   },
 
   methods: {
     hasSlot(name = 'default') {
-      return !!this.$slots[name] || !!this.$scopedSlots[name];
+      return !!this.$slots[name] || !!this.$slots.name();
     },
 
     // allows parent components to programmatically open the dropdown
     togglePopover() {
       // this.$refs.popoverButton.click();
     },
-  }
+  },
 };
 </script>
 <template>
   <div class="dropdown-button-group">
     <div
       class="dropdown-button bg-primary"
-      :class="{'one-action':!dualAction, [buttonSize]:true, 'disabled': disableButton}"
+      :class="{
+        'one-action': !dualAction,
+        [buttonSize]: true,
+        disabled: disableButton,
+      }"
     >
-      <v-popover
+      <v-dropdown
         placement="bottom"
         :container="false"
         :disabled="disableButton"
-        :popper-options="{modifiers: { flip: { enabled: false } } }"
+        :flip="false"
       >
-        <slot
-          name="button-content"
-          :buttonSize="buttonSize"
-        >
-          <button
+        <slot name="button-content" :buttonSize="buttonSize">
+          <a-button
             ref="popoverButton"
-            class="icon-container bg-primary no-left-border-radius"
+            class="icon-container no-left-border-radius"
             :class="buttonSize"
             :disabled="disableButton"
-            type="button"
+            type="primary"
           >
             Button <i class="icon icon-chevron-down" />
-          </button>
+          </a-button>
         </slot>
-        <template #popover>
+        <template #popper>
           <slot name="popover-content" />
         </template>
-      </v-popover>
+      </v-dropdown>
     </div>
   </div>
 </template>
@@ -113,8 +114,8 @@ export default {
   .btn-xs,
   .btn-group-xs > .btn,
   .btn-xs .btn-label {
-      padding: $xs-padding;
-      font-size: 13px;
+    padding: $xs-padding;
+    font-size: 13px;
   }
 
   // this matches the top/bottom padding of the default button
@@ -123,7 +124,7 @@ export default {
   $sm-trigger-padding: 10px 10px 10px 10px;
   $lg-trigger-padding: 18px 10px 10px 10px;
 
-  .v-popover {
+  .v-popper {
     .text-right {
       margin-top: 5px;
     }
@@ -165,9 +166,10 @@ export default {
       }
     }
 
-    &>*, .icon-chevron-down {
+    & > *,
+    .icon-chevron-down {
       color: var(--primary);
-      background-color: rgba(0,0,0,0);
+      background-color: rgba(0, 0, 0, 0);
     }
 
     &.bg-primary:hover {
@@ -176,11 +178,11 @@ export default {
 
     &.one-action {
       position: relative;
-      &>.btn {
+      & > .btn {
         padding: 15px 35px 15px 15px;
       }
-      .v-popover{
-        .trigger{
+      .v-popper {
+        .trigger {
           position: absolute;
           top: 0px;
           right: 0px;
@@ -194,23 +196,19 @@ export default {
       }
     }
   }
-  .popover {
+  .v-popper__popper {
     border: none;
   }
-  .tooltip {
+  .v-popper__popper {
     margin-top: 0px;
 
-    &[x-placement^="bottom"] {
-      .tooltip-arrow {
-        border-bottom-color: var(--dropdown-border);
-
-        &:after {
-          border-bottom-color: var(--dropdown-bg);
-        }
+    &[data-popper-placement^='bottom'] {
+      .v-popper__arrow-container {
+        display: none;
       }
     }
 
-    .tooltip-inner {
+    .v-popper__inner {
       color: var(--dropdown-text);
       background-color: var(--dropdown-bg);
       border: 1px solid var(--dropdown-border);
@@ -238,7 +236,6 @@ export default {
           cursor: pointer;
         }
       }
-
     }
   }
 
@@ -248,5 +245,4 @@ export default {
     display: block;
   }
 }
-
 </style>

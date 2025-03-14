@@ -6,37 +6,39 @@ import ResourceCancelModal from '@shell/components/ResourceCancelModal';
 import { _VIEW } from '@shell/config/query-params';
 
 export default {
+  emits: ['cancel-confirmed', 'finish'],
+
   components: { AsyncButton, ResourceCancelModal },
-  props:      {
+  props: {
     mode: {
-      type:    String,
+      type: String,
       default: 'create',
     },
 
     isForm: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
     },
 
     // Override the set of labels shown on the button from the default save/create.
     finishButtonMode: {
-      type:    String,
+      type: String,
       default: null,
     },
 
     confirmCancelRequired: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
 
     confirmBackRequired: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
     },
 
     showCancel: {
-      type:    Boolean,
-      default: true
+      type: Boolean,
+      default: true,
     },
 
     /**
@@ -44,9 +46,9 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type:    String,
-      default: 'form-footer'
-    }
+      type: String,
+      default: 'form-footer',
+    },
   },
 
   data() {
@@ -80,27 +82,31 @@ export default {
 
 <template>
   <div class="cru-resource-footer">
-    <slot name="footer-prefix" />
-    <slot name="cancel">
-      <button
-        v-if="!isView && showCancel"
-        id="cru-cancel"
-        :data-testid="componentTestid + '-cancel'"
-        type="button"
-        class="btn role-secondary"
-        @click="confirmCancelRequired ? checkCancel(true) : $emit('cancel-confirmed', true)"
-      >
-        <t k="generic.cancel" />
-      </button>
-    </slot>
-    <slot :checkCancel="checkCancel">
-      <AsyncButton
-        v-if="!isView"
-        :data-testid="componentTestid + '-create'"
-        :mode="finishButtonMode || mode"
-        @click="$emit('finish', $event)"
-      />
-    </slot>
+    <a-space>
+      <slot name="footer-prefix" />
+      <slot name="cancel">
+        <a-button
+          v-if="!isView && showCancel"
+          id="cru-cancel"
+          :data-testid="componentTestid + '-cancel'"
+          @click="
+            confirmCancelRequired
+              ? checkCancel(true)
+              : $emit('cancel-confirmed', true)
+          "
+        >
+          <t k="generic.cancel" />
+        </a-button>
+      </slot>
+      <slot :checkCancel="checkCancel">
+        <AsyncButton
+          v-if="!isView"
+          :data-testid="componentTestid + '-create'"
+          :mode="finishButtonMode || mode"
+          @click="$emit('finish', $event)"
+        />
+      </slot>
+    </a-space>
     <ResourceCancelModal
       ref="cancelModal"
       :is-cancel-modal="isCancelModal"
@@ -115,10 +121,10 @@ export default {
   display: flex;
   justify-content: flex-end;
   margin-top: 20px;
+  z-index: z-index('cruFooter');
 
   .btn {
     margin-left: 20px;
   }
 }
-
 </style>

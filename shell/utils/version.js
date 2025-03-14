@@ -83,7 +83,7 @@ export function isDevBuild(version) {
 
 export function getVersionInfo(store) {
   const setting = store.getters['management/byId'](MANAGEMENT.SETTING, 'server-version');
-  const fullVersion = setting?.value || setting.default || 'unknown';
+  const fullVersion = setting?.value || setting?.default || 'unknown';
   let displayVersion = fullVersion;
 
   const match = fullVersion.match(/^(.*)-([0-9a-f]{40})-(.*)$/);

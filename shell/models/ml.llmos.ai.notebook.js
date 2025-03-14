@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { set } from '@shell/utils/object';
 import MlWorkload from '@shell/models/ml_workload';
 
@@ -66,7 +65,7 @@ export default class NoteBook extends MlWorkload {
       }
     };
 
-    Vue.set(this, 'metadata', value.metadata);
+    this.metadata = value.metadata;
     set(this, 'spec', this.spec || value.spec);
   }
 

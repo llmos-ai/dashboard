@@ -1,18 +1,24 @@
-import { COUNT, SCHEMA } from '@shell/config/types';
+
+import { SCHEMA, COUNT } from '@shell/config/types';
+
 import { matches } from '@shell/utils/selector';
 import { typeMunge, typeRef, SIMPLE_TYPES } from '@shell/utils/create-yaml';
 import Resource from '@shell/plugins/dashboard-store/resource-class';
 import mutations from './mutations';
 import { keyFieldFor, normalizeType } from './normalize';
 import { lookup } from './model-loader';
+import garbageCollect from '@shell/utils/gc/gc';
+import paginationUtils from '@shell/utils/pagination-utils';
 
 export const urlFor = (state, getters) => (type, id, opt) => {
   opt = opt || {};
   type = getters.normalizeType(type);
   let url = opt.url;
 
+  let schema;
+
   if ( !url ) {
-    const schema = getters.schemaFor(type);
+    schema = getters.schemaFor(type);
 
     if ( !schema ) {
       throw new Error(`Unknown schema for type: ${ type }`);
@@ -35,7 +41,7 @@ export const urlFor = (state, getters) => (type, id, opt) => {
     url = `${ baseUrl }/${ url }`;
   }
 
-  url = getters.urlOptions(url, opt);
+  url = getters.urlOptions(url, opt, schema);
 
   return url;
 };
@@ -65,6 +71,9 @@ function matchingCounts(typeObj, namespaces) {
 
 export default {
 
+  /**
+   * Get all entries in the store. This might not mean all entries of this type
+   */
   all: (state, getters, rootState) => (type) => {
     type = getters.normalizeType(type);
 
@@ -74,6 +83,10 @@ export default {
       console.warn(`All of ${ type } is not loaded yet`); // eslint-disable-line no-console
       mutations.registerType(state, type);
     }
+
+    garbageCollect.gcUpdateLastAccessed({
+      state, getters, rootState
+    }, type);
 
     return state.types[type].list;
   },
@@ -85,6 +98,10 @@ export default {
     if (namespace && typeof namespace === 'string') {
       matching = matching.filter((obj) => obj.namespace === namespace);
     }
+
+    garbageCollect.gcUpdateLastAccessed({
+      state, getters, rootState
+    }, type);
 
     // Looks like a falsy selector is a thing, so if we're not interested in filtering by the selector... explicitly avoid it
     if (config.skipSelector) {
@@ -101,6 +118,10 @@ export default {
     const entry = state.types[type];
 
     if ( entry ) {
+      garbageCollect.gcUpdateLastAccessed({
+        state, getters, rootState
+      }, type);
+
       return entry.map.get(id);
     }
   },
@@ -243,7 +264,6 @@ export default {
 
   typeRegistered: (state, getters) => (type) => {
     type = getters.normalizeType(type);
-
     return !!state.types[type];
   },
 
@@ -279,10 +299,37 @@ export default {
     return false;
   },
 
+  havePaginatedPage: (state, getters) => (type, opt) => {
+    if (!opt.pagination) {
+      return false;
+    }
+
+    type = getters.normalizeType(type);
+    const entry = state.types[type];
+
+    if ( entry?.havePage ) {
+      const { namespace: aNamespace = undefined, pagination: aPagination } = entry.havePage.request;
+      const { namespace: bNamespace = undefined, pagination: bPagination } = {
+        namespace:  opt.namespaced,
+        pagination: opt.pagination
+      };
+
+      return entry.havePage && aNamespace === bNamespace && paginationUtils.paginationEqual(aPagination, bPagination);
+    }
+
+    return false;
+  },
+
   haveNamespace: (state, getters) => (type) => {
     type = getters.normalizeType(type);
 
     return state.types[type]?.haveNamespace || null;
+  },
+
+  havePage: (state, getters) => (type) => {
+    type = getters.normalizeType(type);
+
+    return state.types[type]?.havePage || null;
   },
 
   haveSelector: (state, getters) => (type, selector) => {
@@ -306,7 +353,7 @@ export default {
 
   urlFor,
 
-  urlOptions: () => (url, opt) => {
+  urlOptions: () => (url, opt, schema) => {
     return url;
   },
 
@@ -363,8 +410,6 @@ export default {
     let _typeObj = typeObj;
     const { name: type, count } = _typeObj;
 
-    // console.log('count', typeObj, _typeObj, name, type, count);
-
     if (!type) {
       throw new Error(`Resource type required to calc count: ${ JSON.stringify(typeObj) }`);
     }
@@ -387,4 +432,25 @@ export default {
 
     return matchingCounts(_typeObj, namespaces.length ? namespaces : null);
   },
+
+  generation: (state, getters) => (type) => {
+    type = getters.normalizeType(type);
+    const entry = state.types[type];
+
+    if ( entry ) {
+      return entry.generation;
+    }
+
+    return undefined;
+  },
+
+  paginationEnabled: (state, getters, rootState, rootGetters) => (args) => {
+    const id = typeof args === 'object' ? args.id : args;
+    const context = typeof args === 'object' ? args.context : undefined;
+
+    const store = state.config.namespace;
+    const resource = id || context ? { id, context } : null;
+
+    return paginationUtils.isEnabled({ rootGetters }, { store, resource });
+  }
 };

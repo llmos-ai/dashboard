@@ -1,49 +1,48 @@
 <script>
-import { Card } from '@components/Card';
 import ProjectMemberEditor from '@shell/components/form/ProjectMemberEditor.vue';
 import AsyncButton from '@shell/components/AsyncButton.vue';
 import Banner from '@components/Banner/Banner.vue';
 import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from '@shell/config/types';
 
 export default {
+  emit: ['close'],
   components: {
-    Card,
     ProjectMemberEditor,
     AsyncButton,
-    Banner
+    Banner,
   },
 
   props: {
     resources: {
-      type:     Array,
-      required: true
+      type: Array,
+      required: true,
     },
 
     onAdd: {
-      type:    Function,
-      default: () => {}
+      type: Function,
+      default: () => {},
     },
 
     projectId: {
-      type:    String,
-      default: null
+      type: String,
+      default: null,
     },
 
     saveInModal: {
-      type:    Boolean,
-      default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
     return {
       member: {
         permissionGroup: 'owner',
-        custom:          {},
-        principalId:     '',
-        roleTemplateIds: []
+        custom: {},
+        principalId: '',
+        roleTemplateIds: [],
       },
-      error: null
+      error: null,
     };
   },
 
@@ -64,22 +63,24 @@ export default {
     },
 
     async createBindings() {
-      const promises = this.member.roleTemplateIds.map((roleTemplateId) => this.$store.dispatch(`management/create`, {
-        type:            MANAGEMENT.ROLE_TEMPLATE_BINDING,
-        namespaceId:     this.projectId,
-        roleTemplateRef: {
-          apiGroup: MANAGEMENT_GROUP,
-          kind:     'RoleTemplate',
-          name:     roleTemplateId,
-        },
-        subjects: [
-          {
-            apiGroup: RBAC_GROUP,
-            kind:     'User',
-            name:     this.member.principalId,
-          }
-        ],
-      }));
+      const promises = this.member.roleTemplateIds.map((roleTemplateId) =>
+        this.$store.dispatch(`management/create`, {
+          type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
+          namespaceId: this.projectId,
+          roleTemplateRef: {
+            apiGroup: MANAGEMENT_GROUP,
+            kind: 'RoleTemplate',
+            name: roleTemplateId,
+          },
+          subjects: [
+            {
+              apiGroup: RBAC_GROUP,
+              kind: 'User',
+              name: this.member.principalId,
+            },
+          ],
+        })
+      );
 
       return Promise.all(promises);
     },
@@ -98,80 +99,41 @@ export default {
           this.error = err;
           btnCB(false);
         });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
-  <Card
-    class="prompt-rotate"
+  <a-Card
+    :title="t('addProjectMemberDialog.title')"
     :show-highlight-border="false"
     :sticky="true"
   >
-    <h4
-      slot="title"
-      v-clean-html="t('addNamespaceMemberDialog.title')"
-      class="text-default-text"
-    />
-
-    <div
-      slot="body"
-      class="pl-10 pr-10"
-    >
-      <Banner
-        v-if="error"
-        color="error"
-      >
+    <div class="pl-10 pr-10">
+      <Banner v-if="error" color="error">
         {{ error }}
       </Banner>
       <ProjectMemberEditor
-        v-model="member"
+        v-model:value="member"
         :use-two-columns-for-custom="true"
       />
     </div>
 
-    <div
-      slot="actions"
-      class="buttons"
-    >
-      <button
-        class="btn role-secondary mr-10"
-        @click="close"
-      >
+    <template #actions>
+      <a-button class="mr-10" @click="close">
         {{ t('generic.cancel') }}
-      </button>
+      </a-button>
 
       <AsyncButton
         v-if="saveInModal"
         mode="create"
-        @click="cb=>saveBindings(cb)"
+        @click="(cb) => saveBindings(cb)"
       />
 
-      <button
-        v-else
-        class="btn role-primary"
-        @click="apply"
-      >
+      <a-button v-else type="primary" @click="apply">
         {{ t('generic.add') }}
-      </button>
-    </div>
-  </Card>
+      </a-button>
+    </template>
+  </a-Card>
 </template>
-<style lang='scss' scoped>
-  .prompt-rotate {
-    margin: 0;
-  }
-  .buttons {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-  }
-</style>
-
-<style lang="scss">
-  .card-container {
-    border: 1px solid var(--border);
-    box-shadow: none;
-  }
-</style>

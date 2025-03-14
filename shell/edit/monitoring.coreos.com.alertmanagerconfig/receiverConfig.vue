@@ -9,7 +9,6 @@ import Tab from '@shell/components/Tabbed/Tab';
 import YamlEditor, { EDITOR_MODES } from '@shell/components/YamlEditor';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import jsyaml from 'js-yaml';
-import ButtonDropdown from '@shell/components/ButtonDropdown';
 import { _CREATE, _VIEW } from '@shell/config/query-params';
 import FormValidation from '@shell/mixins/form-validation';
 import { fetchAlertManagerConfigSpecs } from '@shell/utils/alertmanagerconfig';
@@ -18,49 +17,49 @@ import { fetchAlertManagerConfigSpecs } from '@shell/utils/alertmanagerconfig';
 // i18n-uses monitoringReceiver.opsgenie.*, monitoringReceiver.webhook.*, monitoringReceiver.custom.*
 export const RECEIVERS_TYPES = [
   {
-    name:  'slack',
+    name: 'slack',
     label: 'monitoringReceiver.slack.label',
     title: 'monitoringReceiver.slack.title',
-    info:  'monitoringReceiver.slack.info',
-    key:   'slackConfigs',
-    logo:  require(`@shell/assets/images/vendor/slack.svg`)
+    info: 'monitoringReceiver.slack.info',
+    key: 'slackConfigs',
+    logo: require(`@shell/assets/images/vendor/slack.svg`),
   },
   {
-    name:  'email',
+    name: 'email',
     label: 'monitoringReceiver.email.label',
     title: 'monitoringReceiver.email.title',
-    key:   'emailConfigs',
-    logo:  require(`@shell/assets/images/vendor/email.svg`)
+    key: 'emailConfigs',
+    logo: require(`@shell/assets/images/vendor/email.svg`),
   },
   {
-    name:  'pagerduty',
+    name: 'pagerduty',
     label: 'monitoringReceiver.pagerduty.label',
     title: 'monitoringReceiver.pagerduty.title',
-    info:  'monitoringReceiver.pagerduty.info',
-    key:   'pagerdutyConfigs',
-    logo:  require(`@shell/assets/images/vendor/pagerduty.svg`)
+    info: 'monitoringReceiver.pagerduty.info',
+    key: 'pagerdutyConfigs',
+    logo: require(`@shell/assets/images/vendor/pagerduty.svg`),
   },
   {
-    name:  'opsgenie',
+    name: 'opsgenie',
     label: 'monitoringReceiver.opsgenie.label',
     title: 'monitoringReceiver.opsgenie.title',
-    key:   'opsgenieConfigs',
-    logo:  require(`@shell/assets/images/vendor/email.svg`)
+    key: 'opsgenieConfigs',
+    logo: require(`@shell/assets/images/vendor/email.svg`),
   },
   {
-    name:  'webhook',
+    name: 'webhook',
     label: 'monitoringReceiver.webhook.label',
     title: 'monitoringReceiver.webhook.title',
-    key:   'webhookConfigs',
-    logo:  require(`@shell/assets/images/vendor/webhook.svg`),
+    key: 'webhookConfigs',
+    logo: require(`@shell/assets/images/vendor/webhook.svg`),
   },
   {
-    name:  'custom',
+    name: 'custom',
     label: 'monitoringReceiver.custom.label',
     title: 'monitoringReceiver.custom.title',
-    info:  'monitoringReceiver.custom.info',
-    key:   'webhookConfigs',
-    logo:  require(`@shell/assets/images/vendor/custom.svg`)
+    info: 'monitoringReceiver.custom.info',
+    key: 'webhookConfigs',
+    logo: require(`@shell/assets/images/vendor/custom.svg`),
   },
 ];
 
@@ -68,38 +67,36 @@ export default {
   components: {
     ArrayListGrouped,
     Banner,
-    ButtonDropdown,
     CruResource,
     LabeledInput,
     Loading,
     Tabbed,
     Tab,
-    YamlEditor
+    YamlEditor,
   },
 
   props: {
-
     value: {
-      type:    Object,
+      type: Object,
       default: () => {
         return {};
-      }
+      },
     },
     mode: {
-      type:    String,
-      default: ''
+      type: String,
+      default: '',
     },
     alertmanagerConfigResource: {
-      type:     Object,
-      required: true
+      type: Object,
+      required: true,
     },
     alertmanagerConfigId: {
-      type:     String,
-      required: true
+      type: String,
+      required: true,
     },
     saveOverride: {
-      type:     Function,
-      required: true
+      type: Function,
+      required: true,
     },
   },
 
@@ -116,7 +113,9 @@ export default {
     const { receiverSchema } = await fetchAlertManagerConfigSpecs(this.$store);
 
     if (!receiverSchema) {
-      throw new Error("Can't render the form because the AlertmanagerConfig schema, or it's definitions, is not loaded yet.");
+      throw new Error(
+        "Can't render the form because the AlertmanagerConfig schema, or it's definitions, is not loaded yet."
+      );
     }
 
     const expectedFields = Object.keys(receiverSchema.resourceFields);
@@ -144,22 +143,21 @@ export default {
 
     if (mode === _CREATE) {
       RECEIVERS_TYPES.forEach((receiverType) => {
-        this.$set(currentReceiver, receiverType.key, currentReceiver[receiverType.key] || []);
+        currentReceiver[receiverType.key] =
+          currentReceiver[receiverType.key] || [];
       });
     }
 
     return {
-      create:         _CREATE,
+      create: _CREATE,
       EDITOR_MODES,
-      fileFound:      false,
-      receiverTypes:  RECEIVERS_TYPES,
-      view:           _VIEW,
-      yamlError:      '',
-      suffixYaml:     null,
-      fvFormRuleSets: [
-        { path: 'name', rules: ['required', 'duplicateName'] }
-      ],
-      fvReportedValidationPaths: ['value']
+      fileFound: false,
+      receiverTypes: RECEIVERS_TYPES,
+      view: _VIEW,
+      yamlError: '',
+      suffixYaml: null,
+      fvFormRuleSets: [{ path: 'name', rules: ['required', 'duplicateName'] }],
+      fvReportedValidationPaths: ['value'],
     };
   },
 
@@ -174,7 +172,7 @@ export default {
 
   computed: {
     editorMode() {
-      if ( this.$route.query.mode === _VIEW ) {
+      if (this.$route.query.mode === _VIEW) {
         return EDITOR_MODES.VIEW_CODE;
       }
 
@@ -194,7 +192,7 @@ export default {
         // We need this step so we don't just keep adding new keys when modifying the custom field
         Object.keys(this.value).forEach((key) => {
           if (!this.expectedFields.includes(key)) {
-            this.$delete(this.value, key);
+            delete this.value[key];
           }
         });
 
@@ -203,14 +201,14 @@ export default {
         Object.assign(this.value, suffix);
         this.yamlError = '';
       } catch (ex) {
-        this.yamlError = `There was a problem parsing the Custom Config: ${ ex }`;
+        this.yamlError = `There was a problem parsing the Custom Config: ${ex}`;
       }
     },
   },
 
   methods: {
     getComponent(name) {
-      return require(`./types/${ name }`).default;
+      return require(`./types/${name}`).default;
     },
 
     navigateTo(receiverType) {
@@ -225,9 +223,9 @@ export default {
 
     tabChanged({ tab }) {
       window.scrollTop = 0;
-      if ( tab.name === 'custom' ) {
+      if (tab.name === 'custom') {
         this.$nextTick(() => {
-          if ( this.$refs.customEditor ) {
+          if (this.$refs.customEditor) {
             this.$refs.customEditor[0].refresh();
             this.$refs.customEditor[0].focus();
           }
@@ -245,8 +243,8 @@ export default {
       } else {
         this.errors = [err];
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -261,14 +259,14 @@ export default {
     :errors="errors"
     :cancel-event="true"
     :validation-passed="fvFormIsValid"
-    @error="e=>errors = e"
+    @error="(e) => (errors = e)"
     @finish="saveOverride"
     @cancel="redirectAfterCancel"
   >
     <div class="row mb-20">
       <div class="col span-6">
         <LabeledInput
-          v-model="value.name"
+          v-model:value="value.name"
           :is-disabled="receiverNameDisabled"
           :label="t('generic.name')"
           :required="true"
@@ -284,12 +282,8 @@ export default {
       default-tab="overview"
       @changed="tabChanged"
     >
-      <Tab
-        :label="t('generic.overview')"
-        :weight="99"
-        name="overview"
-      >
-        <div class="box-container create-resource-container ">
+      <Tab :label="t('generic.overview')" :weight="99" name="overview">
+        <div class="box-container create-resource-container">
           <div
             v-for="(receiverType, i) in receiverTypes"
             :key="i"
@@ -299,16 +293,13 @@ export default {
           >
             <div class="left">
               <div class="logo">
-                <img :src="receiverType.logo">
+                <img :src="receiverType.logo" />
               </div>
               <h4 class="name ml-10">
                 <t :k="receiverType.label" />
               </h4>
             </div>
-            <div
-              v-if="receiverType.name !== 'custom'"
-              class="right"
-            >
+            <div v-if="receiverType.name !== 'custom'" class="right">
               {{ getCount(receiverType) }}
             </div>
           </div>
@@ -324,17 +315,19 @@ export default {
         <YamlEditor
           v-if="receiverType.name === 'custom'"
           ref="customEditor"
-          v-model="suffixYaml"
+          v-model:value="suffixYaml"
           :scrolling="false"
           :editor-mode="editorMode"
         />
         <div v-else>
           <ArrayListGrouped
-            v-model="value[receiverType.key]"
+            v-model:value="value[receiverType.key]"
             class="namespace-list"
             :mode="mode"
             :default-add-value="{}"
-            :add-label="t('monitoringReceiver.addButton', { type: t(receiverType.label) })"
+            :add-label="
+              t('monitoringReceiver.addButton', { type: t(receiverType.label) })
+            "
           >
             <template #default="props">
               <component
@@ -352,54 +345,54 @@ export default {
 </template>
 
 <style lang="scss">
-  .receiver {
-    $margin: 10px;
-    $logo: 60px;
+.receiver {
+  $margin: 10px;
+  $logo: 60px;
 
-    .box-container.create-resource-container {
-      display: flex;
+  .box-container.create-resource-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin: 0 -1 * $margin;
+
+    .subtype-banner {
       justify-content: space-between;
-      flex-wrap: wrap;
-      margin: 0 -1*$margin;
-
-      .subtype-banner{
-        justify-content: space-between;
-        align-items: center;
-        flex-direction: row;
-      }
-    }
-
-    .right {
-      padding: 30px;
-      border-left: 1px solid var(--border);
-    }
-
-    .logo {
-      text-align: center;
-      width: $logo;
-      height: $logo;
-      border-radius: calc(2 * var(--border-radius));
-      overflow: hidden;
-      background-color: white;
-      display: inline-block;
-      vertical-align: middle;
-
-      img {
-        width: $logo - 4px;
-        height: $logo - 4px;
-        object-fit: contain;
-        position: relative;
-        top: 2px;
-      }
-    }
-
-    .name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 0;
-      display: inline-block;
-      vertical-align: middle;
+      align-items: center;
+      flex-direction: row;
     }
   }
+
+  .right {
+    padding: 30px;
+    border-left: 1px solid var(--border);
+  }
+
+  .logo {
+    text-align: center;
+    width: $logo;
+    height: $logo;
+    border-radius: calc(2 * var(--border-radius));
+    overflow: hidden;
+    background-color: white;
+    display: inline-block;
+    vertical-align: middle;
+
+    img {
+      width: $logo - 4px;
+      height: $logo - 4px;
+      object-fit: contain;
+      position: relative;
+      top: 2px;
+    }
+  }
+
+  .name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0;
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
 </style>

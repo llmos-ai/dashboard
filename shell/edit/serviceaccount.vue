@@ -41,7 +41,7 @@ export default {
 
   mixins: [CreateEditView],
   data() {
-    this.$set(this.value, 'automountServiceAccountToken', this.value.automountServiceAccountToken || false);
+    this.value['automountServiceAccountToken'] = this.value.automountServiceAccountToken || false;
 
     return { allSecrets: [] };
   },
@@ -56,7 +56,7 @@ export default {
     imagePullSecrets: {
       get() {
         if (!this.value.imagePullSecrets) {
-          this.$set(this.value, 'imagePullSecrets', []);
+          this.value['imagePullSecrets'] = [];
         }
         const { imagePullSecrets } = this.value;
 
@@ -110,7 +110,7 @@ export default {
         <div class="row">
           <div class="col mt-20">
             <Checkbox
-              v-model="value.automountServiceAccountToken"
+              v-model:value="value.automountServiceAccountToken"
               :label="t('serviceAccount.automount')"
               type="checkbox"
               :mode="mode"
@@ -122,7 +122,7 @@ export default {
             <h3>{{ t('serviceAccount.imagePullSecrets') }}</h3>
 
             <LabeledSelect
-              v-model="imagePullSecrets"
+              v-model:value="imagePullSecrets"
               :label="t('workload.container.imagePullSecrets')"
               :multiple="true"
               :options="namespacedSecrets"

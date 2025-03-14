@@ -108,11 +108,11 @@ export default {
 
     // init env and volumeClaimTemplates if not exist
     if (!container.env) {
-      this.$set(container, 'env', []);
+      container['env'] = [];
     }
 
     if (!this.value.spec.volumeClaimTemplates) {
-      this.$set(this.value.spec, 'volumeClaimTemplates', []);
+      this.value.spec['volumeClaimTemplates'] = [];
     }
 
     return {
@@ -146,33 +146,33 @@ export default {
         return this.spec.template.spec;
       },
       set(neu) {
-        this.$set(this.spec.template, 'spec', neu);
+        this.spec.template['spec'] = neu;
       },
     },
 
     podLabels: {
       get() {
         if (!this.spec.template.metadata) {
-          this.$set(this.spec.template, 'metadata', { labels: {} });
+          this.spec.template['metadata'] = { labels: {} };
         }
 
         return this.spec.template.metadata.labels;
       },
       set(neu) {
-        this.$set(this.spec.template.metadata, 'labels', neu);
+        this.spec.template.metadata['labels'] = neu;
       },
     },
 
     podAnnotations: {
       get() {
         if (!this.spec.template.metadata) {
-          this.$set(this.spec.template, 'metadata', { annotations: {} });
+          this.spec.template['metadata'] = { annotations: {} };
         }
 
         return this.spec.template.metadata.annotations;
       },
       set(neu) {
-        this.$set(this.spec.template.metadata, 'annotations', neu);
+        this.spec.template.metadata['annotations'] = neu;
       },
     },
 
@@ -183,7 +183,7 @@ export default {
       set(neu) {
         const out = FlatResources.set(neu);
 
-        this.$set(this.container, 'resources', cleanUp(out));
+        this.container['resources'] = cleanUp(out);
       }
     },
 
@@ -205,7 +205,7 @@ export default {
     imagePullSecrets: {
       get() {
         if (!this.podTemplateSpec.imagePullSecrets) {
-          this.$set(this.podTemplateSpec, 'imagePullSecrets', []);
+          this.podTemplateSpec['imagePullSecrets'] = [];
         }
 
         const { imagePullSecrets } = this.podTemplateSpec;

@@ -14,17 +14,26 @@ import NamespaceFilter from './NamespaceFilter';
 import WorkspaceSwitcher from './WorkspaceSwitcher';
 import TopLevelMenu from './TopLevelMenu';
 import Jump from './Jump';
+import AppModal from '@shell/components/AppModal';
 import { allHash } from '@shell/utils/promise';
 import { ActionLocation, ExtensionPoint } from '@shell/core/types';
 import { getApplicableExtensionEnhancements } from '@shell/core/plugin-helpers';
 import IconOrSvg from '@shell/components/IconOrSvg';
 import { wait } from '@shell/utils/async';
+import HeaderPageActionMenu from './HeaderPageActionMenu.vue';
+
+import {
+  RcDropdown,
+  RcDropdownItem,
+  RcDropdownSeparator,
+  RcDropdownTrigger,
+} from '@components/RcDropdown';
 
 const PAGE_HEADER_ACTION = 'page-action';
 
 export default {
-
   components: {
+    AppModal,
     NamespaceFilter,
     WorkspaceSwitcher,
     Import,
@@ -33,14 +42,19 @@ export default {
     BrandImage,
     ClusterBadge,
     ClusterProviderIcon,
-    IconOrSvg
+    IconOrSvg,
+    HeaderPageActionMenu,
+    RcDropdown,
+    RcDropdownItem,
+    RcDropdownSeparator,
+    RcDropdownTrigger,
   },
 
   props: {
     simple: {
-      type:    Boolean,
-      default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
@@ -48,21 +62,37 @@ export default {
     const shellShortcut = '(Ctrl+`)';
 
     return {
-      show:                   false,
-      showTooltip:            false,
-      kubeConfigCopying:      false,
+      show: false,
+      showTooltip: false,
+      kubeConfigCopying: false,
       searchShortcut,
       shellShortcut,
       LOGGED_OUT,
-      navHeaderRight:         null,
-      extensionHeaderActions: getApplicableExtensionEnhancements(this, ExtensionPoint.ACTION, ActionLocation.HEADER, this.$route),
-      ctx:                    this
+      navHeaderRight: null,
+      extensionHeaderActions: getApplicableExtensionEnhancements(
+        this,
+        ExtensionPoint.ACTION,
+        ActionLocation.HEADER,
+        this.$route
+      ),
+      ctx: this,
+      showImportModal: false,
+      showSearchModal: false,
     };
   },
 
   computed: {
-    ...mapGetters(['clusterReady', 'isExplorer', 'isMgmt', 'currentCluster',
-      'currentProduct', 'backToRancherLink', 'backToRancherGlobalLink', 'pageActions', 'showTopLevelMenu']),
+    ...mapGetters([
+      'clusterReady',
+      'isExplorer',
+      'isMgmt',
+      'currentCluster',
+      'currentProduct',
+      'backToRancherLink',
+      'backToRancherGlobalLink',
+      'pageActions',
+      'showTopLevelMenu',
+    ]),
     ...mapGetters('type-map', ['activeProducts']),
 
     appName() {
@@ -73,8 +103,18 @@ export default {
       return this.$store.getters['auth/enabled'];
     },
 
+    generateLogoutRoute() {
+      console.log('---aaa');
+      return { name: 'auth-logout', query: { [LOGGED_OUT]: true } };
+    },
+
     loggedInUser() {
-      return this.$store.getters['management/byId'](MANAGEMENT.USER, this.$store.getters['auth/principalId']) || {};
+      const user =
+        this.$store.getters['management/byId'](
+          MANAGEMENT.USER,
+          this.$store.getters['auth/principalId']
+        ) || {};
+      return user;
     },
 
     kubeConfigEnabled() {
@@ -98,13 +138,18 @@ export default {
     },
 
     showPreferencesLink() {
-      return (this.$store.getters['management/schemaFor'](STEVE.PREFERENCE, false, false)?.resourceMethods || []).includes('PUT');
+      return (
+        this.$store.getters['management/schemaFor'](
+          STEVE.PREFERENCE,
+          false,
+          false
+        )?.resourceMethods || []
+      ).includes('PUT');
     },
 
     showAccountAndApiKeyLink() {
-      // Keep this simple for the moment and only check if the user can see tokens... plus the usual isMgmt
-      // const canSeeTokens = this.$store.getters['rancher/schemaFor'](NORMAN.TOKEN, false, false);
-      return (this.isMgmt);
+      // TODO: why is this here?
+      return this.isMgmt;
     },
 
     showPageActions() {
@@ -117,13 +162,16 @@ export default {
 
     showFilter() {
       // Some products won't have a current cluster
-      const validClusterOrProduct = this.currentCluster ||
-                 (this.currentProduct && this.currentProduct.customNamespaceFilter) ||
-                 (this.currentProduct && this.currentProduct.showWorkspaceSwitcher);
+      const validClusterOrProduct =
+        this.currentCluster ||
+        (this.currentProduct && this.currentProduct.customNamespaceFilter) ||
+        (this.currentProduct && this.currentProduct.showWorkspaceSwitcher);
       // Don't show if the header is in 'simple' mode
       const notSimple = !this.simple;
       // One of these must be enabled, otherwise t here's no component to show
-      const validFilterSettings = this.currentProduct.showNamespaceFilter || this.currentProduct.showWorkspaceSwitcher;
+      const validFilterSettings =
+        this.currentProduct.showNamespaceFilter ||
+        this.currentProduct.showWorkspaceSwitcher;
 
       return validClusterOrProduct && notSimple && validFilterSettings;
     },
@@ -139,11 +187,19 @@ export default {
     prod() {
       const name = this.currentProduct.name;
 
-      return this.$store.getters['i18n/withFallback'](`product."${ name }"`, null, ucFirst(name));
+      return this.$store.getters['i18n/withFallback'](
+        `product."${name}"`,
+        null,
+        ucFirst(name)
+      );
     },
 
     category() {
-      return this.$store.getters['i18n/withFallback'](`product.${ this.currentProduct.category }.label`, null, this.currentProduct.category);
+      return this.$store.getters['i18n/withFallback'](
+        `product.${this.currentProduct.category}.label`,
+        null,
+        this.currentProduct.category
+      );
     },
 
     showSearch() {
@@ -155,10 +211,12 @@ export default {
     },
 
     nameTooltip() {
-      return !this.showTooltip ? {} : {
-        content: this.currentCluster?.nameDisplay,
-        delay:   400,
-      };
+      return !this.showTooltip
+        ? {}
+        : {
+            content: this.currentCluster?.nameDisplay,
+            delay: 400,
+          };
     },
   },
 
@@ -171,11 +229,19 @@ export default {
     // since the Header is a "persistent component" we need to update it at every route change...
     $route(nue) {
       if (nue) {
-        this.extensionHeaderActions = getApplicableExtensionEnhancements(this, ExtensionPoint.ACTION, ActionLocation.HEADER, nue);
+        this.extensionHeaderActions = getApplicableExtensionEnhancements(
+          this,
+          ExtensionPoint.ACTION,
+          ActionLocation.HEADER,
+          nue
+        );
 
-        this.navHeaderRight = this.$plugin?.getDynamic('component', 'NavHeaderRight');
+        this.navHeaderRight = this.$plugin?.getDynamic(
+          'component',
+          'NavHeaderRight'
+        );
       }
-    }
+    },
   },
 
   mounted() {
@@ -216,43 +282,32 @@ export default {
         const w = Math.max(32, product.offsetWidth - overflow);
 
         // Set exact width on the product div so that the content in it fits that available space
-        product.style.width = `${ w }px`;
+        product.style.width = `${w}px`;
       }
-    },
-    showMenu(show) {
-      if (this.$refs.popover) {
-        if (show) {
-          this.$refs.popover.show();
-        } else {
-          this.$refs.popover.hide();
-        }
-      }
-    },
-
-    openImport() {
-      this.$modal.show('importModal');
-    },
-
-    closeImport() {
-      this.$modal.hide('importModal');
     },
 
     openSearch() {
-      this.$modal.show('searchModal');
+      this.showSearchModal = true;
     },
 
     hideSearch() {
-      this.$modal.hide('searchModal');
+      this.showSearchModal = false;
     },
 
-    showPageActionsMenu(show) {
-      if (this.$refs.pageActions) {
-        if (show) {
-          this.$refs.pageActions.show();
-        } else {
-          this.$refs.pageActions.hide();
-        }
-      }
+    openImport() {
+      this.showImportModal = true;
+    },
+
+    closeImport() {
+      this.showImportModal = false;
+    },
+
+    openSearch() {
+      this.showSearchModal = true;
+    },
+
+    hideSearch() {
+      this.showSearchModal = false;
     },
 
     pageAction(action) {
@@ -263,7 +318,7 @@ export default {
       this.$nextTick(() => {
         const el = this.$refs.clusterName;
 
-        this.showTooltip = el && (el.clientWidth < el.scrollWidth);
+        this.showTooltip = el && el.clientWidth < el.scrollWidth;
       });
     },
 
@@ -282,7 +337,7 @@ export default {
 
       // Make sure we wait at least 1 second so that the user can see the visual indication that the config has been copied
       allHash({
-        copy:     this.currentCluster.copyKubeConfig(),
+        copy: this.currentCluster.copyKubeConfig(),
         minDelay: wait(1000),
       }).finally(() => {
         this.kubeConfigCopying = false;
@@ -298,11 +353,13 @@ export default {
       const opts = {
         event,
         action,
-        isAlt:   isAlternate(event),
+        isAlt: isAlternate(event),
         product: this.currentProduct.name,
         cluster: this.currentCluster,
       };
-      const enabled = action.enabled ? action.enabled.apply(this, [this.ctx]) : true;
+      const enabled = action.enabled
+        ? action.enabled.apply(this, [this.ctx])
+        : true;
 
       if (fn && enabled) {
         fn.apply(this, [opts, [], { $route: this.$route }]);
@@ -311,66 +368,49 @@ export default {
 
     handleExtensionTooltip(action) {
       if (action.tooltipKey || action.tooltip) {
-        const tooltip = action.tooltipKey ? this.t(action.tooltipKey) : action.tooltip;
+        const tooltip = action.tooltipKey
+          ? this.t(action.tooltipKey)
+          : action.tooltip;
         const shortcut = action.shortcutLabel ? action.shortcutLabel() : '';
 
-        return `${ tooltip } ${ shortcut }`;
+        return `${tooltip} ${shortcut}`;
       }
 
       return null;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
-  <header
-    ref="header"
-    data-testid="header"
-  >
+  <header ref="header" class="flex" data-testid="header">
     <!-- side menu -->
     <div>
       <TopLevelMenu v-if="showTopLevelMenu" />
     </div>
 
-    <div
-      v-if="!simple"
-      ref="product"
-      class="product"
-    >
+    <div v-if="!simple" ref="product" class="product">
       <div
         v-if="currentProduct && currentProduct.showClusterSwitcher"
         v-clean-tooltip="nameTooltip"
         class="cluster cluster-clipped"
       >
-        <template>
-          <ClusterProviderIcon
-            v-if="currentCluster"
-            :cluster="currentCluster"
-            class="mr-10"
-          />
-          <div
-            v-if="currentCluster"
-            ref="clusterName"
-            class="cluster-name"
-          >
-            {{ currentCluster.displayName }}
-          </div>
-          <ClusterBadge
-            v-if="currentCluster"
-            :cluster="currentCluster"
-            class="ml-10"
-          />
-          <div
-            v-if="!currentCluster"
-            class="simple-title"
-          >
-            <BrandImage
-              class="side-menu-logo-img"
-              file-name="logo.svg"
-            />
-          </div>
-        </template>
+        <ClusterProviderIcon
+          v-if="currentCluster"
+          :cluster="currentCluster"
+          class="mr-10"
+        />
+        <div v-if="currentCluster" ref="clusterName" class="cluster-name">
+          {{ currentCluster.displayName }}
+        </div>
+        <ClusterBadge
+          v-if="currentCluster"
+          :cluster="currentCluster"
+          class="ml-10"
+        />
+        <div v-if="!currentCluster" class="simple-title">
+          <BrandImage class="side-menu-logo-img" file-name="logo.svg" />
+        </div>
       </div>
 
       <div
@@ -382,25 +422,17 @@ export default {
           v-bind="$attrs"
           :src="currentProduct.iconHeader"
           class="cluster-os-logo mr-10"
-          style="width: 44px; height: 36px;"
-        >
+          style="width: 44px; height: 36px"
+        />
         <div class="product-name">
           {{ prod }}
         </div>
       </div>
     </div>
 
-    <div
-      v-else
-      class="simple-title"
-    >
-      <div
-        class="side-menu-logo"
-      >
-        <BrandImage
-          class="side-menu-logo-img"
-          file-name="logo.svg"
-        />
+    <div v-else class="simple-title">
+      <div class="side-menu-logo">
+        <BrandImage class="side-menu-logo-img" file-name="logo.svg" />
       </div>
     </div>
 
@@ -409,120 +441,116 @@ export default {
     <div class="rd-header-right">
       <component :is="navHeaderRight" />
 
-      <div
-        v-if="showFilter"
-        class="top"
-      >
-        <NamespaceFilter v-if="clusterReady && currentProduct && (currentProduct.showNamespaceFilter || isExplorer)" />
-        <WorkspaceSwitcher v-else-if="clusterReady && currentProduct && currentProduct.showWorkspaceSwitcher" />
+      <div v-if="showFilter" class="top">
+        <NamespaceFilter
+          v-if="
+            clusterReady &&
+            currentProduct &&
+            (currentProduct.showNamespaceFilter || isExplorer)
+          "
+        />
+        <WorkspaceSwitcher
+          v-else-if="
+            clusterReady &&
+            currentProduct &&
+            currentProduct.showWorkspaceSwitcher
+          "
+        />
       </div>
-      <div
-        v-if="currentCluster && !simple"
-        class="header-buttons"
-      >
+      <div v-if="currentCluster && !simple" class="header-buttons">
         <template v-if="currentProduct && currentProduct.showClusterSwitcher">
-          <button
+          <a-button
             v-if="showImportYaml"
             v-clean-tooltip="t('nav.import')"
             :disabled="!importEnabled"
-            type="button"
-            class="btn header-btn role-tertiary"
+            type="text"
             @click="openImport()"
           >
             <i class="icon icon-upload icon-lg" />
-          </button>
-          <modal
+          </a-button>
+          <app-modal
+            v-if="showImportModal"
             class="import-modal"
             name="importModal"
             width="75%"
             height="auto"
             styles="max-height: 90vh;"
+            @close="closeImport"
           >
-            <Import
-              :cluster="currentCluster"
-              @close="closeImport"
-            />
-          </modal>
+            <Import :cluster="currentCluster" @close="closeImport" />
+          </app-modal>
 
-          <button
+          <a-button
             v-if="showKubeShell"
             id="btn-kubectl"
-            v-clean-tooltip="t('nav.shellShortcut', {key: shellShortcut})"
-            v-shortkey="{windows: ['ctrl', '`'], mac: ['meta', '`']}"
+            v-clean-tooltip="t('nav.shellShortcut', { key: shellShortcut })"
+            v-shortkey="{ windows: ['ctrl', '`'], mac: ['meta', '`'] }"
             :disabled="!shellEnabled"
-            type="button"
-            class="btn header-btn role-tertiary"
+            type="text"
             @shortkey="currentCluster.openShell()"
             @click="currentCluster.openShell()"
           >
             <i class="icon icon-terminal icon-lg" />
-          </button>
+          </a-button>
 
-          <button
+          <a-button
             v-if="showKubeConfig"
             v-clean-tooltip="t('nav.kubeconfig.download')"
             :disabled="!kubeConfigEnabled"
-            type="button"
-            class="btn header-btn role-tertiary"
+            type="text"
             @click="currentCluster.downloadKubeConfig()"
           >
             <i class="icon icon-file icon-lg" />
-          </button>
+          </a-button>
 
-          <button
+          <a-button
             v-if="showCopyConfig"
             v-clean-tooltip="t('nav.kubeconfig.copy')"
             :disabled="!kubeConfigEnabled"
-            type="button"
-            class="btn header-btn role-tertiary"
+            type="text"
             @click="copyKubeConfig($event)"
           >
-            <i
-              v-if="kubeConfigCopying"
-              class="icon icon-checkmark icon-lg"
-            />
-            <i
-              v-else
-              class="icon icon-copy icon-lg"
-            />
-          </button>
+            <i v-if="kubeConfigCopying" class="icon icon-checkmark icon-lg" />
+            <i v-else class="icon icon-copy icon-lg" />
+          </a-button>
         </template>
 
-        <button
+        <a-button
           v-if="showSearch"
-          v-clean-tooltip="t('nav.resourceSearch.toolTip', {key: searchShortcut})"
-          v-shortkey="{windows: ['ctrl', 'k'], mac: ['meta', 'k']}"
-          type="button"
-          class="btn header-btn role-tertiary"
+          v-clean-tooltip="
+            t('nav.resourceSearch.toolTip', { key: searchShortcut })
+          "
+          v-shortkey="{ windows: ['ctrl', 'k'], mac: ['meta', 'k'] }"
+          type="text"
+          id="header-btn-search"
           @shortkey="openSearch()"
           @click="openSearch()"
         >
           <i class="icon icon-search icon-lg" />
-        </button>
-        <modal
-          v-if="showSearch"
+        </a-button>
+        <app-modal
+          v-if="showSearch && showSearchModal"
           class="search-modal"
           name="searchModal"
           width="50%"
           height="auto"
+          :trigger-focus-trap="true"
+          return-focus-selector="#header-btn-search"
+          @close="hideSearch()"
         >
           <Jump @closeSearch="hideSearch()" />
-        </modal>
+        </app-modal>
       </div>
 
       <!-- Extension header actions -->
-      <div
-        v-if="extensionHeaderActions.length"
-        class="header-buttons"
-      >
-        <button
-          v-for="action, i in extensionHeaderActions"
+      <div v-if="extensionHeaderActions.length" class="header-buttons">
+        <a-button
+          v-for="(action, i) in extensionHeaderActions"
           :key="`${action.label}${i}`"
           v-clean-tooltip="handleExtensionTooltip(action)"
           v-shortkey="action.shortcutKey"
           :disabled="action.enabled ? !action.enabled(ctx) : false"
-          type="button"
-          class="btn header-btn role-tertiary"
+          type="text"
           @shortkey="handleExtensionAction(action, $event)"
           @click="handleExtensionAction(action, $event)"
         >
@@ -532,518 +560,420 @@ export default {
             :src="action.svg"
             color="header"
           />
-        </button>
+        </a-button>
       </div>
 
-      <div
-        v-if="showPageActions"
-        id="page-actions"
-        class="actions"
-      >
-        <i
-          data-testid="page-actions-menu"
-          class="icon icon-actions"
-          @blur="showPageActionsMenu(false)"
-          @click="showPageActionsMenu(true)"
-          @focus.capture="showPageActionsMenu(true)"
-        />
-        <v-popover
-          ref="pageActions"
-          placement="bottom-end"
-          offset="0"
-          trigger="manual"
-          :delay="{show: 0, hide: 0}"
-          :popper-options="{modifiers: { flip: { enabled: false } } }"
-          :container="false"
-        >
-          <template
-            slot="popover"
-            class="user-menu"
-          >
-            <ul
-              data-testid="page-actions-dropdown"
-              class="list-unstyled dropdown"
-              @click.stop="showPageActionsMenu(false)"
-            >
-              <li
-                v-for="a in pageActions"
-                :key="a.label"
-                class="user-menu-item"
-              >
-                <a
-                  v-if="!a.separator"
-                  @click="pageAction(a)"
-                >{{ a.labelKey ? t(a.labelKey) : a.label }}</a>
-                <div
-                  v-else
-                  class="menu-separator"
-                >
-                  <div class="menu-separator-line" />
-                </div>
-              </li>
-            </ul>
-          </template>
-        </v-popover>
-      </div>
+      <div class="flex items-center">
+        <!-- page action -->
+        <header-page-action-menu v-if="showPageActions" />
 
-      <div class="header-spacer" />
-      <div
-        v-if="showUserMenu"
-        class="user user-menu"
-        data-testid="nav_header_showUserMenu"
-        tabindex="0"
-        @blur="showMenu(false)"
-        @click="showMenu(true)"
-        @focus.capture="showMenu(true)"
-      >
-        <v-popover
-          ref="popover"
-          placement="bottom-end"
-          offset="-10"
-          trigger="manual"
-          :delay="{show: 0, hide: 0}"
-          :popper-options="{modifiers: { flip: { enabled: false } } }"
-          :container="false"
-        >
-          <div class="user-image text-right hand">
+        <!-- userMenu action -->
+        <!-- TODO: use option refactor -->
+        <a-dropdown v-if="showUserMenu" trigger="click">
+          <div>
             <img
               v-if="loggedInUser && loggedInUser.avatarSrc"
               :src="loggedInUser.avatarSrc"
-              :class="{'avatar-round': loggedInUser.roundAvatar}"
+              :class="{ 'avatar-round': loggedInUser.roundAvatar }"
               width="36"
               height="36"
-            >
-            <i
-              v-else
-              class="icon icon-user icon-3x avatar"
             />
+            <i v-else class="icon icon-user icon-3x avatar" />
           </div>
-          <template
-            slot="popover"
-            class="user-menu"
-          >
-            <ul
-              class="list-unstyled dropdown"
-              data-testid="user-menu-dropdown"
-              @click.stop="showMenu(false)"
-            >
-              <li
-                v-if="authEnabled"
-                class="user-info"
-              >
-                <div class="user-name">
-                  <i class="icon icon-lg icon-user" /> {{ loggedInUser.spec?.username }}
+
+          <template #overlay>
+            <a-menu>
+              <a-menu-item class="w-3xs">
+                <div class="user-info" v-if="authEnabled">
+                  <div class="user-name">
+                    <i class="icon icon-lg icon-user" />
+                    {{ loggedInUser.loginName }}
+                  </div>
+                  <div class="text-small">
+                    <template
+                      v-if="loggedInUser.loginName !== loggedInUser.name"
+                    >
+                      {{ loggedInUser.name }}
+                    </template>
+                  </div>
                 </div>
-                <div class="text-small pt-5 pb-5">
-                  <template v-if="loggedInUser.spec?.username !== loggedInUser.spec?.displayName">
-                    {{ loggedInUser.spec?.displayName }}
-                  </template>
+              </a-menu-item>
+
+              <a-menu-item v-if="showPreferencesLink">
+                <div @click="$router.push({ name: 'prefs' })">
+                  {{ t('nav.userMenu.preferences') }}
                 </div>
-              </li>
-              <nuxt-link
-                v-if="showPreferencesLink"
-                tag="li"
-                :to="{name: 'prefs'}"
-                class="user-menu-item"
-              >
-                <a>{{ t('nav.userMenu.preferences') }}</a>
-              </nuxt-link>
-              <nuxt-link
-                v-if="showAccountAndApiKeyLink"
-                tag="li"
-                :to="{name: 'account'}"
-                class="user-menu-item"
-              >
-                <a>{{ t('nav.userMenu.accountAndKeys', {}, true) }}</a>
-              </nuxt-link>
-              <nuxt-link
-                tag="li"
-                :to="{name: 'auth-logout', query: { [LOGGED_OUT]: true }}"
-                class="user-menu-item"
-              >
-                <a @blur="showMenu(false)">{{ t('nav.userMenu.logOut') }}</a>
-              </nuxt-link>
-            </ul>
+              </a-menu-item>
+
+              <a-menu-item v-if="showAccountAndApiKeyLink">
+                <div @click="$router.push({ name: 'account' })">
+                  {{ t('nav.userMenu.accountAndKeys', {}, true) }}
+                </div>
+              </a-menu-item>
+
+              <!-- <a-menu-item v-if="authEnabled">
+                <div @click="showSloModal">
+                  {{ t("nav.userMenu.logOut") }}
+                </div>
+              </a-menu-item> -->
+
+              <a-menu-item v-if="authEnabled">
+                <div @click="$router.push(generateLogoutRoute)">
+                  {{ t('nav.userMenu.logOut') }}
+                </div>
+              </a-menu-item>
+            </a-menu>
           </template>
-        </v-popover>
+        </a-dropdown>
       </div>
     </div>
   </header>
 </template>
 
 <style lang="scss" scoped>
-  // It would be nice to grab this from `Group.vue`, but there's margin, padding and border, which is overkill to var
-  $side-menu-group-padding-left: 16px;
+HEADER {
+  display: flex;
+  z-index: z-index('mainHeader');
 
-  HEADER {
-    display: flex;
-    z-index: z-index('mainHeader');
+  > .spacer {
+    flex: 1;
+  }
 
-    > .spacer {
-      flex: 1;
+  > .menu-spacer {
+    flex: 0 0 15px;
+  }
+
+  .title {
+    border-left: 1px solid var(--header-border);
+    padding-left: 10px;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  .filter {
+    :deep() .labeled-select,
+    :deep() .unlabeled-select {
+      .vs__search::placeholder {
+        color: var(--body-text) !important;
+      }
+
+      .vs__dropdown-toggle .vs__actions:after {
+        color: var(--body-text) !important;
+      }
+
+      .vs__dropdown-toggle {
+        background: transparent;
+        border: 1px solid var(--header-border);
+      }
     }
+  }
 
-    > .menu-spacer {
-      flex: 0 0 15px;
+  .back {
+    padding-top: 6px;
+
+    > *:first-child {
+      height: 40px;
     }
+  }
+
+  .simple-title {
+    max-width: 200px;
+    width: 200px;
 
     .title {
-      border-left: 1px solid var(--header-border);
-      padding-left: 10px;
-      opacity: 0.7;
-      text-transform: uppercase;
+      height: 24px;
+      line-height: 24px;
     }
+  }
 
-    .filter {
-      ::v-deep .labeled-select,
-      ::v-deep .unlabeled-select {
-        .vs__search::placeholder {
-          color: var(--body-text) !important;
-        }
-
-        .vs__dropdown-toggle .vs__actions:after {
-          color: var(--body-text) !important;
-        }
-
-        .vs__dropdown-toggle {
-          background: transparent;
-          border: 1px solid var(--header-border);
-        }
-      }
-    }
-
-    .back {
-      padding-top: 6px;
-
-      > *:first-child {
-        height: 40px;
-      }
-    }
-
-    .simple-title {
-      max-width: 200px;
-      width: 200px;
-
-      .title {
-        height: 24px;
-        line-height: 24px;
-      }
-    }
-
-    .cluster {
-      align-items: center;
-      display: flex;
-      height: 32px;
-      white-space: nowrap;
-      .cluster-name {
-        font-size: 16px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-      &.cluster-clipped {
-        overflow: hidden;
-      }
-    }
-
-    > .product {
-      align-items: center;
-      position: relative;
-      display: flex;
-      padding-left: 10px;
-
-      .logo {
-        height: 30px;
-        position: absolute;
-        top: 9px;
-        left: 0;
-        z-index: 2;
-
-        img {
-          height: 30px;
-        }
-      }
-    }
-
-    .product-name {
+  .cluster {
+    align-items: center;
+    display: flex;
+    height: 32px;
+    white-space: nowrap;
+    .cluster-name {
       font-size: 16px;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
-
-    .side-menu-logo {
-      align-items: center;
-      display: flex;
-      margin-right: 8px;
-      height: 60px;
-      margin-left: 10px;
-      max-width: 200px;
-      padding: 12px 0;
+    &.cluster-clipped {
+      overflow: hidden;
     }
+  }
 
-    .side-menu-logo-img {
-      object-fit: contain;
+  > .product {
+    align-items: center;
+    position: relative;
+    display: flex;
+    padding-left: 10px;
+
+    .logo {
       height: 30px;
-      max-width: 200px;
+      position: absolute;
+      top: 9px;
+      left: 0;
+      z-index: 2;
+
+      img {
+        height: 30px;
+      }
     }
+  }
+
+  .product-name {
+    font-size: 16px;
+  }
+
+  .side-menu-logo {
+    align-items: center;
+    display: flex;
+    margin-right: 8px;
+    height: 60px;
+    margin-left: 10px;
+    max-width: 200px;
+    padding: 12px 0;
+  }
+
+  .side-menu-logo-img {
+    object-fit: contain;
+    height: 30px;
+    max-width: 200px;
+  }
+
+  > * {
+    background-color: var(--header-bg);
+    border-bottom: var(--header-border-size) solid var(--header-border);
+  }
+
+  .rd-header-right {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
 
     > * {
-      background-color: var(--header-bg);
-      border-bottom: var(--header-border-size) solid var(--header-border);
+      padding: 0 5px;
     }
 
-    .rd-header-right {
-      display: flex;
-      flex-direction: row;
-      padding: 0;
+    > .top {
+      padding-top: 6px;
 
-      > * {
-        padding: 0 5px;
-      }
-
-      > .top {
-        padding-top: 6px;
-
-        INPUT[type='search']::placeholder,
-        .vs__open-indicator,
-        .vs__selected {
-          color: var(--header-btn-bg) !important;
-          background: var(--header-btn-bg);
-          border-radius: var(--border-radius);
-          border: none;
-          margin: 0 35px 0 25px!important;
-        }
-
-        .vs__selected {
-          background: rgba(255, 255, 255, 0.15);
-          border-color: rgba(255, 255, 255, 0.25);
-        }
-
-        .vs__deselect {
-          fill: var(--header-btn-bg);
-        }
-
-        .filter .vs__dropdown-toggle {
-          background: var(--header-btn-bg);
-          border-radius: var(--border-radius);
-          border: none;
-          margin: 0 35px 0 25px!important;
-        }
-      }
-
-      .header-buttons {
-        align-items: center;
-        display: flex;
-        margin-top: 1px;
-
-        // Spacing between header buttons
-        .btn:not(:last-of-type) {
-          margin-right: 10px;
-        }
-
-        .btn:focus {
-          box-shadow: none;
-        }
-
-        > .header-btn {
-          &.header-btn-active, &.header-btn-active:hover {
-            background-color: var(--success);
-            color: var(--success-text);
-          }
-
-          img {
-            height: 20px;
-            width: 20px;
-          }
-        }
-      }
-
-      .header-btn {
-        width: 40px;
-      }
-
-      ::v-deep > div > .btn.role-tertiary {
-        border: 1px solid var(--header-btn-bg);
-        border: none;
+      INPUT[type='search']::placeholder,
+      .vs__open-indicator,
+      .vs__selected {
+        color: var(--header-btn-bg) !important;
         background: var(--header-btn-bg);
-        color: var(--header-btn-text);
-        padding: 0 10px;
-        line-height: 32px;
-        min-height: 32px;
-
-        i {
-          // Ideally same height as the parent button, but this means tooltip needs adjusting (which is it's own can of worms)
-          line-height: 20px;
-        }
-
-        &:hover {
-          background: var(--primary);
-          color: #fff;
-        }
-
-        &[disabled=disabled] {
-          background-color: rgba(0,0,0,0.25) !important;
-          color: var(--header-btn-text) !important;
-          opacity: 0.7;
-        }
+        border-radius: var(--border-radius);
+        border: none;
+        margin: 0 35px 0 25px !important;
       }
 
-      .actions {
-        align-items: center;
-        cursor: pointer;
-        display: flex;
-
-        > I {
-          font-size: 18px;
-          padding: 6px;
-          &:hover {
-            color: var(--link);
-          }
-        }
+      .vs__selected {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.25);
       }
 
-      .header-spacer {
-        background-color: var(--header-bg);
-        position: relative;
+      .vs__deselect {
+        fill: var(--header-btn-bg);
       }
 
-      .user-menu {
-        padding-top: 9.5px;
-      }
-
-      > .user {
-        outline: none;
-        width: var(--header-height);
-
-        .v-popover {
-          display: flex;
-          ::v-deep .trigger{
-          .user-image {
-              display: flex;
-            }
-          }
-        }
-
-        .user-image {
-          display: flex;
-          align-items: center;
-        }
-
-        &:focus {
-          .v-popover {
-            ::v-deep .trigger {
-              line-height: 0;
-              .user-image {
-                max-height: 40px;
-              }
-              .user-image > * {
-                @include form-focus
-              }
-            }
-          }
-        }
-
-        background-color: var(--header-bg);
-
-        .avatar-round {
-          border: 0;
-          border-radius: 50%;
-        }
+      .filter .vs__dropdown-toggle {
+        background: var(--header-btn-bg);
+        border-radius: var(--border-radius);
+        border: none;
+        margin: 0 35px 0 25px !important;
       }
     }
-  }
 
-  .list-unstyled {
-    li {
-      a {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-      }
-
-      &.user-info {
-        display: block;
-        margin-bottom: 10px;
-        padding: 10px 20px;
-        border-bottom: solid 1px var(--border);
-        min-width: 200px;
-      }
-    }
-  }
-
-  .config-actions {
-    li {
-      a {
-        justify-content: start;
-        align-items: center;
-
-        & .icon {
-          margin: 0 4px;
-        }
-
-        &:hover {
-          cursor: pointer;
-        }
-      }
-    }
-  }
-
-  .popover .popover-inner {
-    padding: 0;
-    border-radius: 0;
-  }
-
-  .user-name {
-    display: flex;
-    align-items: center;
-    color: var(--secondary);
-  }
-
-  .user-menu {
-    // Remove the default padding on the popup so that the hover on menu items goes full width of the menu
-    ::v-deep .popover-inner {
-      padding: 10px 0;
-    }
-
-    ::v-deep .v-popover {
+    .header-buttons {
+      align-items: center;
       display: flex;
-    }
-  }
+      margin-top: 1px;
 
-  .actions {
-    ::v-deep .popover:focus {
-      outline: 0;
+      // Spacing between header buttons
+      .btn:not(:last-of-type) {
+        margin-right: 10px;
+      }
+
+      .btn:focus {
+        box-shadow: none;
+      }
+
+      > .header-btn {
+        &.header-btn-active,
+        &.header-btn-active:hover {
+          background-color: var(--success);
+          color: var(--success-text);
+        }
+
+        img {
+          height: 20px;
+          width: 20px;
+        }
+      }
     }
 
-    .dropdown {
-      margin: 0 -10px;
+    .header-btn {
+      width: 40px;
     }
-  }
 
-  .user-menu-item {
-    a {
-      cursor: hand;
-      padding: 0px 10px;
+    :deep() > div > .btn.role-tertiary {
+      border: 1px solid var(--header-btn-bg);
+      border: none;
+      background: var(--header-btn-bg);
+      color: var(--header-btn-text);
+      padding: 0 10px;
+      line-height: 32px;
+      min-height: 32px;
+
+      i {
+        // Ideally same height as the parent button, but this means tooltip needs adjusting (which is it's own can of worms)
+        line-height: 20px;
+      }
 
       &:hover {
-        background-color: var(--dropdown-hover-bg);
-        color: var(--dropdown-hover-text);
-        text-decoration: none;
+        background: var(--primary);
+        color: #fff;
       }
 
-      // When the menu item is focused, pop the margin and compensate the padding, so that
-      // the focus border appears within the menu
-      &:focus {
-        margin: 0 2px;
-        padding: 10px 8px;
+      &[disabled='disabled'] {
+        background-color: rgba(0, 0, 0, 0.25) !important;
+        color: var(--header-btn-text) !important;
+        opacity: 0.7;
       }
     }
 
-    div.menu-separator {
-      cursor: default;
-      padding: 4px 0;
+    .actions {
+      align-items: center;
+      cursor: pointer;
+      display: flex;
 
-      .menu-separator-line {
-        background-color: var(--border);
-        height: 1px;
+      > I {
+        font-size: 18px;
+        padding: 6px;
+        &:hover {
+          color: var(--link);
+        }
+      }
+    }
+
+    .header-spacer {
+      background-color: var(--header-bg);
+      position: relative;
+    }
+
+    .user-menu {
+      padding-top: 9.5px;
+    }
+
+    > .user {
+      outline: none;
+      width: var(--header-height);
+
+      .user-image {
+        display: flex;
+        align-items: center;
+      }
+
+      background-color: var(--header-bg);
+
+      .avatar-round {
+        border: 0;
+        border-radius: 50%;
       }
     }
   }
+}
+
+.list-unstyled {
+  li {
+    a {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    &.user-info {
+      display: block;
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      border-bottom: solid 1px var(--border);
+      min-width: 200px;
+    }
+  }
+}
+
+.config-actions {
+  li {
+    a {
+      justify-content: start;
+      align-items: center;
+
+      & .icon {
+        margin: 0 4px;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.popover .popover-inner {
+  padding: 0;
+  border-radius: 0;
+}
+
+.user-name {
+  display: flex;
+  align-items: center;
+  color: var(--secondary);
+}
+
+.user-menu {
+  // Remove the default padding on the popup so that the hover on menu items goes full width of the menu
+  :deep() .popover-inner {
+    padding: 10px 0;
+  }
+}
+
+.actions {
+  :deep() .popover:focus {
+    outline: 0;
+  }
+
+  .dropdown {
+    margin: 0 -10px;
+  }
+}
+
+.user-menu-item {
+  a {
+    cursor: hand;
+    padding: 0px 10px;
+
+    &:hover {
+      background-color: var(--dropdown-hover-bg);
+      color: var(--dropdown-hover-text);
+      text-decoration: none;
+    }
+
+    // When the menu item is focused, pop the margin and compensate the padding, so that
+    // the focus border appears within the menu
+    &:focus {
+      margin: 0 2px;
+      padding: 10px 8px;
+    }
+  }
+
+  div.menu-separator {
+    cursor: default;
+    padding: 4px 0;
+
+    .menu-separator-line {
+      background-color: var(--border);
+      height: 1px;
+    }
+  }
+}
 </style>

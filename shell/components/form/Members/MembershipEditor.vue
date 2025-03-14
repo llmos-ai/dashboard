@@ -11,113 +11,139 @@ function normalizeId(id) {
 }
 
 export function canViewMembershipEditor(store, needsProject = false) {
-  return (!!store.getters['management/schemaFor'](MANAGEMENT.ROLE_TEMPLATE_BINDING) || !needsProject) &&
-    !!store.getters['management/schemaFor'](MANAGEMENT.ROLE_TEMPLATE);
+  return (
+    (!!store.getters['management/schemaFor'](
+      MANAGEMENT.ROLE_TEMPLATE_BINDING
+    ) ||
+      !needsProject) &&
+    !!store.getters['management/schemaFor'](MANAGEMENT.ROLE_TEMPLATE)
+  );
 }
 
 export default {
+  emits: ['membership-update'],
   components: {
-    ArrayList, Loading, Principal
+    ArrayList,
+    Loading,
+    Principal,
   },
 
   props: {
     addMemberDialogName: {
-      type:     String,
-      required: true
+      type: String,
+      required: true,
     },
 
     parentKey: {
-      type:     String,
-      required: true
+      type: String,
+      required: true,
     },
 
     parentId: {
-      type:    String,
-      default: null
+      type: String,
+      default: null,
     },
 
     mode: {
-      type:     String,
-      required: true
+      type: String,
+      required: true,
     },
 
     type: {
-      type:     String,
-      required: true
+      type: String,
+      required: true,
     },
 
     defaultBindingHandler: {
-      type:    Function,
+      type: Function,
       default: null,
     },
 
     modalSticky: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
-    }
+    },
   },
 
   async fetch() {
     const userHydration = [
-      this.schema ? this.$store.dispatch(`management/findAll`, { type: this.type, opt: { force: true } }) : [],
-      this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.ROLE_TEMPLATE }),
-      this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.USER })
+      this.schema
+        ? this.$store.dispatch(`management/findAll`, {
+            type: this.type,
+            opt: { force: true },
+          })
+        : [],
+      this.$store.dispatch(`management/findAll`, {
+        type: MANAGEMENT.ROLE_TEMPLATE,
+      }),
+      this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.USER }),
     ];
     const [allBindings] = await Promise.all(userHydration);
 
-    const bindings = allBindings
-      .filter((b) => normalizeId(get(b, this.parentKey)) === normalizeId(this.parentId));
+    const bindings = allBindings.filter(
+      (b) => normalizeId(get(b, this.parentKey)) === normalizeId(this.parentId)
+    );
 
-    this.$set(this, 'lastSavedBindings', [...bindings]);
+    this['lastSavedBindings'] = [...bindings];
 
     // Add the current user as the project owner. This will get created by default
-    if (this.mode === _CREATE && bindings.length === 0 && this.defaultBindingHandler) {
+    if (
+      this.mode === _CREATE &&
+      bindings.length === 0 &&
+      this.defaultBindingHandler
+    ) {
       const defaultBinding = await this.defaultBindingHandler();
 
       // defaultBinding.isDefaultBinding = true;
       bindings.push(defaultBinding);
     }
 
-    this.$set(this, 'bindings', bindings);
+    this['bindings'] = bindings;
   },
 
   data() {
     return {
-      schema:            this.$store.getters[`management/schemaFor`](this.type),
-      bindings:          [],
+      schema: this.$store.getters[`management/schemaFor`](this.type),
+      bindings: [],
       lastSavedBindings: [],
     };
   },
 
   computed: {
     newBindings() {
-      return this.bindings
-        .filter((binding) => !binding.id && !this.lastSavedBindings.includes(binding));
+      return this.bindings.filter(
+        (binding) => !binding.id && !this.lastSavedBindings.includes(binding)
+      );
     },
     removedBindings() {
-      return this.lastSavedBindings
-        .filter((binding) => !this.bindings.includes(binding));
+      return this.lastSavedBindings.filter(
+        (binding) => !this.bindings.includes(binding)
+      );
     },
     membershipUpdate() {
       const newBindings = this.newBindings;
       const removedBindings = this.removedBindings;
 
       return {
-        newBindings:     this.newBindings,
+        newBindings: this.newBindings,
         removedBindings: this.removedBindings,
-        save:            (parentId) => {
+        save: (parentId) => {
           const savedPromises = newBindings.map((binding) => {
-            set(binding, 'metadata.generateName', `${ parentId }-rtb-`);
-            set(binding, 'metadata.labels', { 'auth.management.llmos.ai/namespace-id': parentId });
+            set(binding, 'metadata.generateName', `${parentId}-rtb-`);
+            set(binding, 'metadata.labels', {
+              'auth.management.llmos.ai/namespace-id': parentId,
+            });
             set(binding, this.parentKey, parentId);
 
             return binding.save();
           });
 
-          const removedPromises = removedBindings.map((binding) => binding.remove());
+          const removedPromises = removedBindings.map((binding) =>
+            binding.remove()
+          );
 
           return Promise.all([...savedPromises, ...removedPromises]);
-        }
+        },
       };
     },
 
@@ -134,37 +160,32 @@ export default {
       deep: true,
       handler() {
         this.$emit('membership-update', this.membershipUpdate);
-      }
-    }
+      },
+    },
   },
 
   methods: {
     addMember() {
       this.$store.dispatch('cluster/promptModal', {
-        component:      this.addMemberDialogName,
+        component: this.addMemberDialogName,
         componentProps: { onAdd: this.onAddMember },
-        modalSticky:    this.modalSticky
+        modalSticky: this.modalSticky,
       });
     },
 
     onAddMember(bindings) {
-      this.$set(this, 'bindings', [...this.bindings, ...bindings]);
+      this['bindings'] = [...this.bindings, ...bindings];
     },
 
     principalId(row) {
       return row.value.subjects[0].name;
-    }
-  }
+    },
+  },
 };
 </script>
 <template>
   <Loading v-if="$fetchState.pending" />
-  <ArrayList
-    v-else
-    v-model="bindings"
-    :mode="mode"
-    :show-header="true"
-  >
+  <ArrayList v-else v-model:value="bindings" :mode="mode" :show-header="true">
     <template #column-headers>
       <div class="box mb-0">
         <div class="column-headers row">
@@ -177,13 +198,10 @@ export default {
         </div>
       </div>
     </template>
-    <template #columns="{row}">
+    <template #columns="{ row }">
       <div class="columns row">
         <div class="col span-6">
-          <Principal
-            :key="principalId(row)"
-            :value="principalId(row)"
-          />
+          <Principal :value="principalId(row)" />
         </div>
         <div class="col span-6 role">
           {{ row.value?.roleTemplateRef?.name }}
@@ -191,25 +209,15 @@ export default {
       </div>
     </template>
     <template #add>
-      <button
-        type="button"
-        class="btn role-primary mt-10"
-        @click="addMember"
-      >
+      <a-button class="mt-10" type="primary" @click="addMember">
         {{ t('generic.add') }}
-      </button>
+      </a-button>
     </template>
-    <template #remove-button="{remove, i}">
+    <template #remove-button="{ remove, i }">
       <span v-if="(isCreate && i === 0) || isView" />
-      <button
-        v-else
-        type="button"
-        :disabled="isView"
-        class="btn role-link"
-        @click="remove"
-      >
+      <a-button v-else type="link" :disabled="isView" @click="remove">
         {{ t('generic.remove') }}
-      </button>
+      </a-button>
     </template>
   </ArrayList>
 </template>

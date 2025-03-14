@@ -1,142 +1,96 @@
-<script>
-import TextAreaAutoGrow from '@components/Form/TextArea/TextAreaAutoGrow.vue';
+<script setup>
+import { ref, watch } from "vue";
+import { EditOutlined, ArrowUpOutlined } from "@ant-design/icons-vue";
 
-export default {
-  name:       'EditInput',
-  components: { TextAreaAutoGrow },
-  props:      {
-    value: {
-      type:    String,
-      default: '',
-    },
-    isEdit: {
-      type:    Boolean,
-      default: false,
-    },
+const props = defineProps({
+  value: {
+    type: String,
+    default: "",
   },
-  data() {
-    return {
-      beforeValue: '',
-      editing:     this.isEdit,
-      inputValue:  this.value,
-    };
+  isEdit: {
+    type: Boolean,
+    default: false,
   },
-  watch: {
-    value(newVal) {
-      this.inputValue = newVal;
-    },
-  },
-  methods: {
-    toggleEdit() {
-      this.editing = true;
-    },
+});
 
-    handleCancel() {
-      this.inputValue = this.value;
-      this.editing = false;
-    },
+const emit = defineEmits(["update:value"]);
 
-    save() {
-      this.$emit('input', this.inputValue);
-      this.editing = false;
-    }
-  },
+const inputValue = ref(props.value);
+const editing = ref(props.isEdit);
+
+watch(
+  () => props.value,
+  (newVal) => {
+    inputValue.value = newVal;
+  }
+);
+
+const toggleEdit = () => {
+  editing.value = true;
+};
+
+const handleCancel = () => {
+  inputValue.value = props.value;
+  editing.value = false;
+};
+
+const save = () => {
+  emit("update:value", inputValue.value);
+  editing.value = false;
 };
 </script>
 
 <template>
-  <div class="edit-input">
-    <div
-      v-if="!editing"
-      class="editText"
-    >
-      <span>
-        {{ inputValue }}
-        <button
-          type="button"
-          class="btn btn-sm role-link"
+  <div>
+    <div v-if="!editing" class="relative">
+      <div class="flex flex-col items-end group w-auto">
+        <span class="px-[16px] py-[9px] rounded-xl bg-[#a22d2d0a] w-auto">
+          {{ inputValue }}
+        </span>
+
+        <div
+          class="action w-auto group-hover:opacity-100 opacity-0 transition-opacity duration-300"
         >
-          <i
-            class="icon icon-edit"
+          <a-button
+            type="button"
+            class="btn btn-sm role-link"
             @click="toggleEdit"
-          />
-        </button>
-      </span>
+          >
+            <EditOutlined />
+          </a-button>
+        </div>
+      </div>
     </div>
 
     <div v-else>
-      <div class="input-area">
-        <TextAreaAutoGrow
-          v-model="inputValue"
-          @blur="toggleEdit"
-        />
-        <slot name="bottom">
-          <div class="bottom-content">
-            <button
-              type="button"
-              class="btn btn-sm role-link"
-              @click="save"
-            >
-              <i class="icon icon-checkmark" />
-            </button>
+      <div class="flex items-end">
+        <button
+          type="button"
+          class="btn btn-sm role-link"
+          @click="handleCancel"
+        >
+          <i class="icon icon-close" />
+        </button>
 
-            <button
-              type="button"
-              class="btn btn-sm role-link"
-              @click="handleCancel"
-            >
-              <i class="icon icon-close" />
-            </button>
-          </div>
-        </slot>
+        <a-textarea v-model:value="inputValue" auto-size />
+
+        <a-button
+          shape="circle"
+          type="primary"
+          class="btn-sm inline-flex items-center ml-5"
+          @click="save"
+        >
+          <template #icon>
+            <ArrowUpOutlined class="!align-text-bottom" />
+          </template>
+        </a-button>
       </div>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
-.edit-input {
-  margin: 10px;
-}
-
-.input-area {
-  position: relative;
-
-  .bottom-content {
-    position: absolute;
-    bottom: 0px;
-    right: 2px;
-
-    button {
-      padding: 0px 4px 0px 4px;
-    }
-  }
-}
-
-.editText {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  position: relative;
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 26px;
-
-  button {
-    padding: 0px;
-
-    text-align: center;
-  }
-
-  .icon-edit {
-    margin-left: 10px;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out;
-  }
-  &:hover .icon-edit {
-    opacity: 1;
-  }
+<style lang="scss">
+.v-center {
+  vertical-align: 0px !important;
 }
 </style>

@@ -18,7 +18,6 @@ export default {
 
     return {
       previousRoute: '',
-      styles:        { '--custom-content': `'${ this.t('nav.failWhale.separator') }'` }
     };
   },
 
@@ -54,34 +53,22 @@ export default {
         <h1 v-if="error.status">
           HTTP Error {{ error.status }}: {{ error.statusText }}
         </h1>
-        <h1 v-else>
-          Error
-        </h1>
-        <h2
-          v-if="error"
-          class="text-secondary mt-20"
-        >
+        <h1 v-else>Error</h1>
+        <h2 v-if="error" class="text-secondary mt-20">
           {{ displayError }}
         </h2>
         <p class="mt-20">
-          <a
-            :href="home"
-            class="btn role-primary"
-          >
+          <a-button :href="home">
             {{ t('nav.home') }}
-          </a>
+          </a-button>
         </p>
-        <hr
-          class="custom-content"
-          :style="styles"
-        >
+        <a-divider style="border-color: #1677ff" dashed>{{
+          t('nav.failWhale.separator')
+        }}</a-divider>
         <p class="mt-20">
-          <a
-            class="btn role-secondary"
-            @click="$router.push(previousRoute.fullPath)"
-          >
+          <a-button @click="$router.push(previousRoute.fullPath)">
             {{ t('nav.failWhale.reload') }}
-          </a>
+          </a-button>
         </p>
       </div>
     </main>
@@ -89,41 +76,25 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  .error {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    justify-content: center;
-    overflow: hidden;
+.error {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  overflow: hidden;
 
-    .row {
-      align-items: center;
-    }
-
-    h1 {
-      font-size: 5rem;
-    }
-
-    .desert-landscape {
-      img {
-        max-width: 100%;
-      }
-    }
+  .row {
+    align-items: center;
   }
 
-  .custom-content {
-    text-align: center;
-    margin-top: 18px;
-    margin-bottom: 18px;
-    max-width: 450px;
+  h1 {
+    font-size: 5rem;
+  }
 
-    &::after {
-      background: var(--body-bg);
-      color: var(--body-text);
-      content: var(--custom-content);
-      padding: 0 12px;
-      position: relative;
-      top: -12px;
+  .desert-landscape {
+    img {
+      max-width: 100%;
     }
   }
+}
 </style>

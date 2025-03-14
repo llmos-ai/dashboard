@@ -93,6 +93,5 @@ export default {
     :rows="pvcs"
     :schema="schema"
     key-field="_key"
-    v-on="$listeners"
   />
 </template>

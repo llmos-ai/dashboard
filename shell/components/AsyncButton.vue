@@ -1,12 +1,12 @@
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent, PropType, inject } from 'vue';
 import typeHelper from '@shell/utils/type-helpers';
 
 export const ASYNC_BUTTON_STATES = {
-  ACTION:  'action',
+  ACTION: 'action',
   WAITING: 'waiting',
   SUCCESS: 'success',
-  ERROR:   'error',
+  ERROR: 'error',
 };
 
 const TEXT = 'text';
@@ -14,86 +14,95 @@ const TOOLTIP = 'tooltip';
 
 export type AsyncButtonCallback = (success: boolean) => void;
 
-export default Vue.extend<{ phase: string}, any, any, any>({
+interface NonReactiveProps {
+  timer: NodeJS.Timeout | undefined;
+}
+
+const provideProps: NonReactiveProps = { timer: undefined };
+
+// i18n-uses asyncButton.*
+export default defineComponent({
   props: {
     /**
      * Mode maps to keys in asyncButton.* translations
      */
     mode: {
-      type:    String,
+      type: String,
       default: 'edit',
     },
     delay: {
-      type:    Number,
+      type: Number,
       default: 5000,
     },
 
     name: {
-      type:    String,
+      type: String,
       default: null,
     },
     disabled: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
     type: {
-      type:    String,
-      default: 'button'
+      type: String as PropType<
+        'button' | 'submit' | 'reset' | undefined | 'primary' | 'link' | 'text'
+      >,
+      default: 'button',
     },
     tabIndex: {
-      type:    Number,
+      type: Number,
       default: null,
     },
 
     actionColor: {
-      type:    String,
+      type: String,
       default: 'role-primary',
     },
     waitingColor: {
-      type:    String,
+      type: String,
       default: 'bg-primary',
     },
     successColor: {
-      type:    String,
+      type: String,
       default: 'bg-success',
     },
     errorColor: {
-      type:    String,
+      type: String,
       default: 'bg-error',
     },
 
     actionLabel: {
-      type:    String,
+      type: String,
       default: null,
     },
     waitingLabel: {
-      type:    String,
+      type: String,
       default: null,
     },
     successLabel: {
-      type:    String,
+      type: String,
       default: null,
     },
     errorLabel: {
-      type:    String,
+      type: String,
       default: null,
     },
 
     icon: {
-      type:    String,
+      type: String,
       default: null,
     },
     labelAs: {
-      type:    String,
+      type: String,
       default: TEXT,
     },
     size: {
-      type:    String,
+      type: String,
       default: '',
     },
 
     currentPhase: {
-      type:    String,
+      type: String,
       default: ASYNC_BUTTON_STATES.ACTION,
     },
 
@@ -102,62 +111,64 @@ export default Vue.extend<{ phase: string}, any, any, any>({
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type:    String,
-      default: 'action-button'
+      type: String,
+      default: 'action-button',
     },
 
     manual: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
-
   },
 
-  data(): { phase: string, timer?: NodeJS.Timeout} {
+  setup() {
+    const timer = inject('timer', provideProps.timer);
+
+    return { timer };
+  },
+
+  emits: ['click'],
+
+  data() {
     return { phase: this.currentPhase };
   },
 
   watch: {
     currentPhase(neu) {
       this.phase = neu;
-    }
+    },
   },
 
   computed: {
-    classes(): {btn: boolean, [color: string]: boolean} {
-      const key = `${ this.phase }Color`;
-      const color = typeHelper.memberOfComponent(this, key);
+    // classes(): { [color: string]: boolean } {
+    //   const key = `${this.phase}Color`;
+    //   const color = typeHelper.memberOfComponent(this, key);
 
-      const out = {
-        btn:     true,
-        [color]: true,
-      };
+    //   const out = {
+    //     [color]: true,
+    //   };
 
-      if (this.size) {
-        out[`btn-${ this.size }`] = true;
-      }
-
-      return out;
-    },
+    //   return out;
+    // },
 
     displayIcon(): string {
       const exists = this.$store.getters['i18n/exists'];
       const t = this.$store.getters['i18n/t'];
-      const key = `asyncButton.${ this.mode }.${ this.phase }Icon`;
-      const defaultKey = `asyncButton.default.${ this.phase }Icon`;
+      const key = `asyncButton.${this.mode}.${this.phase}Icon`;
+      const defaultKey = `asyncButton.default.${this.phase}Icon`;
 
       let out = '';
 
-      if ( this.icon ) {
+      if (this.icon) {
         out = this.icon;
-      } else if ( exists(key) ) {
-        out = `icon-${ t(key) }`;
-      } else if ( exists(defaultKey) ) {
-        out = `icon-${ t(defaultKey) }`;
+      } else if (exists(key)) {
+        out = `icon-${t(key)}`;
+      } else if (exists(defaultKey)) {
+        out = `icon-${t(defaultKey)}`;
       }
 
-      if ( this.isSpinning ) {
-        if ( !out ) {
+      if (this.isSpinning) {
+        if (!out) {
           out = 'icon-spinner';
         }
 
@@ -168,17 +179,17 @@ export default Vue.extend<{ phase: string}, any, any, any>({
     },
 
     displayLabel(): string {
-      const override = typeHelper.memberOfComponent(this, `${ this.phase }Label`);
+      const override = typeHelper.memberOfComponent(this, `${this.phase}Label`);
       const exists = this.$store.getters['i18n/exists'];
       const t = this.$store.getters['i18n/t'];
-      const key = `asyncButton.${ this.mode }.${ this.phase }`;
-      const defaultKey = `asyncButton.default.${ this.phase }`;
+      const key = `asyncButton.${this.mode}.${this.phase}`;
+      const defaultKey = `asyncButton.default.${this.phase}`;
 
-      if ( override ) {
+      if (override) {
         return override;
-      } else if ( exists(key) ) {
+      } else if (exists(key)) {
         return t(key);
-      } else if ( exists(defaultKey) ) {
+      } else if (exists(defaultKey)) {
         return t(defaultKey);
       } else {
         return '';
@@ -193,32 +204,31 @@ export default Vue.extend<{ phase: string}, any, any, any>({
       return this.disabled || this.phase === ASYNC_BUTTON_STATES.WAITING;
     },
 
-    tooltip(): { content: string, hideOnTargetClick: boolean} | null {
-      if ( this.labelAs === TOOLTIP ) {
+    isManualRefresh() {
+      return this.mode === 'manual-refresh';
+    },
+
+    tooltip(): { content: string; hideOnTargetClick: boolean } | null {
+      if (this.labelAs === TOOLTIP) {
         return {
-          content:           this.displayLabel,
-          hideOnTargetClick: false
+          content: this.displayLabel,
+          hideOnTargetClick: false,
         };
       }
 
       return null;
-    }
+    },
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.timer) {
       clearTimeout(this.timer);
     }
   },
 
   methods: {
-    clicked($event: MouseEvent) {
-      if ($event) {
-        $event.stopPropagation();
-        $event.preventDefault();
-      }
-
-      if ( this.isDisabled ) {
+    clicked() {
+      if (this.isDisabled) {
         return;
       }
 
@@ -242,49 +252,68 @@ export default Vue.extend<{ phase: string}, any, any, any>({
       if (success === 'cancelled') {
         this.phase = ASYNC_BUTTON_STATES.ACTION;
       } else {
-        this.phase = (success ? ASYNC_BUTTON_STATES.SUCCESS : ASYNC_BUTTON_STATES.ERROR );
+        this.phase = success
+          ? ASYNC_BUTTON_STATES.SUCCESS
+          : ASYNC_BUTTON_STATES.ERROR;
         this.timer = setTimeout(() => {
           this.timerDone();
-        }, this.delay );
+        }, this.delay);
       }
     },
 
     timerDone() {
-      if ( this.phase === ASYNC_BUTTON_STATES.SUCCESS || this.phase === ASYNC_BUTTON_STATES.ERROR ) {
+      if (
+        this.phase === ASYNC_BUTTON_STATES.SUCCESS ||
+        this.phase === ASYNC_BUTTON_STATES.ERROR
+      ) {
         this.phase = ASYNC_BUTTON_STATES.ACTION;
       }
     },
 
     focus() {
       (this.$refs.btn as HTMLElement).focus();
-    }
-  }
+    },
+  },
 });
 </script>
 
 <template>
-  <button
+  <a-button
     ref="btn"
-    :class="classes"
+    role="button"
+    :size="size"
     :name="name"
     :type="type"
     :disabled="isDisabled"
+    :aria-disabled="isDisabled"
     :tab-index="tabIndex"
     :data-testid="componentTestid + '-async-button'"
     @click="clicked"
   >
-    <span v-if="mode === 'manual-refresh'">{{ t('action.refresh') }}</span>
+    <span
+      v-if="isManualRefresh"
+      :class="{
+        'mr-10': displayIcon && size !== 'sm',
+        'mr-5': displayIcon && size === 'sm',
+      }"
+      >{{ t('action.refresh') }}</span
+    >
     <i
       v-if="displayIcon"
       v-clean-tooltip="tooltip"
-      :class="{icon: true, 'icon-lg': true, [displayIcon]: true}"
+      :class="{
+        icon: true,
+        'icon-lg': true,
+        [displayIcon]: true,
+        'mr-0': isManualRefresh,
+      }"
     />
     <span
       v-if="labelAs === 'text' && displayLabel"
       v-clean-tooltip="tooltip"
       v-clean-html="displayLabel"
     />
-  </button>
+  </a-button>
 </template>
 
 <style lang="scss" scoped>

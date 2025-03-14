@@ -1,8 +1,9 @@
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 import { _VIEW } from '@shell/config/query-params';
+import { randomStr } from '@shell/utils/string';
 
-export default Vue.extend({
+export default defineComponent({
   props: {
     /**
      * The name of the input, for grouping.
@@ -67,11 +68,24 @@ export default Vue.extend({
     description: {
       type:    String,
       default: null
+    },
+
+    /**
+     * Prevent focus when using radio in the context of a Radio group
+     */
+    preventFocusOnRadioGroups: {
+      type:    Boolean,
+      default: false
     }
   },
 
+  emits: ['update:value'],
+
   data() {
-    return { isChecked: this.value === this.val };
+    return {
+      isChecked:    this.value === this.val,
+      randomString: `${ randomStr() }-radio`,
+    };
   },
 
   computed: {
@@ -98,14 +112,14 @@ export default Vue.extend({
     },
 
     hasLabelSlot(): boolean {
-      return !!this.$slots.label || !!this.$scopedSlots.label;
+      return !!this.$slots.label;
     }
   },
 
   watch: {
     value(neu) {
       this.isChecked = this.val === neu;
-      if (this.isChecked) {
+      if (this.isChecked && !this.preventFocusOnRadioGroups) {
         (this.$refs.custom as HTMLElement).focus();
       }
     }
@@ -115,29 +129,36 @@ export default Vue.extend({
     /**
      * Emits the input event.
      */
-    clicked({ target }: { target?: HTMLElement }) {
-      if (this.isDisabled || target?.tagName === 'A') {
+    clicked(event: MouseEvent | KeyboardEvent) {
+      const target = event.target;
+
+      if (this.isDisabled || (target instanceof HTMLElement && target.tagName === 'A')) {
         return;
       }
 
-      this.$emit('input', this.val);
-    }
+      this.$emit('update:value', this.val);
+    },
   }
 });
 </script>
 
 <template>
   <label
-    :class="{'disabled': isDisabled, 'radio-container': true}"
+    :class="{
+      'disabled': isDisabled,
+      'radio-container': true,
+      'radio-button-checked': isChecked
+    }"
     @keydown.enter="clicked($event)"
     @keydown.space="clicked($event)"
     @click.stop="clicked($event)"
   >
     <input
-      :id="_uid+'-radio'"
+      :id="randomString"
       :disabled="isDisabled"
       :name="name"
       :value="''+val"
+      :data-testid="label"
       :checked="isChecked"
       type="radio"
       :tabindex="-1"
@@ -146,7 +167,7 @@ export default Vue.extend({
     <span
       ref="custom"
       :class="[ isDisabled ? 'text-muted' : '', 'radio-custom']"
-      :tabindex="isDisabled ? -1 : 0"
+      :tabindex="isDisabled || preventFocusOnRadioGroups ? -1 : 0"
       :aria-label="label"
       :aria-checked="isChecked"
       role="radio"
@@ -212,9 +233,11 @@ $fontColor: var(--input-label);
   display: inline-flex;
   align-items: flex-start;
   margin: 0;
+  left: -4px;
   user-select: none;
   border-radius: var(--border-radius);
   padding-bottom: 5px;
+  padding-left: 4px;
 
   &,
   .radio-label,
@@ -235,14 +258,8 @@ $fontColor: var(--input-label);
     min-width: 14px;
     background-color: var(--input-bg);
     border-radius: 50%;
-    transition: all 0.3s ease-out;
     border: 1.5px solid var(--border);
     margin-top: 5px;
-
-    &:focus {
-      outline: none;
-      border-radius: 50%;
-    }
   }
 
   input {

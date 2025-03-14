@@ -5,9 +5,9 @@ import {
   FOCUS,
   MODE,
   _UNFLAG,
-  _EDIT
+  _EDIT,
 } from '@shell/config/query-params';
-import Vue from 'vue';
+
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { STATES_ENUM } from '@shell/plugins/dashboard-store/resource-class';
 import { LLMOS, STORAGE_CLASS } from '@shell/config/types';
@@ -16,14 +16,15 @@ import { clone } from '@shell/utils/object';
 export default class PVC extends SteveModel {
   applyDefaults(_, realMode) {
     const accessModes = realMode === _CLONE ? this.spec.accessModes : [];
-    const storage = realMode === _CLONE ? this.spec.resources.requests.storage : null;
+    const storage =
+      realMode === _CLONE ? this.spec.resources.requests.storage : null;
 
-    Vue.set(this, 'spec', {
+    this['spec'] = {
       accessModes,
       storageClassName: '',
-      volumeName:       '',
-      resources:        { requests: { storage } }
-    });
+      volumeName: '',
+      resources: { requests: { storage } },
+    };
   }
 
   get bound() {
@@ -31,7 +32,8 @@ export default class PVC extends SteveModel {
   }
 
   get expandable() {
-    return !!this.$getters[`byId`](STORAGE_CLASS, this.spec?.storageClassName)?.allowVolumeExpansion;
+    return !!this.$getters[`byId`](STORAGE_CLASS, this.spec?.storageClassName)
+      ?.allowVolumeExpansion;
   }
 
   get _availableActions() {
@@ -40,10 +42,10 @@ export default class PVC extends SteveModel {
     // Add backwards, each one to the top
     insertAt(out, 0, { divider: true });
     insertAt(out, 0, {
-      action:  'goToEditVolumeSize',
+      action: 'goToEditVolumeSize',
       enabled: this.expandable && this.bound,
-      icon:    'icon icon-fw icon-plus',
-      label:   this.t('persistentVolumeClaim.expand.label'),
+      icon: 'icon icon-fw icon-plus',
+      label: this.t('persistentVolumeClaim.expand.label'),
     });
 
     return out;
@@ -54,9 +56,9 @@ export default class PVC extends SteveModel {
 
     location.query = {
       ...location.query,
-      [MODE]:  _EDIT,
-      [AS]:    _UNFLAG,
-      [FOCUS]: 'volumeclaim'
+      [MODE]: _EDIT,
+      [AS]: _UNFLAG,
+      [FOCUS]: 'volumeclaim',
     };
 
     this.currentRouter().push(location);
@@ -82,7 +84,9 @@ export default class PVC extends SteveModel {
   }
 
   get parentNameOverride() {
-    return this.$rootGetters['i18n/t'](`typeLabel."${ LLMOS.VOLUME }"`, { count: 1 }).trim();
+    return this.$rootGetters['i18n/t'](`typeLabel."${LLMOS.VOLUME}"`, {
+      count: 1,
+    }).trim();
   }
 
   get parentLocationOverride() {

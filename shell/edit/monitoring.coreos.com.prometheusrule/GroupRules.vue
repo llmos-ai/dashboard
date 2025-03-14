@@ -18,26 +18,26 @@ export default {
 
   props: {
     value: {
-      type:    Array,
+      type: Array,
       default: () => [],
     },
 
     mode: {
-      type:    String,
+      type: String,
       default: 'create',
     },
   },
 
   data(props) {
     const defaultAlert = {
-      alert:  '',
-      expr:   '',
-      for:    '0s',
+      alert: '',
+      expr: '',
+      for: '0s',
       labels: {
-        severity:     'none',
-        namespace:    'default',
-        cluster_id:   this.$store.getters['clusterId'],
-        cluster_name: this.$store.getters['currentCluster'].spec.displayName
+        severity: 'none',
+        namespace: 'default',
+        cluster_id: this.$store.getters['clusterId'],
+        cluster_name: this.$store.getters['currentCluster'].spec.displayName,
       },
     };
 
@@ -92,24 +92,24 @@ export default {
       const { value } = this;
 
       switch (ruleType) {
-      case 'record':
-        value.push({
-          record: '',
-          expr:   '',
-          labels: {
-            severity:     'none',
-            namespace:    'default',
-            cluster_id:   this.$store.getters['clusterId'],
-            cluster_name: this.$store.getters['currentCluster'].spec.displayName
-
-          },
-        });
-        break;
-      case 'alert':
-        value.push(clone(this.defaultAlert));
-        break;
-      default:
-        break;
+        case 'record':
+          value.push({
+            record: '',
+            expr: '',
+            labels: {
+              severity: 'none',
+              namespace: 'default',
+              cluster_id: this.$store.getters['clusterId'],
+              cluster_name:
+                this.$store.getters['currentCluster'].spec.displayName,
+            },
+          });
+          break;
+        case 'alert':
+          value.push(clone(this.defaultAlert));
+          break;
+        default:
+          break;
       }
     },
     removeRule(ruleIndex) {
@@ -121,7 +121,9 @@ export default {
 
 <template>
   <div class="container-group-rules">
-    <div :class="[{ hide: hideRecordingRulesOnView }, 'container-recording-rules']">
+    <div
+      :class="[{ hide: hideRecordingRulesOnView }, 'container-recording-rules']"
+    >
       <h3 class="mt-20 mb-20">
         <t k="prometheusRule.recordingRules.label" />
         <i
@@ -132,11 +134,7 @@ export default {
       </h3>
       <ArrayListGrouped :value="recordingRules">
         <template #default="props">
-          <RecordingRule
-            class="rule"
-            :value="props.row.value"
-            :mode="mode"
-          />
+          <RecordingRule class="rule" :value="props.row.value" :mode="mode" />
         </template>
         <template #add>
           <button
@@ -164,7 +162,9 @@ export default {
         </template>
       </ArrayListGrouped>
     </div>
-    <div :class="[{ hide: hideAlertingRulesOnView }, 'container-alerting-rules']">
+    <div
+      :class="[{ hide: hideAlertingRulesOnView }, 'container-alerting-rules']"
+    >
       <div class="mt-20 mb-20">
         <h3>
           <t k="prometheusRule.alertingRules.label" />
@@ -182,11 +182,7 @@ export default {
       </div>
       <ArrayListGrouped :value="alertingRules">
         <template #default="props">
-          <AlertingRule
-            class="rule"
-            :value="props.row.value"
-            :mode="mode"
-          />
+          <AlertingRule class="rule" :value="props.row.value" :mode="mode" />
         </template>
         <template #add>
           <button

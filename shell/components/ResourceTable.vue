@@ -8,13 +8,12 @@ import { NAMESPACE, AGE } from '@shell/config/table-headers';
 import { findBy } from '@shell/utils/array';
 import { ExtensionPoint, TableColumnLocation } from '@shell/core/types';
 import { getApplicableExtensionEnhancements } from '@shell/core/plugin-helpers';
-import { Banner } from '@components/Banner';
 
 // Default group-by in the case the group stored in the preference does not apply
 const DEFAULT_GROUP = 'namespace';
 
 export const defaultTableSortGenerationFn = (schema, $store) => {
-  if ( !schema ) {
+  if (!schema) {
     return null;
   }
 
@@ -22,16 +21,16 @@ export const defaultTableSortGenerationFn = (schema, $store) => {
   let sortKey = resource;
 
   const inStore = $store.getters['currentStore'](resource);
-  const generation = $store.getters[`${ inStore }/currentGeneration`]?.(resource);
+  const generation = $store.getters[`${inStore}/currentGeneration`]?.(resource);
 
-  if ( generation ) {
-    sortKey += `/${ generation }`;
+  if (generation) {
+    sortKey += `/${generation}`;
   }
 
   const nsFilterKey = $store.getters['activeNamespaceCacheKey'];
 
-  if ( nsFilterKey ) {
-    return `${ sortKey }/${ nsFilterKey }`;
+  if (nsFilterKey) {
+    return `${sortKey}/${nsFilterKey}`;
   }
 
   // covers case where we have no current cluster's ns cache
@@ -39,64 +38,68 @@ export const defaultTableSortGenerationFn = (schema, $store) => {
 };
 
 export default {
-
   name: 'ResourceTable',
 
-  components: {
-    ButtonGroup, SortableTable, Banner
-  },
+  emits: ['clickedActionButton'],
+
+  components: { ButtonGroup, SortableTable },
 
   props: {
     schema: {
-      type:    Object,
+      type: Object,
       default: null,
     },
 
     rows: {
-      type:     Array,
-      required: true
+      type: Array,
+      required: true,
     },
 
     loading: {
-      type:     Boolean,
-      required: false
+      type: Boolean,
+      required: false,
+    },
+
+    altLoading: {
+      type: Boolean,
+      required: false,
     },
 
     keyField: {
       // Field that is unique for each row.
-      type:    String,
+      type: String,
       default: '_key',
     },
 
     headers: {
-      type:    Array,
+      type: Array,
       default: null,
     },
 
     groupBy: {
-      type:    String,
-      default: null
+      type: String,
+      default: null,
     },
 
     namespaced: {
-      type:    Boolean,
+      type: Boolean,
       default: null, // Automatic from schema
     },
 
     search: {
       // Show search input to filter rows
-      type:    Boolean,
-      default: true
+      type: Boolean,
+      default: true,
     },
 
     tableActions: {
       // Show bulk table actions
-      type:    [Boolean, null],
-      default: null
+      type: [Boolean, null],
+      default: null,
     },
 
     pagingLabel: {
-      type:    String,
+      type: String,
       default: 'sortableTable.paging.resource',
     },
 
@@ -104,119 +107,157 @@ export default {
      * Additional params to pass to the pagingLabel translation
      */
     pagingParams: {
-      type:    Object,
+      type: Object,
       default: null,
     },
 
     rowActions: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
     },
 
     groupable: {
-      type:    Boolean,
+      type: Boolean,
       default: null, // Null: auto based on namespaced and type custom groupings
     },
 
     groupTooltip: {
-      type:    String,
+      type: String,
       default: 'resourceTable.groupBy.namespace',
     },
 
     overflowX: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     overflowY: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     sortGenerationFn: {
-      type:    Function,
+      type: Function,
       default: null,
     },
     getCustomDetailLink: {
-      type:    Function,
-      default: null
+      type: Function,
+      default: null,
     },
-
     ignoreFilter: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     hasAdvancedFiltering: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     advFilterHideLabelsAsCols: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     advFilterPreventFilteringLabels: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     /**
      * Allows for the usage of a query param to work for simple filtering (q)
      */
     useQueryParamsForSimpleFiltering: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     /**
-     * Manaul force the update of live and delayed cells. Change this number to kick off the update
+     * Manual force the update of live and delayed cells. Change this number to kick off the update
      */
     forceUpdateLiveAndDelayed: {
-      type:    Number,
-      default: 0
+      type: Number,
+      default: 0,
     },
 
-    notification: {
-      type:     Object,
-      default:  null,
-      required: false
-    }
-  },
+    externalPaginationEnabled: {
+      type: Boolean,
+      default: false,
+    },
 
-  mounted() {
-    /**
-     * v-shortkey prevents the event's propagation:
-     * https://github.com/fgr-araujo/vue-shortkey/blob/55d802ea305cadcc2ea970b55a3b8b86c7b44c05/src/index.js#L156-L157
-     *
-     * 'Enter' key press is handled via event listener in order to allow the event propagation
-     */
-    window.addEventListener('keyup', this.handleEnterKeyPress);
-  },
+    externalPaginationResult: {
+      type: Object,
+      default: null,
+    },
 
-  beforeDestroy() {
-    window.removeEventListener('keyup', this.handleEnterKeyPress);
+    rowsPerPage: {
+      type: Number,
+      default: null, // Default comes from the user preference
+    },
+
+    hideGroupingControls: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
-    const options = this.$store.getters[`type-map/optionsFor`](this.schema);
-    const listGroups = options?.listGroups || [];
-    const listGroupMapped = listGroups.reduce((acc, grp) => {
-      acc[grp.value] = grp;
-
-      return acc;
-    }, {});
-
     // Confirm which store we're in, if schema isn't available we're probably showing a list with different types
-    const inStore = this.schema?.id ? this.$store.getters['currentStore'](this.schema.id) : undefined;
+    const inStore = this.schema?.id
+      ? this.$store.getters['currentStore'](this.schema.id)
+      : undefined;
 
     return {
-      listGroups, listGroupMapped, inStore
+      inStore,
+      /**
+       * Override the sortGenerationFn given changes in the rows we pass through to sortable table
+       *
+       * Primary purpose is to directly connect an iteration of `rows` with a sortGeneration string. This avoids
+       * reactivity issues where `rows` hasn't yet changed but something like workspaces has (stale values stored against fresh key)
+       */
+      sortGeneration: undefined,
     };
   },
 
+  watch: {
+    filteredRows: {
+      handler() {
+        // This is only prevalent in fleet world and the workspace switcher
+        // - it's singular (a --> b --> c) instead of namespace switchers additive (a --> a+b --> a)
+        // - this means it's much more likely to switch between resource sets containing the same mount of rows
+        //
+        if (this.currentProduct.showWorkspaceSwitcher) {
+          this.sortGeneration = this.safeSortGenerationFn(
+            this.schema,
+            this.$store
+          );
+        }
+      },
+      immediate: true,
+    },
+  },
+
   computed: {
+    options() {
+      return this.$store.getters[`type-map/optionsFor`](
+        this.schema,
+        this.externalPaginationEnabled
+      );
+    },
+
+    _listGroupMapped() {
+      return this.options?.listGroups?.reduce((acc, grp) => {
+        acc[grp.value] = grp;
+
+        return acc;
+      }, {});
+    },
+
+    _mandatorySort() {
+      return this.options?.listMandatorySort;
+    },
+
     ...mapGetters(['currentProduct']),
+
     isNamespaced() {
-      if ( this.namespaced !== null ) {
+      if (this.namespaced !== null) {
         return this.namespaced;
       }
 
-      return !!get( this.schema, 'attributes.namespaced');
+      return !!get(this.schema, 'attributes.namespaced');
     },
 
     showNamespaceColumn() {
@@ -230,7 +271,9 @@ export default {
       if (this.tableActions !== null) {
         return this.tableActions;
       } else if (this.schema) {
-        const hideTableActions = this.$store.getters['type-map/hideBulkActionsFor'](this.schema);
+        const hideTableActions = this.$store.getters[
+          'type-map/hideBulkActionsFor'
+        ](this.schema);
 
         return !hideTableActions;
       }
@@ -242,16 +285,24 @@ export default {
       let headers;
       const showNamespace = this.showNamespaceColumn;
 
-      if ( this.headers ) {
+      if (this.headers) {
         headers = this.headers.slice();
       } else {
-        headers = this.$store.getters['type-map/headersFor'](this.schema);
+        headers = this.$store.getters['type-map/headersFor'](
+          this.schema,
+          this.externalPaginationEnabled
+        );
       }
 
       // add custom table columns provided by the extensions ExtensionPoint.TABLE_COL hook
       // gate it so that we prevent errors on older versions of dashboard
       if (this.$store.$plugin?.getUIConfig) {
-        const extensionCols = getApplicableExtensionEnhancements(this, ExtensionPoint.TABLE_COL, TableColumnLocation.RESOURCE, this.$route);
+        const extensionCols = getApplicableExtensionEnhancements(
+          this,
+          ExtensionPoint.TABLE_COL,
+          TableColumnLocation.RESOURCE,
+          this.$route
+        );
 
         // Try and insert the columns before the Age column
         let insertPosition = headers.length;
@@ -264,7 +315,11 @@ export default {
           } else {
             // we've found some labels with ' ', which isn't necessarily empty (explore action/button)
             // if we are to add cols, let's push them before these so that the UI doesn't look weird
-            const lastViableColIndex = headers.findIndex((h) => (!h.label || !h.label?.trim()) && (!h.labelKey || !h.labelKey?.trim()));
+            const lastViableColIndex = headers.findIndex(
+              (h) =>
+                (!h.label || !h.label?.trim()) &&
+                (!h.labelKey || !h.labelKey?.trim())
+            );
 
             if (lastViableColIndex >= 0) {
               insertPosition = lastViableColIndex;
@@ -283,21 +338,25 @@ export default {
       }
 
       // If only one namespace is selected, hide the namespace column
-      if ( !showNamespace ) {
-        const idx = headers.findIndex((header) => header.name === NAMESPACE.name);
+      if (!showNamespace) {
+        const idx = headers.findIndex(
+          (header) => header.name === NAMESPACE.name
+        );
 
-        if ( idx >= 0 ) {
+        if (idx >= 0) {
           headers.splice(idx, 1);
         }
       }
 
       // If we are grouping by a custom group, it may specify that we hide a specific column
-      const custom = this.listGroupMapped[this.group];
+      const custom = this._listGroupMapped?.[this.group];
 
       if (custom?.hideColumn) {
-        const idx = headers.findIndex((header) => header.name === custom.hideColumn);
+        const idx = headers.findIndex(
+          (header) => header.name === custom.hideColumn
+        );
 
-        if ( idx >= 0 ) {
+        if (idx >= 0) {
           headers.splice(idx, 1);
         }
       }
@@ -305,6 +364,9 @@ export default {
       return headers;
     },
 
+    /**
+     * Take rows and filter out entries given the namespace filter
+     */
     filteredRows() {
       const isAll = this.$store.getters['isAllNamespaces'];
 
@@ -312,8 +374,12 @@ export default {
       if (
         !this.isNamespaced || // Resource type isn't namespaced
         this.ignoreFilter || // Component owner strictly states no filtering
+        this.externalPaginationEnabled ||
         (isAll && !this.currentProduct?.hideSystemResources) || // Need all
-        (this.inStore ? this.$store.getters[`${ this.inStore }/haveNamespace`](this.schema.id)?.length : false)// Store reports type has namespace filter, so rows already contain the correctly filtered resources
+        (this.inStore
+          ? this.$store.getters[`${this.inStore}/haveNamespace`](this.schema.id)
+              ?.length
+          : false) // Store reports type has namespace filter, so rows already contain the correctly filtered resources
       ) {
         return this.rows || [];
       }
@@ -329,7 +395,10 @@ export default {
 
       return this.rows.filter((row) => {
         if (this.currentProduct?.hideSystemResources && this.isNamespaced) {
-          return !!includedNamespaces[row.metadata.namespace] && !row.isSystemResource;
+          return (
+            !!includedNamespaces[row.metadata.namespace] &&
+            !row.isSystemResource
+          );
         } else if (!this.isNamespaced) {
           return true;
         } else if (haveAllNamespace) {
@@ -353,20 +422,28 @@ export default {
         const exists = this.groupOptions.find((g) => g.value === this._group);
 
         if (!exists) {
-          return DEFAULT_GROUP;
+          // Attempt to find the default option in available options...
+          // if not use the first value in the options collection...
+          // and if not that just fall back to the default
+          if (this.groupOptions.find((g) => g.value === DEFAULT_GROUP)) {
+            return DEFAULT_GROUP;
+          }
+
+          return this.groupOptions[0]?.value || DEFAULT_GROUP;
         }
 
         return this._group;
       },
       set(value) {
         this._group = value;
-      }
+      },
     },
 
     showGrouping() {
-      if ( this.groupable === null ) {
-        const namespaceGroupable = this.$store.getters['isMultipleNamespaces'] && this.isNamespaced;
-        const customGroupable = this.listGroups.length > 0;
+      if (this.groupable === null) {
+        const namespaceGroupable =
+          this.$store.getters['isMultipleNamespaces'] && this.isNamespaced;
+        const customGroupable = !!this.options?.listGroups?.length;
 
         return namespaceGroupable || customGroupable;
       }
@@ -375,17 +452,25 @@ export default {
     },
 
     computedGroupBy() {
-      if ( this.groupBy ) {
+      // If we're not showing grouping options we shouldn't have a group by property
+      if (!this.showGrouping) {
+        return null;
+      }
+
+      if (this.groupBy) {
+        // This probably comes from the type-map config for the resource (see ResourceList)
         return this.groupBy;
       }
 
-      if ( this.group === 'namespace' && this.showGrouping ) {
+      if (this.group === 'namespace') {
+        // This switches to group rows by a key which is the label for the group (??)
         return 'groupByLabel';
       }
 
-      const custom = this.listGroupMapped[this.group];
+      const custom = this._listGroupMapped?.[this.group];
 
-      if (custom && custom.field) {
+      if (custom?.field) {
+        // Override the normal filtering
         return custom.field;
       }
 
@@ -393,20 +478,37 @@ export default {
     },
 
     groupOptions() {
+      // Ignore the defaults below, we have an override set of groups
+      // REPLACE (instead of SUPPLEMENT) defaults with listGroups (given listGroupsWillOverride is true)
+      if (
+        this.options?.listGroupsWillOverride &&
+        !!this.options?.listGroups?.length
+      ) {
+        return this.options?.listGroups;
+      }
+
       const standard = [
         {
           tooltipKey: 'resourceTable.groupBy.none',
-          icon:       'icon-list-flat',
-          value:      'none',
-        },
-        {
-          tooltipKey: this.groupTooltip,
-          icon:       'icon-folder',
-          value:      'namespace',
+          icon: 'icon-list-flat',
+          value: 'none',
         },
       ];
 
-      return standard.concat(this.listGroups);
+      if (!this.options?.hiddenNamespaceGroupButton) {
+        standard.push({
+          tooltipKey: this.groupTooltip,
+          icon: 'icon-folder',
+          value: 'namespace',
+        });
+      }
+
+      // SUPPLEMENT (instead of REPLACE) defaults with listGroups (given listGroupsWillOverride is false)
+      if (!!this.options?.listGroups?.length) {
+        return standard.concat(this.options.listGroups);
+      }
+
+      return standard;
     },
 
     parsedPagingParams() {
@@ -414,16 +516,16 @@ export default {
         return this.pagingParams;
       }
 
-      if ( !this.schema ) {
+      if (!this.schema) {
         return {
           singularLabel: '',
-          pluralLabel:   ''
+          pluralLabel: '',
         };
       }
 
       return {
         singularLabel: this.$store.getters['type-map/labelFor'](this.schema),
-        pluralLabel:   this.$store.getters['type-map/labelFor'](this.schema, 99),
+        pluralLabel: this.$store.getters['type-map/labelFor'](this.schema, 99),
       };
     },
   },
@@ -432,16 +534,16 @@ export default {
     keyAction(action) {
       const table = this.$refs.table;
 
-      if ( !table ) {
+      if (!table) {
         return;
       }
 
       const selection = table.selectedRows;
 
-      if ( action === 'remove' ) {
+      if (action === 'remove') {
         const act = findBy(table.availableActions, 'action', 'promptRemove');
 
-        if ( act ) {
+        if (act) {
           table.setBulkActionOfInterest(act);
           table.applyTableAction(act);
         }
@@ -449,20 +551,20 @@ export default {
         return;
       }
 
-      if ( selection.length !== 1 ) {
+      if (selection.length !== 1) {
         return;
       }
 
-      switch ( action ) {
-      case 'detail':
-        selection[0].goToDetail();
-        break;
-      case 'edit':
-        selection[0].goToEdit();
-        break;
-      case 'yaml':
-        selection[0].goToViewYaml();
-        break;
+      switch (action) {
+        case 'detail':
+          selection[0].goToDetail();
+          break;
+        case 'edit':
+          selection[0].goToEdit();
+          break;
+        case 'yaml':
+          selection[0].goToViewYaml();
+          break;
       }
     },
 
@@ -486,110 +588,89 @@ export default {
       if (event.key === 'Enter') {
         this.keyAction('detail');
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
-  <div>
-    <Banner
-      v-if="notification"
-      :color="notification.type || 'info'"
-      class="mb-20"
-      :label="notification.message"
-      :inner-html="notification.html"
-    />
+  <SortableTable
+    ref="table"
+    v-bind="$attrs"
+    :headers="_headers"
+    :rows="filteredRows"
+    :loading="loading"
+    :alt-loading="altLoading"
+    :group-by="computedGroupBy"
+    :group="group"
+    :group-options="groupOptions"
+    :search="search"
+    :paging="true"
+    :paging-params="parsedPagingParams"
+    :paging-label="pagingLabel"
+    :rows-per-page="rowsPerPage"
+    :row-actions="rowActions"
+    :table-actions="_showBulkActions"
+    :overflow-x="overflowX"
+    :overflow-y="overflowY"
+    :get-custom-detail-link="getCustomDetailLink"
+    :has-advanced-filtering="hasAdvancedFiltering"
+    :adv-filter-hide-labels-as-cols="advFilterHideLabelsAsCols"
+    :adv-filter-prevent-filtering-labels="advFilterPreventFilteringLabels"
+    :key-field="keyField"
+    :sortGeneration="sortGeneration"
+    :sort-generation-fn="safeSortGenerationFn"
+    :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
+    :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
+    :external-pagination-enabled="externalPaginationEnabled"
+    :external-pagination-result="externalPaginationResult"
+    :mandatory-sort="_mandatorySort"
+    @clickedActionButton="handleActionButtonClick"
+    @group-value-change="group = $event"
+    @enter="handleEnterKeyPress"
+  >
+    <template v-if="!hideGroupingControls && showGrouping" #header-middle>
+      <slot name="more-header-middle" />
 
-    <SortableTable
-      ref="table"
-      v-bind="$attrs"
-      :headers="_headers"
-      :rows="filteredRows"
-      :loading="loading"
-      :group-by="computedGroupBy"
-      :group="group"
-      :group-options="groupOptions"
-      :search="search"
-      :paging="true"
-      :paging-params="parsedPagingParams"
-      :paging-label="pagingLabel"
-      :row-actions="rowActions"
-      :table-actions="_showBulkActions"
-      :overflow-x="overflowX"
-      :overflow-y="overflowY"
-      :get-custom-detail-link="getCustomDetailLink"
-      :has-advanced-filtering="hasAdvancedFiltering"
-      :adv-filter-hide-labels-as-cols="advFilterHideLabelsAsCols"
-      :adv-filter-prevent-filtering-labels="advFilterPreventFilteringLabels"
-      :key-field="keyField"
-      :sort-generation-fn="safeSortGenerationFn"
-      :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
-      :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
-      @clickedActionButton="handleActionButtonClick"
-      @group-value-change="group = $event"
-      v-on="$listeners"
-    >
-      <template
-        v-if="showGrouping"
-        #header-middle
-      >
-        <slot name="more-header-middle" />
-        <ButtonGroup
-          v-model="group"
-          :options="groupOptions"
-        />
-      </template>
+      <ButtonGroup v-model:value="group" :options="groupOptions" />
+    </template>
 
-      <template
-        v-if="showGrouping"
-        #header-right
-      >
-        <slot name="header-right" />
-      </template>
+    <template v-if="showGrouping" #header-right>
+      <slot name="header-right" />
+    </template>
 
-      <template #group-by="{group: thisGroup}">
-        <div
-          v-clean-html="thisGroup.ref"
-          class="group-tab"
-        />
-      </template>
+    <template #group-by="{ group: thisGroup }">
+      <div v-clean-html="thisGroup.ref" class="group-tab" />
+    </template>
 
-      <!-- Pass down templates provided by the caller -->
-      <template
-        v-for="(_, slot) of $scopedSlots"
-        v-slot:[slot]="scope"
-      >
-        <slot
-          :name="slot"
-          v-bind="scope"
-        />
-      </template>
+    <!-- Pass down templates provided by the caller -->
+    <template v-for="(_, slot) of $slots" :key="slot" v-slot:[slot]="scope">
+      <slot :name="slot" v-bind="scope" />
+    </template>
 
-      <template #shortkeys>
-        <button
-          v-shortkey.once="['e']"
-          class="hide"
-          @shortkey="keyAction('edit')"
-        />
-        <button
-          v-shortkey.once="['y']"
-          class="hide"
-          @shortkey="keyAction('yaml')"
-        />
-        <button
-          v-if="_showBulkActions"
-          v-shortkey.once="['del']"
-          class="hide"
-          @shortkey="keyAction('remove')"
-        />
-        <button
-          v-if="_showBulkActions"
-          v-shortkey.once="['backspace']"
-          class="hide"
-          @shortkey="keyAction('remove')"
-        />
-      </template>
-    </SortableTable>
-  </div>
+    <template #shortkeys>
+      <a-button
+        v-shortkey.once="['e']"
+        class="hide"
+        @shortkey="keyAction('edit')"
+      />
+      <a-button
+        v-shortkey.once="['y']"
+        class="hide"
+        @shortkey="keyAction('yaml')"
+      />
+      <a-button
+        v-if="_showBulkActions"
+        v-shortkey.once="['del']"
+        class="hide"
+        @shortkey="keyAction('remove')"
+      />
+      <a-button
+        v-if="_showBulkActions"
+        v-shortkey.once="['backspace']"
+        class="hide"
+        @shortkey="keyAction('remove')"
+      />
+    </template>
+  </SortableTable>
 </template>

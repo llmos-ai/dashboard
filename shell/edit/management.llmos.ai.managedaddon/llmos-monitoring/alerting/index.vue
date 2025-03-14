@@ -29,7 +29,7 @@ export default {
       <div class="row">
         <div class="col span-6">
           <Checkbox
-            v-model="value.alertmanager.enabled"
+            v-model:value="value.alertmanager.enabled"
             :label="t('monitoring.alerting.enable.label')"
           />
         </div>

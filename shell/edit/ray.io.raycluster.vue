@@ -11,11 +11,21 @@ import { allHash } from '@shell/utils/promise';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { ANNOTATIONS } from '@shell/config/labels-annotations';
 import {
-  CONFIG_MAP, MANAGEMENT, NODE, PVC, RUNTIME_CLASS, SECRET, SERVICE_ACCOUNT
+  CONFIG_MAP,
+  MANAGEMENT,
+  NODE,
+  PVC,
+  RUNTIME_CLASS,
+  SECRET,
+  SERVICE_ACCOUNT,
 } from '@shell/config/types';
 import { Checkbox } from '@components/Form/Checkbox';
 import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
-import { FlatResources, hasGPUResources, VolcanoScheduler } from '@shell/utils/container-resource';
+import {
+  FlatResources,
+  hasGPUResources,
+  VolcanoScheduler,
+} from '@shell/utils/container-resource';
 import { cleanUp, clone, isEmpty } from '@shell/utils/object';
 import EnvVars from '@shell/components/form/EnvVars.vue';
 import { TYPES as SECRET_TYPES } from '@shell/models/secret';
@@ -28,11 +38,17 @@ import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 export const RAY_DEFAULT_MONITORING_CONFIG = {
   RAY_GRAFANA_IFRAME_HOST: '',
-  RAY_GRAFANA_HOST:        'http://llmos-monitoring-grafana.llmos-monitoring-system.svc:80',
-  RAY_PROMETHEUS_HOST:     'http://llmos-monitoring-prometheus.llmos-monitoring-system.svc:9090',
+  RAY_GRAFANA_HOST:
+    'http://llmos-monitoring-grafana.llmos-monitoring-system.svc:80',
+  RAY_PROMETHEUS_HOST:
+    'http://llmos-monitoring-prometheus.llmos-monitoring-system.svc:9090',
 };
 
-export const RAY_MONITORING_ENV_KEYS = ['RAY_GRAFANA_IFRAME_HOST', 'RAY_GRAFANA_HOST', 'RAY_PROMETHEUS_HOST'];
+export const RAY_MONITORING_ENV_KEYS = [
+  'RAY_GRAFANA_IFRAME_HOST',
+  'RAY_GRAFANA_HOST',
+  'RAY_PROMETHEUS_HOST',
+];
 
 export default {
   name: 'MLClusterEdit',
@@ -57,15 +73,27 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const hash = await allHash({
-      defaultConfig:       this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' }),
-      addonConfigs:        this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.MANAGED_ADDON_CONFIGS }),
-      systemImageRegistry: this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY }),
+      defaultConfig: this.$store.dispatch(`${inStore}/request`, {
+        url: 'v1-public/ui',
+      }),
+      addonConfigs: this.$store.dispatch(`${inStore}/find`, {
+        type: MANAGEMENT.SETTING,
+        id: SETTING.MANAGED_ADDON_CONFIGS,
+      }),
+      systemImageRegistry: this.$store.dispatch(`${inStore}/find`, {
+        type: MANAGEMENT.SETTING,
+        id: SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY,
+      }),
     });
 
     if (!this.spec.rayVersion) {
-      const rayDefaultVersion = await this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.RAY_CLUSTER_DEFAULT_VERSION);
+      const rayDefaultVersion = await this.$store.getters[`${inStore}/byId`](
+        MANAGEMENT.SETTING,
+        SETTING.RAY_CLUSTER_DEFAULT_VERSION
+      );
 
-      this.spec.rayVersion = rayDefaultVersion?.value || rayDefaultVersion.default;
+      this.spec.rayVersion =
+        rayDefaultVersion?.value || rayDefaultVersion.default;
     }
 
     if (hash.systemImageRegistry.value) {
@@ -80,7 +108,9 @@ export default {
     }
 
     // don't block UI for these resources
-    await this.resourceManagerFetchSecondaryResources(this.secondaryResourceData); // non-blocking
+    await this.resourceManagerFetchSecondaryResources(
+      this.secondaryResourceData
+    ); // non-blocking
   },
 
   data() {
@@ -90,7 +120,8 @@ export default {
     // head group configs
     const headGroupSpec = spec.headGroupSpec;
     const headGroupContainer = headGroupSpec?.template?.spec?.containers[0];
-    const scheduleOnHeadNode = headGroupSpec?.rayStartParams['num-cpus'] !== '0';
+    const scheduleOnHeadNode =
+      headGroupSpec?.rayStartParams['num-cpus'] !== '0';
 
     // worker group configs
     const workerGroupSpecs = this.value?.spec?.workerGroupSpecs || [];
@@ -98,9 +129,9 @@ export default {
     const monitoringConfig = this.initMonitoringConfig(headGroupContainer);
 
     return {
-      defaultConfig:       {},
-      runtimeClasses:      [],
-      savePvcHookName:     'savePvcHook',
+      defaultConfig: {},
+      runtimeClasses: [],
+      savePvcHookName: 'savePvcHook',
       spec,
       autoScaleOptions,
       headGroupSpec,
@@ -110,12 +141,12 @@ export default {
       defaultWorkerPodTemplateSpec,
       monitoringConfig,
       RAY_DEFAULT_MONITORING_CONFIG,
-      addonConfigs:        null,
+      addonConfigs: null,
       systemImageRegistry: '',
 
       secondaryResourceData: this.secondaryResourceDataConfig(),
-      namespacedConfigMaps:  [],
-      namespacedSecrets:     [],
+      namespacedConfigMaps: [],
+      namespacedSecrets: [],
     };
   },
 
@@ -125,13 +156,16 @@ export default {
 
   computed: {
     upScalingModeOption() {
-      return [{
-        label: 'Conservative',
-        value: 'Conservative'
-      }, {
-        label: 'Default',
-        value: 'Default'
-      }];
+      return [
+        {
+          label: 'Conservative',
+          value: 'Conservative',
+        },
+        {
+          label: 'Default',
+          value: 'Default',
+        },
+      ];
     },
 
     headGroupFlatResources: {
@@ -143,33 +177,47 @@ export default {
         const out = FlatResources.set(neu);
 
         this.$set(this.headGroupSpec, 'resources', cleanUp(out));
-      }
+      },
     },
 
     workerGroupFlatResources: {
       get() {
-        return FlatResources.get(this.workerGroupSpecs[0]?.template?.spec?.containers[0]);
+        return FlatResources.get(
+          this.workerGroupSpecs[0]?.template?.spec?.containers[0]
+        );
       },
 
       set(neu) {
         const out = FlatResources.set(neu);
 
-        this.$set(this.workerGroupSpecs[0]?.template?.spec?.containers[0], 'resources', cleanUp(out));
-      }
+        this.$set(
+          this.workerGroupSpecs[0]?.template?.spec?.containers[0],
+          'resources',
+          cleanUp(out)
+        );
+      },
     },
 
     enableGCSFaultTolerance: {
       get() {
-        return this.value.metadata.annotations[ANNOTATIONS.RAY_CLUSTER_FT_ENABLED] === 'true';
+        return (
+          this.value.metadata.annotations[
+            ANNOTATIONS.RAY_CLUSTER_FT_ENABLED
+          ] === 'true'
+        );
       },
       set(neu) {
-        this.value.metadata.annotations[ANNOTATIONS.RAY_CLUSTER_FT_ENABLED] = `${ neu }`;
-      }
+        this.value.metadata.annotations[
+          ANNOTATIONS.RAY_CLUSTER_FT_ENABLED
+        ] = `${neu}`;
+      },
     },
 
     monitoringEnabled() {
       if (this.addonConfigs) {
-        const moni = this.addonConfigs.AddonConfigs.find((addonConfig) => addonConfig.name === 'llmos-monitoring');
+        const moni = this.addonConfigs.AddonConfigs.find(
+          (addonConfig) => addonConfig.name === 'llmos-monitoring'
+        );
 
         return moni.enabled && moni.status === 'Complete';
       } else {
@@ -179,18 +227,18 @@ export default {
 
     monitoringAddonLink() {
       const query = {
-        [MODE]:    _EDIT,
+        [MODE]: _EDIT,
         [ENABLED]: 'true',
       };
 
       return {
-        name:   'c-cluster-product-resource-namespace-id',
+        name: 'c-cluster-product-resource-namespace-id',
         params: {
-          product:   LLMOS,
-          cluster:   'local',
-          resource:  MANAGEMENT.MANAGED_ADDON,
+          product: LLMOS,
+          cluster: 'local',
+          resource: MANAGEMENT.MANAGED_ADDON,
           namespace: 'llmos-monitoring-system',
-          id:        'llmos-monitoring',
+          id: 'llmos-monitoring',
         },
         query,
       };
@@ -198,14 +246,19 @@ export default {
 
     enableMonitoring: {
       get() {
-        return this.value.metadata.annotations[ANNOTATIONS.MONITORING_ENABLED] === 'true';
+        return (
+          this.value.metadata.annotations[ANNOTATIONS.MONITORING_ENABLED] ===
+          'true'
+        );
       },
       set(neu) {
-        this.value.metadata.annotations[ANNOTATIONS.MONITORING_ENABLED] = `${ neu }`;
+        this.value.metadata.annotations[
+          ANNOTATIONS.MONITORING_ENABLED
+        ] = `${neu}`;
         if (neu && isEmpty(this.monitoringConfig)) {
           this.monitoringConfig = this.initMonitoringConfig();
         }
-      }
+      },
     },
 
     excludeEnvs() {
@@ -218,14 +271,20 @@ export default {
       let monitoringConfig = clone(RAY_DEFAULT_MONITORING_CONFIG);
 
       if (headGroupContainer.env) {
-        monitoringConfig = mergeObjectValueFromArrayEnv(monitoringConfig, headGroupContainer.env);
+        monitoringConfig = mergeObjectValueFromArrayEnv(
+          monitoringConfig,
+          headGroupContainer.env
+        );
       }
 
-      if (!monitoringConfig.RAY_GRAFANA_IFRAME_HOST || monitoringConfig.RAY_GRAFANA_IFRAME_HOST === '') {
+      if (
+        !monitoringConfig.RAY_GRAFANA_IFRAME_HOST ||
+        monitoringConfig.RAY_GRAFANA_IFRAME_HOST === ''
+      ) {
         const serverURL = window.location.origin;
         const url = new URL(serverURL);
 
-        monitoringConfig.RAY_GRAFANA_IFRAME_HOST = `${ url.origin }${ MONITORING_GRAFANA_PATH }`;
+        monitoringConfig.RAY_GRAFANA_IFRAME_HOST = `${url.origin}${MONITORING_GRAFANA_PATH}`;
       }
 
       return monitoringConfig;
@@ -234,57 +293,63 @@ export default {
     secondaryResourceDataConfig() {
       return {
         namespace: this.value?.metadata?.namespace || null,
-        data:      {
-          [CONFIG_MAP]:      { applyTo: [{ var: 'namespacedConfigMaps' }] },
+        data: {
+          [CONFIG_MAP]: { applyTo: [{ var: 'namespacedConfigMaps' }] },
           [SERVICE_ACCOUNT]: { applyTo: [{ var: 'namespacedServiceNames' }] },
-          [RUNTIME_CLASS]:   { applyTo: [{ var: 'runtimeClasses' }] },
-          [PVC]:             {
+          [RUNTIME_CLASS]: { applyTo: [{ var: 'runtimeClasses' }] },
+          [PVC]: {
             applyTo: [
               {
-                var:         'pvcs',
+                var: 'pvcs',
                 parsingFunc: (data) => {
                   return data.filter((pvc) => {
                     return pvc.namespace !== this.value?.metadata?.namespace;
                   });
-                }
+                },
               },
-            ]
+            ],
           },
           [SECRET]: {
             applyTo: [
               { var: 'namespacedSecrets' },
               {
-                var:         'imagePullNamespacedSecrets',
+                var: 'imagePullNamespacedSecrets',
                 parsingFunc: (data) => {
-                  return data.filter((secret) => (secret._type === SECRET_TYPES.DOCKER || secret._type === SECRET_TYPES.DOCKER_JSON));
-                }
-              }
-            ]
+                  return data.filter(
+                    (secret) =>
+                      secret._type === SECRET_TYPES.DOCKER ||
+                      secret._type === SECRET_TYPES.DOCKER_JSON
+                  );
+                },
+              },
+            ],
           },
           [NODE]: {
             applyTo: [
               { var: 'allNodeObjects' },
               {
-                var:         'allNodes',
+                var: 'allNodes',
                 parsingFunc: (data) => {
-                  return data.filter((node) => {
-                    if (!node.status?.conditions) {
-                      return false;
-                    }
-
-                    for (const condition of node.status.conditions) {
-                      if (condition.type === 'Ready') {
-                        return condition.status === 'True';
+                  return data
+                    .filter((node) => {
+                      if (!node.status?.conditions) {
+                        return false;
                       }
-                    }
 
-                    return false;
-                  }).map((node) => node.id);
-                }
-              }
-            ]
+                      for (const condition of node.status.conditions) {
+                        if (condition.type === 'Ready') {
+                          return condition.status === 'True';
+                        }
+                      }
+
+                      return false;
+                    })
+                    .map((node) => node.id);
+                },
+              },
+            ],
           },
-        }
+        },
       };
     },
 
@@ -293,15 +358,23 @@ export default {
       this.update();
 
       if (this.spec.rayVersion === '') {
-        this.errors.push(this.t('validation.required', { key: 'Ray Version' }, true));
+        this.errors.push(
+          this.t('validation.required', { key: 'Ray Version' }, true)
+        );
       }
 
-      if (this.headGroupContainer.resources?.requests?.memory === '' ||
-          this.defaultWorkerPodTemplateSpec.resources?.requests?.memory === '') {
-        this.errors.push(this.t('validation.required', { key: 'Memory' }, true));
+      if (
+        this.headGroupContainer.resources?.requests?.memory === '' ||
+        this.defaultWorkerPodTemplateSpec.resources?.requests?.memory === ''
+      ) {
+        this.errors.push(
+          this.t('validation.required', { key: 'Memory' }, true)
+        );
       }
-      if (this.headGroupContainer.resources?.requests?.cpu === '' ||
-          this.defaultWorkerPodTemplateSpec.resources?.requests?.cpu === '') {
+      if (
+        this.headGroupContainer.resources?.requests?.cpu === '' ||
+        this.defaultWorkerPodTemplateSpec.resources?.requests?.cpu === ''
+      ) {
         this.errors.push(this.t('validation.required', { key: 'CPU' }, true));
       }
 
@@ -316,7 +389,8 @@ export default {
 
     update() {
       if (this.scheduleOnHeadNode) {
-        this.headGroupSpec.rayStartParams['num-cpus'] = this.headGroupContainer.resources?.requests?.cpu?.toString();
+        this.headGroupSpec.rayStartParams['num-cpus'] =
+          this.headGroupContainer.resources?.requests?.cpu?.toString();
       } else {
         this.headGroupSpec.rayStartParams['num-cpus'] = '0';
       }
@@ -324,10 +398,13 @@ export default {
 
       const annotations = {
         ...this.value.metadata.annotations,
-        [ANNOTATIONS.RAY_CLUSTER_FT_ENABLED]: this.enableGCSFaultTolerance.toString(),
+        [ANNOTATIONS.RAY_CLUSTER_FT_ENABLED]:
+          this.enableGCSFaultTolerance.toString(),
       };
 
-      const workerPodSpec = FlatResources.validateGPU(this.defaultWorkerPodTemplateSpec);
+      const workerPodSpec = FlatResources.validateGPU(
+        this.defaultWorkerPodTemplateSpec
+      );
 
       if (workerPodSpec) {
         this.workerGroupSpecs[0].template.spec = workerPodSpec;
@@ -339,11 +416,11 @@ export default {
 
       // set rayVersion
       if (this.spec.rayVersion) {
-        this.headGroupContainer.image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }`;
+        this.headGroupContainer.image = `${this.systemImageRegistry}/llmos-ai/mirrored-rayproject-ray:${this.spec.rayVersion}`;
         if (hasGPUResources(this.defaultWorkerPodTemplateSpec.containers)) {
-          this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }-gpu`;
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `${this.systemImageRegistry}/llmos-ai/mirrored-rayproject-ray:${this.spec.rayVersion}-gpu`;
         } else {
-          this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }`;
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `${this.systemImageRegistry}/llmos-ai/mirrored-rayproject-ray:${this.spec.rayVersion}`;
         }
         this.defaultWorkerPodTemplateSpec.schedulerName = VolcanoScheduler;
       }
@@ -356,18 +433,28 @@ export default {
       let monitoringEnv = [];
 
       if (this.enableMonitoring) {
-        monitoringEnv = Object.entries(this.monitoringConfig).map(([key, value]) => ({
-          name: key,
-          value
-        }));
+        monitoringEnv = Object.entries(this.monitoringConfig).map(
+          ([key, value]) => ({
+            name: key,
+            value,
+          })
+        );
       } else {
-        this.headGroupContainer.env = this.headGroupContainer.env.filter((env) => {
-          return !Object.prototype.hasOwnProperty.call(RAY_DEFAULT_MONITORING_CONFIG, env.name);
-        });
+        this.headGroupContainer.env = this.headGroupContainer.env.filter(
+          (env) => {
+            return !Object.prototype.hasOwnProperty.call(
+              RAY_DEFAULT_MONITORING_CONFIG,
+              env.name
+            );
+          }
+        );
       }
 
-      this.headGroupContainer.env = mergeEnvs(this.headGroupContainer.env, monitoringEnv);
-    }
+      this.headGroupContainer.env = mergeEnvs(
+        this.headGroupContainer.env,
+        monitoringEnv
+      );
+    },
   },
 };
 </script>
@@ -381,16 +468,13 @@ export default {
     :apply-hooks="applyHooks"
     @finish="save"
   >
-    <NameNsDescription
-      :value="value"
-      :namespaced="true"
-      :mode="mode"
-    />
+    <NameNsDescription :value="value" :namespaced="true" :mode="mode" />
 
     <ResourceTabs
       v-model="value"
       class="mt-15"
       :need-conditions="false"
+      :tableActions="true"
       :need-related="false"
       :side-tabs="true"
       :mode="mode"
@@ -412,10 +496,7 @@ export default {
             />
           </div>
         </div>
-        <div
-          v-if="value.spec.enableInTreeAutoscaling"
-          class="row mb-20"
-        >
+        <div v-if="value.spec.enableInTreeAutoscaling" class="row mb-20">
           <div class="col span-6">
             <LabeledSelect
               v-if="autoScaleOptions"
@@ -451,20 +532,14 @@ export default {
               @input="update"
             />
             <span class="text-tips">
-              <a
-                href="https://llmos.1block.ai/docs/monitoring"
-                target="_blank"
-              >
+              <a href="https://llmos.1block.ai/docs/monitoring" target="_blank">
                 View more
               </a>
             </span>
           </div>
         </div>
         <div v-if="enableMonitoring">
-          <div
-            v-if="!monitoringEnabled"
-            class="row mb-20"
-          >
+          <div v-if="!monitoringEnabled" class="row mb-20">
             <div class="text-banner">
               <span class="warning">
                 LLMOS monitoring is not installed, click
@@ -495,10 +570,7 @@ export default {
           </div>
         </div>
 
-        <div
-          v-if="enableMonitoring"
-          class="row mb-20"
-        >
+        <div v-if="enableMonitoring" class="row mb-20">
           <div class="col span-6">
             <LabeledInput
               v-model="monitoringConfig.RAY_PROMETHEUS_HOST"
@@ -510,10 +582,7 @@ export default {
           </div>
         </div>
 
-        <AdvancedSection
-          class="col span-12 advanced"
-          :mode="mode"
-        >
+        <AdvancedSection class="col span-12 advanced" :mode="mode">
           <h3 class="mb-10">
             {{ t('generic.tabs.advanced') }}
           </h3>
@@ -573,10 +642,7 @@ export default {
           />
         </div>
 
-        <AdvancedSection
-          class="col span-12 advanced"
-          :mode="mode"
-        >
+        <AdvancedSection class="col span-12 advanced" :mode="mode">
           <div class="row mb-20">
             <div class="col span-6">
               <Checkbox
@@ -647,10 +713,10 @@ export default {
         </div>
       </Tab>
     </ResourceTabs>
-  </cruresource>
+  </CruResource>
 </template>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .text-tips {
   a {
     font-size: small;

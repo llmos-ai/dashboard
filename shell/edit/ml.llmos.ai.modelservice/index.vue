@@ -94,11 +94,11 @@ export default {
       const container = this.value.spec.template.spec.containers[0];
 
       if (!container.env) {
-        this.$set(container, 'env', []);
+        container['env'] = [];
       }
 
       if (!this.value.spec.volumeClaimTemplates) {
-        this.$set(this.value.spec, 'volumeClaimTemplates', []);
+        this.value.spec['volumeClaimTemplates'] = [];
       }
     },
 
@@ -172,7 +172,7 @@ export default {
     />
 
     <ResourceTabs
-      v-model="value"
+      v-model:value="value"
       class="mt-15"
       :need-conditions="false"
       :need-related="false"
@@ -188,7 +188,7 @@ export default {
         <div class="row">
           <div class="col span-6 mb-10">
             <LabeledSelect
-              v-model="spec.modelRegistry"
+              v-model:value="spec.modelRegistry"
               label="Source"
               :options="sourceOptions"
               :mode="mode"
@@ -198,7 +198,7 @@ export default {
 
           <div class="col span-6">
             <LabeledInput
-              v-model="spec.model"
+              v-model:value="spec.model"
               :required="true"
               :localized-label="true"
               :mode="mode"
@@ -213,7 +213,7 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <LabeledInput
-              v-model="spec.servedModelName"
+              v-model:value="spec.servedModelName"
               :localized-label="true"
               :mode="mode"
               class="mb-20"
@@ -224,11 +224,11 @@ export default {
           <div class="col span-6">
             <slot name="command">
               <ShellInput
-                v-model="container.args"
+                v-model:value="container.args"
                 :mode="mode"
                 :label="t('workload.container.command.args')"
                 :placeholder="t('generic.placeholder', {text: '--dtype=half --cpu-offload-gb=10'}, true)"
-                @input="update"
+                @update:value="update"
               />
             </slot>
           </div>
@@ -238,19 +238,19 @@ export default {
         <div class="row">
           <div class="col span-6">
             <ValueFromResource
-              v-model="hfToken"
+              v-model:value="hfToken"
               :value="hfToken"
               default-type="secretKeyRef"
               :all-secrets="namespacedSecrets"
               :mode="mode"
               :loading="isLoadingSecondaryResources"
-              @input="update"
+              @update:value="update"
             />
           </div>
 
           <div class="col span-6">
             <LabeledInput
-              v-model="hfEndpoint.value"
+              v-model:value="hfEndpoint.value"
               :localized-label="true"
               :mode="mode"
               class="mb-20"
@@ -281,7 +281,7 @@ export default {
           <div class="row">
             <div class="col span-6">
               <LabeledInput
-                v-model="container.image"
+                v-model:value="container.image"
                 :required="true"
                 :mode="mode"
                 class="mb-20"
@@ -291,12 +291,12 @@ export default {
 
             <div class="col span-6">
               <LabeledSelect
-                v-model="spec.serviceType"
+                v-model:value="spec.serviceType"
                 :mode="mode"
                 :options="svcOptions"
                 :label="t('workload.networking.networkMode.label')"
                 :placeholder="t('workload.networking.networkMode.placeholder')"
-                @input="update"
+                @update:value="update"
               />
             </div>
           </div>
@@ -310,7 +310,7 @@ export default {
       >
         <!-- Resources and Limitations -->
         <ContainerResourceLimit
-          v-model="flatResources"
+          v-model:value="flatResources"
           :mode="mode"
           :runtime-classes="runtimeClasses"
           :pod-spec="podTemplateSpec"
@@ -326,7 +326,7 @@ export default {
         :weight="tabWeightMap['volumes']"
       >
         <Volume
-          v-model="spec"
+          v-model:value="spec"
           :namespace="value.metadata?.namespace"
           :register-before-hook="registerBeforeHook"
           :mode="mode"

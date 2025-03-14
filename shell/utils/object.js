@@ -2,7 +2,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import flattenDeep from 'lodash/flattenDeep';
 import compact from 'lodash/compact';
 import { JSONPath } from 'jsonpath-plus';
-import Vue from 'vue';
 import transform from 'lodash/transform';
 import isObject from 'lodash/isObject';
 import isArray from 'lodash/isArray';
@@ -23,11 +22,11 @@ export function set(obj, path, value) {
   for (let i = 0; i < parts.length; i++) {
     const key = parts[i];
 
-    if ( i === parts.length - 1 ) {
-      Vue.set(ptr, key, value);
-    } else if ( !ptr[key] ) {
+    if (i === parts.length - 1) {
+      ptr[key] = value;
+    } else if (!ptr[key]) {
       // Make sure parent keys exist
-      Vue.set(ptr, key, {});
+      ptr[key] = {};
     }
 
     ptr = ptr[key];
@@ -41,25 +40,29 @@ export function getAllValues(obj, path) {
   let currentValue = [obj];
 
   keysInOrder.forEach((currentKey) => {
-    currentValue = currentValue.map((indexValue) => {
-      if (Array.isArray(indexValue)) {
-        return indexValue.map((arr) => arr[currentKey]).flat();
-      } else if (indexValue) {
-        return indexValue[currentKey];
-      } else {
-        return null;
-      }
-    }).flat();
+    currentValue = currentValue
+      .map((indexValue) => {
+        if (Array.isArray(indexValue)) {
+          return indexValue.map((arr) => arr[currentKey]).flat();
+        } else if (indexValue) {
+          return indexValue[currentKey];
+        } else {
+          return null;
+        }
+      })
+      .flat();
   });
 
   return currentValue.filter((val) => val !== null);
 }
 
 export function get(obj, path) {
-  if ( !path) {
-    throw new Error('Cannot translate an empty input. The t function requires a string.');
+  if (!path) {
+    throw new Error(
+      'Cannot translate an empty input. The t function requires a string.'
+    );
   }
-  if ( path.startsWith('$') ) {
+  if (path.startsWith('$')) {
     try {
       return JSONPath({
         path,
@@ -72,7 +75,7 @@ export function get(obj, path) {
       return '(JSON Path err)';
     }
   }
-  if ( !path.includes('.') ) {
+  if (!path.includes('.')) {
     return obj?.[path];
   }
 
@@ -95,14 +98,14 @@ export function remove(obj, path) {
   // Remove the very last part of the path
 
   if (parentAry.length === 1) {
-    Vue.set(obj, path, undefined);
+    obj[path] = undefined;
     delete obj[path];
   } else {
     const leafKey = parentAry.pop();
     const parent = get(obj, joinObjectPath(parentAry));
 
-    if ( parent ) {
-      Vue.set(parent, leafKey, undefined);
+    if (parent) {
+      parent[leafKey] = undefined;
       delete parent[leafKey];
     }
   }
@@ -125,7 +128,7 @@ export function deleteProperty(obj, path) {
 }
 
 export function getter(path) {
-  return function(obj) {
+  return function (obj) {
     return get(obj, path);
   };
 }
@@ -135,7 +138,7 @@ export function clone(obj) {
 }
 
 export function isEmpty(obj) {
-  if ( !obj ) {
+  if (!obj) {
     return true;
   }
 
@@ -148,10 +151,12 @@ export function isEmpty(obj) {
  * @param {any} obj
  */
 export function isSimpleKeyValue(obj) {
-  return obj !== null &&
+  return (
+    obj !== null &&
     !Array.isArray(obj) &&
     typeof obj === 'object' &&
-    Object.values(obj || {}).every((v) => typeof v !== 'object');
+    Object.values(obj || {}).every((v) => typeof v !== 'object')
+  );
 }
 
 /*
@@ -165,7 +170,7 @@ export function cleanUp(obj) {
   Object.keys(obj).map((key) => {
     const val = obj[key];
 
-    if ( Array.isArray(val) ) {
+    if (Array.isArray(val)) {
       obj[key] = val.map((each) => {
         if (each !== null && each !== undefined) {
           return cleanUp(each);
@@ -176,7 +181,7 @@ export function cleanUp(obj) {
       }
     } else if (typeof val === 'undefined' || val === null) {
       delete obj[key];
-    } else if ( isObject(val) ) {
+    } else if (isObject(val)) {
       if (isEmpty(val)) {
         delete obj[key];
       }
@@ -191,13 +196,13 @@ export function definedKeys(obj) {
   const keys = Object.keys(obj).map((key) => {
     const val = obj[key];
 
-    if ( Array.isArray(val) ) {
-      return `"${ key }"`;
-    } else if ( isObject(val) ) {
+    if (Array.isArray(val)) {
+      return `"${key}"`;
+    } else if (isObject(val)) {
       // no need for quotes around the subkey since the recursive call will fill that in via one of the other two statements in the if block
-      return ( definedKeys(val) || [] ).map((subkey) => `"${ key }".${ subkey }`);
+      return (definedKeys(val) || []).map((subkey) => `"${key}".${subkey}`);
     } else {
-      return `"${ key }"`;
+      return `"${key}"`;
     }
   });
 
@@ -212,14 +217,14 @@ export function diff(from, to) {
   const out = transform(to, (res, toVal, k) => {
     const fromVal = from[k];
 
-    if ( isEqual(toVal, fromVal) ) {
+    if (isEqual(toVal, fromVal)) {
       return;
     }
 
-    if ( Array.isArray(toVal) || Array.isArray(fromVal) ) {
+    if (Array.isArray(toVal) || Array.isArray(fromVal)) {
       // Don't diff arrays, just use the whole value
       res[k] = toVal;
-    } else if ( isObject(toVal) && isObject(from[k]) ) {
+    } else if (isObject(toVal) && isObject(from[k])) {
       res[k] = diff(fromVal, toVal);
     } else {
       res[k] = toVal;
@@ -232,7 +237,7 @@ export function diff(from, to) {
   // Return keys that are in 'from' but not 'to.'
   const missing = difference(fromKeys, toKeys);
 
-  for ( const k of missing ) {
+  for (const k of missing) {
     set(out, k, null);
   }
 
@@ -269,26 +274,31 @@ export { isEqualBasic as isEqual };
 export function changeset(from, to, parentPath = []) {
   let out = {};
 
-  if ( isEqual(from, to) ) {
+  if (isEqual(from, to)) {
     return out;
   }
 
-  for ( const k in from ) {
+  for (const k in from) {
     const path = joinObjectPath([...parentPath, k]);
 
-    if ( !(k in to) ) {
+    if (!(k in to)) {
       out[path] = { op: 'remove', path };
-    } else if ( (isObject(from[k]) && isObject(to[k])) || (isArray(from[k]) && isArray(to[k])) ) {
+    } else if (
+      (isObject(from[k]) && isObject(to[k])) ||
+      (isArray(from[k]) && isArray(to[k]))
+    ) {
       out = { ...out, ...changeset(from[k], to[k], [...parentPath, k]) };
-    } else if ( !isEqual(from[k], to[k]) ) {
+    } else if (!isEqual(from[k], to[k])) {
       out[path] = {
-        op: 'change', from: from[k], value: to[k]
+        op: 'change',
+        from: from[k],
+        value: to[k],
       };
     }
   }
 
-  for ( const k in to ) {
-    if ( !(k in from) ) {
+  for (const k in to) {
+    if (!(k in from)) {
       const path = joinObjectPath([...parentPath, k]);
 
       out[path] = { op: 'add', value: to[k] };
@@ -303,14 +313,14 @@ export function changesetConflicts(a, b) {
   const out = [];
   const seen = {};
 
-  for ( const k of keys ) {
+  for (const k of keys) {
     let ok = true;
     const aa = a[k];
     const bb = b[k];
 
     // If we've seen a change for a parent of this key before (e.g. looking at `spec.replicas` and there's already been a change to `spec`), assume they conflict
-    for ( const parentKey of parentKeys(k) ) {
-      if ( seen[parentKey] ) {
+    for (const parentKey of parentKeys(k)) {
+      if (seen[parentKey]) {
         ok = false;
         break;
       }
@@ -318,41 +328,41 @@ export function changesetConflicts(a, b) {
 
     seen[k] = true;
 
-    if ( ok && bb ) {
-      switch ( `${ aa.op }-${ bb.op }` ) {
-      case 'add-add':
-      case 'add-change':
-      case 'change-add':
-      case 'change-change':
-        ok = isEqual(aa.value, bb.value);
-        break;
+    if (ok && bb) {
+      switch (`${aa.op}-${bb.op}`) {
+        case 'add-add':
+        case 'add-change':
+        case 'change-add':
+        case 'change-change':
+          ok = isEqual(aa.value, bb.value);
+          break;
 
-      case 'add-remove':
-      case 'change-remove':
-      case 'remove-add':
-      case 'remove-change':
-        ok = false;
-        break;
+        case 'add-remove':
+        case 'change-remove':
+        case 'remove-add':
+        case 'remove-change':
+          ok = false;
+          break;
 
-      case 'remove-remove':
-      default:
-        ok = true;
-        break;
+        case 'remove-remove':
+        default:
+          ok = true;
+          break;
       }
     }
 
-    if ( !ok ) {
+    if (!ok) {
       addObject(out, k);
     }
   }
 
   // Check parent keys going the other way
   keys = Object.keys(b).sort();
-  for ( const k of keys ) {
+  for (const k of keys) {
     let ok = true;
 
-    for ( const parentKey of parentKeys(k) ) {
-      if ( seen[parentKey] ) {
+    for (const parentKey of parentKeys(k)) {
+      if (seen[parentKey]) {
         ok = false;
         break;
       }
@@ -360,7 +370,7 @@ export function changesetConflicts(a, b) {
 
     seen[k] = true;
 
-    if ( !ok ) {
+    if (!ok) {
       addObject(out, k);
     }
   }
@@ -373,7 +383,7 @@ export function changesetConflicts(a, b) {
 
     parts.pop();
 
-    while ( parts.length ) {
+    while (parts.length) {
       const path = joinObjectPath(parts);
 
       out.push(path);
@@ -387,15 +397,15 @@ export function changesetConflicts(a, b) {
 export function applyChangeset(obj, changeset) {
   let entry;
 
-  for ( const path in changeset ) {
+  for (const path in changeset) {
     entry = changeset[path];
 
-    if ( entry.op === 'add' || entry.op === 'change' ) {
+    if (entry.op === 'add' || entry.op === 'change') {
       set(obj, path, entry.value);
-    } else if ( entry.op === 'remove' ) {
+    } else if (entry.op === 'remove') {
       remove(obj, path);
     } else {
-      throw new Error(`Unknown operation:${ entry.op }`);
+      throw new Error(`Unknown operation:${entry.op}`);
     }
   }
 
@@ -406,14 +416,13 @@ export function applyChangeset(obj, changeset) {
  * Creates an object composed of the `object` properties `predicate` returns
  */
 export function pickBy(obj = {}, predicate = (value, key) => false) {
-  return Object.entries(obj)
-    .reduce((res, [key, value]) => {
-      if (predicate(value, key)) {
-        res[key] = value;
-      }
+  return Object.entries(obj).reduce((res, [key, value]) => {
+    if (predicate(value, key)) {
+      res[key] = value;
+    }
 
-      return res;
-    }, {});
+    return res;
+  }, {});
 }
 
 /**
@@ -422,16 +431,15 @@ export function pickBy(obj = {}, predicate = (value, key) => false) {
  * @param {*} callback
  * @returns
  */
-export const toDictionary = (array, callback) => Object.assign(
-  {}, ...array.map((item) => ({ [item]: callback(item) }))
-);
+export const toDictionary = (array, callback) =>
+  Object.assign({}, ...array.map((item) => ({ [item]: callback(item) })));
 
 export function dropKeys(obj, keys) {
-  if ( !obj ) {
+  if (!obj) {
     return;
   }
 
-  for ( const k of keys ) {
+  for (const k of keys) {
     delete obj[k];
   }
 }

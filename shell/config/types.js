@@ -152,3 +152,10 @@ export const AUTH_TYPE = {
 };
 
 export const DEFAULT_GRAFANA_STORAGE_SIZE = '10Gi';
+
+export const CATALOG = {
+  CLUSTER_REPO: 'catalog.cattle.io.clusterrepo',
+  OPERATION:    'catalog.cattle.io.operation',
+  APP:          'catalog.cattle.io.app',
+  REPO:         'catalog.cattle.io.repo',
+};

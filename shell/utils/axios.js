@@ -75,7 +75,7 @@ const createAxiosInstance = (axiosOptions) => {
 };
 
 const setupProgress = (axios) => {
-  // A noop loading inteterface for when $nuxt is not yet ready
+  // A noop loading inteterface for when $loading is not yet ready
   const noopLoading = {
     finish: () => { },
     start:  () => { },
@@ -84,9 +84,9 @@ const setupProgress = (axios) => {
   };
 
   const $loading = () => {
-    const $nuxt = typeof window !== 'undefined' && window['$nuxt'];
+    const $globalApp = window.$globalApp;
 
-    return ($nuxt && $nuxt.$loading && $nuxt.$loading.set) ? $nuxt.$loading : noopLoading;
+    return ($globalApp && $globalApp.$loading && $globalApp.$loading.set) ? $globalApp.$loading : noopLoading;
   };
 
   let currentRequests = 0;

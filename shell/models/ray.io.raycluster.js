@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { set } from '@shell/utils/object';
 import MlWorkload from '@shell/models/ml_workload';
 
@@ -19,21 +18,21 @@ export default class RayCluster extends MlWorkload {
           resources:          {
             limits: {
               cpu:    '500m',
-              memory: '512Mi'
+              memory: '512Mi',
             },
             requests: {
               cpu:    '200m',
-              memory: '256Mi'
-            }
+              memory: '256Mi',
+            },
           },
-          upscalingMode: 'Default'
+          upscalingMode: 'Default',
         },
         enableInTreeAutoscaling: true,
         headGroupSpec:           {
           serviceType:    'NodePort',
           rayStartParams: {
             'num-cpus':       '0',
-            'redis-password': '$REDIS_PASSWORD'
+            'redis-password': '$REDIS_PASSWORD',
           },
           template: {
             metadata: {},
@@ -41,72 +40,62 @@ export default class RayCluster extends MlWorkload {
               containers: [
                 {
                   image:     '',
-                  lifecycle: {
-                    preStop: {
-                      exec: {
-                        command: [
-                          '/bin/sh',
-                          '-c',
-                          'ray stop'
-                        ]
-                      }
-                    }
-                  },
-                  name: 'ray-head',
-                  env:  [
+                  lifecycle: { preStop: { exec: { command: ['/bin/sh', '-c', 'ray stop'] } } },
+                  name:      'ray-head',
+                  env:       [
                     {
                       name:  'RAY_enable_autoscaler_v2',
-                      value: '1'
-                    }
+                      value: '1',
+                    },
                   ],
                   ports: [
                     {
                       containerPort: 6379,
                       name:          'redis',
-                      protocol:      'TCP'
+                      protocol:      'TCP',
                     },
                     {
                       containerPort: 8265,
                       name:          'dashboard',
-                      protocol:      'TCP'
+                      protocol:      'TCP',
                     },
                     {
                       containerPort: 10001,
                       name:          'client',
-                      protocol:      'TCP'
+                      protocol:      'TCP',
                     },
                     {
                       containerPort: 8000,
                       name:          'serve',
-                      protocol:      'TCP'
-                    }
+                      protocol:      'TCP',
+                    },
                   ],
                   resources: {
                     requests: {
                       cpu:    '2',
-                      memory: '4Gi'
+                      memory: '4Gi',
                     },
                     limits: {
                       cpu:    '2',
-                      memory: '4Gi'
+                      memory: '4Gi',
                     },
                   },
                   volumeMounts: [
                     {
                       mountPath: '/tmp/ray',
-                      name:      'ray-logs'
-                    }
-                  ]
-                }
+                      name:      'ray-logs',
+                    },
+                  ],
+                },
               ],
               volumes: [
                 {
                   name:     'ray-logs',
                   emptyDir: {},
-                }
-              ]
-            }
-          }
+                },
+              ],
+            },
+          },
         },
         workerGroupSpecs: [
           {
@@ -124,54 +113,44 @@ export default class RayCluster extends MlWorkload {
                     env: [
                       {
                         name:  'RAY_gcs_rpc_server_reconnect_timeout_s',
-                        value: '300'
-                      }
+                        value: '300',
+                      },
                     ],
-                    image:     '',
-                    lifecycle: {
-                      preStop: {
-                        exec: {
-                          command: [
-                            '/bin/sh',
-                            '-c',
-                            'ray stop'
-                          ]
-                        }
-                      }
-                    },
+                    image:        '',
+                    lifecycle:    { preStop: { exec: { command: ['/bin/sh', '-c', 'ray stop'] } } },
                     name:         'ray-worker',
                     volumeMounts: [
                       {
                         mountPath: '/tmp/ray',
-                        name:      'ray-logs'
-                      }
+                        name:      'ray-logs',
+                      },
                     ],
                     resources: {
                       requests: {
                         cpu:    '4',
-                        memory: '8Gi'
+                        memory: '8Gi',
                       },
                       limits: {
                         cpu:    '4',
-                        memory: '8Gi'
-                      }
-                    }
-                  }
+                        memory: '8Gi',
+                      },
+                    },
+                  },
                 ],
                 volumes: [
                   {
                     name:     'ray-logs',
                     emptyDir: {},
-                  }
+                  },
                 ],
-              }
-            }
-          }
-        ]
-      }
+              },
+            },
+          },
+        ],
+      },
     };
 
-    Vue.set(this, 'metadata', value.metadata);
+    this['metadata'] = value.metadata;
     set(this, 'spec', this.spec || value.spec);
   }
 
@@ -183,7 +162,11 @@ export default class RayCluster extends MlWorkload {
       pod.remove();
     }
 
-    this.$dispatch('growl/success', { message: `ML Cluster ${ this.name } has been successfully redeployed.` }, { root: true });
+    this.$dispatch(
+      'growl/success',
+      { message: `ML Cluster ${ this.name } has been successfully redeployed.` },
+      { root: true }
+    );
   }
 
   get details() {
@@ -196,7 +179,8 @@ export default class RayCluster extends MlWorkload {
       {
         label:   this.t('mlWorkload.detail.detailTop.workerReplicas'),
         content: this.workerReplicaRange,
-      }];
+      },
+    ];
   }
 
   get workerReady() {

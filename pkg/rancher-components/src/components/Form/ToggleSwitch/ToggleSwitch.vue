@@ -1,6 +1,9 @@
 <script lang="ts">
-import Vue from 'vue';
-export default Vue.extend({
+import { defineComponent, onMounted, onBeforeUnmount, useTemplateRef } from 'vue';
+
+type StateType = boolean | 'true' | 'false' | undefined;
+
+export default defineComponent({
   props: {
     value: {
       type:    [Boolean, String, Number],
@@ -27,8 +30,34 @@ export default Vue.extend({
       default: '',
     },
   },
+
+  emits: ['update:value'],
+
+  setup() {
+    const switchChrome = useTemplateRef<HTMLElement>('switchChrome');
+    const focus = () => {
+      switchChrome.value?.classList.add('focus');
+    };
+
+    const blur = () => {
+      switchChrome.value?.classList.remove('focus');
+    };
+
+    const switchInput = useTemplateRef<HTMLInputElement>('switchInput');
+
+    onMounted(() => {
+      switchInput.value?.addEventListener('focus', focus);
+      switchInput.value?.addEventListener('blur', blur);
+    });
+
+    onBeforeUnmount(() => {
+      switchInput.value?.removeEventListener('focus', focus);
+      switchInput.value?.removeEventListener('blur', blur);
+    });
+  },
+
   data() {
-    return { state: false as boolean | string | number };
+    return { state: false as StateType };
   },
 
   watch: {
@@ -41,9 +70,9 @@ export default Vue.extend({
   },
 
   methods: {
-    toggle(neu: boolean | string | number) {
+    toggle(neu: StateType | null) {
       this.state = neu === null ? !this.state : neu;
-      this.$emit('input', this.state ? this.onValue : this.offValue);
+      this.$emit('update:value', this.state ? this.onValue : this.offValue);
     }
   }
 });
@@ -58,11 +87,18 @@ export default Vue.extend({
     >{{ offLabel }}</span>
     <label class="switch hand">
       <input
+        ref="switchInput"
         type="checkbox"
+        role="switch"
         :checked="state"
+        :aria-label="onLabel"
         @input="toggle(null)"
+        @keydown.enter="toggle(null)"
       >
-      <span class="slider round" />
+      <span
+        ref="switchChrome"
+        class="slider round"
+      />
     </label>
     <span
       class="label no-select hand"
@@ -112,6 +148,13 @@ $toggle-height: 16px;
   background-color: var(--checkbox-disabled-bg);
   -webkit-transition: .4s;
   transition: .4s;
+
+  &.focus {
+    @include focus-outline;
+    outline-offset: 2px;
+    -webkit-transition: 0s;
+    transition: 0s;
+  }
 }
 
 .slider:before {

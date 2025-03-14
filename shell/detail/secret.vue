@@ -87,7 +87,7 @@ export default {
     }
 
     if (!this.value._type) {
-      this.$set(this.value, '_type', TYPES.OPAQUE);
+      this.value['_type'] = TYPES.OPAQUE;
     }
 
     return {
@@ -158,7 +158,7 @@ export default {
 
 <template>
   <ResourceTabs
-    v-model="value"
+    v-model:value="value"
     :mode="mode"
   >
     <Tab
@@ -253,9 +253,7 @@ export default {
 
       <div v-else>
         <div
-          v-for="(row,idx) in parsedRows"
-          :key="idx"
-          class="entry"
+          v-for="(row,idx) in parsedRows" :key="idx" class="entry"
         >
           <DetailText
             :value="row.value"

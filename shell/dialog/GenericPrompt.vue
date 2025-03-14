@@ -1,40 +1,38 @@
 <script>
 import AsyncButton from '@shell/components/AsyncButton';
-import { Card } from '@components/Card';
 import { Banner } from '@components/Banner';
 import { exceptionToErrorsArray } from '@shell/utils/error';
 import { decodeHtml } from '@shell/utils/string';
 
 export default {
   components: {
-    Card,
     AsyncButton,
     Banner,
   },
   props: {
     applyAction: {
-      type:    Function,
-      default: () => {}
+      type: Function,
+      default: () => {},
     },
     applyMode: {
-      type:    String,
-      default: 'create'
+      type: String,
+      default: 'create',
     },
     title: {
-      type:    String,
-      default: ''
+      type: String,
+      default: '',
     },
     body: {
-      type:    String,
-      default: ''
+      type: String,
+      default: '',
     },
 
     /**
      * Callback to identify response of the prompt
      */
     confirm: {
-      type:    Function,
-      default: () => { }
+      type: Function,
+      default: () => {},
     },
   },
   data() {
@@ -58,78 +56,28 @@ export default {
         this.errors = exceptionToErrorsArray(err);
         buttonDone(false);
       }
-    }
+    },
   },
 };
 </script>
 
 <template>
-  <Card
-    class="prompt-restore"
-    :show-highlight-border="false"
-  >
-    <template slot="title">
-      <slot name="title">
-        <h4
-          slot="title"
-          v-clean-html="title"
-          class="text-default-text"
-        />
-      </slot>
-    </template>
-
-    <template slot="body">
-      <slot name="body">
-        <div
-          v-clean-html="decodeHtml(body)"
-          class="pl-10 pr-10"
-          style="min-height: 50px; display: flex;"
-        />
-      </slot>
-    </template>
-
-    <div
-      slot="actions"
-      class="bottom"
-    >
-      <Banner
-        v-for="(err, i) in errors"
-        :key="i"
-        color="error"
-        :label="err"
+  <a-card :title="title">
+    <slot name="body">
+      <div
+        v-clean-html="decodeHtml(body)"
+        class="pl-10 pr-10"
+        style="min-height: 50px; display: flex"
       />
-      <div class="buttons">
-        <button
-          class="btn role-secondary mr-10"
-          @click="close"
-        >
-          {{ t('generic.cancel') }}
-        </button>
+      <Banner v-for="(err, i) in errors" :key="i" color="error" :label="err" />
+    </slot>
 
-        <AsyncButton
-          :mode="applyMode"
-          @click="apply"
-        />
-      </div>
-    </div>
-  </Card>
+    <template #actions>
+      <a-button class="btn role-secondary mr-10" @click="close">
+        {{ t('generic.cancel') }}
+      </a-button>
+
+      <AsyncButton :mode="applyMode" type="primary" danger @click="apply" />
+    </template>
+  </a-card>
 </template>
-<style lang='scss' scoped>
-  .prompt-restore {
-    margin: 0;
-  }
-  .bottom {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    .banner {
-      margin-top: 0
-    }
-    .buttons {
-      display: flex;
-      justify-content: flex-end;
-      width: 100%;
-    }
-  }
-
-</style>

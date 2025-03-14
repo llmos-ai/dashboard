@@ -1,18 +1,20 @@
 <script>
-import NameNsDescription from '@shell/components/form/NameNsDescription';
-import FormValidation from '@shell/mixins/form-validation';
-import CreateEditView from '@shell/mixins/create-edit-view';
-import Tab from '@shell/components/Tabbed/Tab';
-import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
-import CruResource from '@shell/components/CruResource';
-import { _VIEW, FLAT_VIEW, _CREATE, _EDIT } from '@shell/config/query-params';
-import Loading from '@shell/components/Loading';
-import { K8S_TYPES } from '@shell/components/form/ResourceQuota/shared';
-import Labels from '@shell/components/form/Labels';
-import { randomStr } from '@shell/utils/string';
-import ProjectMembershipEditor, { canViewProjectMembershipEditor } from '@shell/components/form/Members/ProjectMembershipEditor';
-import { Banner } from '@components/Banner';
-import { MANAGEMENT } from '@shell/config/types';
+import NameNsDescription from "@shell/components/form/NameNsDescription";
+import FormValidation from "@shell/mixins/form-validation";
+import CreateEditView from "@shell/mixins/create-edit-view";
+import Tab from "@shell/components/Tabbed/Tab";
+import ResourceTabs from "@shell/components/form/ResourceTabs/index.vue";
+import CruResource from "@shell/components/CruResource";
+import { _VIEW, FLAT_VIEW, _CREATE, _EDIT } from "@shell/config/query-params";
+import Loading from "@shell/components/Loading";
+import { K8S_TYPES } from "@shell/components/form/ResourceQuota/shared";
+import Labels from "@shell/components/form/Labels";
+import { randomStr } from "@shell/utils/string";
+import ProjectMembershipEditor, {
+  canViewProjectMembershipEditor,
+} from "@shell/components/form/Members/ProjectMembershipEditor";
+import { Banner } from "@components/Banner";
+import { MANAGEMENT } from "@shell/config/types";
 
 export default {
   components: {
@@ -31,17 +33,17 @@ export default {
   data() {
     let originalQuotaId = null;
 
-    if ( this.liveValue?.metadata?.name ) {
-      originalQuotaId = `${ this.liveValue.metadata.name }/default-quota`;
+    if (this.liveValue?.metadata?.name) {
+      originalQuotaId = `${this.liveValue.metadata.name}/default-quota`;
     }
 
     return {
       originalQuotaId,
-      viewMode:           _VIEW,
-      rerenderNums:       randomStr(4),
-      membershipUpdate:   {},
-      resource:           MANAGEMENT.ROLE_TEMPLATE_BINDING,
-      saveBindings:       null,
+      viewMode: _VIEW,
+      rerenderNums: randomStr(4),
+      membershipUpdate: {},
+      resource: MANAGEMENT.ROLE_TEMPLATE_BINDING,
+      saveBindings: null,
       membershipHasOwner: false,
       K8S_TYPES,
     };
@@ -65,7 +67,7 @@ export default {
     },
 
     flatView() {
-      return (this.$route.query[FLAT_VIEW] || false);
+      return this.$route.query[FLAT_VIEW] || false;
     },
 
     showPodSecurityAdmission() {
@@ -105,13 +107,13 @@ export default {
     },
 
     onHasOwnerChanged(hasOwner) {
-      this.$set(this, 'membershipHasOwner', hasOwner);
+      this["membershipHasOwner"] = hasOwner;
     },
 
     onMembershipUpdate(update) {
-      this.$set(this, 'membershipUpdate', update);
+      this["membershipUpdate"] = update;
     },
-  }
+  },
 };
 </script>
 
@@ -126,7 +128,7 @@ export default {
     :validation-passed="true"
     :errors="errors"
     :apply-hooks="applyHooks"
-    @error="e=>errors = e"
+    @error="(e) => (errors = e)"
     @finish="save"
     @cancel="done"
   >
@@ -137,11 +139,7 @@ export default {
       :mode="mode"
     />
 
-    <ResourceTabs
-      v-model="value"
-      :mode="mode"
-      :side-tabs="true"
-    >
+    <ResourceTabs v-model:value="value" :mode="mode" :side-tabs="true">
       <Tab
         v-if="canViewMembers"
         name="members"
@@ -166,7 +164,6 @@ export default {
         :weight="-1"
       >
         <Labels
-          :key="rerenderNums"
           default-container-class="labels-and-annotations-container"
           :value="value"
           :mode="mode"

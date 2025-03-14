@@ -45,7 +45,7 @@ export default {
     />
 
     <ResourceTabs
-      v-model="value"
+      v-model:value="value"
       class="mt-15"
       :need-conditions="false"
       :need-related="false"
@@ -60,7 +60,7 @@ export default {
         <h4>Enable Chart</h4>
         <div class="row mb-20">
           <Checkbox
-            v-model="spec.enabled"
+            v-model:value="spec.enabled"
             label="Enabled"
             :mode="mode"
           />
@@ -69,7 +69,7 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <labeledInput
-              v-model="spec.repo"
+              v-model:value="spec.repo"
               label="Chart Repo"
               required
               :disabled="!allowEdit"
@@ -79,7 +79,7 @@ export default {
 
           <div class="col span-6">
             <LabeledInput
-              v-model="spec.chart"
+              v-model:value="spec.chart"
               label="Chart Name"
               required
               :disabled="!allowEdit"
@@ -91,7 +91,7 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <labeledInput
-              v-model="spec.version"
+              v-model:value="spec.version"
               label="Version"
               required
               :disabled="!allowEdit"
@@ -105,7 +105,7 @@ export default {
           <div class="row mb-20">
             <div class="col span-12">
               <YamlEditor
-                v-model="spec.valuesContent"
+                v-model:value="spec.valuesContent"
                 :value="spec.valuesContent"
                 :mode="mode"
                 class="yaml-editor"

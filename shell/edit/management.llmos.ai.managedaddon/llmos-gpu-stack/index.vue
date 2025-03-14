@@ -129,7 +129,7 @@ export default {
     />
 
     <ResourceTabs
-      v-model="value"
+      v-model:value="value"
       class="mt-15"
       :need-conditions="false"
       :need-related="false"
@@ -145,7 +145,7 @@ export default {
         <h4>Enable Chart</h4>
         <div class="row mb-20">
           <Checkbox
-            v-model="spec.enabled"
+            v-model:value="spec.enabled"
             label="Enabled"
             :mode="mode"
           />
@@ -154,7 +154,7 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <labeledInput
-              v-model="spec.repo"
+              v-model:value="spec.repo"
               label="Chart Repo"
               required
               :disabled="!allowEdit"
@@ -164,7 +164,7 @@ export default {
 
           <div class="col span-6">
             <LabeledInput
-              v-model="spec.chart"
+              v-model:value="spec.chart"
               label="Chart Name"
               required
               :disabled="!allowEdit"
@@ -176,7 +176,7 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <labeledInput
-              v-model="spec.version"
+              v-model:value="spec.version"
               label="Version"
               required
               :disabled="!allowEdit"
@@ -195,7 +195,7 @@ export default {
       >
         <div class="mb-20">
           <ContainerResourceLimit
-            v-model="flatResources"
+            v-model:value="flatResources"
             :mode="mode"
             :show-tip="false"
           />
@@ -211,7 +211,7 @@ export default {
       >
         <div class="row mb-20">
           <Checkbox
-            v-model="valuesContent.gpuOperator.enabled"
+            v-model:value="valuesContent.gpuOperator.enabled"
             label="Enable NVIDIA GPU Operator"
             :mode="mode"
             disabled
@@ -223,7 +223,7 @@ export default {
           <div class="row mb-20">
             <div class="col span-6 mb-10">
               <LabeledInput
-                v-model="valuesContent.devicePlugin.splitCount"
+                v-model:value="valuesContent.devicePlugin.splitCount"
                 :label="t('managedAddon.llmosGPUStack.deviceSplitCount.label')"
                 :tooltip="t('managedAddon.llmosGPUStack.deviceSplitCount.description')"
                 :mode="mode"

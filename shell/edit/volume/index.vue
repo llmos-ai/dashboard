@@ -116,11 +116,11 @@ export default {
      */
     initializeStorage() {
       if (!this.value.template?.spec.volumes) {
-        this.$set(this.value, 'spec.template.spec.volumes', []);
+        this.value['spec.template.spec.volumes'] = [];
       }
 
       if (!this.value.volumeClaimTemplates) {
-        this.$set(this.value, 'spec.volumeClaimTemplates', []);
+        this.value['spec.volumeClaimTemplates'] = [];
       }
     },
 
@@ -234,7 +234,7 @@ export default {
 
     // volumeClaimTemplates methods
     updateTemplates() {
-      this.$set(this.value, 'volumeClaimTemplates', this.templates);
+      this.value['volumeClaimTemplates'] = this.templates;
     },
 
     addPVC(name) {
@@ -274,10 +274,10 @@ export default {
   <div>
     <!-- Volume Claim Templates -->
     <ArrayListGrouped
-      v-model="templates"
+      v-model:value="templates"
       class="mb-20"
       :can-add="false"
-      @input="updateTemplates()"
+      @update:value="updateTemplates()"
       @remove="removeVolumeClaimTemplates"
     >
       <template #default="props">
@@ -289,7 +289,7 @@ export default {
             :mode="mode"
             :container="container"
             :save-pvc-hook-name="savePvcHookName"
-            @input="updatePVC(props.row.value)"
+            @update:value="updatePVC(props.row.value)"
           />
         </div>
       </template>
@@ -297,8 +297,7 @@ export default {
 
     <!-- Storage Volumes -->
     <ArrayListGrouped
-      :key="volumes.length"
-      v-model="volumes"
+      v-model:value="volumes"
       :mode="mode"
       :can-add="false"
       @remove="removeVolume"
@@ -350,7 +349,7 @@ export default {
   margin: 20px 0px 20px 0px;
   position: relative;
 
-  ::v-deep .code-mirror {
+  :deep() .code-mirror {
     .CodeMirror {
       background-color: var(--yaml-editor-bg);
       & .CodeMirror-gutters {
