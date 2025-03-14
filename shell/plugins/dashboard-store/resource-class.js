@@ -6,9 +6,9 @@ import {
   _VIEW,
   _YAML,
   AS,
-  MODE
+  MODE,
 } from '@shell/config/query-params';
-import { VIEW_IN_API } from '@shell/store/prefs';
+import { VIEW_IN_API, DEV } from '@shell/store/prefs';
 import { addObject, addObjects, findBy, removeAt } from '@shell/utils/array';
 import CustomValidators from '@shell/utils/custom-validators';
 import { downloadFile, generateZip } from '@shell/utils/download';
@@ -29,7 +29,7 @@ import forIn from 'lodash/forIn';
 import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
 import isString from 'lodash/isString';
-import Vue from 'vue';
+import { markRaw } from 'vue';
 
 import { ExtensionPoint, ActionLocation } from '@shell/core/types';
 import { getApplicableExtensionEnhancements } from '@shell/core/plugin-helpers';
@@ -37,18 +37,18 @@ import { getApplicableExtensionEnhancements } from '@shell/core/plugin-helpers';
 export const DNS_LIKE_TYPES = ['dnsLabel', 'dnsLabelRestricted', 'hostname'];
 
 const REMAP_STATE = {
-  disabled:                 'inactive',
-  notapplied:               'Not Applied',
-  notready:                 'Not Ready',
-  waitapplied:              'Wait Applied',
-  outofsync:                'Out of Sync',
-  'in-progress':            'In Progress',
-  gitupdating:              'Git Updating',
-  errapplied:               'Err Applied',
-  waitcheckin:              'Wait Check-In',
-  off:                      'Disabled',
+  disabled: 'inactive',
+  notapplied: 'Not Applied',
+  notready: 'Not Ready',
+  waitapplied: 'Wait Applied',
+  outofsync: 'Out of Sync',
+  'in-progress': 'In Progress',
+  gitupdating: 'Git Updating',
+  errapplied: 'Err Applied',
+  waitcheckin: 'Wait Check-In',
+  off: 'Disabled',
   waitingforinfrastructure: 'Waiting for Infra',
-  waitingfornoderef:        'Waiting for Node Ref'
+  waitingfornoderef: 'Waiting for Node Ref',
 };
 
 const DEFAULT_COLOR = 'warning';
@@ -58,97 +58,98 @@ const DEFAULT_WAIT_INTERVAL = 1000;
 const DEFAULT_WAIT_TMIMEOUT = 30000;
 
 export const STATES_ENUM = {
-  IN_USE:           'in-use',
-  IN_PROGRESS:      'in-progress',
+  IN_USE: 'in-use',
+  IN_PROGRESS: 'in-progress',
   PENDING_ROLLBACK: 'pending-rollback',
-  PENDING_UPGRADE:  'pending-upgrade',
-  ABORTED:          'aborted',
-  ACTIVATING:       'activating',
-  ACTIVE:           'active',
-  AVAILABLE:        'available',
-  BACKED_UP:        'backedup',
-  BOUND:            'bound',
-  BUILDING:         'building',
-  COMPLETED:        'completed',
-  CORDONED:         'cordoned',
-  COUNT:            'count',
-  CREATED:          'created',
-  CREATING:         'creating',
-  DEACTIVATING:     'deactivating',
-  DEGRADED:         'degraded',
-  DENIED:           'denied',
-  DEPLOYED:         'deployed',
-  DEPLOYING:        'deploying',
-  DISABLED:         'disabled',
-  DISCONNECTED:     'disconnected',
-  DRAINED:          'drained',
-  DRAINING:         'draining',
-  ERR_APPLIED:      'errapplied',
-  ERROR:            'error',
-  ERRORING:         'erroring',
-  ERRORS:           'errors',
-  EXPIRED:          'expired',
-  EXPIRING:         'expiring',
-  FAIL:             'fail',
-  FAILED:           'failed',
-  HEALTHY:          'healthy',
-  INACTIVE:         'inactive',
-  INFO:             'info',
-  INITIALIZING:     'initializing',
-  INPROGRESS:       'inprogress',
-  LOCKED:           'locked',
-  MIGRATING:        'migrating',
-  MISSING:          'missing',
-  MODIFIED:         'modified',
-  NOT_APPLICABLE:   'notApplicable',
-  NOT_APLLIED:      'notapplied',
-  NOT_READY:        'notready',
-  OFF:              'off',
-  ORPHANED:         'orphaned',
-  OTHER:            'other',
-  OUT_OF_SYNC:      'outofsync',
-  ON_GOING:         'on-going',
-  PASS:             'pass',
-  PASSED:           'passed',
-  PAUSED:           'paused',
-  PENDING:          'pending',
-  PROVISIONING:     'provisioning',
-  PROVISIONED:      'provisioned',
-  PURGED:           'purged',
-  PURGING:          'purging',
-  READY:            'ready',
-  RECONNECTING:     'reconnecting',
-  REGISTERING:      'registering',
-  REINITIALIZING:   'reinitializing',
-  RELEASED:         'released',
-  REMOVED:          'removed',
-  REMOVING:         'removing',
-  REQUESTED:        'requested',
-  RESTARTING:       'restarting',
-  RESTORING:        'restoring',
-  RESIZING:         'resizing',
-  RUNNING:          'running',
-  SKIP:             'skip',
-  SKIPPED:          'skipped',
-  STARTING:         'starting',
-  STOPPED:          'stopped',
-  STOPPING:         'stopping',
-  SUCCEEDED:        'succeeded',
-  SUCCESS:          'success',
-  SUCCESSFUL:       'successful',
-  SUPERSEDED:       'superseded',
-  SUSPENDED:        'suspended',
-  UNAVAILABLE:      'unavailable',
-  UNHEALTHY:        'unhealthy',
-  UNINSTALLED:      'uninstalled',
-  UNINSTALLING:     'uninstalling',
-  UNKNOWN:          'unknown',
-  UNTRIGGERED:      'untriggered',
-  UPDATING:         'updating',
-  WAIT_APPLIED:     'waitapplied',
-  WAIT_CHECKIN:     'waitcheckin',
-  WAITING:          'waiting',
-  WARNING:          'warning',
+  PENDING_UPGRADE: 'pending-upgrade',
+  ABORTED: 'aborted',
+  ACTIVATING: 'activating',
+  ACTIVE: 'active',
+  AVAILABLE: 'available',
+  BACKED_UP: 'backedup',
+  BOUND: 'bound',
+  BUILDING: 'building',
+  COMPLETED: 'completed',
+  CORDONED: 'cordoned',
+  COUNT: 'count',
+  CREATED: 'created',
+  CREATING: 'creating',
+  DEACTIVATING: 'deactivating',
+  DEGRADED: 'degraded',
+  DENIED: 'denied',
+  DEPLOYED: 'deployed',
+  DEPLOYING: 'deploying',
+  DISABLED: 'disabled',
+  DISCONNECTED: 'disconnected',
+  DRAINED: 'drained',
+  DRAINING: 'draining',
+  ENABLED: 'enabled',
+  ERR_APPLIED: 'errapplied',
+  ERROR: 'error',
+  ERRORING: 'erroring',
+  ERRORS: 'errors',
+  EXPIRED: 'expired',
+  EXPIRING: 'expiring',
+  FAIL: 'fail',
+  FAILED: 'failed',
+  HEALTHY: 'healthy',
+  INACTIVE: 'inactive',
+  INFO: 'info',
+  INITIALIZING: 'initializing',
+  INPROGRESS: 'inprogress',
+  LOCKED: 'locked',
+  MIGRATING: 'migrating',
+  MISSING: 'missing',
+  MODIFIED: 'modified',
+  NOT_APPLICABLE: 'notApplicable',
+  NOT_APLLIED: 'notapplied',
+  NOT_READY: 'notready',
+  OFF: 'off',
+  ORPHANED: 'orphaned',
+  OTHER: 'other',
+  OUT_OF_SYNC: 'outofsync',
+  ON_GOING: 'on-going',
+  PASS: 'pass',
+  PASSED: 'passed',
+  PAUSED: 'paused',
+  PENDING: 'pending',
+  PROVISIONING: 'provisioning',
+  PROVISIONED: 'provisioned',
+  PURGED: 'purged',
+  PURGING: 'purging',
+  READY: 'ready',
+  RECONNECTING: 'reconnecting',
+  REGISTERING: 'registering',
+  REINITIALIZING: 'reinitializing',
+  RELEASED: 'released',
+  REMOVED: 'removed',
+  REMOVING: 'removing',
+  REQUESTED: 'requested',
+  RESTARTING: 'restarting',
+  RESTORING: 'restoring',
+  RESIZING: 'resizing',
+  RUNNING: 'running',
+  SKIP: 'skip',
+  SKIPPED: 'skipped',
+  STARTING: 'starting',
+  STOPPED: 'stopped',
+  STOPPING: 'stopping',
+  SUCCEEDED: 'succeeded',
+  SUCCESS: 'success',
+  SUCCESSFUL: 'successful',
+  SUPERSEDED: 'superseded',
+  SUSPENDED: 'suspended',
+  UNAVAILABLE: 'unavailable',
+  UNHEALTHY: 'unhealthy',
+  UNINSTALLED: 'uninstalled',
+  UNINSTALLING: 'uninstalling',
+  UNKNOWN: 'unknown',
+  UNTRIGGERED: 'untriggered',
+  UPDATING: 'updating',
+  WAIT_APPLIED: 'waitapplied',
+  WAIT_CHECKIN: 'waitcheckin',
+  WAITING: 'waiting',
+  WARNING: 'warning',
 };
 
 export function mapStateToEnum(statusString) {
@@ -160,284 +161,561 @@ export function mapStateToEnum(statusString) {
 
 export const STATES = {
   [STATES_ENUM.IN_USE]: {
-    color: 'success', icon: 'dot-open', label: 'In Use', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'In Use',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.IN_PROGRESS]: {
-    color: 'info', icon: 'tag', label: 'In Progress', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'In Progress',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.PENDING_ROLLBACK]: {
-    color: 'info', icon: 'dot-half', label: 'Pending Rollback', compoundIcon: 'info'
+    color: 'info',
+    icon: 'dot-half',
+    label: 'Pending Rollback',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.PENDING_UPGRADE]: {
-    color: 'info', icon: 'dot-half', label: 'Pending Update', compoundIcon: 'info'
+    color: 'info',
+    icon: 'dot-half',
+    label: 'Pending Update',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.ABORTED]: {
-    color: 'warning', icon: 'error', label: 'Aborted', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'error',
+    label: 'Aborted',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.ACTIVATING]: {
-    color: 'info', icon: 'tag', label: 'Activating', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Activating',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.ACTIVE]: {
-    color: 'success', icon: 'dot-open', label: 'Active', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Active',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.AVAILABLE]: {
-    color: 'success', icon: 'dot-open', label: 'Available', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Available',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.BACKED_UP]: {
-    color: 'success', icon: 'backup', label: 'Backed Up', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'backup',
+    label: 'Backed Up',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.BOUND]: {
-    color: 'success', icon: 'dot', label: 'Bound', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot',
+    label: 'Bound',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.BUILDING]: {
-    color: 'success', icon: 'dot-open', label: 'Building', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Building',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.COMPLETED]: {
-    color: 'success', icon: 'dot', label: 'Completed', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot',
+    label: 'Completed',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.CORDONED]: {
-    color: 'info', icon: 'tag', label: 'Cordoned', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Cordoned',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.COUNT]: {
-    color: 'success', icon: 'dot-open', label: 'Count', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Count',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.CREATED]: {
-    color: 'info', icon: 'tag', label: 'Created', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Created',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.CREATING]: {
-    color: 'info', icon: 'tag', label: 'Creating', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Creating',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.DEACTIVATING]: {
-    color: 'info', icon: 'adjust', label: 'Deactivating', compoundIcon: 'info'
+    color: 'info',
+    icon: 'adjust',
+    label: 'Deactivating',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.DEGRADED]: {
-    color: 'warning', icon: 'error', label: 'Degraded', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'error',
+    label: 'Degraded',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.DENIED]: {
-    color: 'error', icon: 'adjust', label: 'Denied', compoundIcon: 'error'
+    color: 'error',
+    icon: 'adjust',
+    label: 'Denied',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.DEPLOYED]: {
-    color: 'success', icon: 'dot-open', label: 'Deployed', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Deployed',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.DISABLED]: {
-    color: 'warning', icon: 'error', label: 'Disabled', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'error',
+    label: 'Disabled',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.DISCONNECTED]: {
-    color: 'warning', icon: 'error', label: 'Disconnected', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'error',
+    label: 'Disconnected',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.DRAINED]: {
-    color: 'info', icon: 'tag', label: 'Drained', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Drained',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.DRAINING]: {
-    color: 'warning', icon: 'tag', label: 'Draining', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'tag',
+    label: 'Draining',
+    compoundIcon: 'warning',
+  },
+  [STATES_ENUM.ENABLED]: {
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Enabled',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.ERR_APPLIED]: {
-    color: 'error', icon: 'error', label: 'Error Applied', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Error Applied',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.ERROR]: {
-    color: 'error', icon: 'error', label: 'Error', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Error',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.ERRORING]: {
-    color: 'error', icon: 'error', label: 'Erroring', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Erroring',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.ERRORS]: {
-    color: 'error', icon: 'error', label: 'Errors', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Errors',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.EXPIRED]: {
-    color: 'error', icon: 'error', label: 'Expired', compoundIcon: 'warning'
+    color: 'error',
+    icon: 'error',
+    label: 'Expired',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.EXPIRING]: {
-    color: 'warning', icon: 'error', label: 'Expiring', compoundIcon: 'error'
+    color: 'warning',
+    icon: 'error',
+    label: 'Expiring',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.FAIL]: {
-    color: 'error', icon: 'error', label: 'Fail', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Fail',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.FAILED]: {
-    color: 'error', icon: 'error', label: 'Failed', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Failed',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.HEALTHY]: {
-    color: 'success', icon: 'dot-open', label: 'Healthy', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Healthy',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.INACTIVE]: {
-    color: 'error', icon: 'dot', label: 'Inactive', compoundIcon: 'error'
+    color: 'error',
+    icon: 'dot',
+    label: 'Inactive',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.INITIALIZING]: {
-    color: 'warning', icon: 'error', label: 'Initializing', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'error',
+    label: 'Initializing',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.INPROGRESS]: {
-    color: 'info', icon: 'spinner', label: 'In Progress', compoundIcon: 'info'
+    color: 'info',
+    icon: 'spinner',
+    label: 'In Progress',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.INFO]: {
-    color: 'info', icon: 'info', label: 'Info', compoundIcon: 'info'
+    color: 'info',
+    icon: 'info',
+    label: 'Info',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.LOCKED]: {
-    color: 'warning', icon: 'adjust', label: 'Locked', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'adjust',
+    label: 'Locked',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.MIGRATING]: {
-    color: 'info', icon: 'info', label: 'Migrated', compoundIcon: 'info'
+    color: 'info',
+    icon: 'info',
+    label: 'Migrated',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.MISSING]: {
-    color: 'warning', icon: 'adjust', label: 'Missing', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'adjust',
+    label: 'Missing',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.MODIFIED]: {
-    color: 'warning', icon: 'edit', label: 'Modified', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'edit',
+    label: 'Modified',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.NOT_APPLICABLE]: {
-    color: 'warning', icon: 'tag', label: 'Not Applicable', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'tag',
+    label: 'Not Applicable',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.NOT_APLLIED]: {
-    color: 'warning', icon: 'tag', label: 'Not Applied', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'tag',
+    label: 'Not Applied',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.NOT_READY]: {
-    color: 'warning', icon: 'tag', label: 'Not Ready', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'tag',
+    label: 'Not Ready',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.OFF]: {
-    color: 'darker', icon: 'error', label: 'Off'
+    color: 'darker',
+    icon: 'error',
+    label: 'Off',
   },
   [STATES_ENUM.ON_GOING]: {
-    color: 'info', icon: 'info', label: 'Info', compoundIcon: 'info'
+    color: 'info',
+    icon: 'info',
+    label: 'Info',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.ORPHANED]: {
-    color: 'warning', icon: 'tag', label: 'Orphaned', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'tag',
+    label: 'Orphaned',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.OTHER]: {
-    color: 'info', icon: 'info', label: 'Other', compoundIcon: 'info'
+    color: 'info',
+    icon: 'info',
+    label: 'Other',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.OUT_OF_SYNC]: {
-    color: 'warning', icon: 'tag', label: 'Out Of Sync', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'tag',
+    label: 'Out Of Sync',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.PASS]: {
-    color: 'success', icon: 'dot-dotfill', label: 'Pass', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-dotfill',
+    label: 'Pass',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.PASSED]: {
-    color: 'success', icon: 'dot-dotfill', label: 'Passed', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-dotfill',
+    label: 'Passed',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.PAUSED]: {
-    color: 'info', icon: 'info', label: 'Paused', compoundIcon: 'info'
+    color: 'info',
+    icon: 'info',
+    label: 'Paused',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.PENDING]: {
-    color: 'info', icon: 'tag', label: 'Pending', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Pending',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.PROVISIONING]: {
-    color: 'info', icon: 'dot', label: 'Provisioning', compoundIcon: 'info'
+    color: 'info',
+    icon: 'dot',
+    label: 'Provisioning',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.PROVISIONED]: {
-    color: 'success', icon: 'dot', label: 'Provisioned', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot',
+    label: 'Provisioned',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.PURGED]: {
-    color: 'error', icon: 'purged', label: 'Purged', compoundIcon: 'error'
+    color: 'error',
+    icon: 'purged',
+    label: 'Purged',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.PURGING]: {
-    color: 'info', icon: 'purged', label: 'Purging', compoundIcon: 'info'
+    color: 'info',
+    icon: 'purged',
+    label: 'Purging',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.READY]: {
-    color: 'success', icon: 'dot-open', label: 'Ready', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Ready',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.RECONNECTING]: {
-    color: 'error', icon: 'error', label: 'Reconnecting', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Reconnecting',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.REGISTERING]: {
-    color: 'info', icon: 'tag', label: 'Registering', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Registering',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.REINITIALIZING]: {
-    color: 'warning', icon: 'error', label: 'Reinitializing', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'error',
+    label: 'Reinitializing',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.RELEASED]: {
-    color: 'warning', icon: 'error', label: 'Released', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'error',
+    label: 'Released',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.REMOVED]: {
-    color: 'error', icon: 'trash', label: 'Removed', compoundIcon: 'error'
+    color: 'error',
+    icon: 'trash',
+    label: 'Removed',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.REMOVING]: {
-    color: 'info', icon: 'trash', label: 'Removing', compoundIcon: 'info'
+    color: 'info',
+    icon: 'trash',
+    label: 'Removing',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.REQUESTED]: {
-    color: 'info', icon: 'tag', label: 'Requested', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Requested',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.RESTARTING]: {
-    color: 'info', icon: 'adjust', label: 'Restarting', compoundIcon: 'info'
+    color: 'info',
+    icon: 'adjust',
+    label: 'Restarting',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.RESTORING]: {
-    color: 'info', icon: 'medicalcross', label: 'Restoring', compoundIcon: 'info'
+    color: 'info',
+    icon: 'medicalcross',
+    label: 'Restoring',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.RESIZING]: {
-    color: 'warning', icon: 'dot', label: 'Resizing', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'dot',
+    label: 'Resizing',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.RUNNING]: {
-    color: 'success', icon: 'dot-open', label: 'Running', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Running',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.SKIP]: {
-    color: 'info', icon: 'dot-open', label: 'Skip', compoundIcon: 'info'
+    color: 'info',
+    icon: 'dot-open',
+    label: 'Skip',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.SKIPPED]: {
-    color: 'info', icon: 'dot-open', label: 'Skipped', compoundIcon: 'info'
+    color: 'info',
+    icon: 'dot-open',
+    label: 'Skipped',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.STARTING]: {
-    color: 'info', icon: 'adjust', label: 'Starting', compoundIcon: 'info'
+    color: 'info',
+    icon: 'adjust',
+    label: 'Starting',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.STOPPED]: {
-    color: 'error', icon: 'dot', label: 'Stopped', compoundIcon: 'error'
+    color: 'error',
+    icon: 'dot',
+    label: 'Stopped',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.STOPPING]: {
-    color: 'info', icon: 'adjust', label: 'Stopping', compoundIcon: 'info'
+    color: 'info',
+    icon: 'adjust',
+    label: 'Stopping',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.SUCCEEDED]: {
-    color: 'success', icon: 'dot-dotfill', label: 'Succeeded', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-dotfill',
+    label: 'Succeeded',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.SUCCESS]: {
-    color: 'success', icon: 'dot-open', label: 'Success', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Success',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.SUCCESSFUL]: {
-    color: 'success', icon: 'dot-open', label: 'Successful'
+    color: 'success',
+    icon: 'dot-open',
+    label: 'Successful',
   },
   [STATES_ENUM.SUPERSEDED]: {
-    color: 'info', icon: 'dot-open', label: 'Superseded', compoundIcon: 'info'
+    color: 'info',
+    icon: 'dot-open',
+    label: 'Superseded',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.SUSPENDED]: {
-    color: 'info', icon: 'pause', label: 'Suspended', compoundIcon: 'info'
+    color: 'info',
+    icon: 'pause',
+    label: 'Suspended',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.UNAVAILABLE]: {
-    color: 'error', icon: 'error', label: 'Unavailable', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Unavailable',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.UNHEALTHY]: {
-    color: 'error', icon: 'error', label: 'Unhealthy', compoundIcon: 'error'
+    color: 'error',
+    icon: 'error',
+    label: 'Unhealthy',
+    compoundIcon: 'error',
   },
   [STATES_ENUM.UNINSTALLED]: {
-    color: 'info', icon: 'trash', label: 'Uninstalled', compoundIcon: 'info'
+    color: 'info',
+    icon: 'trash',
+    label: 'Uninstalled',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.UNINSTALLING]: {
-    color: 'info', icon: 'trash', label: 'Uninstalling', compoundIcon: 'info'
+    color: 'info',
+    icon: 'trash',
+    label: 'Uninstalling',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.UNKNOWN]: {
-    color: 'warning', icon: 'x', label: 'Unknown', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'x',
+    label: 'Unknown',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.UNTRIGGERED]: {
-    color: 'success', icon: 'tag', label: 'Untriggered', compoundIcon: 'checkmark'
+    color: 'success',
+    icon: 'tag',
+    label: 'Untriggered',
+    compoundIcon: 'checkmark',
   },
   [STATES_ENUM.UPDATING]: {
-    color: 'warning', icon: 'tag', label: 'Updating', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'tag',
+    label: 'Updating',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.WAIT_APPLIED]: {
-    color: 'info', icon: 'tag', label: 'Wait Applied', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Wait Applied',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.WAIT_CHECKIN]: {
-    color: 'warning', icon: 'tag', label: 'Wait Checkin', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'tag',
+    label: 'Wait Checkin',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.WAITING]: {
-    color: 'info', icon: 'tag', label: 'Waiting', compoundIcon: 'info'
+    color: 'info',
+    icon: 'tag',
+    label: 'Waiting',
+    compoundIcon: 'info',
   },
   [STATES_ENUM.WARNING]: {
-    color: 'warning', icon: 'error', label: 'Warning', compoundIcon: 'warning'
+    color: 'warning',
+    icon: 'error',
+    label: 'Warning',
+    compoundIcon: 'warning',
   },
   [STATES_ENUM.DEPLOYING]: {
-    color: 'info', icon: 'info', label: 'Deploying', compoundIcon: 'info'
+    color: 'info',
+    icon: 'info',
+    label: 'Deploying',
+    compoundIcon: 'info',
   },
 };
 
 export function getStatesByType(type = 'info') {
   const out = {
-    info:    [],
-    error:   [],
+    info: [],
+    error: [],
     success: [],
     warning: [],
     unknown: [],
@@ -457,49 +735,51 @@ export function getStatesByType(type = 'info') {
 }
 
 const SORT_ORDER = {
-  error:    1,
-  warning:  2,
-  info:     3,
-  success:  4,
-  ready:    5,
+  error: 1,
+  warning: 2,
+  info: 3,
+  success: 4,
+  ready: 5,
   notready: 6,
-  other:    7,
+  other: 7,
 };
 
 export function getStateLabel(state) {
   const lowercaseState = state.toLowerCase();
 
-  return STATES[lowercaseState] ? STATES[lowercaseState].label : STATES[STATES_ENUM.UNKNOWN].label;
+  return STATES[lowercaseState]
+    ? STATES[lowercaseState].label
+    : STATES[STATES_ENUM.UNKNOWN].label;
 }
 
 export function colorForState(state, isError, isTransitioning) {
-  if ( isError ) {
+  if (isError) {
     return 'text-error';
   }
 
-  if ( isTransitioning ) {
+  if (isTransitioning) {
     return 'text-info';
   }
 
   const key = (state || 'active').toLowerCase();
   let color;
 
-  if ( STATES[key] && STATES[key].color ) {
+  if (STATES[key] && STATES[key].color) {
     color = maybeFn.call(this, STATES[key].color);
   }
 
-  if ( !color ) {
+  if (!color) {
     color = DEFAULT_COLOR;
   }
 
-  return `text-${ color }`;
+  return `text-${color}`;
 }
 
 export function stateDisplay(state) {
   // @TODO use translations
   const key = (state || 'active').toLowerCase();
 
-  if ( REMAP_STATE[key] ) {
+  if (REMAP_STATE[key]) {
     return REMAP_STATE[key];
   }
 
@@ -521,9 +801,15 @@ export function primaryDisplayStatusFromCount(status) {
   ];
 
   // sort status by order of statusOrder
-  const existingStatuses = Object.keys(status).filter((key) => {
-    return status[key] > 0 && statusOrder.includes(key.toLowerCase());
-  }).sort((a, b) => statusOrder.indexOf(a.toLowerCase()) - statusOrder.indexOf(b.toLowerCase()));
+  const existingStatuses = Object.keys(status)
+    .filter((key) => {
+      return status[key] > 0 && statusOrder.includes(key.toLowerCase());
+    })
+    .sort(
+      (a, b) =>
+        statusOrder.indexOf(a.toLowerCase()) -
+        statusOrder.indexOf(b.toLowerCase())
+    );
 
   return existingStatuses[0] ? existingStatuses[0] : STATES_ENUM.UNKNOWN;
 }
@@ -531,7 +817,7 @@ export function primaryDisplayStatusFromCount(status) {
 export function stateSort(color, display) {
   color = color.replace(/^(text|bg)-/, '');
 
-  return `${ SORT_ORDER[color] || SORT_ORDER['other'] } ${ display }`;
+  return `${SORT_ORDER[color] || SORT_ORDER['other']} ${display}`;
 }
 
 export function isConditionReadyAndWaiting(condition) {
@@ -539,11 +825,14 @@ export function isConditionReadyAndWaiting(condition) {
     return false;
   }
 
-  return condition?.type?.toLowerCase() === 'ready' && condition?.reason?.toLowerCase() === 'waiting';
+  return (
+    condition?.type?.toLowerCase() === 'ready' &&
+    condition?.reason?.toLowerCase() === 'waiting'
+  );
 }
 
 function maybeFn(val) {
-  if ( isFunction(val) ) {
+  if (isFunction(val)) {
     return val(this);
   }
 
@@ -551,52 +840,56 @@ function maybeFn(val) {
 }
 
 export default class Resource {
-  constructor(data, ctx, rehydrateNamespace = null, setClone = false) {
-    for ( const k in data ) {
+  constructor(data, ctx = {}, rehydrateNamespace = null, setClone = false) {
+    for (const k in data) {
       this[k] = data[k];
     }
 
     Object.defineProperty(this, '$ctx', {
-      value:      ctx,
+      value: markRaw(ctx),
       enumerable: false,
     });
 
-    if ( rehydrateNamespace ) {
+    if (rehydrateNamespace) {
       Object.defineProperty(this, '__rehydrate', {
-        value:        rehydrateNamespace,
-        enumerable:   true,
-        configurable: true
+        value: rehydrateNamespace,
+        enumerable: true,
+        configurable: true,
       });
     }
 
-    if ( setClone ) {
+    if (setClone) {
       Object.defineProperty(this, '__clone', {
-        value:        true,
-        enumerable:   true,
+        value: true,
+        enumerable: true,
         configurable: true,
-        writable:     true
+        writable: true,
       });
     }
   }
 
-  get '$getters'() {
+  get $getters() {
     return this.$ctx.getters;
   }
 
-  get '$rootGetters'() {
+  get $rootGetters() {
     return this.$ctx.rootGetters;
   }
 
-  get '$dispatch'() {
+  get $dispatch() {
     return this.$ctx.dispatch;
   }
 
-  get '$state'() {
+  get $state() {
     return this.$ctx.state;
   }
 
-  get '$rootState'() {
+  get $rootState() {
     return this.$ctx.rootState;
+  }
+
+  get $plugin() {
+    return this.$ctx.rootState?.$plugin;
   }
 
   get customValidationRules() {
@@ -625,21 +918,21 @@ export default class Resource {
   get _key() {
     const m = this.metadata;
 
-    if ( m ) {
-      if ( m.uid ) {
+    if (m) {
+      if (m.uid) {
         return m.uid;
       }
 
-      if ( m.namespace ) {
-        return `${ this.type }/${ m.namespace }/${ m.name }`;
+      if (m.namespace) {
+        return `${this.type}/${m.namespace}/${m.name}`;
       }
     }
 
-    if ( this.id ) {
-      return `${ this.type }/${ this.id }`;
+    if (this.id) {
+      return `${this.type}/${this.id}`;
     }
 
-    return `${ this.type }/${ Math.random() }`;
+    return `${this.type}/${Math.random()}`;
   }
 
   get schema() {
@@ -647,13 +940,13 @@ export default class Resource {
   }
 
   toString() {
-    return `[${ this.type }: ${ this.id }]`;
+    return `[${this.type}: ${this.id}]`;
   }
 
   get typeDisplay() {
     const schema = this.schema;
 
-    if ( schema ) {
+    if (schema) {
       return this.$rootGetters['type-map/labelFor'](schema);
     }
 
@@ -661,7 +954,13 @@ export default class Resource {
   }
 
   get nameDisplay() {
-    return this.displayName || this.spec?.displayName || this.name || this.metadata?.name || this.id;
+    return (
+      this.displayName ||
+      this.spec?.displayName ||
+      this.name ||
+      this.metadata?.name ||
+      this.id
+    );
   }
 
   get nameSort() {
@@ -672,8 +971,8 @@ export default class Resource {
     const namespace = this.metadata?.namespace;
     const name = this.nameDisplay;
 
-    if ( namespace ) {
-      return `${ namespace }:${ name }`;
+    if (namespace) {
+      return `${namespace}:${name}`;
     }
 
     return name;
@@ -687,8 +986,10 @@ export default class Resource {
     const name = this.metadata?.namespace;
     let out;
 
-    if ( name ) {
-      out = this.t('resourceTable.groupLabel.namespace', { name: escapeHtml(name) });
+    if (name) {
+      out = this.t('resourceTable.groupLabel.namespace', {
+        name: escapeHtml(name),
+      });
     } else {
       out = this.t('resourceTable.groupLabel.notInANamespace');
     }
@@ -734,31 +1035,31 @@ export default class Resource {
     let trans = false;
     let error = false;
 
-    if ( this.metadata && this.metadata.state ) {
+    if (this.metadata && this.metadata.state) {
       trans = this.metadata.state.transitioning;
       error = this.metadata.state.error;
     }
 
-    if ( trans ) {
+    if (trans) {
       return 'icon icon-spinner icon-spin';
     }
 
-    if ( error ) {
+    if (error) {
       return 'icon icon-error';
     }
 
     const key = (this.state || '').toLowerCase();
     let icon;
 
-    if ( STATES[key] && STATES[key].icon ) {
+    if (STATES[key] && STATES[key].icon) {
       icon = maybeFn.call(this, STATES[key].icon);
     }
 
-    if ( !icon ) {
+    if (!icon) {
       icon = DEFAULT_ICON;
     }
 
-    return `icon icon-${ icon }`;
+    return `icon icon-${icon}`;
   }
 
   get stateSort() {
@@ -780,31 +1081,57 @@ export default class Resource {
   // ------------------------------------------------------------------
 
   waitForTestFn(fn, msg, timeoutMs, intervalMs) {
-    return waitFor(() => fn.apply(this), msg, timeoutMs || DEFAULT_WAIT_TMIMEOUT, intervalMs || DEFAULT_WAIT_INTERVAL, true);
+    return waitFor(
+      () => fn.apply(this),
+      msg,
+      timeoutMs || DEFAULT_WAIT_TMIMEOUT,
+      intervalMs || DEFAULT_WAIT_INTERVAL,
+      true
+    );
   }
 
   waitForState(state, timeout, interval) {
-    return this.waitForTestFn(() => {
-      return (this.state || '').toLowerCase() === state.toLowerCase();
-    }, `state=${ state }`, timeout, interval);
+    return this.waitForTestFn(
+      () => {
+        return (this.state || '').toLowerCase() === state.toLowerCase();
+      },
+      `state=${state}`,
+      timeout,
+      interval
+    );
   }
 
   waitForTransition() {
-    return this.waitForTestFn(() => {
-      return !this.transitioning;
-    }, 'transition completion', undefined, undefined);
+    return this.waitForTestFn(
+      () => {
+        return !this.transitioning;
+      },
+      'transition completion',
+      undefined,
+      undefined
+    );
   }
 
   waitForAction(name) {
-    return this.waitForTestFn(() => {
-      return this.hasAction(name);
-    }, `action=${ name }`, undefined, undefined);
+    return this.waitForTestFn(
+      () => {
+        return this.hasAction(name);
+      },
+      `action=${name}`,
+      undefined,
+      undefined
+    );
   }
 
   waitForLink(name) {
-    return this.waitForTestFn(() => {
-      return this.hasLink(name);
-    }, `link=${ name }`, undefined, undefined);
+    return this.waitForTestFn(
+      () => {
+        return this.hasLink(name);
+      },
+      `link=${name}`,
+      undefined,
+      undefined
+    );
   }
 
   hasCondition(condition) {
@@ -812,27 +1139,37 @@ export default class Resource {
   }
 
   isCondition(condition, withStatus = 'True') {
-    if ( !this.status || !this.status.conditions ) {
+    if (!this.status || !this.status.conditions) {
       return false;
     }
 
-    const entry = findBy((this.status.conditions || []), 'type', condition);
+    const entry = findBy(this.status.conditions || [], 'type', condition);
 
-    if ( !entry ) {
+    if (!entry) {
       return false;
     }
 
-    if ( !withStatus ) {
+    if (!withStatus) {
       return true;
     }
 
-    return (entry.status || '').toLowerCase() === `${ withStatus }`.toLowerCase();
+    return (entry.status || '').toLowerCase() === `${withStatus}`.toLowerCase();
   }
 
-  waitForCondition(name, withStatus = 'True', timeoutMs = DEFAULT_WAIT_TMIMEOUT, intervalMs = DEFAULT_WAIT_INTERVAL) {
-    return this.waitForTestFn(() => {
-      return this.isCondition(name, withStatus);
-    }, `condition ${ name }=${ withStatus }`, timeoutMs, intervalMs);
+  waitForCondition(
+    name,
+    withStatus = 'True',
+    timeoutMs = DEFAULT_WAIT_TMIMEOUT,
+    intervalMs = DEFAULT_WAIT_INTERVAL
+  ) {
+    return this.waitForTestFn(
+      () => {
+        return this.isCondition(name, withStatus);
+      },
+      `condition ${name}=${withStatus}`,
+      timeoutMs,
+      intervalMs
+    );
   }
 
   // ------------------------------------------------------------------
@@ -843,7 +1180,7 @@ export default class Resource {
     // Remove disabled items and consecutive dividers
     let last = null;
     const out = all.filter((item) => {
-      if ( item.enabled === false ) {
+      if (item.enabled === false) {
         return false;
       }
 
@@ -856,18 +1193,18 @@ export default class Resource {
     });
 
     // Remove dividers at the beginning
-    while ( out.length && out[0].divider ) {
+    while (out.length && out[0].divider) {
       out.shift();
     }
 
     // Remove dividers at the end
-    while ( out.length && out[out.length - 1].divider ) {
+    while (out.length && out[out.length - 1].divider) {
       out.pop();
     }
 
     // Remove consecutive dividers in the middle
-    for ( let i = 1 ; i < out.length ; i++ ) {
-      if ( out[i].divider && out[i - 1].divider ) {
+    for (let i = 1; i < out.length; i++) {
+      if (out[i].divider && out[i - 1].divider) {
         removeAt(out, i, 1);
         i--;
       }
@@ -879,54 +1216,63 @@ export default class Resource {
   // You can add custom actions by overriding your own availableActions (and probably reading super._availableActions)
   get _availableActions() {
     // get menu actions available by plugins configuration
-    const currentRoute = this.currentRouter().app._route;
-    const extensionMenuActions = getApplicableExtensionEnhancements(this.$rootState, ExtensionPoint.ACTION, ActionLocation.TABLE, currentRoute, this);
+    const currentRoute = this.currentRouter().currentRoute.value;
+    const extensionMenuActions = getApplicableExtensionEnhancements(
+      this.$rootState,
+      ExtensionPoint.ACTION,
+      ActionLocation.TABLE,
+      currentRoute,
+      this
+    );
 
     const all = [
       { divider: true },
       {
-        action:  this.canUpdate ? 'goToEdit' : 'goToViewConfig',
-        label:   this.t(this.canUpdate ? 'action.edit' : 'action.view'),
-        icon:    'icon icon-edit',
+        action: this.canUpdate ? 'goToEdit' : 'goToViewConfig',
+        label: this.t(this.canUpdate ? 'action.edit' : 'action.view'),
+        icon: 'icon icon-edit',
         enabled: this.canCustomEdit,
       },
       {
-        action:  this.canEditYaml ? 'goToEditYaml' : 'goToViewYaml',
-        label:   this.t(this.canEditYaml ? 'action.editYaml' : 'action.viewYaml'),
-        icon:    'icon icon-file',
+        action: this.canEditYaml ? 'goToEditYaml' : 'goToViewYaml',
+        label: this.t(this.canEditYaml ? 'action.editYaml' : 'action.viewYaml'),
+        icon: 'icon icon-file',
         enabled: this.canYaml,
       },
       {
-        action:  (this.canCustomEdit ? 'goToClone' : 'cloneYaml'),
-        label:   this.t('action.clone'),
-        icon:    'icon icon-copy',
-        enabled: this.canClone && this.canCreate && (this.canCustomEdit || this.canYaml),
+        action: this.canCustomEdit ? 'goToClone' : 'cloneYaml',
+        label: this.t('action.clone'),
+        icon: 'icon icon-copy',
+        enabled:
+          this.canClone &&
+          this.canCreate &&
+          (this.canCustomEdit || this.canYaml),
       },
       { divider: true },
       {
-        action:     'download',
-        label:      this.t('action.download'),
-        icon:       'icon icon-download',
-        bulkable:   true,
+        action: 'download',
+        label: this.t('action.download'),
+        icon: 'icon icon-download',
+        bulkable: true,
         bulkAction: 'downloadBulk',
-        enabled:    this.canYaml,
-        weight:     -9,
+        enabled: this.canYaml,
+        weight: -9,
       },
       {
-        action:  'viewInApi',
-        label:   this.t('action.viewInApi'),
-        icon:    'icon icon-external-link',
+        action: 'viewInApi',
+        label: this.t('action.viewInApi'),
+        icon: 'icon icon-external-link',
         enabled: this.canViewInApi,
       },
       {
-        action:     'promptRemove',
-        altAction:  'remove',
-        label:      this.t('action.remove'),
-        icon:       'icon icon-trash',
-        bulkable:   true,
-        enabled:    this.canDelete,
+        action: 'promptRemove',
+        altAction: 'remove',
+        label: this.t('action.remove'),
+        icon: 'icon icon-trash',
+        bulkable: true,
+        enabled: this.canDelete,
         bulkAction: 'promptRemove',
-        weight:     -10, // Delete always goes last
+        weight: -10, // Delete always goes last
       },
     ];
 
@@ -942,20 +1288,26 @@ export default class Resource {
         const typeofEnabled = typeof enabledFn;
 
         switch (typeofEnabled) {
-        case 'undefined':
-          newActionInstance.enabled = true;
-          break;
-        case 'function':
-          Object.defineProperty(newActionInstance, 'enabled', { get: () => enabledFn(this) });
-          break;
-        case 'boolean':
-          // no op, just use it directly
-          break;
-        default:
-          // unsupported value
-          console.warn(`Unsupported 'enabled' property type for action: ${ action.label || action.labelKey }` ); // eslint-disable-line no-console
-          delete newActionInstance.enabled;
-          break;
+          case 'undefined':
+            newActionInstance.enabled = true;
+            break;
+          case 'function':
+            Object.defineProperty(newActionInstance, 'enabled', {
+              get: () => enabledFn(this),
+            });
+            break;
+          case 'boolean':
+            // no op, just use it directly
+            break;
+          default:
+            // unsupported value
+            console.warn(
+              `Unsupported 'enabled' property type for action: ${
+                action.label || action.labelKey
+              }`
+            ); // eslint-disable-line no-console
+            delete newActionInstance.enabled;
+            break;
         }
 
         all.push(newActionInstance);
@@ -972,7 +1324,10 @@ export default class Resource {
   }
 
   get _canDelete() {
-    return this.hasLink('remove') && this.$rootGetters['type-map/optionsFor'](this.type).isRemovable;
+    return (
+      this.hasLink('remove') &&
+      this.$rootGetters['type-map/optionsFor'](this.type).isRemovable
+    );
   }
 
   get canClone() {
@@ -980,7 +1335,10 @@ export default class Resource {
   }
 
   get canUpdate() {
-    return this.hasLink('update') && this.$rootGetters['type-map/optionsFor'](this.type).isEditable;
+    return (
+      this.hasLink('update') &&
+      this.$rootGetters['type-map/optionsFor'](this.type).isEditable
+    );
   }
 
   get canCustomEdit() {
@@ -988,7 +1346,10 @@ export default class Resource {
   }
 
   get canCreate() {
-    if ( this.schema && !this.schema?.collectionMethods.find((x) => x.toLowerCase() === 'post') ) {
+    if (
+      this.schema &&
+      !this.schema?.collectionMethods.find((x) => x.toLowerCase() === 'post')
+    ) {
       return false;
     }
 
@@ -996,7 +1357,13 @@ export default class Resource {
   }
 
   get canViewInApi() {
-    return this.hasLink('self') && this.$rootGetters['prefs/get'](VIEW_IN_API);
+    try {
+      return (
+        this.hasLink('self') && this.$rootGetters['prefs/get'](VIEW_IN_API)
+      );
+    } catch {
+      return this.hasLink('self') && this.$rootGetters['prefs/get'](DEV);
+    }
   }
 
   get canYaml() {
@@ -1004,7 +1371,9 @@ export default class Resource {
   }
 
   get canEditYaml() {
-    return this.schema?.resourceMethods?.find((x) => x === 'blocked-PUT') ? false : this.canUpdate;
+    return this.schema?.resourceMethods?.find((x) => x === 'blocked-PUT')
+      ? false
+      : this.canUpdate;
   }
 
   // ------------------------------------------------------------------
@@ -1018,19 +1387,19 @@ export default class Resource {
   }
 
   followLink(linkName, opt = {}) {
-    if ( !opt.url ) {
+    if (!opt.url) {
       opt.url = (this.links || {})[linkName];
     }
 
-    if ( opt.urlSuffix ) {
+    if (opt.urlSuffix) {
       opt.url += opt.urlSuffix;
     }
 
-    if ( !opt.url ) {
-      throw new Error(`Unknown link ${ linkName } on ${ this.type } ${ this.id }`);
+    if (!opt.url) {
+      throw new Error(`Unknown link ${linkName} on ${this.type} ${this.id}`);
     }
 
-    return this.$dispatch('request', { opt, type: this.type } );
+    return this.$dispatch('request', { opt, type: this.type });
   }
 
   // ------------------------------------------------------------------
@@ -1054,24 +1423,30 @@ export default class Resource {
 
   async doActionGrowl(actionName, body, opt = {}) {
     try {
-      await this.$dispatch('resourceAction', {
+      return await this.$dispatch('resourceAction', {
         resource: this,
         actionName,
         body,
         opt,
       });
     } catch (err) {
-      this.$dispatch('growl/fromError', {
-        title: this.$rootGetters['i18n/t']('generic.notification.title.error'),
-        err:   err.data || err,
-      }, { root: true });
+      this.$dispatch(
+        'growl/fromError',
+        {
+          title: this.$rootGetters['i18n/t'](
+            'generic.notification.title.error'
+          ),
+          err: err.data || err,
+        },
+        { root: true }
+      );
     }
   }
 
   // ------------------------------------------------------------------
 
   patch(data, opt = {}, merge = false, alertOnError = false) {
-    if ( !opt.url ) {
+    if (!opt.url) {
       // Workaround for the links not being correct - view link is the only one that seems correct
       opt.url = this.linkFor('view') || this.linkFor('self');
     }
@@ -1080,25 +1455,33 @@ export default class Resource {
     opt.headers = opt.headers || {};
 
     if (!opt.headers['content-type']) {
-      const contentType = merge ? 'application/strategic-merge-patch+json' : 'application/json-patch+json';
+      const contentType = merge
+        ? 'application/strategic-merge-patch+json'
+        : 'application/json-patch+json';
 
       opt.headers['content-type'] = contentType;
     }
     opt.data = data;
 
-    const dispatch = this.$dispatch('request', { opt, type: this.type } );
+    const dispatch = this.$dispatch('request', { opt, type: this.type });
 
-    return !alertOnError ? dispatch : dispatch.catch((e) => {
-      const title = this.t('resource.errors.update', { name: this.name });
+    return !alertOnError
+      ? dispatch
+      : dispatch.catch((e) => {
+          const title = this.t('resource.errors.update', { name: this.name });
 
-      console.error(title, e); // eslint-disable-line no-console
+          console.error(title, e); // eslint-disable-line no-console
 
-      this.$dispatch('growl/error', {
-        title,
-        message: e?.message,
-        timeout: 5000
-      }, { root: true });
-    });
+          this.$dispatch(
+            'growl/error',
+            {
+              title,
+              message: e?.message,
+              timeout: 5000,
+            },
+            { root: true }
+          );
+        });
   }
 
   save() {
@@ -1119,9 +1502,9 @@ export default class Resource {
    * Allow to handle the response of the save request
    * @param {*} res Full request response
    */
-  processSaveResponse(res) { }
+  processSaveResponse(res) {}
 
-  async _save(opt = { }) {
+  async _save(opt = {}) {
     const forNew = !this.id;
 
     const errors = this.validationErrors(this, opt);
@@ -1130,17 +1513,22 @@ export default class Resource {
       return Promise.reject(errors);
     }
 
-    if ( this.metadata?.resourceVersion ) {
-      this.metadata.resourceVersion = `${ this.metadata.resourceVersion }`;
+    if (this.metadata?.resourceVersion) {
+      this.metadata.resourceVersion = `${this.metadata.resourceVersion}`;
     }
 
-    if ( !opt.url ) {
-      if ( forNew ) {
+    if (!opt.url) {
+      if (forNew) {
         const schema = this.$getters['schemaFor'](this.type);
         let url = schema.linkFor('collection');
 
-        if ( schema.attributes && schema.attributes.namespaced && this.metadata && this.metadata.namespace ) {
-          url += `/${ this.metadata.namespace }`;
+        if (
+          schema.attributes &&
+          schema.attributes.namespaced &&
+          this.metadata &&
+          this.metadata.namespace
+        ) {
+          url += `/${this.metadata.namespace}`;
         }
 
         opt.url = url;
@@ -1149,19 +1537,19 @@ export default class Resource {
       }
     }
 
-    if ( !opt.method ) {
-      opt.method = ( forNew ? 'post' : 'put' );
+    if (!opt.method) {
+      opt.method = forNew ? 'post' : 'put';
     }
 
-    if ( !opt.headers ) {
+    if (!opt.headers) {
       opt.headers = {};
     }
 
-    if ( !opt.headers['content-type'] ) {
+    if (!opt.headers['content-type']) {
       opt.headers['content-type'] = 'application/json';
     }
 
-    if ( !opt.headers['accept'] ) {
+    if (!opt.headers['accept']) {
       opt.headers['accept'] = 'application/json';
     }
 
@@ -1190,27 +1578,30 @@ export default class Resource {
     if (opt?.replace && opt.method === 'put') {
       const argParam = opt.url.includes('?') ? '&' : '?';
 
-      opt.url = `${ opt.url }${ argParam }_replace=true`;
+      opt.url = `${opt.url}${argParam}_replace=true`;
       delete opt.replace;
     }
 
     try {
-      const res = await this.$dispatch('request', { opt, type: this.type } );
+      const res = await this.$dispatch('request', { opt, type: this.type });
 
       // Allow to process response independently from the related models
       this.processSaveResponse(res);
 
       // Steve sometimes returns Table responses instead of the resource you just saved.. ignore
-      if ( res && res.kind !== 'Table') {
-        await this.$dispatch('load', { data: res, existing: (forNew ? this : undefined ) });
+      if (res && res.kind !== 'Table') {
+        await this.$dispatch('load', {
+          data: res,
+          existing: forNew ? this : undefined,
+        });
       }
     } catch (e) {
-      if ( this.type && this.id && e?._status === 409) {
+      if (this.type && this.id && e?._status === 409) {
         // If there's a conflict, try to load the new version
         await this.$dispatch('find', {
           type: this.type,
-          id:   this.id,
-          opt:  { force: true }
+          id: this.id,
+          opt: { force: true },
         });
       }
 
@@ -1225,15 +1616,15 @@ export default class Resource {
   }
 
   async _remove(opt = {}) {
-    if ( !opt.url ) {
+    if (!opt.url) {
       opt.url = this.linkFor('self');
     }
 
     opt.method = 'delete';
 
-    const res = await this.$dispatch('request', { opt, type: this.type } );
+    const res = await this.$dispatch('request', { opt, type: this.type });
 
-    if ( res?._status === 204 ) {
+    if (res?._status === 204) {
       // If there's no body, assume the resource was immediately deleted
       // and drop it from the store as if a remove event happened.
       await this.$dispatch('ws.resource.remove', { data: this });
@@ -1243,21 +1634,21 @@ export default class Resource {
   // ------------------------------------------------------------------
 
   currentRoute() {
-    return window.$nuxt.$route;
+    return window.$globalApp.$route;
   }
 
   currentRouter() {
-    return window.$nuxt.$router;
+    return window.$globalApp.$router;
   }
 
   get listLocation() {
     return {
-      name:   `c-cluster-product-resource`,
+      name: `c-cluster-product-resource`,
       params: {
-        product:  this.$rootGetters['productId'],
-        cluster:  this.$rootGetters['clusterId'],
+        product: this.$rootGetters['productId'],
+        cluster: this.$rootGetters['clusterId'],
         resource: this.type,
-      }
+      },
     };
   }
 
@@ -1267,14 +1658,16 @@ export default class Resource {
     const id = this.id?.replace(/.*\//, '');
 
     return {
-      name:   `c-cluster-product-resource${ schema?.attributes?.namespaced ? '-namespace' : '' }-id`,
+      name: `c-cluster-product-resource${
+        schema?.attributes?.namespaced ? '-namespace' : ''
+      }-id`,
       params: {
-        product:   this.$rootGetters['productId'],
-        cluster:   this.$rootGetters['clusterId'],
-        resource:  this.type,
+        product: this.$rootGetters['productId'],
+        cluster: this.$rootGetters['clusterId'],
+        resource: this.type,
         namespace: this.metadata?.namespace,
         id,
-      }
+      },
     };
   }
 
@@ -1286,14 +1679,20 @@ export default class Resource {
     this.currentRouter().push(this.detailLocation);
   }
 
+  /**
+   * Resource action redirects to the detail page with a query parameter 'clone'
+   * When the query parameter is present, the view will fetch the resource to clone define in the parameter
+   * E.g.: /my-id?mode=clone
+   * @param {*} moreQuery
+   */
   goToClone(moreQuery = {}) {
     const location = this.detailLocation;
 
     location.query = {
       ...location.query,
       [MODE]: _CLONE,
-      [AS]:   _UNFLAG,
-      ...moreQuery
+      [AS]: _UNFLAG,
+      ...moreQuery,
     };
 
     this.currentRouter().push(location);
@@ -1305,8 +1704,8 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _EDIT,
-      [AS]:   _UNFLAG,
-      ...moreQuery
+      [AS]: _UNFLAG,
+      ...moreQuery,
     };
 
     this.currentRouter().push(location);
@@ -1318,8 +1717,8 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _VIEW,
-      [AS]:   _CONFIG,
-      ...moreQuery
+      [AS]: _CONFIG,
+      ...moreQuery,
     };
 
     this.currentRouter().push(location);
@@ -1331,7 +1730,7 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _EDIT,
-      [AS]:   _YAML
+      [AS]: _YAML,
     };
 
     this.currentRouter().push(location);
@@ -1343,7 +1742,7 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _VIEW,
-      [AS]:   _YAML
+      [AS]: _YAML,
     };
 
     this.currentRouter().push(location);
@@ -1355,42 +1754,46 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _CLONE,
-      [AS]:   _YAML,
-      ...moreQuery
+      [AS]: _YAML,
+      ...moreQuery,
     };
 
     this.currentRouter().push(location);
   }
 
   async download() {
-    const value = await this.followLink('view', { headers: { accept: 'application/yaml' } });
+    const value = await this.followLink('view', {
+      headers: { accept: 'application/yaml' },
+    });
     const data = await this.cleanForDownload(value.data);
 
-    downloadFile(`${ this.nameDisplay }.yaml`, data, 'application/yaml');
+    downloadFile(`${this.nameDisplay}.yaml`, data, 'application/yaml');
   }
 
   async downloadBulk(items) {
     const files = {};
     const names = [];
 
-    for ( const item of items ) {
-      let name = `${ item.nameDisplay }.yaml`;
+    for (const item of items) {
+      let name = `${item.nameDisplay}.yaml`;
       let i = 2;
 
-      while ( names.includes(name) ) {
-        name = `${ item.nameDisplay }_${ i++ }.yaml`;
+      while (names.includes(name)) {
+        name = `${item.nameDisplay}_${i++}.yaml`;
       }
 
       names.push(name);
     }
 
     await eachLimit(items, 10, (item, idx) => {
-      return item.followLink('view', { headers: { accept: 'application/yaml' } } ).then(async(data) => {
-        const yaml = data.data || data;
-        const cleanedYaml = await this.cleanForDownload(yaml);
+      return item
+        .followLink('view', { headers: { accept: 'application/yaml' } })
+        .then(async (data) => {
+          const yaml = data.data || data;
+          const cleanedYaml = await this.cleanForDownload(yaml);
 
-        files[`resources/${ names[idx] }`] = cleanedYaml;
-      });
+          files[`resources/${names[idx]}`] = cleanedYaml;
+        });
     });
 
     const zip = await generateZip(files);
@@ -1403,7 +1806,7 @@ export default class Resource {
   }
 
   promptRemove(resources) {
-    if ( !resources ) {
+    if (!resources) {
       resources = this;
     }
 
@@ -1414,12 +1817,13 @@ export default class Resource {
     return false;
   }
 
-  applyDefaults() {
-  }
+  applyDefaults() {}
 
   get urlFromAttrs() {
     const schema = this.$getters['schemaFor'](this.type);
-    const { metadata:{ namespace = 'default' } } = this;
+    const {
+      metadata: { namespace = 'default' },
+    } = this;
     let url = schema.links.collection;
 
     const attributes = schema?.attributes;
@@ -1429,7 +1833,10 @@ export default class Resource {
     }
     const { group, resource } = attributes;
 
-    url = `${ url.slice(0, url.indexOf('/v1')) }/apis/${ group }/namespaces/${ namespace }/${ resource }`;
+    url = `${url.slice(
+      0,
+      url.indexOf('/v1')
+    )}/apis/${group}/namespaces/${namespace}/${resource}`;
 
     return url;
   }
@@ -1506,8 +1913,10 @@ export default class Resource {
 
     const parsed = jsyaml.load(yaml); // will throw on invalid yaml, and return one or more documents (usually one)
 
-    if ( this.schema?.attributes?.namespaced && !parsed.metadata.namespace ) {
-      const err = this.$rootGetters['i18n/t']('resourceYaml.errors.namespaceRequired');
+    if (this.schema?.attributes?.namespaced && !parsed.metadata.namespace) {
+      const err = this.$rootGetters['i18n/t'](
+        'resourceYaml.errors.namespaceRequired'
+      );
 
       throw err;
     }
@@ -1516,30 +1925,34 @@ export default class Resource {
     const isCreate = !this.id;
     const headers = {
       'content-type': 'application/yaml',
-      accept:         'application/json',
+      accept: 'application/json',
     };
 
-    if ( isCreate ) {
+    if (isCreate) {
       res = await this.schema.followLink('collection', {
         method: 'POST',
         headers,
-        data:   yaml
+        data: yaml,
       });
     } else {
       res = await this.followLink('update', {
         method: 'PUT',
         headers,
-        data:   yaml
+        data: yaml,
       });
     }
 
     await this.$dispatch(`load`, {
-      data:     res,
-      existing: (isCreate ? this : undefined)
+      data: res,
+      existing: isCreate ? this : undefined,
     });
 
     if (this.isSpoofed) {
-      await this.$dispatch('cluster/findAll', { type: this.type, opt: { force: true } }, { root: true });
+      await this.$dispatch(
+        'cluster/findAll',
+        { type: this.type, opt: { force: true } },
+        { root: true }
+      );
     }
   }
 
@@ -1549,14 +1962,22 @@ export default class Resource {
     const customValidationRulesets = this?.customValidationRules
       .filter((rule) => !!rule.validators || !!rule.required)
       .map((rule) => {
-        const formRules = formRulesGenerator(this.t, { displayKey: rule?.translationKey ? this.t(rule.translationKey) : 'Value' });
+        const formRules = formRulesGenerator(this.t, {
+          displayKey: rule?.translationKey
+            ? this.t(rule.translationKey)
+            : 'Value',
+        });
 
         return {
-          path:  rule.path,
+          path: rule.path,
           rules: [
             ...(rule.validators || []),
-            ...rule.required ? ['required'] : [],
-            ...['dnsLabel', 'dnsLabelRestricted', 'hostname'].includes(rule.type) ? [rule.type] : []
+            ...(rule.required ? ['required'] : []),
+            ...(['dnsLabel', 'dnsLabelRestricted', 'hostname'].includes(
+              rule.type
+            )
+              ? [rule.type]
+              : []),
           ]
             .map((rule) => {
               if (rule.includes(':')) {
@@ -1566,9 +1987,8 @@ export default class Resource {
               }
 
               return formRules[rule];
-            }
-            )
-            .filter((rule) => !!rule)
+            })
+            .filter((rule) => !!rule),
         };
       })
       .filter((ruleset) => ruleset.rules.length > 0);
@@ -1588,70 +2008,109 @@ export default class Resource {
         customValidationRules = customValidationRules();
       }
 
-      customValidationRules.filter((rule) => !ignorePaths.includes(rule.path)).forEach((rule) => {
-        const {
-          path,
-          requiredIf: requiredIfPath,
-          validators = [],
-          type: fieldType,
-        } = rule;
-        let pathValue = get(data, path);
+      customValidationRules
+        .filter((rule) => !ignorePaths.includes(rule.path))
+        .forEach((rule) => {
+          const {
+            path,
+            requiredIf: requiredIfPath,
+            validators = [],
+            type: fieldType,
+          } = rule;
+          let pathValue = get(data, path);
 
-        const parsedRules = compact((validators || []));
-        let displayKey = path;
+          const parsedRules = compact(validators || []);
+          let displayKey = path;
 
-        if (rule.translationKey && this.$rootGetters['i18n/exists'](rule.translationKey)) {
-          displayKey = this.t(rule.translationKey);
-        }
-
-        if (isString(pathValue)) {
-          pathValue = pathValue.trim();
-        }
-        if (requiredIfPath) {
-          const reqIfVal = get(data, requiredIfPath);
-
-          if (!isEmpty(reqIfVal) && (isEmpty(pathValue) && pathValue !== 0)) {
-            errors.push(this.t('validation.required', { key: displayKey }));
-          }
-        }
-
-        validateLength(pathValue, rule, displayKey, this.$rootGetters, errors);
-        validateChars(pathValue, rule, displayKey, this.$rootGetters, errors);
-
-        if ( !isEmpty(pathValue) && DNS_LIKE_TYPES.includes(fieldType) ) {
-          // DNS types should be lowercase
-          const tolower = (pathValue || '').toLowerCase();
-
-          if ( tolower !== pathValue ) {
-            pathValue = tolower;
-
-            Vue.set(data, path, pathValue);
+          if (
+            rule.translationKey &&
+            this.$rootGetters['i18n/exists'](rule.translationKey)
+          ) {
+            displayKey = this.t(rule.translationKey);
           }
 
-          errors.push(...validateDnsLikeTypes(pathValue, fieldType, displayKey, this.$rootGetters, errors));
-        }
+          if (isString(pathValue)) {
+            pathValue = pathValue.trim();
+          }
+          if (requiredIfPath) {
+            const reqIfVal = get(data, requiredIfPath);
 
-        parsedRules.forEach((validator) => {
-          const validatorAndArgs = validator.split(':');
-          const validatorName = validatorAndArgs.slice(0, 1);
-          const validatorArgs = validatorAndArgs.slice(1) || null;
-          const validatorExists = Object.prototype.hasOwnProperty.call(CustomValidators, validatorName);
-
-          if (!isEmpty(validatorName) && validatorExists) {
-            CustomValidators[validatorName](pathValue, this.$rootGetters, errors, validatorArgs, displayKey, data);
-          } else if (!isEmpty(validatorName) && !validatorExists) {
-            // Check if validator is imported from plugin
-            const pluginValidator = this.$rootState.$plugin?.getValidator(validatorName);
-
-            if (pluginValidator) {
-              pluginValidator(pathValue, this.$rootGetters, errors, validatorArgs, displayKey, data);
-            } else {
-              // eslint-disable-next-line
-              console.warn(this.t('validation.custom.missing', { validatorName }));
+            if (!isEmpty(reqIfVal) && isEmpty(pathValue) && pathValue !== 0) {
+              errors.push(this.t('validation.required', { key: displayKey }));
             }
           }
+
+          validateLength(
+            pathValue,
+            rule,
+            displayKey,
+            this.$rootGetters,
+            errors
+          );
+          validateChars(pathValue, rule, displayKey, this.$rootGetters, errors);
+
+          if (!isEmpty(pathValue) && DNS_LIKE_TYPES.includes(fieldType)) {
+            // DNS types should be lowercase
+            const tolower = (pathValue || '').toLowerCase();
+
+            if (tolower !== pathValue) {
+              pathValue = tolower;
+
+              data[path] = pathValue;
+            }
+
+            errors.push(
+              ...validateDnsLikeTypes(
+                pathValue,
+                fieldType,
+                displayKey,
+                this.$rootGetters,
+                errors
+              )
+            );
+          }
+
+          parsedRules.forEach((validator) => {
+            const validatorAndArgs = validator.split(':');
+            const validatorName = validatorAndArgs.slice(0, 1);
+            const validatorArgs = validatorAndArgs.slice(1) || null;
+            const validatorExists = Object.prototype.hasOwnProperty.call(
+              CustomValidators,
+              validatorName
+            );
+
+            if (!isEmpty(validatorName) && validatorExists) {
+              CustomValidators[validatorName](
+                pathValue,
+                this.$rootGetters,
+                errors,
+                validatorArgs,
+                displayKey,
+                data
+              );
+            } else if (!isEmpty(validatorName) && !validatorExists) {
+              // Check if validator is imported from plugin
+              const pluginValidator =
+                this.$rootState.$plugin?.getValidator(validatorName);
+
+              if (pluginValidator) {
+                pluginValidator(
+                  pathValue,
+                  this.$rootGetters,
+                  errors,
+                  validatorArgs,
+                  displayKey,
+                  data
+                );
+              } else {
+                // eslint-disable-next-line
+                console.warn(
+                  this.t('validation.custom.missing', { validatorName })
+                );
+              }
+            }
+          });
         });
-      });
     }
 
     return errors;
@@ -1663,7 +2122,7 @@ export default class Resource {
    *
    * Models can override this and call super.validationErrors
    */
-  validationErrors(data = this, opts = { }) {
+  validationErrors(data = this, opts = {}) {
     return this.customValidationErrors(data);
   }
 
@@ -1685,15 +2144,17 @@ export default class Resource {
   get owners() {
     const owners = [];
 
-    for ( const kind in this.ownersByType) {
+    for (const kind in this.ownersByType) {
       const schema = this.$rootGetters['cluster/schema'](kind);
 
       if (schema) {
         const type = schema.id;
-        const allOfResourceType = this.$rootGetters['cluster/all']( type );
+        const allOfResourceType = this.$rootGetters['cluster/all'](type);
 
         this.ownersByType[kind].forEach((resource, idx) => {
-          const resourceInstance = allOfResourceType.find((resourceByType) => resourceByType?.metadata?.uid === resource.uid);
+          const resourceInstance = allOfResourceType.find(
+            (resourceByType) => resourceByType?.metadata?.uid === resource.uid
+          );
 
           if (resourceInstance) {
             owners.push(resourceInstance);
@@ -1714,23 +2175,25 @@ export default class Resource {
 
     if (this.owners?.length > 0) {
       details.push({
-        label:     this.t('resourceDetail.detailTop.ownerReferences', { count: this.owners.length }),
+        label: this.t('resourceDetail.detailTop.ownerReferences', {
+          count: this.owners.length,
+        }),
         formatter: 'ListLinkDetail',
-        content:   this.owners.map((owner) => ({
-          key:   owner.id,
-          row:   owner,
-          col:   {},
-          value: owner.metadata.name
-        }))
+        content: this.owners.map((owner) => ({
+          key: owner.id,
+          row: owner,
+          col: {},
+          value: owner.metadata.name,
+        })),
       });
     }
 
     if (get(this, 'metadata.deletionTimestamp')) {
       details.push({
-        label:         this.t('resourceDetail.detailTop.deleted'),
-        formatter:     'LiveDate',
+        label: this.t('resourceDetail.detailTop.deleted'),
+        formatter: 'LiveDate',
         formatterOpts: { addSuffix: true },
-        content:       get(this, 'metadata.deletionTimestamp')
+        content: get(this, 'metadata.deletionTimestamp'),
       });
     }
 
@@ -1758,38 +2221,38 @@ export default class Resource {
   _relationshipsFor(rel, direction) {
     const out = { selectors: [], ids: [] };
 
-    if ( !this.metadata?.relationships?.length ) {
+    if (!this.metadata?.relationships?.length) {
       return out;
     }
 
-    for ( const r of this.metadata.relationships ) {
-      if ( rel !== 'any' && r.rel !== rel ) {
+    for (const r of this.metadata.relationships) {
+      if (rel !== 'any' && r.rel !== rel) {
         continue;
       }
 
-      if ( !r[`${ direction }Type`] ) {
+      if (!r[`${direction}Type`]) {
         continue;
       }
 
-      if ( r.selector ) {
+      if (r.selector) {
         addObjects(out.selectors, {
-          type:      r.toType,
+          type: r.toType,
           namespace: r.toNamespace,
-          selector:  r.selector
+          selector: r.selector,
         });
       } else {
-        const type = r[`${ direction }Type`];
-        let namespace = r[`${ direction }Namespace`];
-        let name = r[`${ direction }Id`];
+        const type = r[`${direction}Type`];
+        let namespace = r[`${direction}Namespace`];
+        let name = r[`${direction}Id`];
 
-        if ( !namespace && name.includes('/') ) {
+        if (!namespace && name.includes('/')) {
           const idx = name.indexOf('/');
 
           namespace = name.substr(0, idx);
           name = name.substr(idx + 1);
         }
 
-        const id = (namespace ? `${ namespace }/` : '') + name;
+        const id = (namespace ? `${namespace}/` : '') + name;
 
         addObject(out.ids, {
           type,
@@ -1806,7 +2269,7 @@ export default class Resource {
   _getRelationship(rel, direction) {
     const res = this._relationshipsFor(rel, direction);
 
-    if ( res.selectors?.length ) {
+    if (res.selectors?.length) {
       // eslint-disable-next-line no-console
       console.warn('Sync request for a relationship that is a selector');
     }
@@ -1818,21 +2281,20 @@ export default class Resource {
     const { selectors, ids } = this._relationshipsFor(rel, direction);
     const out = [];
 
-    for ( const sel of selectors ) {
+    for (const sel of selectors) {
       const matching = await this.$dispatch('findMatching', sel);
 
       addObjects(out, matching.data);
     }
 
-    for ( const obj of ids ) {
+    for (const obj of ids) {
       const { type, id } = obj;
       let matching = this.$getters['byId'](type, id);
 
-      if ( !matching ) {
+      if (!matching) {
         try {
           matching = await this.$dispatch('find', { type, id });
-        } catch {
-        }
+        } catch {}
       }
       if (matching) {
         addObject(out, matching);
@@ -1852,8 +2314,8 @@ export default class Resource {
     const out = {};
     const keys = Object.keys(this);
 
-    for ( const k of keys ) {
-      if ( this[k]?.toJSON ) {
+    for (const k of keys) {
+      if (this[k]?.toJSON) {
         out[k] = this[k].toJSON();
       } else {
         out[k] = clone(this[k]);

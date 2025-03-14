@@ -1,21 +1,8 @@
-import Vue from 'vue';
 import { _CREATE, _EDIT, _VIEW } from '@shell/config/query-params';
 import { getCephClusterAddonUrl } from '@shell/utils/url';
 
-export default Vue.extend({
+export default {
   computed: {
-    isCreate() {
-      return this.mode === _CREATE;
-    },
-
-    isEdit() {
-      return this.mode === _EDIT;
-    },
-
-    isView() {
-      return this.mode === _VIEW;
-    },
-
     managedWarning() {
       const { value } = this;
       const managedWarning = {
@@ -39,4 +26,4 @@ export default Vue.extend({
       return [{ label: 'true', value: true }, { label: 'false', value: false }];
     }
   }
-});
+};

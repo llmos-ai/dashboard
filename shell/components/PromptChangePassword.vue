@@ -1,23 +1,29 @@
 <script>
 import { mapGetters } from 'vuex';
 import ChangePassword from '@shell/components/form/ChangePassword';
-import { Card } from '@components/Card';
 import AsyncButton from '@shell/components/AsyncButton';
+import AppModal from '@shell/components/AppModal.vue';
 
 export default {
   components: {
-    Card, AsyncButton, ChangePassword
+    AsyncButton,
+    ChangePassword,
+    AppModal,
   },
   data() {
-    return { valid: false, password: '' };
+    return {
+      valid: false,
+      password: '',
+      showModal: false,
+    };
   },
   computed: { ...mapGetters({ t: 'i18n/t' }) },
-  methods:  {
+  methods: {
     show(show) {
       if (show) {
-        this.$modal.show('password-modal');
+        this.showModal = true;
       } else {
-        this.$modal.hide('password-modal');
+        this.showModal = false;
       }
     },
     async submit(buttonCb) {
@@ -28,92 +34,47 @@ export default {
       } catch (err) {
         buttonCb(false);
       }
-    }
+    },
   },
 };
 </script>
 
 <template>
-  <modal
-    class="change-password-modal"
+  <app-modal
+    v-if="showModal"
+    custom-class="change-password-modal"
+    data-testid="change-password__modal"
     name="password-modal"
     :width="500"
     :height="465"
+    :trigger-focus-trap="true"
+    @close="show(false)"
   >
-    <Card
-      class="prompt-password"
-      :show-highlight-border="false"
-    >
-      <h4
-        slot="title"
-        class="text-default-text"
-      >
-        {{ t("changePassword.title") }}
-      </h4>
-      <div slot="body">
-        <form @submit.prevent>
-          <ChangePassword
-            ref="changePassword"
-            @valid="valid = $event"
-          />
-        </form>
-      </div>
+    <a-card :title="t('changePassword.title')">
+      <form @submit.prevent>
+        <ChangePassword ref="changePassword" @valid="valid = $event" />
+      </form>
 
       <template #actions>
         <!-- type reset is required by lastpass -->
-        <button
-          class="btn role-secondary"
-          type="reset"
+        <a-button
+          role="button"
+          :aria-label="t('changePassword.cancel')"
+          htmlType="reset"
           @click="show(false)"
         >
-          {{ t("changePassword.cancel") }}
-        </button>
+          {{ t('changePassword.cancel') }}
+        </a-button>
+        <!-- TODO: type=submit -->
         <AsyncButton
-          type="submit"
+          type="primary"
           mode="apply"
-          class="btn bg-error ml-10"
+          class="btn bg-error"
           :disabled="!valid"
           value="LOGIN"
           @click="submit"
         />
       </template>
-    </Card>
-  </modal>
+    </a-card>
+  </app-modal>
 </template>
-
-<style lang="scss" scoped>
-    .change-password-modal {
-      ::v-deep .v--modal {
-        display: flex;
-
-        .card-wrap {
-          display: flex;
-          flex-direction: column;
-
-          .card-body {
-            flex: 1;
-            justify-content: start;
-            & > div {
-              flex: 1;
-              display: flex;
-            }
-          }
-
-          .card-actions {
-            display: flex;
-            justify-content: flex-end;
-            width: 100%;
-          }
-        }
-      }
-    }
-
-    .prompt-password {
-      flex: 1;
-      display: flex;
-      form {
-        flex: 1;
-      }
-    }
-
-</style>

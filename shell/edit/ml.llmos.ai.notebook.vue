@@ -140,7 +140,7 @@ export default {
         name: this.value.metadata.name
       }];
 
-      this.$set(this.value.spec.template.spec, 'containers', _containers);
+      this.value.spec.template.spec['containers'] = _containers;
     },
   }
 };
@@ -167,7 +167,7 @@ export default {
       />
 
       <ResourceTabs
-        v-model="value"
+        v-model:value="value"
         class="mt-15"
         :need-conditions="false"
         :need-related="false"
@@ -183,7 +183,7 @@ export default {
           <div class="row mb-20">
             <div class="col span-6">
               <LabeledSelect
-                v-model="notebookType"
+                v-model:value="notebookType"
                 label="Type"
                 :options="notebookTypeOptions"
                 :disabled="!isCreate"
@@ -195,7 +195,7 @@ export default {
 
             <div class="col span-6">
               <LabeledSelect
-                v-model="container.image"
+                v-model:value="container.image"
                 label="Image"
                 :options="notebookImages"
                 required
@@ -229,7 +229,7 @@ export default {
               <div class="row">
                 <div class="col span-6">
                   <LabeledSelect
-                    v-model="spec.serviceType"
+                    v-model:value="spec.serviceType"
                     :mode="mode"
                     :options="svcOptions"
                     :label="t('workload.networking.networkMode.label')"
@@ -249,7 +249,7 @@ export default {
         >
           <!-- Resources and Limitations -->
           <ContainerResourceLimit
-            v-model="flatResources"
+            v-model:value="flatResources"
             :mode="mode"
             :runtime-classes="runtimeClasses"
             :pod-spec="podTemplateSpec"
@@ -264,7 +264,7 @@ export default {
           :weight="tabWeightMap['volumes']"
         >
           <Volume
-            v-model="spec"
+            v-model:value="spec"
             :namespace="value.metadata.namespace"
             :register-before-hook="registerBeforeHook"
             :mode="mode"

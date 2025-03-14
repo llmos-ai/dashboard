@@ -10,7 +10,8 @@ import metricPoller from '@shell/mixins/metric-poller';
 import { LLMOS, METRIC, NODE, POD } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
 import { GROUP_RESOURCES, mapPref } from '@shell/store/prefs';
-import { COLUMN_BREAKPOINTS } from '@shell/components/SortableTable/index.vue';
+// import { COLUMN_BREAKPOINTS } from '@shell/components/SortableTable/index.vue';
+import { COLUMN_BREAKPOINTS } from '@shell/types/store/type-map';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 
 export default {
@@ -69,7 +70,7 @@ export default {
     };
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     // Stop watching pods, nodes and node metrics
     if (this.canViewPods) {
       this.$store.dispatch('cluster/forgetType', POD);
@@ -145,7 +146,7 @@ export default {
     },
 
     toggleLabels(row) {
-      this.$set(row, 'displayLabels', !row.displayLabels);
+      row['displayLabels'] = !row.displayLabels;
     },
 
     // count GPUs by vendor
@@ -201,7 +202,6 @@ export default {
       :loading="loading"
       :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
       :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
-      v-on="$listeners"
     >
       <template #sub-row="{fullColspan, row, onRowMouseEnter, onRowMouseLeave}">
         <tr
@@ -217,8 +217,8 @@ export default {
               <span v-if="row.spec.taints && row.spec.taints.length">
                 {{ t('node.list.nodeTaint') }}:
                 <Tag
-                  v-for="taint in row.spec.taints"
-                  :key="taint.key + taint.value + taint.effect"
+                  v-for="(taint, i) in row.spec.taints"
+                  :key="i"
                   class="mr-5 mt-2"
                 >
                   {{ taint.key }}={{ taint.value }}:{{ taint.effect }}
@@ -277,7 +277,7 @@ export default {
                 class="gpu-device"
               >
                 <svg
-                  v-tooltip="getTooltipConfig(count)"
+                  v-clean-tooltip="getTooltipConfig(count)"
                   xmlns="http://www.w3.org/2000/svg"
                   width="5.1em"
                   height="1em"
@@ -291,7 +291,7 @@ export default {
               </span>
               <span v-else-if="vendor === 'AMD'">
                 <svg
-                  v-tooltip="getTooltipConfig(count)"
+                  v-clean-tooltip="getTooltipConfig(count)"
                   xmlns="http://www.w3.org/2000/svg"
                   width="4.17em"
                   height="1em"
@@ -302,7 +302,7 @@ export default {
               </span>
               <span v-else>
                 <svg
-                  v-tooltip="getTooltipConfig(count)"
+                  v-clean-tooltip="getTooltipConfig(count)"
                   xmlns="http://www.w3.org/2000/svg"
                   width="1em"
                   height="1em"

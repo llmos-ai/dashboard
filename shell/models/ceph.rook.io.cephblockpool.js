@@ -1,30 +1,32 @@
-import SteveModel from '@shell/plugins/steve/steve-class';
-import Vue from 'vue';
-import { set } from '@shell/utils/object';
+import SteveModel from "@shell/plugins/steve/steve-class";
+
+import { set } from "@shell/utils/object";
 
 export default class CephBlockPool extends SteveModel {
   applyDefaults() {
     const value = {
-      apiVersion: 'ceph.rook.io/v1',
-      kind:       'CephBlockPool',
-      metadata:   {
-        name:        '',
-        namespace:   'storage-system',
-        labels:      {},
+      apiVersion: "ceph.rook.io/v1",
+      kind: "CephBlockPool",
+      metadata: {
+        name: "",
+        namespace: "storage-system",
+        labels: {},
         annotations: {},
       },
       spec: {
-        failureDomain: 'host',
-        replicated:    { size: 3 },
+        failureDomain: "host",
+        replicated: { size: 3 },
       },
     };
 
-    Vue.set(this, 'metadata', value.metadata);
-    set(this, 'spec', this.spec || value.spec);
+    this["metadata"] = value.metadata;
+    set(this, "spec", this.spec || value.spec);
   }
 
   get isLLMOSRelease() {
-    return this.annotations?.['meta.helm.sh/release-name'] === 'llmos-ceph-cluster';
+    return (
+      this.annotations?.["meta.helm.sh/release-name"] === "llmos-ceph-cluster"
+    );
   }
 
   get canDelete() {

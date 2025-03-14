@@ -1,70 +1,66 @@
 <script lang="ts">
-import Vue from 'vue';
-import { nlToBr } from '@shell/utils/string';
-import { stringify } from '@shell/utils/error';
+import { defineComponent } from "vue";
+import { nlToBr } from "@shell/utils/string";
+import { stringify } from "@shell/utils/error";
 
-export default Vue.extend({
+export default defineComponent({
   props: {
     /**
      * A color class that represents the color of the banner.
      * @values primary, secondary, success, warning, error, info
      */
     color: {
-      type:    String,
-      default: 'secondary'
+      type: String,
+      default: "secondary",
     },
     /**
      * The label to display as the banner's default content.
      */
     label: {
-      type:    [String, Error, Object],
-      default: null
-    },
-    /**
-     * The inner HTML to display as the banner's default content.
-     */
-    innerHtml: {
-      type:    String,
-      default: null
+      type: [String, Error, Object],
+      default: null,
     },
     /**
      * The i18n key for the label to display as the banner's default content.
      */
     labelKey: {
-      type:    String,
-      default: null
+      type: String,
+      default: null,
     },
     /**
      * Add icon for the banner
      */
     icon: {
-      type:    String,
-      default: null
+      type: String,
+      default: null,
     },
     /**
      * Toggles the banner's close button.
      */
     closable: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     /**
      * Toggles the stacked class for the banner.
      */
     stacked: {
-      type:    Boolean,
-      default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
+  emits: ["close"],
   computed: {
     /**
      * Return message text as label.
      */
     messageLabel(): string | void {
-      return !(typeof this.label === 'string') ? stringify(this.label) : undefined;
-    }
+      return !(typeof this.label === "string")
+        ? stringify(this.label)
+        : undefined;
+    },
   },
-  methods: { nlToBr }
+  methods: { nlToBr },
 });
 </script>
 <template>
@@ -73,16 +69,10 @@ export default Vue.extend({
     :class="{
       [color]: true,
     }"
+    role="banner"
   >
-    <div
-      v-if="icon"
-      class="banner__icon"
-      data-testid="banner-icon"
-    >
-      <i
-        class="icon icon-2x"
-        :class="icon"
-      />
+    <div v-if="icon" class="banner__icon" data-testid="banner-icon">
+      <i class="icon icon-2x" :class="icon" />
     </div>
     <div
       class="banner__content"
@@ -90,36 +80,25 @@ export default Vue.extend({
       :class="{
         closable,
         stacked,
-        icon
+        icon,
       }"
     >
-      <!-- Use inner html -->
-      <div v-if="innerHtml">
-        <div v-html="innerHtml"></div>
-      </div>
-
-      <slot v-else>
-        <t
-          v-if="labelKey"
-          :k="labelKey"
-          :raw="true"
-        />
+      <slot>
+        <t v-if="labelKey" :k="labelKey" :raw="true" />
         <span v-else-if="messageLabel">{{ messageLabel }}</span>
-        <span
-          v-else
-          v-clean-html="nlToBr(label)"
-        />
+        <span v-else v-clean-html="nlToBr(label)" />
       </slot>
-
       <div
         v-if="closable"
         class="banner__content__closer"
+        tabindex="0"
+        role="button"
+        :aria-label="t('generic.close')"
         @click="$emit('close')"
+        @keyup.enter="$emit('close')"
+        @keyup.space="$emit('close')"
       >
-        <i
-          data-testid="banner-close"
-          class="icon icon-close closer-icon"
-        />
+        <i data-testid="banner-close" class="icon icon-close closer-icon" />
       </div>
     </div>
   </div>
@@ -238,6 +217,7 @@ $icon-size: 24px;
       width: $icon-size;
       line-height: $icon-size;
       text-align: center;
+      outline: none;
 
       .closer-icon {
         opacity: 0.7;
@@ -246,6 +226,11 @@ $icon-size: 24px;
           opacity: 1;
           color: var(--link);
         }
+      }
+
+      &:focus-visible i {
+        @include focus-outline;
+        outline-offset: 2px;
       }
     }
 

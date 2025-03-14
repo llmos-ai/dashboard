@@ -34,17 +34,17 @@ export default {
     const cmOptions = {
       mode: {
         name: 'javascript',
-        json: true
-      }
+        json: true,
+      },
     };
 
     return {
-      setting:        ALLOWED_SETTINGS[this.value.id],
-      description:    t(`advancedSettings.descriptions.${ this.value.id }`),
-      editHelp:       t(`advancedSettings.editHelp.${ this.value.id }`),
-      enumOptions:    [],
-      canReset:       false,
-      errors:         [],
+      setting: ALLOWED_SETTINGS[this.value.id],
+      description: t(`advancedSettings.descriptions.${this.value.id}`),
+      editHelp: t(`advancedSettings.editHelp.${this.value.id}`),
+      enumOptions: [],
+      canReset: false,
+      errors: [],
       fvFormRuleSets: [],
       cmOptions,
     };
@@ -52,7 +52,7 @@ export default {
 
   created() {
     if (this.value.value === undefined) {
-      this.$set(this.value, 'value', this.value.default);
+      this.value['value'] = this.value.default;
     }
     this.value.value = this.value.value || this.value.default;
     if (this.setting?.kind === 'json') {
@@ -61,16 +61,23 @@ export default {
       this.value.value = JSON.stringify(jsonVal, null, 2);
     }
 
-    this.enumOptions = this.setting?.kind === 'enum' ? this.setting.options.map((id) => ({
-      // i18n-uses advancedSettings.enum.*
-      label: `advancedSettings.enum.${ this.value.id }.${ id }`,
-      value: id,
-    })) : [];
+    this.enumOptions =
+      this.setting?.kind === 'enum'
+        ? this.setting.options.map((id) => ({
+            // i18n-uses advancedSettings.enum.*
+            label: `advancedSettings.enum.${this.value.id}.${id}`,
+            value: id,
+          }))
+        : [];
     this.canReset = this.setting?.canReset || !!this.value.default;
-    this.fvFormRuleSets = this.setting?.ruleSet ? [{
-      path:  'value',
-      rules: this.setting.ruleSet.map(({ name }) => name)
-    }] : [];
+    this.fvFormRuleSets = this.setting?.ruleSet
+      ? [
+          {
+            path: 'value',
+            rules: this.setting.ruleSet.map(({ name }) => name),
+          },
+        ]
+      : [];
 
     // Don't allow the user to reset the server URL if there is no default
     // helps to ensure that a value is always set
@@ -84,14 +91,17 @@ export default {
       const t = this.$store.getters['i18n/t'];
 
       // We map the setting rulesets to use values to define validation from factory
-      return this.setting?.ruleSet ? mapValues(
-        keyBy(this.setting.ruleSet, 'name'),
-        // The validation is curried and may require the factory argument for the ValidatorFactory
-        ({ key, name, factoryArg }) => {
-          const rule = formRulesGenerator(t, key ? { key } : {})[name];
+      return this.setting?.ruleSet
+        ? mapValues(
+            keyBy(this.setting.ruleSet, 'name'),
+            // The validation is curried and may require the factory argument for the ValidatorFactory
+            ({ key, name, factoryArg }) => {
+              const rule = formRulesGenerator(t, key ? { key } : {})[name];
 
-          return factoryArg ? rule(factoryArg) : rule;
-        }) : {};
+              return factoryArg ? rule(factoryArg) : rule;
+            }
+          )
+        : {};
     },
 
     showLocalhostWarning() {
@@ -104,12 +114,12 @@ export default {
 
     validationPassed() {
       return this.fvFormIsValid && this.fvGetPathErrors(['value']).length === 0;
-    }
+    },
   },
 
   methods: {
     convertToString(event) {
-      this.value.value = `${ event.target.value }`;
+      this.value.value = `${event.target.value}`;
     },
 
     saveSettings(done) {
@@ -150,7 +160,7 @@ export default {
     onInput(value) {
       this.value.value = value;
     },
-  }
+  },
 };
 </script>
 
@@ -164,36 +174,31 @@ export default {
     :subtypes="[]"
     :can-yaml="false"
     :validation-passed="validationPassed"
-    @error="e=>errors = e"
+    @error="(e) => (errors = e)"
     @finish="saveSettings"
     @cancel="done"
   >
     <Banner
       v-if="showWarningBanner"
       color="warning"
-      :label="t(`advancedSettings.warnings.${ setting.warning }`)"
+      :label="t(`advancedSettings.warnings.${setting.warning}`)"
       data-testid="advanced_settings_warning_banner"
     />
 
     <h4>{{ description }}</h4>
 
-    <h5
-      v-if="editHelp"
-      v-clean-html="editHelp"
-      class="edit-help"
-    />
+    <h5 v-if="editHelp" v-clean-html="editHelp" class="edit-help" />
 
     <div class="edit-change mt-20">
       <h5 v-t="'advancedSettings.edit.changeSetting'" />
-      <button
+      <a-button
         data-testid="advanced_settings_use_default"
         :disabled="!canReset"
-        type="button"
-        class="btn role-primary"
+        type="primary"
         @click="useDefault"
       >
         {{ t('advancedSettings.edit.useDefault') }}
-      </button>
+      </a-button>
     </div>
 
     <Banner
@@ -214,7 +219,7 @@ export default {
     <div class="mt-20">
       <div v-if="setting.kind === 'enum'">
         <LabeledSelect
-          v-model="value.value"
+          v-model:value="value.value"
           data-testid="input-setting-enum"
           :label="t('advancedSettings.edit.value')"
           :rules="fvGetAndReportPathRules('value')"
@@ -226,17 +231,20 @@ export default {
       </div>
       <div v-else-if="setting.kind === 'boolean'">
         <RadioGroup
-          v-model="value.value"
+          v-model:value="value.value"
           data-testid="input-setting-boolean"
           name="settings_value"
           :rules="fvGetAndReportPathRules('value')"
-          :labels="[t('advancedSettings.edit.trueOption'), t('advancedSettings.edit.falseOption')]"
+          :labels="[
+            t('advancedSettings.edit.trueOption'),
+            t('advancedSettings.edit.falseOption'),
+          ]"
           :options="['true', 'false']"
         />
       </div>
       <div v-else-if="setting.kind === 'multiline'">
         <TextAreaAutoGrow
-          v-model="value.value"
+          v-model:value="value.value"
           data-testid="input-setting-json"
           :required="true"
           :rules="fvGetAndReportPathRules('value')"
@@ -253,7 +261,7 @@ export default {
       </div>
       <div v-else-if="setting.kind === 'integer'">
         <LabeledInput
-          v-model="value.value"
+          v-model:value="value.value"
           data-testid="input-setting-integer"
           :label="t('advancedSettings.edit.value')"
           :mode="mode"
@@ -264,7 +272,7 @@ export default {
       </div>
       <div v-else>
         <LabeledInput
-          v-model="value.value"
+          v-model:value="value.value"
           data-testid="input-setting-generic"
           :localized-label="true"
           :required="true"
@@ -287,7 +295,7 @@ export default {
   }
 }
 
-::v-deep .edit-help code {
+:deep() .edit-help code {
   padding: 1px 5px;
 }
 </style>

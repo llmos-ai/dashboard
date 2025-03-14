@@ -1,5 +1,5 @@
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 interface Badge {
   stateBackground: string;
@@ -11,7 +11,7 @@ interface Badge {
  * <p>Represents a badge whose label and color is either taken from the value property or
  * from the label and color properties. The state property takes precedence.</p>
  */
-export default Vue.extend({
+export default defineComponent({
   props: {
     /**
      * A value having the properties `stateBackground` and `stateDisplay`
@@ -59,7 +59,7 @@ export default Vue.extend({
 </script>
 
 <template>
-  <span :class="{'badge-state': true, [bg]: true}">
+  <span :class="['badge-state', bg]">
     <i
       v-if="icon"
       class="icon"
@@ -77,7 +77,7 @@ export default Vue.extend({
     border-radius: 20px;
 
     &.bg-info {
-      border-color: var(--primary);
+      border-color: var(--info);
     }
 
     &.bg-error {
@@ -93,6 +93,13 @@ export default Vue.extend({
       color: var(--success);
       background: transparent;
       border-color: var(--success);
+    }
+
+    // Added badge-disabled instead of bg-disabled since bg-disabled is used in other places with !important styling, an investigation is needed to make the naming consistent
+    &.badge-disabled {
+      color: var(--badge-state-disabled-text);
+      background-color: var( --badge-state-disabled-bg);
+      border: 1px solid var(--badge-state-disabled-border);
     }
   }
 </style>

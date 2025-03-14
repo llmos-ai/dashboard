@@ -125,7 +125,7 @@ export default {
     <div>
       <div class="create-resource-container">
         <div class="subtypes-container">
-          <nuxt-link
+          <router-link
             v-for="fel in externalLinks"
             :key="fel.label"
             v-clean-tooltip="
@@ -162,7 +162,7 @@ export default {
                 </span>
               </div>
             </div>
-          </nuxt-link>
+          </router-link>
         </div>
       </div>
     </div>

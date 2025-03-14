@@ -1,7 +1,6 @@
 <script>
 import AsyncButton from '@shell/components/AsyncButton';
 import day from 'dayjs';
-import { Card } from '@components/Card';
 import { exceptionToErrorsArray } from '@shell/utils/error';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { Banner } from '@components/Banner';
@@ -17,7 +16,7 @@ const HIDE = [
   'metadata.labels.pod-template-hash',
   'spec.selector.matchLabels.pod-template-hash',
   'spec.template.metadata.labels.pod-template-hash',
-  'metadata.fields'
+  'metadata.fields',
 ];
 
 const REMOVE = [...ACTIVELY_REMOVE, ...NEVER_ADD, ...HIDE];
@@ -38,18 +37,18 @@ export default {
   },
   props: {
     workload: {
-      type:     Object,
-      required: true
-    }
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
-      errors:           [],
+      errors: [],
       selectedRevision: null,
-      currentRevision:  null,
-      revisions:        [],
-      editorMode:       EDITOR_MODES.DIFF_CODE,
-      showDiff:         false,
+      currentRevision: null,
+      revisions: [],
+      editorMode: EDITOR_MODES.DIFF_CODE,
+      showDiff: false,
     };
   },
   computed: {
@@ -65,7 +64,9 @@ export default {
       return this.workload.kind.toLowerCase();
     },
     revisionsType() {
-      return this.workloadType === 'deployment' ? WORKLOAD_TYPES.REPLICA_SET : 'apps.controllerrevision';
+      return this.workloadType === 'deployment'
+        ? WORKLOAD_TYPES.REPLICA_SET
+        : 'apps.controllerrevision';
     },
     selectedRevisionId() {
       return this.selectedRevision.id;
@@ -74,47 +75,57 @@ export default {
       return this.sanitizeYaml(this.selectedRevision);
     },
     timeFormatStr() {
-      const dateFormat = escapeHtml( this.$store.getters['prefs/get'](DATE_FORMAT));
-      const timeFormat = escapeHtml( this.$store.getters['prefs/get'](TIME_FORMAT));
+      const dateFormat = escapeHtml(
+        this.$store.getters['prefs/get'](DATE_FORMAT)
+      );
+      const timeFormat = escapeHtml(
+        this.$store.getters['prefs/get'](TIME_FORMAT)
+      );
 
-      return `${ dateFormat }, ${ timeFormat }`;
+      return `${dateFormat}, ${timeFormat}`;
     },
   },
   fetch() {
     // Fetch revisions of the current workload
-    this.$store.dispatch('cluster/findAll', { type: this.revisionsType })
-      .then(( response ) => {
+    this.$store
+      .dispatch('cluster/findAll', { type: this.revisionsType })
+      .then((response) => {
         const allRevisions = response;
 
-        const hasRelationshipWithCurrentWorkload = ( replicaSet ) => {
+        const hasRelationshipWithCurrentWorkload = (replicaSet) => {
           const relationshipsOfReplicaSet = replicaSet.metadata.relationships;
 
-          const revisionsOfCurrentWorkload = relationshipsOfReplicaSet.filter(( relationship ) => {
-            const isRevisionOfCurrentWorkload = relationship.fromId && relationship.fromId === `${ this.workloadNamespace }/${ this.workloadName }`;
+          const revisionsOfCurrentWorkload = relationshipsOfReplicaSet.filter(
+            (relationship) => {
+              const isRevisionOfCurrentWorkload =
+                relationship.fromId &&
+                relationship.fromId ===
+                  `${this.workloadNamespace}/${this.workloadName}`;
 
-            return isRevisionOfCurrentWorkload;
-          });
+              return isRevisionOfCurrentWorkload;
+            }
+          );
 
           return revisionsOfCurrentWorkload.length > 0;
         };
 
-        const workloadRevisions = allRevisions.filter(( replicaSet ) => {
-          return hasRelationshipWithCurrentWorkload( replicaSet );
+        const workloadRevisions = allRevisions.filter((replicaSet) => {
+          return hasRelationshipWithCurrentWorkload(replicaSet);
         });
 
         const revisionOptions = workloadRevisions
-          .map( (revision ) => {
+          .map((revision) => {
             if (this.isCurrentRevision(revision)) {
               this.currentRevision = revision;
             }
 
-            return this.buildRevisionOption( revision );
+            return this.buildRevisionOption(revision);
           })
           .sort((a, b) => b.revisionNumber - a.revisionNumber);
 
         this.revisions = revisionOptions;
       })
-      .catch(( err ) => {
+      .catch((err) => {
         this.errors = exceptionToErrorsArray(err);
       });
   },
@@ -124,7 +135,11 @@ export default {
     },
     async save() {
       try {
-        await this.workload.rollBack(this.currentCluster, this.workload, this.selectedRevision);
+        await this.workload.rollBack(
+          this.currentCluster,
+          this.workload,
+          this.selectedRevision
+        );
         this.close();
       } catch (err) {
         this.errors = exceptionToErrorsArray(err);
@@ -133,7 +148,7 @@ export default {
     isCurrentRevision(revision) {
       return revision.revisionNumber === this.workload.currentRevisionNumber;
     },
-    buildRevisionOption( revision ) {
+    buildRevisionOption(revision) {
       const { revisionNumber } = revision;
       const isCurrentRevision = this.isCurrentRevision(revision);
       const now = day();
@@ -141,22 +156,24 @@ export default {
       const createdDateFormatted = createdDate.format(this.timeFormatStr);
 
       const revisionAgeObject = diffFrom(createdDate, now, this.t);
-      const revisionAge = `${ createdDateFormatted }, ${ revisionAgeObject.label }`;
-      const units = this.t(revisionAgeObject.unitsKey, { count: revisionAgeObject.label });
+      const revisionAge = `${createdDateFormatted}, ${revisionAgeObject.label}`;
+      const units = this.t(revisionAgeObject.unitsKey, {
+        count: revisionAgeObject.label,
+      });
       const currentLabel = this.t('promptRollback.currentLabel');
 
       const optionLabel = this.t('promptRollback.revisionOption', {
         revisionNumber,
         revisionAge,
         units,
-        currentLabel: isCurrentRevision ? currentLabel : ''
+        currentLabel: isCurrentRevision ? currentLabel : '',
       });
 
       return {
-        label:    optionLabel,
-        value:    revision,
+        label: optionLabel,
+        value: revision,
         disabled: isCurrentRevision,
-        revisionNumber
+        revisionNumber,
       };
     },
     getOptionLabel(option) {
@@ -178,7 +195,7 @@ export default {
       }
 
       Object.keys(obj).forEach((key) => {
-        const keyPath = !path ? key : `${ path }.${ key }`;
+        const keyPath = !path ? key : `${path}.${key}`;
 
         if (!REMOVE_KEYS[keyPath]) {
           res[key] = obj[key];
@@ -190,26 +207,17 @@ export default {
       });
 
       return res;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
-  <Card
-    class="prompt-rollback"
-    :show-highlight-border="false"
-  >
-    <h4
-      slot="title"
-      class="text-default-text"
-    >
+  <Card class="prompt-rollback" :show-highlight-border="false">
+    <h4 slot="title" class="text-default-text">
       {{ t('promptRollback.modalTitle', { workloadName }, true) }}
     </h4>
-    <div
-      slot="body"
-      class="pl-10 pr-10 "
-    >
+    <div slot="body" class="pl-10 pr-10">
       <Banner
         v-if="revisions.length === 1"
         color="info"
@@ -217,7 +225,7 @@ export default {
       />
       <form>
         <LabeledSelect
-          v-model="selectedRevision"
+          v-model:value="selectedRevision"
           class="provider"
           :label="t('promptRollback.dropdownTitle')"
           :placeholder="t('promptRollback.placeholder')"
@@ -235,31 +243,32 @@ export default {
       <YamlEditor
         v-if="selectedRevision && showDiff"
         :key="selectedRevisionId"
-        v-model="sanitizedSelectedRevision"
+        v-model:value="sanitizedSelectedRevision"
         :initial-yaml-values="sanitizeYaml(currentRevision)"
-        class="mt-10 "
+        class="mt-10"
         :editor-mode="editorMode"
         :as-object="true"
       />
     </div>
-    <div
-      slot="actions"
-      class="buttons "
-    >
+    <div slot="actions" class="buttons">
       <div class="left">
         <button
           :disabled="!selectedRevision"
           class="btn role-secondary diff"
-          @click="showDiff = !showDiff; sizeDialog()"
+          @click="
+            showDiff = !showDiff;
+            sizeDialog();
+          "
         >
-          {{ showDiff ? t('resourceYaml.buttons.hideDiff') : t('resourceYaml.buttons.diff') }}
+          {{
+            showDiff
+              ? t('resourceYaml.buttons.hideDiff')
+              : t('resourceYaml.buttons.diff')
+          }}
         </button>
       </div>
       <div class="right">
-        <button
-          class="btn role-secondary mr-10"
-          @click="close"
-        >
+        <button class="btn role-secondary mr-10" @click="close">
           {{ t('generic.cancel') }}
         </button>
         <AsyncButton
@@ -273,12 +282,11 @@ export default {
     </div>
   </Card>
 </template>
-<style lang='scss' scoped>
-
+<style lang="scss" scoped>
 .prompt-rollback {
   margin: 0;
 
-  & ::v-deep .card-actions {
+  & :deep() .card-actions {
     display: grid;
   }
 }
@@ -286,7 +294,7 @@ export default {
 .yaml-editor {
   max-height: 70vh;
 
-  & ::v-deep.root {
+  & :deep().root {
     max-height: 65vh;
   }
 }
@@ -301,9 +309,8 @@ export default {
   }
 }
 
-::v-deep .card-body {
+:deep() .card-body {
   max-height: calc(95vh - 135px);
   overflow: hidden;
 }
-
 </style>

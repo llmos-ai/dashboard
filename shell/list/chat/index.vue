@@ -1,231 +1,126 @@
-<script>
-import { modelStreamJson } from '@shell/utils/stream';
+<script setup>
+import { useStore } from 'vuex';
+import { ref, computed, useTemplateRef, watch } from 'vue';
 
-import Header from './component/header.vue';
-import ModelDescription from './component/ModelDescription.vue';
-import ModelConfig from './component/ModelConfig.vue';
-import CompareModel from './component/CompareModel.vue';
-import ChatInput from './component/ChatInput.vue';
+import { ML_WORKLOAD_TYPES } from '@shell/config/types';
+import useAutoScrollWithControl from '@shell/composables/useAutoScrollWithControl';
 
-import StreamContent from '@shell/components/StreamContent.vue';
+import { ModelParamConfig } from '@shell/config/constants';
+import { matchModelString } from '@shell/utils/ai-model';
 
-export default {
-  components: {
-    ChatInput, Header, StreamContent, ModelDescription, ModelConfig, CompareModel,
-  },
+import ChatFlex from '@shell/components/ChatFlex.vue';
+import Header from './components/header.vue';
+import ModelDescription from './components/ModelDescription.vue';
+import CompareModel from './components/CompareModel.vue';
+import ChatInput from './components/ChatInput.vue';
+import StreamContent from './components/StreamContent.vue';
+import useChat from './composables/useChat';
 
-  data() {
-    const chatTypeOptions = [
-      {
-        label: '对话',
-        value: 'chat',
-      },
-      {
-        label: '模型比较',
-        value: 'compare',
-      },
-    ];
+const store = useStore();
 
-    const modalOptions = [
-      {
-        label: 'deepseek-r1',
-        value: 'deepseek-r1',
-      },
-      {
-        label: 'chatgpt-01',
-        value: 'chatgpt-01',
-      },
-      {
-        label: 'deepseek-r2',
-        value: 'deepseek-r2',
-      }
-    ];
-
-    return {
-      postBody: {
-        model:            'deepseek-chat',
-        thinking_enabled: true,
-        stream:           true,
-        stream_options:   { include_usage: true },
-        temperature:      1,
-        top_p:            1,
-        seed:             null,
-      },
-      messages:  [],
-      chatTypeOptions,
-      chatType:  'compare',
-      direction: 'rtl',
-      modalName: 'deepseek',
-      modalOptions,
-      config:    {
-        seed:        null,
-        stop:        null,
-        temperature: 1,
-        top_p:       1,
-        max_tokens:  4090
-      },
-      question:  '',
-      isLoading: false
-    };
-  },
-
-  computed: {
-    isChatType() {
-      return this.chatType === 'chat';
-    }
-  },
-
-  methods: {
-    changeChatType(value) {
-      this.chatType = value;
-    },
-
-    async fetchStreamData(prefixCallback, callback, endCallback) {
-      const jsonString = JSON.stringify({
-        ...this.postBody,
-        messages: this.messages
-      });
-
-      if (prefixCallback) {
-        prefixCallback();
-      }
-
-      const response = await modelStreamJson('https://api.deepseek.com/chat/completions', {
-        method:  'POST',
-        headers: {
-          Authorization:  'Bearer sk-6070b868bc004dc6a54057b597895431',
-          'Content-Type': 'application/json',
-        },
-        body: jsonString,
-      }).finally(() => {
-        endCallback();
-      });
-
-      const reader = response;
-      const decoder = new TextDecoder();
-
-      let done = false;
-
-      while (!done) {
-        const { value, done: readerDone } = await reader.read();
-
-        done = readerDone;
-
-        const text = decoder.decode(value, { stream: true });
-
-        const lines = text.split('\n');
-
-        for (const line of lines) {
-          try {
-            const cleanedLine = line.replace(/^data: /, '');
-            const parsed = JSON.parse(cleanedLine);
-            const content = parsed.choices[0]?.delta?.content;
-
-            if (content) {
-              callback(content);
-            }
-          } catch (error) {
-          }
-        }
-      }
-    },
-
-    send(question) {
-      this.isLoading = true;
-
-      this.messages.push({
-        role:    'user',
-        content: question
-      });
-      this.question = '';
-      this.fetchStreamData(this.prefixCallback, this.callback, this.endCallback);
-    },
-
-    prefixCallback() {
-      this.messages.push({
-        role:    'assistant',
-        content: ''
-      });
-    },
-    callback(suffix) {
-      const lastMessage = this.messages[this.messages.length - 1];
-      const content = lastMessage.content + suffix;
-
-      this.messages.splice(this.messages.length - 1, 1, {
-        role: 'assistant',
-        content
-      });
-    },
-    endCallback() {
-      this.isLoading = false;
-    },
-
-    showConfigDialog() {
-      this.$refs.modalRef.show();
-    },
-
-    changeConfig(value) {
-      this.postBody = JSON.stringify(value);
-    },
-
-    changeQuestion(text) {
-      console.log('🚀 ~ changeQuestion ~ text:', text);
-      this.question = text;
-    }
-  },
+const loadFetch = async () => {
+  await store.dispatch('cluster/findAll', {
+    type: ML_WORKLOAD_TYPES.MODEL_SERVICE,
+  });
 };
+loadFetch();
+
+const config = ref({
+  ...ModelParamConfig,
+});
+
+const url = ref('');
+const question = ref('');
+const copyQuestion = ref('');
+
+const chatType = ref('chat');
+const isChatType = computed(() => chatType.value === 'chat');
+
+const compareRef = useTemplateRef('compareRef');
+
+const { send, messages, loading } = useChat(url, config, copyQuestion);
+
+const scrollContainer = useTemplateRef('scrollContainer');
+const observerTarget = useTemplateRef('observerTarget');
+
+// TODO: enhancement scroll
+useAutoScrollWithControl(scrollContainer, observerTarget);
+
+const submit = (_question, fileList) => {
+  // We should copy the value of question, because ChatInput needs to be empty.
+  copyQuestion.value = question.value;
+  question.value = '';
+
+  if (isChatType.value) {
+    send(_question, fileList);
+  } else {
+    compareRef.value.handleSend(_question, fileList);
+  }
+};
+
+const model = ref('');
+const updateModel = (_model) => {
+  url.value = _model.modelApi;
+  model.value = _model;
+};
+
+const icon = ref('');
+const modelDisplayName = ref('');
+watch(model, () => {
+  if (model.value) {
+    modelDisplayName.value = model.value.modelName;
+    icon.value = matchModelString(modelDisplayName.value);
+  }
+});
 </script>
 
 <template>
+  <Header v-model:type="chatType" />
+
   <div class="wrapper">
-    <Header
-      :option="chatType"
-      @changeChatType="changeChatType"
+    <ModelDescription
+      :name="modelDisplayName"
+      :icon="icon"
+      v-model:config="config"
+      @update:model="updateModel"
+      v-if="isChatType"
     />
 
-    <div
-      v-if="isChatType"
-      class="chat-stream"
-    >
-      <ModelDescription
-        @showConfigDialog="showConfigDialog"
-      />
-
-      <div
-        v-for="message in messages"
-        :key="message.content"
+    <a-row class="chat-stream mb-10" justify="center">
+      <a-col
+        :md="22"
+        :lg="20"
+        :xl="16"
+        :xxl="12"
+        v-if="isChatType"
+        class="h-full"
       >
-        <StreamContent
-          :message="message"
-        />
-      </div>
-    </div>
+        <div class="overflow-y-scroll hide-scrollbar h-full">
+          <ChatFlex>
+            <StreamContent
+              v-for="(message, i) in messages.slice().reverse()"
+              :key="i"
+              :message="message"
+            />
+          </ChatFlex>
+        </div>
+      </a-col>
 
-    <div
-      v-else
-      class="chat-stream"
-    >
-      <CompareModel />
-    </div>
+      <a-col
+        v-else
+        :md="22"
+        :lg="22"
+        :xl="22"
+        :xxl="18"
+        class="h-full overflow-hidden"
+      >
+        <CompareModel ref="compareRef" :question="copyQuestion" />
+      </a-col>
+    </a-row>
 
     <div class="footer">
-      <ChatInput
-        class="mb-10"
-        :text="question"
-        :loading="isLoading"
-        @handleQuestion="send"
-        @input="changeQuestion"
-      />
-      <p class="text-center">
-        试用体验内容均由人工智能模型生成，不代表平台立场{{ question }}
-      </p>
+      <ChatInput v-model="question" :loading="loading" @submit="submit" />
     </div>
-
-    <ModelConfig
-      ref="modalRef"
-      :config="config"
-      @changeConfig="changeConfig"
-    />
   </div>
 </template>
 
@@ -238,13 +133,10 @@ export default {
 
   .chat-stream {
     display: flex;
-    overflow: hidden;
-    flex-direction: column;
     flex-grow: 1;
     height: calc(300px);
     scroll-behavior: smooth;
-      scrollbar-width: none;
-      overflow-y: scroll;
+    overflow: hiddle;
   }
 }
 </style>

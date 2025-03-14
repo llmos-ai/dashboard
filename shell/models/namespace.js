@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import SYSTEM_NAMESPACES from '@shell/config/system-namespaces';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { PROJECT, SYSTEM_NAMESPACE, RESOURCE_QUOTA } from '@shell/config/labels-annotations';
@@ -91,7 +90,7 @@ export default class Namespace extends SteveModel {
   }
 
   set resourceQuota(value) {
-    Vue.set(this.metadata.annotations, RESOURCE_QUOTA, JSON.stringify(value));
+    this.metadata.annotations[RESOURCE_QUOTA] = JSON.stringify(value);
   }
 
   get detailTopTooltips() {

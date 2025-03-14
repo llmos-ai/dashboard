@@ -16,8 +16,7 @@ export default {
   },
   data() {
     if (this.mode === _CREATE) {
-      this.$set(this.value, 'parameters', {
-        clusterID:                                               'storage-system',
+      this.value['parameters'] = {clusterID:                                               'storage-system',
         fsName:                                                  null,
         pool:                                                    null,
         'csi.storage.k8s.io/controller-expand-secret-name':      'rook-csi-cephfs-provisioner',
@@ -26,8 +25,7 @@ export default {
         'csi.storage.k8s.io/node-stage-secret-name':             'rook-csi-cephfs-node',
         'csi.storage.k8s.io/node-stage-secret-namespace':        'storage-system',
         'csi.storage.k8s.io/provisioner-secret-name':            'rook-csi-cephfs-provisioner',
-        'csi.storage.k8s.io/provisioner-secret-namespace':       'storage-system',
-      });
+        'csi.storage.k8s.io/provisioner-secret-namespace':       'storage-system',};
     }
 
     return {};
@@ -36,7 +34,7 @@ export default {
 </script>
 <template>
   <KeyValue
-    v-model="value.parameters"
+    v-model:value="value.parameters"
     :add-label="t('storageClass.longhorn.addLabel')"
     :read-allowed="false"
     :mode="mode"

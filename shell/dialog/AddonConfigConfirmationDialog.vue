@@ -1,6 +1,5 @@
 <script>
 import AsyncButton from '@shell/components/AsyncButton';
-import { Card } from '@components/Card';
 
 export default {
   components: {
@@ -9,13 +8,13 @@ export default {
   },
   props: {
     resources: {
-      type:     Array,
-      required: true
+      type: Array,
+      required: true,
     },
     registerBackgroundClosing: {
-      type:     Function,
-      required: true
-    }
+      type: Function,
+      required: true,
+    },
   },
   created() {
     this.registerBackgroundClosing(this.closing);
@@ -39,20 +38,14 @@ export default {
 
     apply(buttonDone) {
       this.continue(true);
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
-  <Card
-    class="prompt-restore"
-    :show-highlight-border="false"
-  >
-    <h4
-      slot="title"
-      class="text-default-text"
-    >
+  <Card class="prompt-restore" :show-highlight-border="false">
+    <h4 slot="title" class="text-default-text">
       {{ t('addonConfigConfirmation.title') }}
     </h4>
 
@@ -62,27 +55,17 @@ export default {
       </slot>
     </template>
 
-    <div
-      slot="actions"
-      class="bottom"
-    >
+    <div slot="actions" class="bottom">
       <div class="buttons">
-        <button
-          type="button"
-          class="btn role-secondary mr-10"
-          @click="close"
-        >
+        <button type="button" class="btn role-secondary mr-10" @click="close">
           {{ t('generic.cancel') }}
         </button>
-        <AsyncButton
-          mode="continue"
-          @click="apply"
-        />
+        <AsyncButton mode="continue" @click="apply" />
       </div>
     </div>
   </Card>
 </template>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .prompt-restore {
   margin: 0;
 }

@@ -5,94 +5,106 @@ import { removeAt } from '@shell/utils/array';
 import { TextAreaAutoGrow } from '@components/Form/TextArea';
 import { clone } from '@shell/utils/object';
 import { LabeledInput } from '@components/Form/LabeledInput';
-const DEFAULT_PROTIP = 'Tip: Paste lines into any list field for easy bulk entry';
+const DEFAULT_PROTIP =
+  'Tip: Paste lines into any list field for easy bulk entry';
 
 export default {
+  emits: ['add', 'remove', 'update:value'],
+
   components: { TextAreaAutoGrow, LabeledInput },
-  props:      {
+  props: {
     value: {
-      type:    Array,
+      type: Array,
       default: null,
     },
     mode: {
-      type:    String,
+      type: String,
       default: _EDIT,
     },
     initialEmptyRow: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
     title: {
-      type:    String,
-      default: ''
+      type: String,
+      default: '',
     },
     protip: {
-      type:    [String, Boolean],
+      type: [String, Boolean],
       default: DEFAULT_PROTIP,
     },
     showHeader: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
     valueLabel: {
-      type:    String,
+      type: String,
       default: 'Value',
     },
     valuePlaceholder: {
-      type:    String,
-      default: 'e.g. bar'
+      type: String,
+      default: 'e.g. bar',
     },
     valueMultiline: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
+    },
+    addIcon: {
+      type: String,
+      default: '',
     },
     addLabel: {
       type: String,
-      default() {
-        return this.$store.getters['i18n/t']('generic.add');
-      },
+      default: '',
     },
     addAllowed: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
+    },
+    addDisabled: {
+      type: Boolean,
+      default: false,
     },
     removeLabel: {
       type: String,
-      default() {
-        return this.$store.getters['i18n/t']('generic.remove');
-      },
+      default: '',
     },
     removeAllowed: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
     },
     defaultAddValue: {
-      type:    [String, Number, Object, Array],
-      default: ''
+      type: [String, Number, Object, Array],
+      default: '',
     },
     loading: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
     disabled: {
-      type:    Boolean,
+      type: Boolean,
+      default: false,
+    },
+    required: {
+      type: Boolean,
       default: false,
     },
     rules: {
-      default:   () => [],
-      type:      Array,
+      default: () => [],
+      type: Array,
       // we only want functions in the rules array
-      validator: (rules) => rules.every((rule) => ['function'].includes(typeof rule))
-    }
+      validator: (rules) =>
+        rules.every((rule) => ['function'].includes(typeof rule)),
+    },
   },
   data() {
-    const input = (this.value || []).slice();
+    const input = (Array.isArray(this.value) ? this.value : []).slice();
     const rows = [];
 
-    for ( const value of input ) {
+    for (const value of input) {
       rows.push({ value });
     }
-    if ( !rows.length && this.initialEmptyRow ) {
+    if (!rows.length && this.initialEmptyRow) {
       const value = this.defaultAddValue ? clone(this.defaultAddValue) : '';
 
       rows.push({ value });
@@ -101,11 +113,21 @@ export default {
     return { rows, lastUpdateWasFromValue: false };
   },
   computed: {
+    _addLabel() {
+      return this.addLabel || this.t('generic.add');
+    },
+    _removeLabel() {
+      return this.removeLabel || this.t('generic.remove');
+    },
+
     isView() {
       return this.mode === _VIEW;
     },
     showAdd() {
       return this.addAllowed;
+    },
+    disableAdd() {
+      return this.addDisabled;
     },
     showRemove() {
       return this.removeAllowed;
@@ -119,13 +141,17 @@ export default {
       }
 
       return !this.valueMultiline && this.protip;
-    }
+    },
   },
   watch: {
-    value() {
-      this.lastUpdateWasFromValue = true;
-      this.rows = (this.value || []).map((v) => ({ value: v }));
+    value: {
+      deep: true,
+      handler() {
+        this.lastUpdateWasFromValue = true;
+        this.rows = (this.value || []).map((v) => ({ value: v }));
+      },
     },
+
     rows: {
       deep: true,
       handler(newValue, oldValue) {
@@ -135,8 +161,8 @@ export default {
           this.queueUpdate();
         }
         this.lastUpdateWasFromValue = false;
-      }
-    }
+      },
+    },
   },
   created() {
     this.queueUpdate = debounce(this.update, 50);
@@ -150,7 +176,7 @@ export default {
       this.$nextTick(() => {
         const inputs = this.$refs.value;
 
-        if ( inputs && inputs.length > 0 ) {
+        if (inputs && inputs.length > 0) {
           inputs[inputs.length - 1].focus();
         }
         this.$emit('add');
@@ -169,20 +195,20 @@ export default {
      * Cleanup rows and emit input
      */
     update() {
-      if ( this.isView ) {
+      if (this.isView) {
         return;
       }
       const out = [];
 
-      for ( const row of this.rows ) {
-        const trim = !this.valueMultiline && (typeof row.value === 'string');
+      for (const row of this.rows) {
+        const trim = !this.valueMultiline && typeof row.value === 'string';
         const value = trim ? row.value.trim() : row.value;
 
-        if ( typeof value !== 'undefined' ) {
+        if (typeof value !== 'undefined') {
           out.push(value);
         }
       }
-      this.$emit('input', out);
+      this.$emit('update:value', out);
     },
 
     /**
@@ -204,20 +230,18 @@ export default {
       }
 
       this.update();
-    }
+    },
   },
 };
 </script>
 
 <template>
   <div>
-    <div
-      v-if="title"
-      class="clearfix"
-    >
+    <div v-if="title" class="clearfix">
       <slot name="title">
         <h3>
           {{ title }}
+          <span v-if="required" class="required">*</span>
           <i
             v-if="showProtip"
             v-clean-tooltip="protip"
@@ -238,7 +262,7 @@ export default {
       <div
         v-for="(row, idx) in rows"
         :key="idx"
-        :data-testid="`array-list-box${ idx }`"
+        :data-testid="`array-list-box${idx}`"
         class="box"
       >
         <slot
@@ -261,121 +285,115 @@ export default {
               <TextAreaAutoGrow
                 v-if="valueMultiline"
                 ref="value"
-                v-model="row.value"
+                v-model:value="row.value"
                 :data-testid="`textarea-${idx}`"
                 :placeholder="valuePlaceholder"
                 :mode="mode"
                 :disabled="disabled"
                 @paste="onPaste(idx, $event)"
-                @input="queueUpdate"
+                @update:value="queueUpdate"
               />
               <LabeledInput
                 v-else-if="rules.length > 0"
                 ref="value"
-                v-model="row.value"
+                v-model:value="row.value"
                 :data-testid="`labeled-input-${idx}`"
                 :placeholder="valuePlaceholder"
                 :disabled="isView || disabled"
                 :rules="rules"
                 :compact="false"
                 @paste="onPaste(idx, $event)"
-                @input="queueUpdate"
+                @update:value="queueUpdate"
               />
-              <input
+              <a-input
                 v-else
                 ref="value"
-                v-model="row.value"
+                v-model:value="row.value"
                 :data-testid="`input-${idx}`"
                 :placeholder="valuePlaceholder"
                 :disabled="isView || disabled"
                 @paste="onPaste(idx, $event)"
-                @input="queueUpdate"
-              >
+              />
             </slot>
           </div>
         </slot>
-        <div
-          v-if="showRemove"
-          class="remove"
-        >
+        <div v-if="showRemove" class="remove">
           <slot
             name="remove-button"
             :remove="() => remove(row, idx)"
             :i="idx"
             :row="row"
           >
-            <button
-              type="button"
+            <a-button
+              type="link"
               :disabled="isView"
-              class="btn role-link"
               :data-testid="`remove-item-${idx}`"
               @click="remove(row, idx)"
             >
-              {{ removeLabel }}
-            </button>
+              {{ _removeLabel }}
+            </a-button>
           </slot>
         </div>
       </div>
     </template>
-    <div
-      v-else-if="mode==='view'"
-      class="text-muted"
-    >
-      &mdash;
-    </div>
     <div v-else>
-      <slot name="empty" />
+      <slot name="empty">
+        <div v-if="mode === 'view'" class="text-muted">&mdash;</div>
+      </slot>
     </div>
-    <div
-      v-if="showAdd && !isView"
-      class="footer"
-    >
-      <slot
-        v-if="showAdd"
-        name="add"
-        :add="add"
-      >
-        <button
-          type="button"
-          class="btn role-tertiary add"
-          :disabled="loading"
+    <div v-if="showAdd && !isView" class="footer mt-20">
+      <slot v-if="showAdd" name="add" :add="add">
+        <a-button
+          class="add"
+          :disabled="loading || disableAdd"
           data-testid="array-list-button"
           @click="add()"
         >
           <i
-            v-if="loading"
-            class="mr-5 icon icon-spinner icon-spin icon-lg"
+            class="mr-5 icon"
+            :class="
+              loading ? ['icon-lg', 'icon-spinner', 'icon-spin'] : [addIcon]
+            "
           />
-          {{ addLabel }}
-        </button>
+          {{ _addLabel }}
+        </a-button>
       </slot>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-  .title {
-    margin-bottom: 10px;
-  }
-  .box {
-    display: grid;
-    grid-template-columns: auto $array-list-remove-margin;
-    align-items: center;
-    margin-bottom: 10px;
-    .value {
-      flex: 1;
-      INPUT {
-        height: $input-height;
-      }
+.title {
+  margin-bottom: 10px;
+}
+
+.required {
+  color: var(--error);
+}
+
+.box {
+  display: grid;
+  grid-template-columns: auto $array-list-remove-margin;
+  align-items: center;
+  margin-bottom: 10px;
+  .value {
+    flex: 1;
+    INPUT {
+      height: $unlabeled-input-height;
     }
   }
-  .remove {
-    text-align: right;
+}
+.remove {
+  text-align: right;
+}
+.footer {
+  .protip {
+    float: right;
+    padding: 5px 0;
   }
-  .footer {
-    .protip {
-      float: right;
-      padding: 5px 0;
-    }
-  }
+}
+
+.required {
+  color: var(--error);
+}
 </style>

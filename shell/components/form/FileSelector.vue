@@ -3,7 +3,7 @@ import { _EDIT, _VIEW } from '@shell/config/query-params';
 import { set } from '@shell/utils/object';
 
 export function createOnSelected(field) {
-  return function(contents) {
+  return function (contents) {
     set(this, field, contents);
   };
 }
@@ -11,66 +11,65 @@ export function createOnSelected(field) {
 export default {
   props: {
     label: {
-      type:     String,
-      required: true
+      type: String,
+      required: true,
     },
 
     mode: {
-      type:    String,
-      default: _EDIT
+      type: String,
+      default: _EDIT,
     },
 
     disabled: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
 
     includeFileName: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
 
     showGrowlError: {
-      type:    Boolean,
-      default: true
+      type: Boolean,
+      default: true,
     },
 
     multiple: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
 
     byteLimit: {
-      type:    Number,
-      default: 0
+      type: Number,
+      default: 0,
     },
 
     readAsDataUrl: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
 
     directory: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
 
     rawData: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
 
     accept: {
-      type:    String,
-      default: '*'
+      type: String,
+      default: '*',
     },
-
   },
 
   computed: {
     isView() {
       return this.mode === _VIEW;
-    }
+    },
   },
 
   methods: {
@@ -87,7 +86,10 @@ export default {
       if (this.byteLimit) {
         for (const file of files) {
           if (file.size > this.byteLimit) {
-            this.$emit('error', `${ file.name } exceeds the file size limit of ${ this.byteLimit } bytes`);
+            this.$emit(
+              'error',
+              `${file.name} exceeds the file size limit of ${this.byteLimit} bytes`
+            );
 
             return;
           }
@@ -95,7 +97,8 @@ export default {
       }
 
       if (this.rawData) {
-        const unboxedContents = !this.multiple && files.length === 1 ? files[0] : files;
+        const unboxedContents =
+          !this.multiple && files.length === 1 ? files[0] : files;
 
         this.$emit('selected', unboxedContents);
 
@@ -105,13 +108,20 @@ export default {
       try {
         const asyncFileContents = files.map(this.getFileContents);
         const fileContents = await Promise.all(asyncFileContents);
-        const unboxedContents = !this.multiple && fileContents.length === 1 ? fileContents[0] : fileContents;
+        const unboxedContents =
+          !this.multiple && fileContents.length === 1
+            ? fileContents[0]
+            : fileContents;
 
         this.$emit('selected', unboxedContents);
       } catch (error) {
         this.$emit('error', error);
         if (this.showGrowlError) {
-          this.$store.dispatch('growl/fromError', { title: 'Error reading file', error }, { root: true });
+          this.$store.dispatch(
+            'growl/fromError',
+            { title: 'Error reading file', error },
+            { root: true }
+          );
         }
       }
     },
@@ -137,16 +147,15 @@ export default {
           reader.readAsText(file);
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
-  <button
+  <a-button
     v-if="!isView"
     :disabled="disabled"
-    type="button"
     class="file-selector btn"
     @click="selectFile"
   >
@@ -159,6 +168,6 @@ export default {
       :webkitdirectory="directory"
       :accept="accept"
       @change="fileChange"
-    >
-  </button>
+    />
+  </a-button>
 </template>

@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { get, set } from '@shell/utils/object';
 import SteveDescriptionModel from '@shell/plugins/steve/steve-description-class';
 import { AS, MODE, _CLONE, _UNFLAG } from '@shell/config/query-params';
@@ -22,7 +21,7 @@ export default class RoleTemplate extends SteveDescriptionModel {
       },
     };
 
-    Vue.set(this, 'metadata', value.metadata);
+    this['metadata'] = value.metadata;
     set(this, 'spec', this.spec || value.spec);
   }
 
@@ -58,7 +57,7 @@ export default class RoleTemplate extends SteveDescriptionModel {
   }
 
   updateSubtype(subtype) {
-    Vue.set(this, '_subtype', subtype);
+    this['_subtype'] = subtype;
     this.context = SUBTYPE_MAPPING[subtype].context;
   }
 

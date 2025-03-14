@@ -22,59 +22,59 @@ export default {
   components: {
     Footer,
     FileSelector,
-    YamlEditor
+    YamlEditor,
   },
 
   props: {
     mode: {
-      type:     String,
+      type: String,
       required: true,
     },
 
     value: {
-      type:     Object,
+      type: Object,
       required: true,
     },
 
     initialYamlForDiff: {
-      type:    String,
+      type: String,
       default: null,
     },
 
     yaml: {
-      type:     String,
+      type: String,
       required: true,
     },
 
     doneRoute: {
-      type:    [String, Object],
+      type: [String, Object],
       default: null,
     },
 
     offerPreview: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
     },
 
     parentParams: {
-      type:    Object,
+      type: Object,
       default: null,
     },
 
     doneOverride: {
-      type:    [Function, Object],
-      default: null
+      type: [Function, Object],
+      default: null,
     },
 
     showFooter: {
-      type:    Boolean,
-      default: true
+      type: Boolean,
+      default: true,
     },
 
     applyHooks: {
-      type:    Function,
+      type: Function,
       default: null,
-    }
+    },
   },
 
   data() {
@@ -82,12 +82,12 @@ export default {
     this.$router.applyQuery({ [PREVIEW]: _UNFLAG });
 
     return {
-      initialYaml:  this.initialYamlForDiff || this.yaml,
-      currentYaml:  this.yaml,
-      showPreview:  false,
-      errors:       null,
-      cm:           null,
-      initialReady: true
+      initialYaml: this.initialYamlForDiff || this.yaml,
+      currentYaml: this.yaml,
+      showPreview: false,
+      errors: null,
+      cm: null,
+      initialReady: true,
     };
   },
 
@@ -95,7 +95,7 @@ export default {
     schema() {
       const inStore = this.$store.getters['currentStore'](this.value.type);
 
-      return this.$store.getters[`${ inStore }/schemaFor`]( this.value.type );
+      return this.$store.getters[`${inStore}/schemaFor`](this.value.type);
     },
 
     isCreate() {
@@ -115,9 +115,14 @@ export default {
       // of this computed property so that the editor
       // toggles when you navigate back and forth between
       // edit and view.
-      if ( this.$route.query.mode === _VIEW || (this.isView && (this.$route.query.mode !== _EDIT || this.$route.query.mode !== _VIEW))) {
+      if (
+        this.$route.query.mode === _VIEW ||
+        (this.isView &&
+          (this.$route.query.mode !== _EDIT ||
+            this.$route.query.mode !== _VIEW))
+      ) {
         return EDITOR_MODES.VIEW_CODE;
-      } else if ( this.showPreview ) {
+      } else if (this.showPreview) {
         return EDITOR_MODES.DIFF_CODE;
       }
 
@@ -131,7 +136,7 @@ export default {
 
   watch: {
     yaml(neu) {
-      if ( this.mode === _VIEW ) {
+      if (this.mode === _VIEW) {
         this.currentYaml = neu;
       }
     },
@@ -142,7 +147,7 @@ export default {
       if (neu === _CREATE && old === _VIEW) {
         this.currentYaml = this.value.cleanYaml(this.yaml, neu);
       }
-    }
+    },
   },
 
   methods: {
@@ -159,7 +164,7 @@ export default {
 
       this.cm = cm;
 
-      if ( this.isEdit ) {
+      if (this.isEdit) {
         cm.foldLinesMatching(/^status:\s*$/);
       }
 
@@ -170,20 +175,20 @@ export default {
 
         let foldAnnotations = false;
 
-        for ( const k of annotations ) {
-          if ( foldAnnotations ) {
+        for (const k of annotations) {
+          if (foldAnnotations) {
             break;
           }
 
-          for ( const regex of regexes ) {
-            if ( k.match(regex) ) {
+          for (const regex of regexes) {
+            if (k.match(regex)) {
               foldAnnotations = true;
               break;
             }
           }
         }
 
-        if ( foldAnnotations ) {
+        if (foldAnnotations) {
           cm.foldLinesMatching(/^\s+annotations:\s*$/);
         }
       } catch (e) {}
@@ -204,13 +209,13 @@ export default {
     },
 
     onChanges(cm, changes) {
-      if ( changes.length !== 1 ) {
+      if (changes.length !== 1) {
         return;
       }
 
       const change = changes[0];
 
-      if ( change.from.line !== change.to.line ) {
+      if (change.from.line !== change.to.line) {
         return;
       }
 
@@ -218,25 +223,25 @@ export default {
       let str = cm.getLine(line);
       let maxIndent = indentChars(str);
 
-      if ( maxIndent === null ) {
+      if (maxIndent === null) {
         return;
       }
 
       cm.replaceRange('', { line, ch: 0 }, { line, ch: 1 }, '+input');
 
-      while ( line > 0 ) {
+      while (line > 0) {
         line--;
         str = cm.getLine(line);
         const indent = indentChars(str);
 
-        if ( indent === null ) {
+        if (indent === null) {
           break;
         }
 
-        if ( indent < maxIndent ) {
+        if (indent < maxIndent) {
           cm.replaceRange('', { line, ch: 0 }, { line, ch: 1 }, '+input');
 
-          if ( indent === 0 ) {
+          if (indent === 0) {
             break;
           }
 
@@ -247,7 +252,7 @@ export default {
       function indentChars(str) {
         const match = str.match(/^#(\s+)/);
 
-        if ( match ) {
+        if (match) {
           return match[1].length;
         }
 
@@ -274,7 +279,7 @@ export default {
       const yaml = this.value.yamlForSave(this.currentYaml) || this.currentYaml;
 
       try {
-        if ( this.applyHooks ) {
+        if (this.applyHooks) {
           await this.applyHooks(BEFORE_SAVE_HOOKS);
         }
 
@@ -284,7 +289,7 @@ export default {
           return onError.call(this, err);
         }
 
-        if ( this.applyHooks ) {
+        if (this.applyHooks) {
           await this.applyHooks(AFTER_SAVE_HOOKS);
         }
 
@@ -295,10 +300,10 @@ export default {
       }
 
       function onError(err) {
-        if ( err && err.response && err.response.data ) {
+        if (err && err.response && err.response.data) {
           const body = err.response.data;
 
-          if ( body && body.message ) {
+          if (body && body.message) {
             this.errors = [body.message];
           } else {
             this.errors = [err];
@@ -315,9 +320,11 @@ export default {
 
     done() {
       if (this.doneOverride) {
-        return typeof (this.doneOverride) === 'function' ? this.doneOverride() : this.$router.replace(this.doneOverride);
+        return typeof this.doneOverride === 'function'
+          ? this.doneOverride()
+          : this.$router.replace(this.doneOverride);
       }
-      if ( !this.doneRoute ) {
+      if (!this.doneRoute) {
         return;
       }
       if (typeOf(this.doneRoute) === 'object') {
@@ -326,8 +333,8 @@ export default {
         return;
       }
       this.$router.replace({
-        name:   this.doneRoute,
-        params: { resource: this.value.type }
+        name: this.doneRoute,
+        params: { resource: this.value.type },
       });
     },
 
@@ -338,8 +345,7 @@ export default {
         component.updateValue(value);
       }
     },
-
-  }
+  },
 };
 </script>
 
@@ -347,7 +353,7 @@ export default {
   <div class="root resource-yaml">
     <YamlEditor
       ref="yamleditor"
-      v-model="currentYaml"
+      v-model:value="currentYaml"
       :initial-yaml-values="initialYaml"
       class="yaml-editor flex-content"
       :editor-mode="editorMode"
@@ -367,50 +373,37 @@ export default {
       <Footer
         v-if="showFooter"
         class="footer"
-        :class="{ 'edit': !isView }"
+        :class="{ edit: !isView }"
         :mode="mode"
         :errors="errors"
         @save="save"
         @done="done"
       >
-        <template
-          v-if="!isView"
-          #left
-        >
+        <template v-if="!isView" #left>
           <FileSelector
             class="btn role-secondary"
             :label="t('generic.readFromFile')"
             @selected="onFileSelected"
           />
         </template>
-        <template
-          v-if="!isView"
-          #middle
-        >
-          <button
-            v-if="showPreview"
-            type="button"
-            class="btn role-secondary"
-            @click="unpreview"
-          >
+        <template v-if="!isView" #middle>
+          <a-button v-if="showPreview" @click="unpreview">
             <t k="resourceYaml.buttons.continue" />
-          </button>
-          <button
+          </a-button>
+          <a-button
             v-else-if="offerPreview"
             :disabled="!canDiff"
-            type="button"
-            class="btn role-secondary"
             @click="preview"
           >
             <t k="resourceYaml.buttons.diff" />
-          </button>
+          </a-button>
         </template>
       </Footer>
     </slot>
   </div>
 </template>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .flex-content {
   display: flex;
   flex-direction: column;
@@ -450,5 +443,4 @@ export default {
     padding: 0;
   }
 }
-
 </style>

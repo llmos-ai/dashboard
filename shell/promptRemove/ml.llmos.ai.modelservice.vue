@@ -131,9 +131,7 @@ export default {
     </div>
     <div v-if="value.length === 1">
       <span
-        v-for="name in removeNameArr[value[0].id]"
-        :key="name"
-      >
+         v-for="(name, i) in removeNameArr[value[0].id]" :key="i" >
         <label class="checkbox-container mr-15"><input
                                                   v-model="checkedList"
                                                   type="checkbox"

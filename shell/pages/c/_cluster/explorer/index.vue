@@ -244,6 +244,7 @@ export default {
       }, initialAggregation);
     },
 
+
     cpuUsed() {
       const total = parseSi(this.currentCluster?.status?.capacity?.cpu);
 
@@ -442,9 +443,7 @@ export default {
 
     <div v-if="componentServices">
       <div
-        v-for="status in componentServices"
-        :key="status.name"
-        class="k8s-component-status"
+         v-for="(status, i) in componentServices" :key="i" class="k8s-component-status"
         :class="{'k8s-component-status-healthy': status.healthy, 'k8s-component-status-unhealthy': !status.healthy}"
       >
         <i
@@ -467,9 +466,9 @@ export default {
           :weight="2"
         >
           <span class="events-table-link">
-            <n-link :to="allEventsLink">
+            <router-link :to="allEventsLink">
               <span>{{ t('glance.eventsTable') }}</span>
-            </n-link>
+            </router-link>
           </span>
           <EventsTable />
         </Tab>
@@ -479,9 +478,9 @@ export default {
           :weight="1"
         >
           <span class="events-table-link">
-            <n-link :to="allSecretsLink">
+            <router-link :to="allSecretsLink">
               <span>{{ t('glance.secretsTable') }}</span>
-            </n-link>
+            </router-link>
           </span>
           <Certificates v-if="selectedTab === 'cluster-certs'" />
         </Tab>
@@ -538,7 +537,7 @@ export default {
   align-items: center;
 }
 
-.etcd-metrics ::v-deep .external-link {
+.etcd-metrics :deep() .external-link {
   top: -107px;
 }
 

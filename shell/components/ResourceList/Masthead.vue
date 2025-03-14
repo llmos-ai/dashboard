@@ -5,69 +5,72 @@ import TypeDescription from '@shell/components/TypeDescription';
 import { get } from '@shell/utils/object';
 import { AS, _YAML } from '@shell/config/query-params';
 import ResourceLoadingIndicator from './ResourceLoadingIndicator';
+import TabTitle from '@shell/components/TabTitle';
+import ButtonLink from '@shell/components/ButtonLink';
 
 /**
  * Resource List Masthead component.
  */
 export default {
-
   name: 'MastheadResourceList',
 
   components: {
     Favorite,
     TypeDescription,
     ResourceLoadingIndicator,
+    TabTitle,
+    ButtonLink,
   },
   props: {
     resource: {
-      type:     String,
+      type: String,
       required: true,
     },
     favoriteResource: {
-      type:    String,
-      default: null
+      type: String,
+      default: null,
     },
     schema: {
-      type:    Object,
+      type: Object,
       default: null,
     },
     typeDisplay: {
-      type:    String,
+      type: String,
       default: null,
     },
     isCreatable: {
-      type:    Boolean,
+      type: Boolean,
       default: null,
     },
     isYamlCreatable: {
-      type:    Boolean,
+      type: Boolean,
       default: null,
     },
     createLocation: {
-      type:    Object,
+      type: Object,
       default: null,
     },
     yamlCreateLocation: {
-      type:    Object,
+      type: Object,
       default: null,
     },
     createButtonLabel: {
-      type:    String,
-      default: null
+      type: String,
+      default: null,
     },
     loadResources: {
-      type:    Array,
-      default: () => []
+      type: Array,
+      default: () => [],
     },
 
     loadIndeterminate: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
 
     showIncrementalLoadingIndicator: {
-      type:    Boolean,
-      default: false
+      type: Boolean,
+      default: false,
     },
 
     /**
@@ -75,20 +78,22 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type:    String,
-      default: 'masthead'
-    }
+      type: String,
+      default: 'masthead',
+    },
   },
 
   data() {
     const params = { ...this.$route.params };
 
-    const formRoute = { name: `${ this.$route.name }-create`, params };
+    const formRoute = { name: `${this.$route.name}-create`, params };
 
-    const hasEditComponent = this.$store.getters['type-map/hasCustomEdit'](this.resource);
+    const hasEditComponent = this.$store.getters['type-map/hasCustomEdit'](
+      this.resource
+    );
 
     const yamlRoute = {
-      name:  `${ this.$route.name }-create`,
+      name: `${this.$route.name}-create`,
       params,
       query: { [AS]: _YAML },
     };
@@ -102,7 +107,7 @@ export default {
 
   computed: {
     get,
-    ...mapGetters(['isExplorer']),
+    ...mapGetters(['isExplorer', 'currentCluster']),
 
     resourceName() {
       if (this.schema) {
@@ -113,11 +118,11 @@ export default {
     },
 
     _typeDisplay() {
-      if ( this.typeDisplay !== null) {
+      if (this.typeDisplay !== null) {
         return this.typeDisplay;
       }
 
-      if ( !this.schema ) {
+      if (!this.schema) {
         return '?';
       }
 
@@ -125,25 +130,35 @@ export default {
     },
 
     _isYamlCreatable() {
-      if ( this.isYamlCreatable !== null) {
+      if (this.isYamlCreatable !== null) {
         return this.isYamlCreatable;
       }
 
-      return this.schema && this._isCreatable && this.$store.getters['type-map/optionsFor'](this.resource).canYaml;
+      return (
+        this.schema &&
+        this._isCreatable &&
+        this.$store.getters['type-map/optionsFor'](this.resource).canYaml
+      );
     },
 
     _isCreatable() {
       // Does not take into account hasEditComponent, such that _isYamlCreatable works
-      if ( this.isCreatable !== null) {
+      if (this.isCreatable !== null) {
         return this.isCreatable;
       }
 
       // blocked-post means you can post through norman, but not through steve.
-      if ( this.schema && !this.schema?.collectionMethods.find((x) => ['blocked-post', 'post'].includes(x.toLowerCase())) ) {
+      if (
+        this.schema &&
+        !this.schema?.collectionMethods.find((x) =>
+          ['blocked-post', 'post'].includes(x.toLowerCase())
+        )
+      ) {
         return false;
       }
 
-      return this.$store.getters['type-map/optionsFor'](this.resource).isCreatable;
+      return this.$store.getters['type-map/optionsFor'](this.resource)
+        .isCreatable;
     },
 
     _createLocation() {
@@ -155,28 +170,21 @@ export default {
     },
 
     _createButtonlabel() {
-      const buttonLabel = this.$store.getters['type-map/optionsFor'](this.resource).createButtonLabel;
-
-      if ( buttonLabel) return this.t(`resourceList.head.${ buttonLabel }`);
-
       return this.createButtonLabel || this.t('resourceList.head.create');
-    }
-
+    },
   },
 };
 </script>
 
 <template>
-  <header>
+  <header class="with-subheader">
     <slot name="typeDescription">
       <TypeDescription :resource="resource" />
     </slot>
     <div class="title">
       <h1 class="m-0">
-        {{ _typeDisplay }} <Favorite
-          v-if="isExplorer"
-          :resource="favoriteResource || resource"
-        />
+        <TabTitle>{{ _typeDisplay }}</TabTitle>
+        <Favorite v-if="isExplorer" :resource="favoriteResource || resource" />
       </h1>
       <ResourceLoadingIndicator
         v-if="showIncrementalLoadingIndicator"
@@ -184,28 +192,30 @@ export default {
         :indeterminate="loadIndeterminate"
       />
     </div>
+    <div class="sub-header">
+      <slot name="subHeader">
+        <!--Slot content-->
+      </slot>
+    </div>
     <div class="actions-container">
       <slot name="actions">
         <div class="actions">
           <slot name="extraActions" />
 
           <slot name="createButton">
-            <n-link
+            <button-link
               v-if="hasEditComponent && _isCreatable"
               :to="_createLocation"
-              class="btn role-primary"
-              :data-testid="componentTestid+'-create'"
-            >
-              {{ _createButtonlabel }}
-            </n-link>
-            <n-link
+              :data-testid="componentTestid + '-create'"
+              :link-label="_createButtonlabel"
+            />
+            <button-link
               v-else-if="_isYamlCreatable"
               :to="_yamlCreateLocation"
-              class="btn role-primary"
-              :data-testid="componentTestid+'-create-yaml'"
+              :data-testid="componentTestid + '-create-yaml'"
             >
-              {{ t("resourceList.head.createFromYaml") }}
-            </n-link>
+              {{ t('resourceList.head.createFromYaml') }}
+            </button-link>
           </slot>
         </div>
       </slot>
@@ -214,15 +224,31 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  .title {
-    align-items: center;
-    display: flex;
-    h1 {
-      margin: 0;
-    }
+.title {
+  align-items: center;
+  display: flex;
+  h1 {
+    margin: 0;
   }
+}
 
-  header {
-    margin-bottom: 20px;
+header {
+  margin-bottom: 20px;
+}
+
+header.with-subheader {
+  grid-template-areas:
+    'type-banner type-banner'
+    'title actions'
+    'sub-header sub-header'
+    'state-banner state-banner';
+}
+
+.sub-header {
+  grid-area: sub-header;
+
+  a {
+    display: inline-block;
   }
+}
 </style>

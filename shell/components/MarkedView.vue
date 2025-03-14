@@ -1,23 +1,93 @@
-<script>
+<template>
+  <div v-if="isLoading" class="flex h-[32px]"><LoadingOutlined /></div>
+  <div v-else class="markdown-box-compile relative pb-6 marked-view">
+    <div class="think-wrapper mb-10" v-if="props.reasoningContent">
+      <a-button
+        type="text"
+        size="small"
+        class="role-link mb-10"
+        @click="showReasoningContent = !showReasoningContent"
+      >
+        <div class="flex items-center">
+          {{ compileHtml.content ? '已完成思考' : '深度思考中' }}
+          <DownOutlined v-if="showReasoningContent" />
+          <UpOutlined v-else />
+        </div>
+      </a-button>
+      <div class="border-l-2 border-[#e5e5e5] pl-4" v-if="showReasoningContent">
+        <div v-html="compileHtml.reasoningContent" />
+      </div>
+    </div>
+    <div v-html="compileHtml.content" />
+
+    <div class="action absolute -bottom-6" v-if="showActions">
+      <span class="bg-[#f2f6fb] px-2 py-2 rounded-md">
+        <!-- TODO: fetch new api -->
+        <!-- <a-button type="link" size="small" class="role-link" @click="refreshFetch">
+        <i class="icon icon-backup" />
+      </a-button> -->
+
+        <a-button
+          type="link"
+          size="small"
+          class="copy-button role-link"
+          :data-code="encodeURIComponent(content)"
+        >
+          <i class="icon icon-copy" />
+        </a-button>
+      </span>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed, onMounted, watch, nextTick, onUnmounted, ref } from 'vue';
 import { marked } from 'marked';
-import { Card } from '@components/Card';
+import {
+  LoadingOutlined,
+  DownOutlined,
+  UpOutlined,
+} from '@ant-design/icons-vue';
 import 'highlight.js/styles/github.css';
+
+const props = defineProps({
+  content: {
+    type: String,
+    default: '',
+  },
+  reasoningContent: {
+    type: String,
+    default: '',
+  },
+  showActions: {
+    type: Boolean,
+    default: true,
+  },
+  loading: {
+    type: Boolean,
+    default: true,
+  },
+});
 
 const renderer = new marked.Renderer();
 
-renderer.code = function(code, language) {
+const showReasoningContent = ref(true);
+
+// TODO: enhance code preview renderer
+renderer.code = function (code, language) {
   const validLanguage = language || 'plaintext';
   const highlightedCode = this.options.highlight(code, validLanguage);
 
-  return `<div class="code-block-wrapper">
-    <div class="code-header">
-      <span class="code-language">${ validLanguage }</span>
-      <button class="copy-button"  data-code="${ encodeURIComponent(code) }">
-        <i class="icon icon-copy"></i>
-      </button>
-    </div>
-    <pre><code class="hljs language-${ validLanguage }">${ highlightedCode }</code></pre>
-  </div>`;
+  return `
+    <div class="code-block-wrapper">
+      <div class="code-header sticky top-0">
+        <span class="code-language">${validLanguage}</span>
+        <a-button class="copy-button" data-code="${encodeURIComponent(code)}">
+          <i class="icon icon-copy"></i>
+        </a-button>
+      </div>
+      <pre><code class="hljs language-${validLanguage}">测试是否渲染了这一块${highlightedCode}</code></pre>
+    </div>`;
 };
 
 marked.setOptions({
@@ -25,154 +95,104 @@ marked.setOptions({
   highlight(code, lang) {
     const hljs = require('highlight.js');
     const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-
-    const highlightedCode = hljs.highlight(code, { language }).value;
-
     try {
-      return highlightedCode;
+      return hljs.highlight(code, { language }).value;
     } catch (err) {
       return code;
     }
   },
-  langPrefix:   'hljs language-',
-  breaks:       true,
-  gfm:          true,
-  headerIds:    true,
-  headerPrefix: '',
-  mangle:       true,
-  pedantic:     false,
-  sanitize:     false,
-  silent:       false,
-  smartLists:   false,
-  smartypants:  false,
-  xhtml:        false
+  langPrefix: 'hljs language-',
+  breaks: true,
+  gfm: true,
 });
 
-export default {
-  components: { Card },
-  props:      {
-    content: {
-      default: '',
-      type:    String
-    }
-  },
+const isLoading = computed(() => {
+  const loading =
+    props.loading &&
+    compileHtml.value.content.length === 0 &&
+    compileHtml.value.reasoningContent.length === 0;
 
-  mounted() {
-    this.initializeCopyButtons();
-  },
+  return loading;
+});
 
-  watch: {
-    // 监听 content 变化，重新绑定复制按钮的事件
-    content() {
-      this.$nextTick(() => {
-        this.initializeCopyButtons();
-      });
-    }
-  },
+const compileHtml = computed(() => {
+  return {
+    content: marked.parse(props.content),
+    reasoningContent: marked.parse(props.reasoningContent),
+  };
+});
 
-  methods: {
-    initializeCopyButtons() {
-      this.$nextTick(() => {
-        const copyButtons = this.$el.querySelectorAll('.copy-button');
+const initializeCopyButtons = () => {
+  nextTick(() => {
+    const copyButtons = document.querySelectorAll('.copy-button');
 
-        copyButtons.forEach((button) => {
-          button.addEventListener('click', this.handleCopy);
-        });
-      });
-    },
+    copyButtons.forEach((button) => {
+      button.addEventListener('click', handleCopy);
+    });
+  });
+};
 
-    async handleCopy(event) {
-      const button = event.currentTarget;
-      const code = decodeURIComponent(button.dataset.code);
+const handleCopy = async (event) => {
+  const button = event.currentTarget;
+  const code = decodeURIComponent(button.dataset.code);
 
-      try {
-        await navigator.clipboard.writeText(code);
-        const icon = button.querySelector('i');
-
-        icon.className = 'icon icon-checkmark';
-        setTimeout(() => {
-          icon.className = 'icon icon-copy';
-        }, 1000);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('copy failed:', err);
-      }
-    }
-  },
-
-  computed: {
-    compileHtml() {
-      return marked.parse(this.content);
-    }
+  try {
+    await navigator.clipboard.writeText(code);
+    const icon = button.querySelector('i');
+    icon.className = 'icon icon-checkmark';
+    setTimeout(() => {
+      icon.className = 'icon icon-copy';
+    }, 1000);
+  } catch (err) {
+    console.error('Copy failed:', err);
   }
 };
+
+onMounted(() => {
+  initializeCopyButtons();
+});
+
+watch(
+  [() => props.content, () => props.reasoningContent],
+  () => {
+    nextTick(() => {
+      initializeCopyButtons();
+    });
+  },
+  {
+    immediate: true,
+  }
+);
+
+onUnmounted(() => {
+  const copyButtons = document.querySelectorAll('.copy-button');
+  copyButtons.forEach((button) => {
+    button.removeEventListener('click', handleCopy);
+  });
+});
 </script>
-
-<template>
-  <Card
-    :show-highlight-border="false"
-    :hasDivider="false"
-    :showActions="false"
-    class="marked-view"
-  >
-    <div
-      slot="body"
-    >
-      <div
-        class="markdown-box-compile"
-        v-html="compileHtml"
-      />
-
-      <div class="action">
-        <button
-          type="button"
-          class="btn btn-sm role-link"
-        >
-          <i class="icon icon-backup" />
-        </button>
-
-        <button
-          type="button"
-          class="copy-button btn btn-sm role-link"
-          :data-code="encodeURIComponent(content)"
-        >
-          <i class="icon icon-copy" />
-        </button>
-      </div>
-    </div>
-  </card>
-</template>
 
 <style lang="scss" scoped>
 .marked-view {
   min-height: 40px;
-  padding-bottom: 20px;
   flex-direction: column;
   flex-grow: 0;
   flex-basis: 100%;
-  position: relative;
 
-  align-items: flex-start !important;
+  .action {
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
 
-    .action {
-      position: absolute;
-      bottom: 4px;
-      right: 8px;
-      opacity: 0;
-      transition: opacity 0.4s ease-in-out;
+    border-radius: 4px;
 
-      border: 2px solid var(--border);
-      border-radius: 4px;
-
-      button {
-        padding: 4px 6px;
-      }
-
+    button {
+      padding: 4px 6px;
     }
+  }
 
-    &:hover .action {
-      opacity: 1;
-    }
+  &:hover .action {
+    opacity: 1;
+  }
 }
 
 :deep(.code-block-wrapper) {

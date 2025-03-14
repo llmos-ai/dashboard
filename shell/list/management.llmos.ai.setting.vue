@@ -11,7 +11,9 @@ export default {
 
   async fetch() {
     const viewInApi = this.$store.getters['prefs/get'](VIEW_IN_API);
-    const rows = await this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.SETTING });
+    const rows = await this.$store.dispatch(`management/findAll`, {
+      type: MANAGEMENT.SETTING,
+    });
     const t = this.$store.getters['i18n/t'];
     // Map settings from array to object keyed by id
     const settingsMap = rows.reduce((res, s) => {
@@ -23,10 +25,10 @@ export default {
     const settings = [];
 
     // Combine the allowed settings with the data from the API
-    for ( const id in ALLOWED_SETTINGS ) {
+    for (const id in ALLOWED_SETTINGS) {
       const setting = settingsMap[id];
 
-      if ( !setting ) {
+      if (!setting) {
         continue;
       }
 
@@ -34,24 +36,30 @@ export default {
       const s = {
         ...ALLOWED_SETTINGS[id],
         id,
-        description: t(`advancedSettings.descriptions.${ id }`),
-        data:        setting,
-        customized:  !readonly && setting.value && setting.value !== setting.default,
-        fromEnv:     setting.fromEnv,
+        description: t(`advancedSettings.descriptions.${id}`),
+        data: setting,
+        customized:
+          !readonly && setting.value && setting.value !== setting.default,
+        fromEnv: setting.fromEnv,
       };
 
-      s.hide = s.canHide = (s.kind === 'json' || s.kind === 'multiline');
+      s.hide = s.canHide = s.kind === 'json' || s.kind === 'multiline';
 
       if (s.kind === 'json') {
-        s.json = JSON.stringify(JSON.parse(s.data.value || s.data.default), null, 2);
+        s.json = JSON.stringify(
+          JSON.parse(s.data.value || s.data.default),
+          null,
+          2
+        );
       } else if (s.kind === 'enum') {
         const v = s.data.value || s.data.default;
 
-        s.enum = `advancedSettings.enum.${ id }.${ v }`;
+        s.enum = `advancedSettings.enum.${id}.${v}`;
       }
       // There are only 2 actions that can be enabled - Edit Setting or View in API
       // If neither is available for this setting then we hide the action menu button
-      s.hasActions = (!s.readOnly || viewInApi) && setting.availableActions?.length;
+      s.hasActions =
+        (!s.readOnly || viewInApi) && setting.availableActions?.length;
       settings.push(s);
     }
 
@@ -66,99 +74,99 @@ export default {
 
   methods: {
     showActionMenu(e, setting) {
+      // TODO: enhancement UI
       const actionElement = e.srcElement;
 
       this.$store.commit(`action-menu/show`, {
         resources: setting.data,
-        elem:      actionElement
+        elem: actionElement,
       });
     },
-  }
+  },
 };
 </script>
 
 <template>
   <Loading v-if="!settings" />
   <div v-else>
-    <Banner
-      color="warning"
-      class="settings-banner"
-    >
+    <Banner color="warning" class="settings-banner">
       <div>
         {{ t('advancedSettings.subtext') }}
       </div>
     </Banner>
     <div
-      v-for="setting in settings"
-      :key="setting.id"
+      v-for="(setting, i) in settings"
+      :key="i"
       class="advanced-setting mb-20"
     >
       <div class="header">
         <div class="title">
-          <h1>
+          <div class="text-base">
             {{ setting.id }}
-            <span
-              v-if="setting.fromEnv"
-              class="modified"
-            >Set by Environment Variable</span>
-            <span
-              v-else-if="setting.customized"
-              class="modified"
-            >{{ t('advancedSettings.modified') }}</span>
-          </h1>
-          <h2 v-clean-html="t(`advancedSettings.descriptions.${ setting.id }`, {}, true)" />
+            <span v-if="setting.fromEnv" class="modified"
+              >Set by Environment Variable</span
+            >
+            <span v-else-if="setting.customized" class="modified">{{
+              t('advancedSettings.modified')
+            }}</span>
+          </div>
+          <div
+            class="text-xs font-light"
+            v-clean-html="
+              t(`advancedSettings.descriptions.${setting.id}`, {}, true)
+            "
+          />
         </div>
-        <div
-          v-if="setting.hasActions"
-          class="action"
-        >
-          <button
+        <div v-if="setting.hasActions" class="action">
+          <a-button
             aria-haspopup="true"
             aria-expanded="false"
-            type="button"
-            class="btn btn-sm role-multi-action actions"
+            size="small"
+            class="!flex items-center role-link"
             @click="showActionMenu($event, setting)"
           >
             <i class="icon icon-actions" />
-          </button>
+          </a-button>
         </div>
       </div>
       <div value>
         <div v-if="setting.hide">
-          <button
-            class="btn btn-sm role-primary"
+          <a-button
+            size="small"
+            type="primary"
             @click="setting.hide = !setting.hide"
           >
             {{ t('advancedSettings.show') }} {{ setting.id }}
-          </button>
+          </a-button>
         </div>
-        <div
-          v-else
-          class="settings-value mb-5"
-        >
+        <div v-else class="settings-value mb-5">
           <pre v-if="setting.kind === 'json'">{{ setting.json }}</pre>
-          <pre v-else-if="setting.kind === 'multiline'">{{ setting.data.value || setting.data.default }}</pre>
+          <pre v-else-if="setting.kind === 'multiline'">{{
+            setting.data.value || setting.data.default
+          }}</pre>
           <pre v-else-if="setting.kind === 'enum'">{{ t(setting.enum) }}</pre>
-          <pre v-else-if="setting.data.value || setting.data.default">{{ setting.data.value || setting.data.default }}</pre>
-          <pre
-            v-else
-            class="text-muted"
-          >&lt;{{ t('advancedSettings.none') }}&gt;</pre>
+          <pre v-else-if="setting.data.value || setting.data.default">{{
+            setting.data.value || setting.data.default
+          }}</pre>
+          <pre v-else class="text-muted">
+&lt;{{ t('advancedSettings.none') }}&gt;</pre
+          >
         </div>
         <div v-if="setting.canHide && !setting.hide">
-          <button
-            class="btn btn-sm role-primary"
+          <a-button
+            type="primary"
+            size="small"
             @click="setting.hide = !setting.hide"
           >
             {{ t('advancedSettings.hide') }} {{ setting.id }}
-          </button>
+          </a-button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .settings-banner {
   margin-top: 0;
 }

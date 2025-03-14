@@ -1,6 +1,5 @@
-import SteveModel from '@shell/plugins/steve/steve-class';
-import { MONITORING_NAMESPACE } from '@shell/utils/monitoring';
-import Vue from 'vue';
+import SteveModel from "@shell/plugins/steve/steve-class";
+import { MONITORING_NAMESPACE } from "@shell/utils/monitoring";
 
 export default class ServiceMonitor extends SteveModel {
   applyDefaults() {
@@ -10,29 +9,31 @@ export default class ServiceMonitor extends SteveModel {
 
     const metadata = {
       namespace: MONITORING_NAMESPACE,
-      labels:    { release: 'llmos-monitoring' }
+      labels: { release: "llmos-monitoring" },
     };
 
-    Vue.set(this, 'metadata', metadata);
+    this["metadata"] = metadata;
   }
 
   get _detailLocation() {
-    const id = this.id?.replace(/.*\//, '');
+    const id = this.id?.replace(/.*\//, "");
 
     return {
-      name:   'c-cluster-monitoring-monitor-namespace-id',
+      name: "c-cluster-monitoring-monitor-namespace-id",
       params: {
-        cluster: this.$rootGetters['clusterId'], id, namespace: this.metadata.namespace
+        cluster: this.$rootGetters["clusterId"],
+        id,
+        namespace: this.metadata.namespace,
       },
-      query: { resource: this.type }
+      query: { resource: this.type },
     };
   }
 
   get doneOverride() {
     return {
-      name:   'c-cluster-monitoring-monitor',
-      params: { cluster: this.$rootGetters['clusterId'] },
-      query:  { resource: this.type }
+      name: "c-cluster-monitoring-monitor",
+      params: { cluster: this.$rootGetters["clusterId"] },
+      query: { resource: this.type },
     };
   }
 }

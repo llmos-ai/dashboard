@@ -82,7 +82,7 @@ From this point, you can run Dashboard in another terminal and make changes to e
 
 ### Rancher Desktop & other projects
 
-Locally developing and testing component changes in projects outside of Rancher Dashboard requires that you manually link via [npm-link](https://docs.npmjs.com/cli/v8/commands/npm-link) or [yarn-link](https://classic.yarnpkg.com/lang/en/docs/cli/link/). 
+Locally developing and testing component changes in projects outside of Rancher Dashboard requires that you manually link via [npm-link](https://docs.npmjs.com/cli/v8/commands/npm-link) or [yarrouter-link](https://classic.yarnpkg.com/lang/en/docs/cli/link/). 
 
 First, you will need to run `npm link` or `yarn link` in the `@rancher/components` project
 

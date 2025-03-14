@@ -72,21 +72,21 @@ export default {
     :loading="loading"
     :defaultAddValue="defaultAddValue"
     :disabled="disabled"
-    @input="$emit('input', $event)"
+    @update:value="$emit('input', $event)"
   >
     <template v-slot:columns="scope">
       <Select
         :value="scope.row.value"
         v-bind="selectProps"
         :options="calculateOptions(scope.row.value)"
-        @input="updateRow(scope.i, $event)"
+        @update:value="updateRow(scope.i, $event)"
       />
     </template>
   </ArrayList>
 </template>
 
 <style lang="scss" scoped>
-::v-deep .unlabeled-select {
+:deep() .unlabeled-select {
     height: 61px;
 }
 </style>

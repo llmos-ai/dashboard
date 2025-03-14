@@ -1,21 +1,21 @@
 <script>
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from "@components/Form/LabeledInput";
 
 export default {
   components: { LabeledInput },
 
   props: {
     value: {
-      type:    Number,
+      type: Number,
       default: 0,
     },
     row: {
-      type:     Object,
-      required: true
+      type: Object,
+      required: true,
     },
     col: {
-      type:    Object,
-      default: () => {}
+      type: Object,
+      default: () => {},
     },
   },
 
@@ -32,22 +32,22 @@ export default {
       const desired = this.row.weights.desired;
       const total = this.totalForApp.desired;
 
-      if ( total === 0 ) {
+      if (total === 0) {
         return 0;
       }
 
-      return Math.round(desired / total * 1000) / 10;
+      return Math.round((desired / total) * 1000) / 10;
     },
 
     current() {
       const current = this.row.weights.current;
       const total = this.totalForApp.current;
 
-      if ( total === 0 ) {
+      if (total === 0) {
         return 0;
       }
 
-      return Math.round(current / total * 1000) / 10;
+      return Math.round((current / total) * 1000) / 10;
     },
 
     showDesired() {
@@ -62,7 +62,7 @@ export default {
       const percent = this.newPercent;
 
       return percent >= 0 && percent <= 100;
-    }
+    },
   },
 
   methods: {
@@ -77,13 +77,13 @@ export default {
 
       this.row.saveWeightPercent(newPercent);
     },
-  }
+  },
 };
 </script>
 
 <template>
-  <v-popover
-    :class="{'hand': canAdjust}"
+  <v-dropdown
+    :class="{ hand: canAdjust }"
     placement="top"
     :open-group="row.id"
     :trigger="canAdjust ? 'click' : 'manual'"
@@ -91,16 +91,11 @@ export default {
     @apply-show="onShown"
   >
     <div>
-      <span
-        v-if="totalForApp.count === 1"
-        class="text-muted"
-      >
-        &mdash;
-      </span>
+      <span v-if="totalForApp.count === 1" class="text-muted"> &mdash; </span>
       <span
         v-else
         v-trim-whitespace
-        :class="{'text-muted': current === 0 && desired === 0}"
+        :class="{ 'text-muted': current === 0 && desired === 0 }"
       >
         {{ current }}%
       </span>
@@ -111,10 +106,7 @@ export default {
     </div>
 
     <template #popover>
-      <div
-        v-if="canAdjust"
-        class="text-center pb-5"
-      >
+      <div v-if="canAdjust" class="text-center pb-5">
         <form>
           <LabeledInput
             ref="newPercent"
@@ -124,12 +116,10 @@ export default {
             min="0"
             max="100"
             class="text-left"
-            style="width: 100px;"
+            style="width: 100px"
           >
             <template #suffix>
-              <div class="addon">
-                %
-              </div>
+              <div class="addon">%</div>
             </template>
           </LabeledInput>
           <button
@@ -143,5 +133,5 @@ export default {
         </form>
       </div>
     </template>
-  </v-popover>
+  </v-dropdown>
 </template>

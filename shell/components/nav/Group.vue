@@ -1,56 +1,62 @@
 <script>
-import Type from '@shell/components/nav/Type';
+import Type from "@shell/components/nav/Type";
+
 export default {
-  name: 'Group',
+  name: "Group",
 
   components: { Type },
 
+  emits: ["expand", "close"],
+
   props: {
     depth: {
-      type:    Number,
+      type: Number,
       default: 0,
     },
 
     idPrefix: {
-      type:     String,
+      type: String,
       required: true,
     },
 
     group: {
-      type:     Object,
+      type: Object,
       required: true,
     },
 
     childrenKey: {
-      type:    String,
-      default: 'children',
+      type: String,
+      default: "children",
     },
 
     canCollapse: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
     },
 
     showHeader: {
-      type:    Boolean,
+      type: Boolean,
       default: true,
     },
 
     fixedOpen: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
-    }
+    },
   },
 
   data() {
-    const id = (this.idPrefix || '') + this.group.name;
+    const id = (this.idPrefix || "") + this.group.name;
 
     return { id, expanded: false };
   },
 
   computed: {
     isGroupActive() {
-      return this.isOverview || (this.hasActiveRoute() && this.isExpanded && this.showHeader);
+      return (
+        this.isOverview ||
+        (this.hasActiveRoute() && this.isExpanded && this.showHeader)
+      );
     },
 
     hasChildren() {
@@ -62,7 +68,11 @@ export default {
     },
 
     onlyHasOverview() {
-      return this.group.children && this.group.children.length === 1 && this.hasOverview;
+      return (
+        this.group.children &&
+        this.group.children.length === 1 &&
+        this.hasOverview
+      );
     },
 
     isOverview() {
@@ -73,7 +83,7 @@ export default {
         if (overviewRoute && grp.overview) {
           const route = this.$router.resolve(overviewRoute || {});
 
-          return this.$route.fullPath.split('#')[0] === route?.route?.fullPath;
+          return this.$route.fullPath.split("#")[0] === route?.fullPath;
         }
       }
 
@@ -86,14 +96,14 @@ export default {
       },
       set(v) {
         this.expanded = v;
-      }
-    }
+      },
+    },
   },
 
   methods: {
     expandGroup() {
       this.isExpanded = true;
-      this.$emit('expand', this.group);
+      this.$emit("expand", this.group);
     },
 
     groupSelected() {
@@ -102,10 +112,10 @@ export default {
         return;
       } else {
         // Remove all active class if click on group header and not active route
-        const headerEl = document.querySelectorAll('.header');
+        const headerEl = document.querySelectorAll(".header");
 
         headerEl.forEach((el) => {
-          el.classList.remove('active');
+          el.classList.remove("active");
         });
       }
       this.expandGroup();
@@ -118,9 +128,11 @@ export default {
 
         // If there is a default type, use it
         if (this.group.defaultType) {
-          const found = items.findIndex((i) => i.name === this.group.defaultType);
+          const found = items.findIndex(
+            (i) => i.name === this.group.defaultType
+          );
 
-          index = (found === -1) ? 0 : found;
+          index = found === -1 ? 0 : found;
         }
 
         const route = items[index].route;
@@ -137,15 +149,15 @@ export default {
     },
 
     close() {
-      this.$emit('close');
+      this.$emit("close");
     },
 
     // User clicked on the expander icon, so toggle the expansion so the user can see inside the group
     peek($event) {
       // Add active class to the current header if click on chevron icon
-      $event.target.parentElement.classList.remove('active');
+      $event.target.parentElement.classList.remove("active");
       if (this.hasActiveRoute() && this.isExpanded) {
-        $event.target.parentElement.classList.add('active');
+        $event.target.parentElement.classList.add("active");
       }
       this.isExpanded = !this.isExpanded;
       $event.stopPropagation();
@@ -160,12 +172,24 @@ export default {
         if (item.children && this.hasActiveRoute(item)) {
           return true;
         } else if (item.route) {
-          const navLevels = ['cluster', 'product', 'resource'];
-          const matchesNavLevel = navLevels.filter((param) => !this.$route.params[param] || this.$route.params[param] !== item.route.params[param]).length === 0;
-          const withoutHash = this.$route.hash ? this.$route.fullPath.slice(0, this.$route.fullPath.indexOf(this.$route.hash)) : this.$route.fullPath;
-          const withoutQuery = withoutHash.split('?')[0];
-
-          if (matchesNavLevel || this.$router.resolve(item.route).route.fullPath === withoutQuery) {
+          const navLevels = ["cluster", "product", "resource"];
+          const matchesNavLevel =
+            navLevels.filter(
+              (param) =>
+                !this.$route.params[param] ||
+                this.$route.params[param] !== item.route.params[param]
+            ).length === 0;
+          const withoutHash = this.$route.hash
+            ? this.$route.fullPath.slice(
+                0,
+                this.$route.fullPath.indexOf(this.$route.hash)
+              )
+            : this.$route.fullPath;
+          const withoutQuery = withoutHash.split("?")[0];
+          if (
+            matchesNavLevel ||
+            this.$router.resolve(item.route).fullPath === withoutQuery
+          ) {
             return true;
           }
         }
@@ -195,65 +219,75 @@ export default {
           }
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
   <div
     class="accordion"
-    :class="{[`depth-${depth}`]: true, 'expanded': isExpanded, 'has-children': hasChildren, 'group-highlight': isGroupActive}"
+    :class="{
+      [`depth-${depth}`]: true,
+      expanded: isExpanded,
+      'has-children': hasChildren,
+      'group-highlight': isGroupActive,
+    }"
   >
     <div
       v-if="showHeader"
       class="header"
-      :class="{'active': isOverview, 'noHover': !canCollapse}"
+      :class="{ active: isOverview, noHover: !canCollapse }"
+      role="button"
+      tabindex="0"
+      :aria-label="group.labelDisplay || group.label || ''"
       @click="groupSelected()"
+      @keyup.enter="groupSelected()"
+      @keyup.space="groupSelected()"
     >
       <slot name="header">
-        <n-link
+        <router-link
           v-if="hasOverview"
           :to="group.children[0].route"
           :exact="group.children[0].exact"
+          :tabindex="-1"
         >
-          <h6 v-clean-html="group.labelDisplay || group.label" />
-        </n-link>
-        <h6
-          v-else
-          v-clean-html="group.labelDisplay || group.label"
-        />
+          <div class="text-sm menu-item">
+            <span v-clean-html="group.labelDisplay || group.label" />
+          </div>
+        </router-link>
+        <div class="text-sm menu-item" v-else>
+          <span v-clean-html="group.labelDisplay || group.label" />
+        </div>
       </slot>
       <i
         v-if="!onlyHasOverview && canCollapse"
-        class="icon toggle"
-        :class="{'icon-chevron-right': !isExpanded, 'icon-chevron-down': isExpanded}"
+        class="icon toggle toggle-accordion"
+        :class="{
+          'icon-chevron-right': !isExpanded,
+          'icon-chevron-down': isExpanded,
+        }"
+        role="button"
+        tabindex="0"
+        :aria-label="t('nav.ariaLabel.collapseExpand')"
         @click="peek($event, true)"
+        @keyup.enter="peek($event, true)"
+        @keyup.space="peek($event, true)"
       />
     </div>
-    <ul
-      v-if="isExpanded"
-      class="list-unstyled body"
-      v-bind="$attrs"
-    >
-      <template v-for="(child, idx) in group[childrenKey]">
-        <li
-          v-if="child.divider"
-          :key="idx"
-        >
-          <hr>
+    <ul v-if="isExpanded" class="list-unstyled body" v-bind="$attrs">
+      <template v-for="(child, idx) in group[childrenKey]" :key="idx">
+        <li v-if="child.divider" :key="idx">
+          <hr />
         </li>
         <!-- <div v-else-if="child[childrenKey] && hideGroup(child[childrenKey])" :key="child.name">
           HIDDEN
         </div> -->
-        <li
-          v-else-if="child[childrenKey]"
-          :key="child.name"
-        >
+        <li v-else-if="child[childrenKey]" :key="child.name">
           <Group
             ref="groups"
-            :key="id+'_'+child.name+'_children'"
-            :id-prefix="id+'_'"
+            :key="id + '_' + child.name + '_children'"
+            :id-prefix="id + '_'"
             :depth="depth + 1"
             :children-key="childrenKey"
             :can-collapse="canCollapse"
@@ -266,7 +300,7 @@ export default {
         </li>
         <Type
           v-else-if="!child.overview || group.name === 'starred'"
-          :key="id+'_' + child.name + '_type'"
+          :key="id + '_' + child.name + '_type'"
           :is-root="depth == 0 && !showHeader"
           :type="child"
           :depth="depth"
@@ -278,152 +312,166 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  .header {
-    position: relative;
-    cursor: pointer;
+.header {
+  position: relative;
+  cursor: pointer;
+  color: var(--body-text);
+  height: 33px;
+  outline: none;
+
+  .menu-item {
     color: var(--body-text);
-    height: 33px;
-
-    H6 {
-      color: var(--body-text);
-      user-select: none;
-      text-transform: none;
-      font-size: 14px;
-    }
-
-    > A {
-      display: block;
-      padding-left: 16px;
-      &:hover{
-        text-decoration: none;
-      }
-      &:focus{
-        outline:none;
-      }
-      > H6 {
-        text-transform: none;
-      }
-    }
+    user-select: none;
+    text-transform: none;
+    font-size: 14px;
   }
 
-  .accordion {
-    .header {
-      &.active {
-        color: var(--primary-hover-text);
-        background-color: var(--primary-hover-bg);
-
-        h6 {
-          font-weight: bold;
-          color: var(--primary-hover-text);
-        }
-
-        &:hover {
-          background-color: var(--primary-hover-bg);
-        }
-      }
-      &:hover:not(.active) {
-        background-color: var(--nav-hover);
-      }
+  > A {
+    display: block;
+    box-sizing: border-box;
+    height: 100%;
+    &:hover {
+      text-decoration: none;
     }
-  }
-
-  .accordion {
-    &.depth-0 {
-      > .header {
-        padding: 8px 0;
-
-        &.noHover {
-          cursor: default;
-        }
-
-        > H6 {
-          text-transform: none;
-          padding-left: 16px;
-        }
-
-        > I {
-          position: absolute;
-          right: 0;
-          top: 0;
-          padding: 10px 10px 9px 7px;
-          user-select: none;
-        }
-      }
-
-      > .body {
-        margin-left: 0;
-      }
-
-      &.group-highlight {
-        background: var(--nav-active);
-      }
-    }
-
-    &.depth-1 {
-      > .header {
-        padding-left: 20px;
-        > H6 {
-          line-height: 18px;
-          padding: 8px 0 7px 5px !important;
-        }
-        > I {
-          padding: 10px 7px 9px 7px !important;
-        }
-      }
-    }
-
-    &:not(.depth-0) {
-      > .header {
-        > H6 {
-          // Child groups that aren't linked themselves
-          display: inline-block;
-          padding: 5px 0 5px 5px;
-        }
-
-        > I {
-          position: absolute;
-          right: 0;
-          top: 0;
-          padding: 6px 8px 6px 8px;
-        }
-      }
-    }
-  }
-
-  .body ::v-deep > .child.nuxt-link-active,
-  .header ::v-deep > .child.nuxt-link-exact-active {
-    padding: 0;
-
-    A, A I {
-      color: var(--primary-hover-text);
-    }
-
-    A {
-      color: var(--primary-hover-text);
-      background-color: var(--primary-hover-bg);
-      font-weight: bold;
-    }
-  }
-
-  .body ::v-deep > .child {
-    A {
-      border-left: solid 5px transparent;
-      line-height: 16px;
-      font-size: 14px;
-      padding-left: 24px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    A:focus {
+    &:focus {
       outline: none;
     }
+    > .menu-item {
+      text-transform: none;
+      padding: 8px 0 8px 16px;
+    }
+  }
+}
 
-    &.root {
-      background: transparent;
-      A {
-        padding-left: 14px;
+.accordion {
+  .header {
+    &:focus-visible {
+      .menu-item span {
+        @include focus-outline;
+        outline-offset: 2px;
+      }
+    }
+    .toggle-accordion:focus-visible {
+      @include focus-outline;
+      outline-offset: -6px;
+    }
+
+    &.active {
+      color: var(--primary-hover-text);
+      background-color: var(--primary-hover-bg);
+
+      .menu-item {
+        padding: 8px 0 8px 16px;
+        font-weight: bold;
+        color: var(--primary-hover-text);
+      }
+
+      &:hover {
+        background-color: var(--primary-hover-bg);
+      }
+    }
+    &:hover:not(.active) {
+      background-color: var(--nav-hover);
+    }
+  }
+}
+
+.accordion {
+  &.depth-0 {
+    > .header {
+      &.noHover {
+        cursor: default;
+      }
+
+      > .menu-item {
+        text-transform: none;
+        padding: 8px 0 8px 16px;
+      }
+
+      > I {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 10px 10px 9px 7px;
+        user-select: none;
+      }
+    }
+
+    > .body {
+      margin-left: 0;
+    }
+
+    &.group-highlight {
+      background: var(--nav-active);
+    }
+  }
+
+  &.depth-1 {
+    > .header {
+      padding-left: 20px;
+      > .menu-item {
+        line-height: 18px;
+        padding: 8px 0 7px 5px !important;
+      }
+      > I {
+        padding: 10px 7px 9px 7px !important;
       }
     }
   }
+
+  &:not(.depth-0) {
+    > .header {
+      > .menu-item {
+        // Child groups that aren't linked themselves
+        display: inline-block;
+        padding: 5px 0 5px 5px;
+      }
+
+      > I {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 6px 8px 6px 8px;
+      }
+    }
+  }
+}
+
+.body :deep() > .child.router-link-active,
+.header :deep() > .child.router-link-exact-active {
+  padding: 0;
+
+  A,
+  A I {
+    color: var(--primary-hover-text);
+  }
+
+  A {
+    color: var(--primary-hover-text);
+    background-color: var(--primary-hover-bg);
+    font-weight: bold;
+  }
+}
+
+.body :deep() > .child {
+  A {
+    border-left: solid 5px transparent;
+    line-height: 16px;
+    font-size: 14px;
+    padding-left: 24px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  A:focus {
+    outline: none;
+  }
+
+  &.root {
+    background: transparent;
+    A {
+      padding-left: 14px;
+    }
+  }
+}
 </style>

@@ -1,21 +1,31 @@
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue';
-import CompactInput from '@shell/mixins/compact-input';
-import LabeledFormElement from '@shell/mixins/labeled-form-element';
+import { defineComponent, inject } from 'vue';
 import TextAreaAutoGrow from '@components/Form/TextArea/TextAreaAutoGrow.vue';
 import LabeledTooltip from '@components/LabeledTooltip/LabeledTooltip.vue';
-import { escapeHtml } from '@shell/utils/string';
+import { escapeHtml, generateRandomAlphaString } from '@shell/utils/string';
 import cronstrue from 'cronstrue';
 import { isValidCron } from 'cron-validator';
 import { debounce } from 'lodash';
+import { useLabeledFormElement, labeledFormElementProps } from '@shell/composables/useLabeledFormElement';
+import { useCompactInput } from '@shell/composables/useCompactInput';
 
-export default (
-  Vue as VueConstructor<Vue & InstanceType<typeof LabeledFormElement> & InstanceType<typeof CompactInput>>
-).extend({
+interface NonReactiveProps {
+  onInput: (event: Event) => void | ((event: Event) => void);
+}
+
+const provideProps: NonReactiveProps = {
+  onInput() {
+    // noop
+  },
+};
+
+export default defineComponent({
   components: { LabeledTooltip, TextAreaAutoGrow },
-  mixins:     [LabeledFormElement, CompactInput],
+
+  inheritAttrs: false,
 
   props: {
+    ...labeledFormElementProps,
     /**
      * The type of the Labeled Input.
      * @values text, cron, multiline, multiline-password
@@ -92,27 +102,57 @@ export default (
       default: 0
     },
 
-    customStyle: {
-      type:    Object,
-      default: () => ({})
+    class: {
+      type:    String,
+      default: ''
+    },
+
+    /**
+     * Optionally use this to comply with a11y IF there's no label
+     * associated with the input
+     */
+    ariaLabel: {
+      type:    String,
+      default: ''
     }
+  },
+
+  emits: ['change', 'update:value', 'blur', 'update:validation'],
+
+  setup(props, { emit }) {
+    const {
+      focused,
+      onFocusLabeled,
+      onBlurLabeled,
+      isDisabled,
+      validationMessage,
+      requiredField
+    } = useLabeledFormElement(props, emit);
+    const { isCompact } = useCompactInput(props);
+
+    const onInput = inject('onInput', provideProps.onInput);
+
+    return {
+      focused,
+      onFocusLabeled,
+      onBlurLabeled,
+      onInput,
+      isDisabled,
+      validationMessage,
+      requiredField,
+      isCompact,
+    };
   },
 
   data() {
     return {
       updated:          false,
-      validationErrors: ''
+      validationErrors: '',
+      inputId:          `input-${ generateRandomAlphaString(12) }`
     };
   },
 
   computed: {
-    /**
-     * Determines if the Labeled Input @input event should be debounced.
-     */
-    onInput(): ((value: string) => void) | void {
-      return this.delay ? debounce(this.delayInput, this.delay) : this.delayInput;
-    },
-
     /**
      * Determines if the Labeled Input should display a label.
      */
@@ -127,7 +167,7 @@ export default (
       return !!this.tooltip || !!this.tooltipKey;
     },
 
-    tooltipValue(): string | undefined {
+    tooltipValue(): string | Record<string, unknown> | undefined {
       if (this.hasTooltip) {
         return this.tooltipKey ? this.t(this.tooltipKey) : this.tooltip;
       }
@@ -149,11 +189,30 @@ export default (
       if (this.type !== 'cron' || !this.value) {
         return;
       }
-      if (!isValidCron(this.value)) {
+
+      // TODO - #13202: This is required due use of 2 libraries and 3 different libraries through the code.
+      const predefined = [
+        '@yearly',
+        '@annually',
+        '@monthly',
+        '@weekly',
+        '@daily',
+        '@midnight',
+        '@hourly'
+      ];
+      const isPredefined = predefined.includes(this.value as string);
+
+      // refer https://github.com/GuillaumeRochat/cron-validator#readme
+      if (!isPredefined && !isValidCron(this.value as string, {
+        alias:              true,
+        allowBlankDay:      true,
+        allowSevenAsSunday: true,
+      })) {
         return this.t('generic.invalidCron');
       }
+
       try {
-        const hint = cronstrue.toString(this.value);
+        const hint = cronstrue.toString(this.value as string || '', { verbose: true });
 
         return hint;
       } catch (e) {
@@ -178,13 +237,32 @@ export default (
     /**
      * The max length for the Labeled Input.
      */
-    _maxlength(): number | null {
+    _maxlength(): number | undefined {
       if (this.type === 'text' && this.maxlength) {
         return this.maxlength;
       }
 
-      return null;
+      return undefined;
     },
+
+    className() {
+      return this.class;
+    }
+  },
+
+  mounted() {
+    const id = this.$attrs?.id as string | undefined;
+
+    if (id) {
+      this.inputId = id;
+    }
+  },
+
+  created() {
+    /**
+     * Determines if the Labeled Input @input event should be debounced.
+    */
+    this.onInput = this.delay ? debounce(this.delayInput, this.delay) : this.delayInput;
   },
 
   methods: {
@@ -221,9 +299,14 @@ export default (
     /**
      * Emit on input with delay. Note: Arrow function is avoided due context
      * binding.
+     *
+     * NOTE: In multiline, TextAreaAutoGrow emits a string with the value
+     * https://github.com/rancher/dashboard/issues/10249
      */
-    delayInput(value: string): void {
-      this.$emit('input', value);
+    delayInput(val: string | Event): void {
+      const value = typeof val === 'string' ? val : (val?.target as HTMLInputElement)?.value;
+
+      this.$emit('update:value', value);
     },
 
     /**
@@ -239,7 +322,7 @@ export default (
      * event.
      * @see labeled-form-element.ts mixin for onBlurLabeled()
      */
-    onBlur(event: string): void {
+    onBlur(event: string | FocusEvent): void {
       this.$emit('blur', event);
       this.onBlurLabeled();
     },
@@ -258,13 +341,17 @@ export default (
       disabled: isDisabled,
       [status]: status,
       suffix: hasSuffix,
-      'has-tooltip': hasTooltip,
+      'v-popper--has-tooltip': hasTooltip,
       'compact-input': isCompact,
-      hideArrows
+      hideArrows,
+      [className]: true
     }"
   >
     <slot name="label">
-      <label v-if="hasLabel">
+      <label
+        v-if="hasLabel"
+        :for="inputId"
+      >
         <t
           v-if="labelKey"
           :k="labelKey"
@@ -283,22 +370,26 @@ export default (
     <slot name="field">
       <TextAreaAutoGrow
         v-if="type === 'multiline' || type === 'multiline-password'"
+        :id="inputId"
         ref="value"
         v-bind="$attrs"
+        v-stripped-aria-label="!hasLabel && ariaLabel ? ariaLabel : undefined"
         :maxlength="_maxlength"
         :disabled="isDisabled"
-        :value="value"
+        :value="value || ''"
         :placeholder="_placeholder"
         autocapitalize="off"
-        :style="customStyle"
         :class="{ conceal: type === 'multiline-password' }"
-        @input="onInput($event)"
+        @update:value="onInput"
         @focus="onFocus"
         @blur="onBlur"
       />
       <input
         v-else
+        :id="inputId"
         ref="value"
+        v-stripped-aria-label="!hasLabel && ariaLabel ? ariaLabel : undefined"
+        role="textbox"
         :class="{ 'no-label': !hasLabel }"
         v-bind="$attrs"
         :maxlength="_maxlength"
@@ -309,7 +400,7 @@ export default (
         autocomplete="off"
         autocapitalize="off"
         :data-lpignore="ignorePasswordManagers"
-        @input="onInput($event.target.value)"
+        @input="onInput"
         @focus="onFocus"
         @blur="onBlur"
         @change="onChange"
@@ -317,25 +408,36 @@ export default (
     </slot>
 
     <slot name="suffix" />
+    <!-- informational tooltip about field -->
     <LabeledTooltip
-      v-if="hasTooltip && !focused"
+      v-if="hasTooltip"
       :hover="hoverTooltip"
       :value="tooltipValue"
       :status="status"
     />
+    <!-- validation tooltip -->
     <LabeledTooltip
       v-if="!!validationMessage"
       :hover="hoverTooltip"
       :value="validationMessage"
     />
-    <label
-      v-if="cronHint"
-      class="cron-label"
-    >{{ cronHint }}</label>
-    <label
-      v-if="subLabel"
+    <div
+      v-if="cronHint || subLabel"
       class="sub-label"
-    >{{ subLabel }}</label>
+      data-testid="sub-label"
+    >
+      <div
+        v-if="cronHint"
+        role="alert"
+        :aria-label="cronHint"
+      >
+        {{ cronHint }}
+      </div>
+      <div
+        v-if="subLabel"
+        v-clean-html="subLabel"
+      />
+    </div>
   </div>
 </template>
 <style scoped lang="scss">

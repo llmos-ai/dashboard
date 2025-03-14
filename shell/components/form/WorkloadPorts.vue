@@ -173,7 +173,7 @@ export default {
         const portSpec = findBy(this.loadBalancerServicePorts, 'name', _name);
 
         if (portSpec) {
-          this.$set(row, '_listeningPort', portSpec.port);
+          row['_listeningPort'] = portSpec.port;
 
           row._serviceType = 'LoadBalancer';
 
@@ -183,7 +183,7 @@ export default {
         const portSpec = findBy(this.nodePortServicePorts, 'name', _name);
 
         if (portSpec) {
-          this.$set(row, '_listeningPort', portSpec.nodePort);
+          row['_listeningPort'] = portSpec.nodePort;
 
           row._serviceType = 'NodePort';
 
@@ -212,9 +212,7 @@ export default {
       {{ t('workload.container.ports.detailedDescription') }}
     </p>
     <div
-      v-for="(row, idx) in rows"
-      :key="idx"
-      class="ports-row"
+      v-for="(row, idx) in rows" :key="idx" class="ports-row"
       :class="{
         'show-host':row._showHost,
         'loadBalancer': row._serviceType === 'LoadBalancer',
@@ -223,7 +221,7 @@ export default {
     >
       <div class="service-type">
         <LabeledSelect
-          v-model="row._serviceType"
+          v-model:value="row._serviceType"
           :mode="mode"
           :label="t('workload.container.ports.createService')"
           :options="serviceTypes"
@@ -236,7 +234,7 @@ export default {
       <div class="portName">
         <LabeledInput
           ref="name"
-          v-model="row.name"
+          v-model:value="row.name"
           :mode="mode"
           :label="t('workload.container.ports.name')"
           @input="queueUpdate"
@@ -259,7 +257,7 @@ export default {
 
       <div class="protocol col">
         <LabeledSelect
-          v-model="row.protocol"
+          v-model:value="row.protocol"
           :mode="mode"
           :options="workloadPortOptions"
           :multiple="false"
@@ -291,7 +289,7 @@ export default {
       >
         <LabeledInput
           ref="port"
-          v-model="row.hostIP"
+          v-model:value="row.hostIP"
           :mode="mode"
           placeholder="e.g. 1.1.1.1"
           :label="t('workload.container.ports.hostIP')"
@@ -410,11 +408,11 @@ $checkbox: 75;
     padding: 5px 0;
   }
 }
-.ports-row .protocol ::v-deep .unlabeled-select,
-.ports-row .protocol ::v-deep .unlabeled-select .v-select {
+.ports-row .protocol :deep() .unlabeled-select,
+.ports-row .protocol :deep() .unlabeled-select .v-select {
   height: 100%;
 }
-.ports-row .protocol ::v-deep .unlabeled-select .vs__dropdown-toggle {
+.ports-row .protocol :deep() .unlabeled-select .vs__dropdown-toggle {
   padding-top: 12px;
 }
 </style>

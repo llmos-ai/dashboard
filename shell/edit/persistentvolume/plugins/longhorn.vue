@@ -27,10 +27,10 @@ export default {
     };
 
     if (this.mode === _CREATE) {
-      this.$set(this.value.spec, 'csi', this.value.spec.csi || {});
-      // this.$set(this.value.spec.csi, 'driver', LONGHORN_DRIVER);
-      this.$set(this.value.spec.csi, 'readOnly', this.value.spec.csi.readOnly || false);
-      this.$set(this.value.spec.csi, 'volumeAttributes', this.value.spec.csi.volumeAttributes || defaultVolumeAttributes);
+      this.value.spec['csi'] = this.value.spec.csi || {};
+      // this.value.spec.csi['driver'] = LONGHORN_DRIVER;
+      this.value.spec.csi['readOnly'] = this.value.spec.csi.readOnly || false;
+      this.value.spec.csi['volumeAttributes'] = this.value.spec.csi.volumeAttributes || defaultVolumeAttributes;
     }
 
     const readOnlyOptions = [
@@ -54,7 +54,7 @@ export default {
     <div class="row mb-20">
       <div class="col span-6">
         <LabeledInput
-          v-model="value.spec.csi.fsType"
+          v-model:value="value.spec.csi.fsType"
           :mode="mode"
           :label="t('persistentVolume.shared.filesystemType.label')"
           :placeholder="t('persistentVolume.shared.filesystemType.placeholder')"
@@ -62,7 +62,7 @@ export default {
       </div>
       <div class="col span-6">
         <LabeledInput
-          v-model="value.spec.csi.volumeHandle"
+          v-model:value="value.spec.csi.volumeHandle"
           :mode="mode"
           :label="t('persistentVolume.longhorn.volumeHandle.label')"
           :placeholder="t('persistentVolume.longhorn.volumeHandle.placeholder')"
@@ -73,7 +73,7 @@ export default {
     <div class="row mb-20">
       <div class="col span-6">
         <RadioGroup
-          v-model="value.spec.csi.readOnly"
+          v-model:value="value.spec.csi.readOnly"
           name="readOnly"
           :mode="mode"
           :label="t('persistentVolume.shared.readOnly.label')"
@@ -85,7 +85,7 @@ export default {
     <div class="row mb-20">
       <div class="col span-12">
         <KeyValue
-          v-model="value.spec.csi.volumeAttributes"
+          v-model:value="value.spec.csi.volumeAttributes"
           :required="true"
           :mode="mode"
           :title="t('persistentVolume.longhorn.options.label')"

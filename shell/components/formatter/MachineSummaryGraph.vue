@@ -1,18 +1,18 @@
 <script>
-import ProgressBarMulti from '@shell/components/ProgressBarMulti';
+import ProgressBarMulti from "@shell/components/ProgressBarMulti";
 
 export default {
   components: { ProgressBarMulti },
 
   props: {
     row: {
-      type:     Object,
-      required: true
+      type: Object,
+      required: true,
     },
     horizontal: {
-      type:    Boolean,
-      default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -23,30 +23,24 @@ export default {
       const desired = this.row?.desired || 0;
 
       return ready > desired ? desired : ready;
-    }
+    },
   },
 };
 </script>
 
 <template>
-  <v-popover
+  <v-dropdown
     class="text-center hand machine-summary-graph"
     placement="top"
-    :open-group="row.id"
-    trigger="click"
+    :show-group="row.id"
+    :triggers="['click']"
     offset="1"
   >
-    <template #popover>
+    <template #popper>
       <table class="fixed">
         <tbody>
-          <tr
-            v-for="obj in row.stateParts"
-            :key="obj.label"
-          >
-            <td
-              class="text-left pr-20"
-              :class="{[obj.textColor]: true}"
-            >
+          <tr v-for="(obj, i) in row.stateParts" :key="i">
+            <td class="text-left pr-20" :class="{ [obj.textColor]: true }">
               {{ obj.label }}
             </td>
             <td class="text-right">
@@ -57,52 +51,43 @@ export default {
       </table>
     </template>
 
-    <div
-      class="content"
-      :class="{ horizontal }"
-    >
+    <div class="content" :class="{ horizontal }">
       <ProgressBarMulti
         v-if="row.stateParts"
         :values="row.stateParts"
         class="progress-bar"
       />
-      <span
-        v-if="row.desired === ready"
-        class="count"
-      >{{ ready }}</span>
-      <span
-        v-else
-        class="count"
-      >{{ ready }} of {{ row.desired }}</span>
+      <span v-if="row.desired === ready" class="count">{{ ready }}</span>
+      <span v-else class="count">{{ ready }} of {{ row.desired }}</span>
     </div>
-  </v-popover>
+  </v-dropdown>
 </template>
 
 <style lang="scss" scoped>
-  .machine-summary-graph {
-    display: flex;
-    align-items: center;
+.machine-summary-graph {
+  display: flex;
+  align-items: center;
 
-    .content {
-      .progress-bar {
-        margin-bottom: 5px;
+  .content {
+    .progress-bar {
+      margin-bottom: 5px;
+    }
+
+    &.horizontal {
+      // When horizontal, put the number before the graph
+      align-items: center;
+      direction: rtl;
+      display: flex;
+
+      > * {
+        direction: ltr;
       }
 
-      &.horizontal {
-        // When horizontal, put the number before the graph
-        align-items: center;
-        direction: rtl;
-        display: flex;
-
-        > * {
-          direction: ltr;
-        }
-
-        .progress-bar {
-          margin-bottom: 0;
-          margin-left: 10px;
-        }
+      .progress-bar {
+        margin-bottom: 0;
+        margin-left: 10px;
       }
     }
   }
+}
 </style>

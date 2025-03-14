@@ -151,7 +151,7 @@ export default {
 
     <div v-else>
       <label class="checkbox-container mr-15"><input
-                                                v-model="checkAll"
+                                                v-model:value="checkAll"
                                                 type="checkbox"
                                               >
         <span

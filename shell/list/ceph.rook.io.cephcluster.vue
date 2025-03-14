@@ -2,6 +2,7 @@
 import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import Loading from '@shell/components/Loading.vue';
+import { Banner } from '@components/Banner';
 import { AGE, NAME, PHASE, STATE } from '@shell/config/table-headers';
 import cephConfig from '@shell/mixins/ceph-config';
 
@@ -10,6 +11,7 @@ export default {
   components: {
     ResourceTable,
     Loading,
+    Banner
   },
   mixins: [ResourceFetch, cephConfig],
   props:  {
@@ -68,10 +70,11 @@ export default {
     },
 
     notification() {
+      // TODO: link enhancement
       if (this.clusters.length === 0) {
         return {
           type: 'warning',
-          html: this.t('ceph.enableNotification', { url: this.cephAddonUrl }, 'html'),
+          msg: this.t('ceph.enableNotification', { url: this.cephAddonUrl }, true),
         };
       }
 
@@ -80,7 +83,7 @@ export default {
 
       return {
         type,
-        html: this.t('ceph.notification', { status: this.clusters[0]?.status?.phase, url: this.cephAddonUrl }, 'html'),
+        msg: this.t('ceph.notification', { status: this.clusters[0]?.status?.phase, url: this.cephAddonUrl }, 'html'),
       };
     },
   },
@@ -89,15 +92,20 @@ export default {
 
 <template>
   <Loading v-if="$fetchState.pending" />
-  <ResourceTable
-    v-else
-    :schema="schema"
-    :rows="rows"
-    :headers="headers"
-    :group-by="$attrs.groupBy"
-    :loading="loading"
-    :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
-    :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
-    :notification="notification"
-  />
+  <div v-else>
+    <Banner :color="notification.type">
+      <span v-html="notification.msg" />
+    </Banner>
+
+    <ResourceTable
+      :schema="schema"
+      :rows="rows"
+      :headers="headers"
+      :group-by="$attrs.groupBy"
+      :loading="loading"
+      :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
+      :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
+    />
+  </div>
+
 </template>

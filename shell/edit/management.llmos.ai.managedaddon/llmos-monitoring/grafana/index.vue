@@ -104,9 +104,9 @@ export default {
         enabled:          true,
       } : null;
 
-      if (resetValsOut) this.$set(this.value.grafana, 'persistence', resetValsOut);
-      if (newValsOut) this.$set(this.value.grafana, 'persistence', newValsOut);
-      else this.$delete(this.value.grafana, 'persistence');
+      if (resetValsOut) this.value.grafana['persistence'] = resetValsOut;
+      if (newValsOut) this.value.grafana['persistence'] = newValsOut;
+      else delete this.value.grafana['persistence'];
     },
   }
 };
@@ -133,7 +133,7 @@ export default {
       >
         <div class="col span-6">
           <LabeledInput
-            v-model="value.grafana.resources.requests.cpu"
+            v-model:value="value.grafana.resources.requests.cpu"
             data-testid="input-grafana-requests-cpu"
             :label="t('monitoring.prometheus.config.requests.cpu')"
             :mode="mode"
@@ -141,7 +141,7 @@ export default {
         </div>
         <div class="col span-6">
           <LabeledInput
-            v-model="value.grafana.resources.requests.memory"
+            v-model:value="value.grafana.resources.requests.memory"
             data-testid="input-grafana-requests-memory"
             :label="t('monitoring.prometheus.config.requests.memory')"
             :mode="mode"
@@ -152,7 +152,7 @@ export default {
       <div class="row">
         <div class="col span-6">
           <LabeledInput
-            v-model="value.grafana.resources.limits.cpu"
+            v-model:value="value.grafana.resources.limits.cpu"
             data-testid="input-grafana-limits-cpu"
             :label="t('monitoring.prometheus.config.limits.cpu')"
             :mode="mode"
@@ -160,7 +160,7 @@ export default {
         </div>
         <div class="col span-6">
           <LabeledInput
-            v-model="value.grafana.resources.limits.memory"
+            v-model:value="value.grafana.resources.limits.memory"
             data-testid="input-grafana-limits-memory"
             :label="t('monitoring.prometheus.config.limits.memory')"
             :mode="mode"
@@ -172,7 +172,7 @@ export default {
       <div class="row pt-10 pb-10">
         <div class="col span-12 persistent-storage-config">
           <RadioGroup
-            v-model="persistentStorageType"
+            v-model:value="persistentStorageType"
             name="persistentStorageType"
             :label="t('monitoring.grafana.storage.label')"
             :labels="persistentStorageTypeLabels"
@@ -203,7 +203,7 @@ export default {
         <div class="row">
           <div class="col span-6">
             <LabeledInput
-              v-model="value.grafana.persistence.size"
+              v-model:value="value.grafana.persistence.size"
               :label="t('monitoring.grafana.storage.size')"
               :mode="mode"
               data-testid="grafana-storage-statefulset-size"
@@ -225,7 +225,7 @@ export default {
         <div class="row">
           <div class="col span-6">
             <LabeledSelect
-              v-model="value.grafana.persistence.accessModes"
+              v-model:value="value.grafana.persistence.accessModes"
               :label="t('monitoring.grafana.storage.mode')"
               :localized-label="true"
               :mode="mode"

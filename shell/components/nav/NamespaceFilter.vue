@@ -17,20 +17,25 @@ import {
   NAMESPACE_FILTER_P_FULL_PREFIX,
 } from '@shell/utils/namespace-filter';
 import { KEY } from '@shell/utils/platform';
-import pAndNFiltering from '@shell/utils/projectAndNamespaceFiltering.utils';
+import pAndNFiltering from '@shell/plugins/steve/projectAndNamespaceFiltering.utils';
+import { SETTING } from '@shell/config/settings';
+import paginationUtils from '@shell/utils/pagination-utils';
 
-const forcedNamespaceValidTypes = [NAMESPACE_FILTER_KINDS.DIVIDER, NAMESPACE_FILTER_KINDS.PROJECT, NAMESPACE_FILTER_KINDS.NAMESPACE];
+const forcedNamespaceValidTypes = [
+  NAMESPACE_FILTER_KINDS.DIVIDER,
+  NAMESPACE_FILTER_KINDS.PROJECT,
+  NAMESPACE_FILTER_KINDS.NAMESPACE,
+];
 
 export default {
-
   data() {
     return {
-      isOpen:              false,
-      filter:              '',
-      hidden:              0,
-      total:               0,
-      activeElement:       null,
-      cachedFiltered:      [],
+      isOpen: false,
+      filter: '',
+      hidden: 0,
+      total: 0,
+      activeElement: null,
+      cachedFiltered: [],
       NAMESPACE_FILTER_KINDS,
       namespaceFilterMode: undefined,
     };
@@ -41,6 +46,10 @@ export default {
     // This is done once and up front
     // - it doesn't need to be re-active
     // - added it as a computed caused massive amounts of churn around the `filtered` watcher
+    await this.$store.dispatch('management/find', {
+      type: MANAGEMENT.SETTING,
+      id: SETTING.UI_PERFORMANCE,
+    });
     this.namespaceFilterMode = this.calcNamespaceFilterMode();
   },
 
@@ -51,6 +60,14 @@ export default {
       return this.filter.length > 0;
     },
 
+    paginatedListFilterMode() {
+      return this.$store.getters[
+        `${this.currentProduct.inStore}/paginationEnabled`
+      ](this.$route.params?.resource)
+        ? paginationUtils.validNsProjectFilters
+        : null;
+    },
+
     filtered() {
       let out = this.options;
 
@@ -59,7 +76,9 @@ export default {
         if (this.namespaceFilterMode?.length) {
           // We always show dividers, projects and namespaces
           if (!forcedNamespaceValidTypes.includes(item.kind)) {
-            const validCustomType = this.namespaceFilterMode.find((prefix) => item.kind.startsWith(prefix));
+            const validCustomType = this.namespaceFilterMode.find((prefix) =>
+              item.kind.startsWith(prefix)
+            );
 
             if (!validCustomType) {
               // Hide any invalid option that's not selected
@@ -70,7 +89,10 @@ export default {
 
         // Filter by the current filter
         if (this.hasFilter) {
-          return item.kind !== NAMESPACE_FILTER_KINDS.SPECIAL && item.label.toLowerCase().includes(this.filter.toLowerCase());
+          return (
+            item.kind !== NAMESPACE_FILTER_KINDS.SPECIAL &&
+            item.label.toLowerCase().includes(this.filter.toLowerCase())
+          );
         }
 
         return true;
@@ -88,16 +110,23 @@ export default {
 
       // Mark all of the selected options
       out.forEach((i) => {
-        i.selected = !!mapped[i.id] || (i.id === ALL && this.value && this.value.length === 0);
+        i.selected =
+          !!mapped[i.id] ||
+          (i.id === ALL && this.value && this.value.length === 0);
         i.elementId = (i.id || '').replace('://', '_');
         i.enabled = true;
         // Are we in restricted resource type mode, if so is this an allowed type?
         if (this.namespaceFilterMode?.length) {
-          const isLastSelected = i.selected && (i.id === ALL || this.value.length === 1);
-          const kindAllowed = this.namespaceFilterMode.find((f) => f === i.kind);
+          const isLastSelected =
+            i.selected && (i.id === ALL || this.value.length === 1);
+          const kindAllowed = this.namespaceFilterMode.find(
+            (f) => f === i.kind
+          );
           const isNotInProjectGroup = i.id === ALL_ORPHANS;
 
-          i.enabled = (!isLastSelected && kindAllowed) && !isNotInProjectGroup;
+          i.enabled = !isLastSelected && kindAllowed && !isNotInProjectGroup;
+        } else if (this.paginatedListFilterMode?.length) {
+          i.enabled = !!i.id && paginationUtils.validateNsProjectFilter(i.id);
         }
       });
 
@@ -105,54 +134,71 @@ export default {
     },
 
     tooltip() {
-      if (this.isOpen || (this.total + this.hidden) === 0) {
+      if (this.isOpen || this.total + this.hidden === 0) {
         return null;
       }
 
       let tooltip = '<div class="ns-filter-tooltip">';
 
       (this.value || []).forEach((v) => {
-        tooltip += `<div class="ns-filter-tooltip-item"><div>${ v.label }</div></div>`;
+        tooltip += `<div class="ns-filter-tooltip-item"><div>${v.label}</div></div>`;
       });
 
       tooltip += '</div>';
 
       return {
-        content:   tooltip,
+        content: tooltip,
         placement: 'bottom',
-        delay:     { show: 500 }
+        delay: { show: 500 },
       };
     },
 
     key() {
-      return createNamespaceFilterKey(this.$store.getters['clusterId'], this.currentProduct);
+      return createNamespaceFilterKey(
+        this.$store.getters['clusterId'],
+        this.currentProduct
+      );
     },
 
     options() {
       const t = this.$store.getters['i18n/t'];
       let out = [];
+      const inStore = this.$store.getters['currentStore'](NAMESPACE);
 
       const params = { ...this.$route.params };
       const resource = params.resource;
+
       // Sometimes, different pages may have different namespaces to filter
-      const notFilterNamespaces = this.$store.getters[`type-map/optionsFor`](resource).notFilterNamespace || [];
+      const notFilterNamespaces =
+        this.$store.getters[`type-map/optionsFor`](resource)
+          .notFilterNamespace || [];
 
       // TODO: Add return info
-      if (this.currentProduct?.customNamespaceFilter && this.currentProduct?.inStore) {
+      if (
+        this.currentProduct?.customNamespaceFilter &&
+        this.currentProduct?.inStore
+      ) {
         // Sometimes the component can show before the 'currentProduct' has caught up, so access the product via the getter rather
         // than caching it in the `fetch`
 
         // The namespace display on the list and edit pages should be the same as in the namespaceFilter component
-        if (this.$store.getters[`${ this.currentProduct.inStore }/filterNamespace`]) {
-          const allNamespaces = this.$store.getters[`${ this.currentProduct.inStore }/filterNamespace`](notFilterNamespaces);
+        if (
+          this.$store.getters[`${this.currentProduct.inStore}/filterNamespace`]
+        ) {
+          const allNamespaces =
+            this.$store.getters[
+              `${this.currentProduct.inStore}/filterNamespace`
+            ](notFilterNamespaces);
 
           this.$store.commit('changeAllNamespaces', allNamespaces);
         }
 
-        return this.$store.getters[`${ this.currentProduct.inStore }/namespaceFilterOptions`]({
+        return this.$store.getters[
+          `${this.currentProduct.inStore}/namespaceFilterOptions`
+        ]({
           addNamespace,
           divider,
-          notFilterNamespaces
+          notFilterNamespaces,
         });
       }
 
@@ -160,28 +206,28 @@ export default {
       if (!this.currentProduct?.hideSystemResources) {
         out = [
           {
-            id:    ALL,
-            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
+            id: ALL,
+            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.all'),
           },
           {
-            id:    ALL_USER,
-            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
+            id: ALL_USER,
+            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.user'),
           },
           {
-            id:    ALL_SYSTEM,
-            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
+            id: ALL_SYSTEM,
+            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.system'),
           },
           {
-            id:    NAMESPACED_YES,
-            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
+            id: NAMESPACED_YES,
+            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.namespaced'),
           },
           {
-            id:    NAMESPACED_NO,
-            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
+            id: NAMESPACED_NO,
+            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.clusterLevel'),
           },
         ];
@@ -189,28 +235,28 @@ export default {
         divider(out);
       }
 
-      const inStore = this.$store.getters['currentStore'](NAMESPACE);
-
       if (!inStore) {
         return out;
       }
 
       let namespaces = sortBy(
-        this.$store.getters[`${ inStore }/all`](NAMESPACE),
+        this.$store.getters[`${inStore}/all`](NAMESPACE),
         ['nameDisplay']
       );
 
       namespaces = this.filterNamespaces(namespaces);
 
-      // isMgmt = mgmt schemas are loaded and there's a project schema
-      if (this.$store.getters['isMgmt']) {
+      // isRancher = mgmt schemas are loaded and there's a project schema
+      if (this.$store.getters['isRancher']) {
         const cluster = this.$store.getters['currentCluster'];
         let projects = this.$store.getters['management/all'](
           MANAGEMENT.PROJECT
         );
 
         projects = projects.filter((p) => {
-          return this.currentProduct?.hideSystemResources ? !p.isSystem && p.spec.clusterName === cluster.id : p.spec.clusterName === cluster.id;
+          return this.currentProduct?.hideSystemResources
+            ? !p.isSystem && p.spec.clusterName === cluster.id
+            : p.spec.clusterName === cluster.id;
         });
         projects = sortBy(filterBy(projects, 'spec.clusterName', cluster.id), [
           'nameDisplay',
@@ -251,8 +297,8 @@ export default {
           }
 
           out.push({
-            id:    `${ NAMESPACE_FILTER_P_FULL_PREFIX }${ id }`,
-            kind:  NAMESPACE_FILTER_KINDS.PROJECT,
+            id: `${NAMESPACE_FILTER_P_FULL_PREFIX}${id}`,
+            kind: NAMESPACE_FILTER_KINDS.PROJECT,
             label: t('nav.ns.project', { name: project.nameDisplay }),
           });
 
@@ -269,10 +315,10 @@ export default {
           }
 
           out.push({
-            id:       ALL_ORPHANS,
-            kind:     NAMESPACE_FILTER_KINDS.PROJECT,
-            label:    t('nav.ns.namespaced'),
-            disabled: false,
+            id: ALL_ORPHANS,
+            kind: NAMESPACE_FILTER_KINDS.PROJECT,
+            label: t('nav.ns.orphan'),
+            disabled: true,
           });
 
           addNamespace(out, orphans);
@@ -292,8 +338,8 @@ export default {
           out,
           namespaces.map((namespace) => {
             return {
-              id:    `${ NAMESPACE_FILTER_NS_FULL_PREFIX }${ namespace.id }`,
-              kind:  NAMESPACE_FILTER_KINDS.NAMESPACE,
+              id: `${NAMESPACE_FILTER_NS_FULL_PREFIX}${namespace.id}`,
+              kind: NAMESPACE_FILTER_KINDS.NAMESPACE,
               label: t('nav.ns.namespace', { name: namespace.nameDisplay }),
             };
           })
@@ -302,22 +348,27 @@ export default {
 
       function divider(out) {
         out.push({
-          kind:     NAMESPACE_FILTER_KINDS.DIVIDER,
-          label:    `Divider ${ out.length }`,
+          kind: NAMESPACE_FILTER_KINDS.DIVIDER,
+          label: `Divider ${out.length}`,
           disabled: true,
         });
       }
     },
 
     isSingleSpecial() {
-      return this.value && this.value.length === 1 && this.value[0].kind === NAMESPACE_FILTER_KINDS.SPECIAL;
+      return (
+        this.value &&
+        this.value.length === 1 &&
+        this.value[0].kind === NAMESPACE_FILTER_KINDS.SPECIAL
+      );
     },
 
     value: {
       get() {
         // Use last picked filter from user preferences
         const prefs = this.$store.getters['prefs/get'](NAMESPACE_FILTERS);
-        const values = prefs && prefs[this.key] ? prefs[this.key] : this.defaultOption();
+        const values =
+          prefs && prefs[this.key] ? prefs[this.key] : this.defaultOption();
         const options = this.options;
 
         // Remove values that are not valid options
@@ -365,14 +416,14 @@ export default {
         this.$nextTick(() => {
           this.$store.dispatch('switchNamespaces', {
             ids,
-            key: this.key
+            key: this.key,
           });
         });
       },
-    }
+    },
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     this.removeCloseKeyHandler();
   },
 
@@ -398,7 +449,7 @@ export default {
       if (!!neu) {
         this.cachedFiltered = neu;
       }
-    }
+    },
   },
 
   methods: {
@@ -475,17 +526,17 @@ export default {
       document.removeEventListener('keyup', this.closeKeyHandler);
     },
     closeKeyHandler(e) {
-      if (e.keyCode === KEY.ESCAPE ) {
+      if (e.keyCode === KEY.ESCAPE) {
         this.close();
       }
     },
     // Keyboard support
     itemKeyHandler(e, opt) {
-      if (e.keyCode === KEY.DOWN ) {
+      if (e.keyCode === KEY.DOWN) {
         e.preventDefault();
         e.stopPropagation();
         this.down();
-      } else if (e.keyCode === KEY.UP ) {
+      } else if (e.keyCode === KEY.UP) {
         e.preventDefault();
         e.stopPropagation();
         this.up();
@@ -501,22 +552,22 @@ export default {
     },
     inputKeyHandler(e) {
       switch (e.keyCode) {
-      case KEY.DOWN:
-        e.preventDefault();
-        e.stopPropagation();
-        this.down(true);
-        break;
-      case KEY.TAB:
-        // Tab out of the input box
-        this.close();
-        e.target.blur();
-        break;
-      case KEY.CR:
-        if (this.filtered.length === 1) {
-          this.selectOption(this.filtered[0]);
-          this.filter = '';
-        }
-        break;
+        case KEY.DOWN:
+          e.preventDefault();
+          e.stopPropagation();
+          this.down(true);
+          break;
+        case KEY.TAB:
+          // Tab out of the input box
+          this.close();
+          e.target.blur();
+          break;
+        case KEY.CR:
+          if (this.filtered.length === 1) {
+            this.selectOption(this.filtered[0]);
+            this.filter = '';
+          }
+          break;
       }
     },
     mouseOver(event) {
@@ -588,10 +639,13 @@ export default {
     open() {
       this.isOpen = true;
       this.$nextTick(() => {
-        this.$refs.filter.focus();
+        this.focusFilter();
       });
       this.addCloseKeyHandler();
       this.layout();
+    },
+    focusFilter() {
+      this.$refs.filter.focus();
     },
     close() {
       this.isOpen = false;
@@ -660,28 +714,20 @@ export default {
         return [];
       }
 
-      const user = this.$store.getters['auth/user'];
-
-      if (user && user.status?.isAdmin) {
-        this.$store.dispatch('prefs/set', {
-          key:   NAMESPACE_FILTERS,
-          value: { local: [] }
-        });
-
-        return [];
-      }
-
       return [ALL_USER];
     },
 
     calcNamespaceFilterMode() {
       if (pAndNFiltering.isEnabled(this.$store.getters)) {
-        return [NAMESPACE_FILTER_KINDS.NAMESPACE, NAMESPACE_FILTER_KINDS.PROJECT];
+        return [
+          NAMESPACE_FILTER_KINDS.NAMESPACE,
+          NAMESPACE_FILTER_KINDS.PROJECT,
+        ];
       }
 
       return null;
     },
-  }
+  },
 };
 </script>
 
@@ -691,13 +737,10 @@ export default {
     class="ns-filter"
     data-testid="namespaces-filter"
     tabindex="0"
+    @mousedown.prevent
     @focus="open()"
   >
-    <div
-      v-if="isOpen"
-      class="ns-glass"
-      @click="close()"
-    />
+    <div v-if="isOpen" class="ns-glass" @click="close()" />
 
     <!-- Select Dropdown control -->
     <div
@@ -771,27 +814,13 @@ export default {
       >
         {{ t('namespaceFilter.more', { more: hidden }) }}
       </div>
-      <i
-        v-if="!isOpen"
-        class="icon icon-chevron-down"
-      />
-      <i
-        v-else
-        class="icon icon-chevron-up"
-      />
+      <i v-if="!isOpen" class="icon icon-chevron-down" />
+      <i v-else class="icon icon-chevron-up" />
     </div>
-    <button
-      v-shortkey.once="['n']"
-      class="hide"
-      @shortkey="open()"
-    />
+    <a-button v-shortkey.once="['n']" class="hide" @shortkey="open()" />
 
     <!-- Dropdown menu -->
-    <div
-      v-if="isOpen"
-      class="ns-dropdown-menu"
-      data-testid="namespaces-menu"
-    >
+    <div v-if="isOpen" class="ns-dropdown-menu" data-testid="namespaces-menu">
       <div class="ns-controls">
         <div class="ns-input">
           <input
@@ -799,46 +828,34 @@ export default {
             v-model="filter"
             tabindex="0"
             class="ns-filter-input"
+            @click="focusFilter"
             @keydown="inputKeyHandler($event)"
-          >
+          />
           <i
             v-if="hasFilter"
             class="ns-filter-clear icon icon-close"
             @click="filter = ''"
           />
         </div>
-        <div
-          v-if="namespaceFilterMode"
-          class="ns-singleton-info"
-        >
+        <div v-if="namespaceFilterMode" class="ns-singleton-info">
           <i
             v-clean-tooltip="t('resourceList.nsFilterToolTip')"
             class="icon icon-info"
           />
         </div>
-        <div
-          v-else
-          class="ns-clear"
-        >
-          <i
-            class="icon icon-close"
-            @click="clear()"
-          />
+        <div v-else class="ns-clear">
+          <i class="icon icon-close" @click="clear()" />
         </div>
       </div>
       <div class="ns-divider mt-0" />
-      <div
-        ref="options"
-        class="ns-options"
-        role="list"
-      >
+      <div ref="options" class="ns-options" role="list">
         <div
           v-for="(opt, i) in cachedFiltered"
           :id="opt.elementId"
           :key="opt.id"
           tabindex="0"
           class="ns-option"
-          :disabled="!opt.enabled"
+          :disabled="opt.enabled ? null : true"
           :class="{
             'ns-selected': opt.selected,
             'ns-single-match': cachedFiltered.length === 1 && !opt.selected,
@@ -852,19 +869,13 @@ export default {
             v-if="opt.kind === NAMESPACE_FILTER_KINDS.DIVIDER"
             class="ns-divider"
           />
-          <div
-            v-else
-            class="ns-item"
-          >
+          <div v-else class="ns-item">
             <i
               v-if="opt.kind === NAMESPACE_FILTER_KINDS.NAMESPACE"
               class="icon icon-folder"
             />
             <div>{{ opt.label }}</div>
-            <i
-              v-if="opt.selected"
-              class="icon icon-checkmark"
-            />
+            <i v-if="opt.selected" class="icon icon-checkmark" />
           </div>
         </div>
         <div
@@ -880,275 +891,274 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  $ns_dropdown_size: 24px;
+$ns_dropdown_size: 24px;
 
-  .ns-abs {
-    position: absolute;
+.ns-abs {
+  position: absolute;
+}
+
+.ns-filter {
+  width: 280px;
+  display: inline-block;
+
+  .ns-glass {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    position: fixed;
+
+    z-index: z-index('overContent');
   }
 
-  .ns-filter {
-    width: 280px;
-    display: inline-block;
+  .ns-controls {
+    align-items: center;
+    display: flex;
+  }
 
-    $glass-z-index: 2;
-    $dropdown-z-index: 1000;
-
-    .ns-glass {
-      height: 100vh;
-      left: 0;
-      opacity: 0;
-      position: absolute;
-      top: 0;
-      width: 100vw;
-      z-index: $glass-z-index;
-    }
-
-    .ns-controls {
-      align-items: center;
-      display: flex;
-    }
-
-    .ns-clear {
-      &:hover {
-        color: var(--primary);
-        cursor: pointer;
-      }
-    }
-
-    .ns-singleton-info, .ns-clear {
-      align-items: center;
-      display: flex;
-      > i {
-        padding-right: 5px;
-      }
-    }
-
-    .ns-input {
-      flex: 1;
-      padding: 5px;
-      position: relative;
-    }
-
-    .ns-filter-input {
-      height: 24px;
-    }
-
-    .ns-filter-clear {
+  .ns-clear {
+    &:hover {
+      color: var(--primary);
       cursor: pointer;
-      position: absolute;
-      right: 10px;
-      top: 5px;
-      line-height: 24px;
-      text-align: center;
-      width: 24px;
+    }
+  }
+
+  .ns-singleton-info,
+  .ns-clear {
+    align-items: center;
+    display: flex;
+    > i {
+      padding-right: 5px;
+    }
+  }
+
+  .ns-input {
+    flex: 1;
+    padding: 5px;
+    position: relative;
+  }
+
+  .ns-filter-input {
+    height: 24px;
+  }
+
+  .ns-filter-clear {
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    line-height: 24px;
+    text-align: center;
+    width: 24px;
+  }
+
+  .ns-dropdown-menu {
+    background-color: var(--header-bg);
+    border: 1px solid var(--primary-border);
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    color: var(--header-btn-text);
+    margin-top: -1px;
+    padding-bottom: 10px;
+    position: relative;
+    z-index: z-index('dropdownOverlay');
+
+    .ns-options {
+      max-height: 50vh;
+      overflow-y: auto;
+
+      .ns-none {
+        color: var(--muted);
+        padding: 0 10px;
+      }
     }
 
-    .ns-dropdown-menu {
-      background-color: var(--header-bg);
-      border: 1px solid var(--primary-border);
-      border-bottom-left-radius: var(--border-radius);
-      border-bottom-right-radius: var(--border-radius);
-      color: var(--header-btn-text);
-      margin-top: -1px;
+    .ns-divider {
+      border-top: 1px solid var(--border);
+      cursor: default;
+      margin-top: 10px;
       padding-bottom: 10px;
-      position: relative;
-      z-index: $dropdown-z-index;
+    }
 
-      .ns-options {
-        max-height: 50vh;
-        overflow-y: auto;
-
-        .ns-none {
-          color: var(--muted);
-          padding: 0 10px;
-        }
-      }
-
-      .ns-divider {
-        border-top: 1px solid var(--border);
+    .ns-option {
+      &[disabled] {
         cursor: default;
-        margin-top: 10px;
-        padding-bottom: 10px;
       }
 
-      .ns-option {
-
-        &[disabled] {
-          cursor: default;
+      &:not([disabled]) {
+        &:focus {
+          background-color: var(--dropdown-hover-bg);
+          color: var(--dropdown-hover-text);
         }
-
-        &:not([disabled]) {
+        .ns-item {
+          &:hover,
           &:focus {
             background-color: var(--dropdown-hover-bg);
             color: var(--dropdown-hover-text);
-          }
-          .ns-item {
-             &:hover, &:focus {
-              background-color: var(--dropdown-hover-bg);
-              color: var(--dropdown-hover-text);
-              cursor: pointer;
+            cursor: pointer;
 
-              > i {
+            > i {
+              color: var(--dropdown-hover-text);
+            }
+          }
+        }
+
+        &.ns-selected {
+          &:hover,
+          &:focus {
+            .ns-item {
+              > * {
+                background-color: var(--dropdown-hover-bg);
                 color: var(--dropdown-hover-text);
               }
             }
           }
+        }
 
-          &.ns-selected {
-            &:hover,&:focus {
-              .ns-item {
-                > * {
-                  background-color: var(--dropdown-hover-bg);
-                  color: var(--dropdown-hover-text);
-                }
-              }
+        &.ns-selected:not(:hover) {
+          .ns-item {
+            > * {
+              color: var(--primary);
             }
           }
 
-          &.ns-selected:not(:hover) {
+          &:focus {
             .ns-item {
               > * {
-                color: var(--dropdown-hover-bg);
-              }
-            }
-
-            &:focus {
-              .ns-item {
-                > * {
-                  color: var(--dropdown-hover-text);
-                }
+                color: var(--dropdown-hover-text);
               }
             }
           }
         }
+      }
 
+      .ns-item {
+        align-items: center;
+        display: flex;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 10px;
+
+        > i {
+          color: var(--muted);
+          margin: 0 5px;
+        }
+
+        > div {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+
+      &.ns-single-match {
         .ns-item {
-          align-items: center;
-          display: flex;
-          height: 24px;
-          line-height: 24px;
-          padding: 0 10px;
-
-          > i {
-            color: var(--muted);
-            margin: 0 5px;
-          }
-
-          > div {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-
-        }
-
-        &.ns-single-match {
-          .ns-item {
-            background-color: var(--dropdown-hover-bg);
-            > * {
-              color: var(--dropdown-hover-text);
-            }
+          background-color: var(--dropdown-hover-bg);
+          > * {
+            color: var(--dropdown-hover-text);
           }
         }
       }
     }
+  }
 
-    .ns-dropdown {
-      align-items: center;
-      display: flex;
-      border: 1px solid var(--header-border);
-      border-radius: var(--border-radius);
-      color: var(--header-btn-text);
-      cursor: pointer;
-      height: 40px;
-      padding: 0 10px;
-      position: relative;
-      z-index: $dropdown-z-index;
+  .ns-dropdown {
+    align-items: center;
+    display: flex;
+    border: 1px solid var(--header-border);
+    border-radius: var(--border-radius);
+    color: var(--header-btn-text);
+    cursor: pointer;
+    height: 40px;
+    padding: 0 10px;
+    position: relative;
+    z-index: z-index('dropdownOverlay');
 
-      &.ns-open {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-color: var(--primary-border);
-      }
+    &.ns-open {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: var(--primary-border);
+    }
 
-      > .ns-values {
-        flex: 1;
-      }
+    > .ns-values {
+      flex: 1;
+    }
 
-      &:hover {
-        > i {
-          color: var(--primary);
-        }
-      }
-
+    &:hover {
       > i {
-        height: $ns_dropdown_size;
-        width: $ns_dropdown_size;
-        cursor: pointer;
-        text-align: center;
-        line-height: $ns_dropdown_size;
+        color: var(--primary);
       }
+    }
 
-      .ns-more {
+    > i {
+      height: $ns_dropdown_size;
+      width: $ns_dropdown_size;
+      cursor: pointer;
+      text-align: center;
+      line-height: $ns_dropdown_size;
+    }
+
+    .ns-more {
+      border: 1px solid var(--header-border);
+      border-radius: 5px;
+      padding: 2px 8px;
+      margin-left: 4px;
+    }
+
+    .ns-values {
+      display: flex;
+      overflow: hidden;
+
+      .ns-value {
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.05);
         border: 1px solid var(--header-border);
         border-radius: 5px;
-        padding: 2px 8px;
-        margin-left: 4px;
-      }
-
-      .ns-values {
+        color: var(--tag-text);
         display: flex;
-        overflow: hidden;
+        line-height: 20px;
+        padding: 2px 5px;
+        white-space: nowrap;
 
-        .ns-value {
-          align-items: center;
-          background-color: rgba(0,0,0,.05);
-          border: 1px solid var(--header-border);
-          border-radius: 5px;
-          color: var(--tag-text);
-          display: flex;
-          line-height: 20px;
-          padding: 2px 5px;
-          white-space: nowrap;
+        > i {
+          margin-left: 5px;
 
-          > i {
-            margin-left: 5px;
-
-            &:hover {
-              color: var(--primary);
-            };
+          &:hover {
+            color: var(--primary);
           }
+        }
 
-          // Spacing between tags
-          &:not(:last-child) {
-            margin-right: 5px;
-          }
+        // Spacing between tags
+        &:not(:last-child) {
+          margin-right: 5px;
         }
       }
     }
   }
+}
 </style>
 <style lang="scss">
-  .tooltip {
-    .ns-filter-tooltip {
-      background-color: var(--body-bg);
-      margin: -6px;
-      padding: 6px;
+.v-popper__popper {
+  .ns-filter-tooltip {
+    background-color: var(--body-bg);
+    margin: -6px;
+    padding: 6px;
 
-      .ns-filter-tooltip-item {
-        > div {
-          background-color: rgba(0,0,0,.05);
-          border: 1px solid var(--header-border);
-          border-radius: 5px;
-          color: var(--tag-text);
-          display: inline-block;
-          line-height: 20px;
-          padding: 2px 5px;
-          white-space: nowrap;
-          margin: 4px 0;
-        }
+    .ns-filter-tooltip-item {
+      > div {
+        background-color: rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--header-border);
+        border-radius: 5px;
+        color: var(--tag-text);
+        display: inline-block;
+        line-height: 20px;
+        padding: 2px 5px;
+        white-space: nowrap;
+        margin: 4px 0;
       }
     }
   }
+}
 </style>

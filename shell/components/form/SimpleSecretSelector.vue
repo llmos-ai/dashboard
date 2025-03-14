@@ -129,7 +129,7 @@ export default {
   <div class="secret-selector show-key-selector">
     <div class="input-container">
       <LabeledSelect
-        v-model="name"
+        v-model:value="name"
         class="col span-6"
         :disabled="!isView && disabled"
         :options="secretNames"
@@ -138,7 +138,7 @@ export default {
         @selecting="updateSecretName"
       />
       <LabeledSelect
-        v-model="key"
+        v-model:value="key"
         class="col span-6"
         :disabled="isKeyDisabled"
         :options="keys"

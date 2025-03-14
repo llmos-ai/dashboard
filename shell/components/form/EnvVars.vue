@@ -12,62 +12,66 @@ export default {
      * Form mode for the component
      */
     mode: {
-      type:     String,
+      type: String,
       required: true,
     },
     configMaps: {
-      type:     Array,
-      required: true
+      type: Array,
+      required: true,
     },
     secrets: {
-      type:     Array,
-      required: true
+      type: Array,
+      required: true,
     },
     loading: {
       default: false,
-      type:    Boolean
+      type: Boolean,
     },
     /**
      * Container spec
      */
     value: {
-      type:    Object,
+      type: Object,
       default: () => {
         return {};
-      }
+      },
     },
     excludes: {
-      type:    Array,
-      default: () => []
-    }
+      type: Array,
+      default: () => [],
+    },
   },
 
   data() {
     const { env = [], envFrom = [] } = this.value;
 
-    const allEnv = [...env, ...envFrom].filter((row) => {
-      return !this.excludes.includes(row.name);
-    }).map((row) => {
-      return { value: row, id: randomStr(4) };
-    });
+    const allEnv = [...env, ...envFrom]
+      .filter((row) => {
+        return !this.excludes.includes(row.name);
+      })
+      .map((row) => {
+        return { value: row, id: randomStr(4) };
+      });
 
     return {
-      env, envFrom, allEnv
+      env,
+      envFrom,
+      allEnv,
     };
   },
 
   computed: {
     isView() {
       return this.mode === _VIEW;
-    }
+    },
   },
 
   watch: {
     'value.tty'(neu) {
       if (neu) {
-        this.$set(this.value, 'stdin', true);
+        this.value['stdin'] = true;
       }
-    }
+    },
   },
   created() {
     this.queueUpdate = debounce(this.update, 500);
@@ -90,8 +94,8 @@ export default {
           envVar.push(row.value);
         }
       });
-      this.$set(this.value, 'env', envVar);
-      this.$set(this.value, 'envFrom', envVarSource);
+      this.value['env'] = envVar;
+      this.value['envFrom'] = envVarSource;
     },
 
     updateRow() {
@@ -104,40 +108,40 @@ export default {
     },
 
     addFromReference() {
-      this.allEnv.push({ value: { name: '', valueFrom: {} }, id: randomStr(4) });
+      this.allEnv.push({
+        value: { name: '', valueFrom: {} },
+        id: randomStr(4),
+      });
     },
   },
 };
 </script>
 <template>
-  <div :style="{'width':'100%'}">
-    <div
-      v-for="(row, i) in allEnv"
-      :key="row.id"
-    >
+  <div :style="{ width: '100%' }">
+    <div v-for="(row, i) in allEnv" :key="i">
       <ValueFromResource
-        v-model="row.value"
+        v-model:value="row.value"
         :all-secrets="secrets"
         :all-config-maps="configMaps"
         :mode="mode"
         :loading="loading"
         @remove="removeRow(i)"
-        @input="updateRow"
+        @update:value="updateRow"
       />
     </div>
-    <button
+    <a-button
       v-if="!isView"
       v-t="'workload.container.command.addEnvVar'"
-      type="button"
-      class="btn role-tertiary add"
+      type="primary"
+      class="add"
       data-testid="add-env-var"
       @click="addFromReference"
     />
   </div>
 </template>
 
-<style lang='scss' scoped>
-.value-from ::v-deep {
+<style lang="scss" scoped>
+.value-from :deep() {
   .v-select {
     height: 50px;
   }
@@ -146,15 +150,16 @@ export default {
     height: 50px;
   }
 }
-.value-from, .value-from-headers {
+.value-from,
+.value-from-headers {
   display: grid;
   grid-template-columns: 20% 20% 20% 5% 20% auto;
   grid-gap: $column-gutter;
   align-items: center;
   margin-bottom: 10px;
 }
-  .value-from-headers {
-    margin: 10px 0px 10px 0px;
-    color: var(--input-label);
-    }
+.value-from-headers {
+  margin: 10px 0px 10px 0px;
+  color: var(--input-label);
+}
 </style>

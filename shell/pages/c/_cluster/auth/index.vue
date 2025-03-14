@@ -1,19 +1,21 @@
-<script>
+<script setup>
+import { onBeforeMount } from 'vue';
+import { useRouter, useRoute } from 'vue-router'
+
 import { NAME as AUTH } from '@shell/config/product/auth';
 import { MANAGEMENT } from '@shell/config/types';
 
-export default {
-  layout: 'plain',
+const route = useRoute()
+const router = useRouter()
 
-  middleware({ redirect, route } ) {
-    return redirect({
-      name:   'c-cluster-product-resource',
+onBeforeMount(() => {
+  router.replace({
+    name:   'c-cluster-product-resource',
       params: {
         ...route.params,
         product:  AUTH,
         resource: MANAGEMENT.USER,
       }
-    });
-  }
-};
+  });
+});
 </script>

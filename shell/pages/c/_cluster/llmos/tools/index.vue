@@ -14,13 +14,17 @@ export default {
     BadgeStateFormatter,
     LazyImage,
     Loading,
-    TabTitle
+    TabTitle,
   },
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const hash = await allHash({ addons: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.MANAGED_ADDON }) });
+    const hash = await allHash({
+      addons: this.$store.dispatch(`${inStore}/findAll`, {
+        type: MANAGEMENT.MANAGED_ADDON,
+      }),
+    });
 
     this.addons = hash.addons;
   },
@@ -51,87 +55,78 @@ export default {
       route.query[ENABLED] = 'false';
       this.$router.replace(route);
     },
-  }
+  },
 };
 </script>
 <template>
   <Loading v-if="$fetchState.pending" />
   <div v-else>
     <h1>
-      <TabTitle>{{ t('typeLabel."llmos.tool"', {count: 2}) }}</TabTitle>
+      <TabTitle>{{ t('typeLabel."llmos.tool"', { count: 2 }) }}</TabTitle>
     </h1>
 
     <div class="grid">
       <div
-        v-for="addon in clusterAddons"
-        :key="addon.id"
+        v-for="(addon, i) in clusterAddons"
+        :key="i"
         class="item"
         :data-testid="`cluster-tools-app-${addon.id}`"
       >
-        <div
-          class="logo"
-        >
-          <i
-            v-if="addon.iconName"
-            class="icon"
-            :class="addon.iconName"
-          />
-          <LazyImage
-            v-else
-            :src="addon.logo"
-          />
+        <div class="logo">
+          <i v-if="addon.iconName" class="icon" :class="addon.iconName" />
+          <LazyImage v-else :src="addon.logo" />
         </div>
         <div class="name-version">
           <div>
-            <nuxt-link
-              :to="addon.editUrl"
-            >
+            <router-link :to="addon.editUrl">
               <h3 class="name">
                 {{ addon.formatName }}
               </h3>
               <div class="state">
                 <BadgeStateFormatter :row="addon" />
               </div>
-            </nuxt-link>
+            </router-link>
           </div>
           <div class="version">
             {{ addon.version }}
           </div>
         </div>
         <div class="description">
-          <div
-            v-clean-html="addon.description"
-            class="description-content"
-          />
+          <div v-clean-html="addon.description" class="description-content" />
         </div>
         <div class="action">
           <template v-if="addon.blocked">
-            <button
+            <a-button
               v-clean-html="t('managedAddon.tools.action.install')"
               disabled="true"
-              class="btn btn-sm role-primary"
-            />
+              type="primary"
+              size="small"
+            >
+            </a-button>
           </template>
           <template v-else-if="addon.spec.enabled">
-            <button
+            <a-button
               v-clean-html="t('managedAddon.tools.action.disable')"
-              class="btn btn-sm role-secondary"
+              type="primary"
+              size="small"
               @click="disable(addon)"
             />
-            <nuxt-link :to="addon.editUrl">
-              <button
+            <router-link :to="addon.editUrl">
+              <a-button
                 v-clean-html="t('managedAddon.tools.action.edit')"
-                class="btn btn-sm role-secondary"
+                type="primary"
+                size="small"
               />
-            </nuxt-link>
+            </router-link>
           </template>
           <template v-else>
-            <nuxt-link :to="addon.editUrl">
-              <button
+            <router-link :to="addon.editUrl">
+              <a-button
                 v-clean-html="t('managedAddon.tools.action.install')"
-                class="btn btn-sm role-primary"
+                type="primary"
+                size="small"
               />
-            </nuxt-link>
+            </router-link>
           </template>
         </div>
       </div>
@@ -147,7 +142,7 @@ $logo: 50px;
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
-  margin: 0 -1*$margin;
+  margin: 0 -1 * $margin;
 
   @media only screen and (min-width: map-get($breakpoints, '--viewport-4')) {
     .item {
@@ -172,9 +167,10 @@ $logo: 50px;
 
   .item {
     display: grid;
-    grid-template-areas:  "logo name-version name-version"
-                            "description description description"
-                            "state state action";
+    grid-template-areas:
+      'logo name-version name-version'
+      'description description description'
+      'state state action';
     grid-template-columns: $logo auto min-content;
     grid-template-rows: 50px 55px 35px;
     row-gap: $margin;
@@ -184,7 +180,7 @@ $logo: 50px;
     padding: $margin;
     position: relative;
     border: 1px solid var(--border);
-    border-radius: calc( 1.5 * var(--border-radius));
+    border-radius: calc(1.5 * var(--border-radius));
 
     .logo {
       grid-area: logo;

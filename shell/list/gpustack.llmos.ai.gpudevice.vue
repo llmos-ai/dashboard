@@ -86,13 +86,13 @@ export default {
     :rows="rows"
     key-field="_key"
     :namespaced="false"
-    v-on="$listeners"
+    
   >
     <template #col:uuid="{row}">
       <td>
-        <n-link :to="row.detailLocation">
+        <router-link :to="row.detailLocation">
           {{ row.status?.uuid }}
-        </n-link>
+        </router-link>
         <CopyToClipboard
           label-as="tooltip"
           :text="row.status?.uuid"

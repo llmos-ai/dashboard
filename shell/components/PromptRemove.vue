@@ -1,19 +1,23 @@
 <script>
+import { shallowRef } from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import { get, isEmpty } from '@shell/utils/object';
 import { escapeHtml, resourceNames } from '@shell/utils/string';
-import { Card } from '@components/Card';
 import { Checkbox } from '@components/Form/Checkbox';
 import { alternateLabel } from '@shell/utils/platform';
 import { uniq } from '@shell/utils/array';
 import AsyncButton from '@shell/components/AsyncButton';
 import { LabeledInput } from '@components/Form/LabeledInput';
+import AppModal from '@shell/components/AppModal.vue';
 
 export default {
   name: 'PromptRemove',
 
   components: {
-    Card, Checkbox, AsyncButton, LabeledInput
+    Checkbox,
+    AsyncButton,
+    LabeledInput,
+    AppModal,
   },
   props: {
     /**
@@ -21,28 +25,31 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type:    String,
-      default: 'prompt-remove'
-    }
+      type: String,
+      default: 'prompt-remove',
+    },
   },
   data() {
     const { resource } = this.$route.params;
 
     return {
-      hasCustomRemove:     false,
-      randomPosition:      Math.random(),
-      confirmName:         '',
-      error:               '',
-      warning:             '',
-      preventDelete:       false,
-      removeComponent:     this.$store.getters['type-map/importCustomPromptRemove'](resource),
+      hasCustomRemove: false,
+      randomPosition: Math.random(),
+      confirmName: '',
+      error: '',
+      warning: '',
+      preventDelete: false,
+      removeComponent: shallowRef(
+        this.$store.getters['type-map/importCustomPromptRemove'](resource)
+      ),
       chartsToRemoveIsApp: false,
-      chartsDeleteCrd:     false
+      chartsDeleteCrd: false,
+      showModal: false,
     };
   },
   computed: {
     names() {
-      return this.toRemove.map((obj) => obj.nameDisplay).slice(0, 5);
+      return this.toRemove.map((obj) => obj.nameDisplay);
     },
 
     nameToMatchPosition() {
@@ -57,11 +64,13 @@ export default {
     },
 
     type() {
-      const types = new Set(this.toRemove.reduce((array, each) => {
-        array.push(each.type);
+      const types = new Set(
+        this.toRemove.reduce((array, each) => {
+          array.push(each.type);
 
-        return array;
-      }, []));
+          return array;
+        }, [])
+      );
 
       if (types.size > 1) {
         return this.t('generic.resource', { count: this.toRemove.length });
@@ -69,11 +78,14 @@ export default {
 
       const schema = this.toRemove[0]?.schema;
 
-      if ( !schema ) {
-        return `resource${ this.toRemove.length === 1 ? '' : 's' }`;
+      if (!schema) {
+        return `resource${this.toRemove.length === 1 ? '' : 's'}`;
       }
 
-      return this.$store.getters['type-map/labelFor'](schema, this.toRemove.length);
+      return this.$store.getters['type-map/labelFor'](
+        schema,
+        this.toRemove.length
+      );
     },
 
     selfLinks() {
@@ -88,12 +100,6 @@ export default {
       return first?.confirmRemove;
     },
 
-    plusMore() {
-      const remaining = this.toRemove.length - this.names.length;
-
-      return this.t('promptRemove.andOthers', { count: remaining });
-    },
-
     // if the current route ends with the ID of the resource being deleted, whatever page this is wont be valid after successful deletion: navigate away
     doneLocation() {
       // if deleting more than one resource, this is happening in list view and shouldn't redirect anywhere
@@ -101,15 +107,19 @@ export default {
         return null;
       }
 
-      if (this.toRemove[0].doneLocationRemove) {
-        return this.toRemove[0].doneLocationRemove;
+      if (this.toRemove[0].doneOverride) {
+        return this.toRemove[0].doneOverride;
       }
 
       const currentRoute = this.toRemove[0].currentRoute();
       const out = {};
       const params = { ...currentRoute.params };
 
-      if (params.id && (params.id === this.toRemove[0]?.metadata?.name || params.id === this.toRemove[0].id)) {
+      if (
+        params.id &&
+        (params.id === this.toRemove[0]?.metadata?.name ||
+          params.id === this.toRemove[0].id)
+      ) {
         let { name = '' } = currentRoute;
 
         const idIndex = name.indexOf('-id');
@@ -149,7 +159,8 @@ export default {
     },
 
     deleteDisabled() {
-      const confirmFailed = this.needsConfirm && this.confirmName !== this.nameToMatch;
+      const confirmFailed =
+        this.needsConfirm && this.confirmName !== this.nameToMatch;
 
       return this.preventDelete || confirmFailed;
     },
@@ -163,11 +174,18 @@ export default {
       if (show) {
         const selected = this.toRemove[0];
 
-        if (this.currentRouter?.currentRoute?.name === 'c-cluster-explorer-tools') {
-          this.chartsToRemoveIsApp = true;
-        }
+        // if (
+        //   this.currentRouter?.currentRoute?.value?.name ===
+        //     "c-cluster-explorer-tools" &&
+        //   selected.type === CATALOG.APP &&
+        //   selected.spec?.chart?.metadata?.annotations[
+        //     CATALOG_ANNOTATIONS.AUTO_INSTALL
+        //   ]
+        // ) {
+        //   this.chartsToRemoveIsApp = true;
+        // }
 
-        this.$modal.show('promptRemove');
+        this.showModal = true;
 
         let { resource } = this.$route.params;
 
@@ -175,11 +193,14 @@ export default {
           resource = selected.type;
         }
 
-        this.hasCustomRemove = this.$store.getters['type-map/hasCustomPromptRemove'](resource);
+        this.hasCustomRemove =
+          this.$store.getters['type-map/hasCustomPromptRemove'](resource);
 
-        this.removeComponent = this.$store.getters['type-map/importCustomPromptRemove'](resource);
+        this.removeComponent = shallowRef(
+          this.$store.getters['type-map/importCustomPromptRemove'](resource)
+        );
       } else {
-        this.$modal.hide('promptRemove');
+        this.showModal = false;
       }
     },
 
@@ -187,7 +208,9 @@ export default {
     // if none found (delete is allowed), then check for any resources with a warning message
     toRemove(neu) {
       let message;
-      const preventDeletionMessages = neu.filter((item) => item.preventDeletionMessage);
+      const preventDeletionMessages = neu.filter(
+        (item) => item.preventDeletionMessage
+      );
 
       this.preventDelete = false;
 
@@ -195,20 +218,22 @@ export default {
         this.preventDelete = true;
         message = preventDeletionMessages[0].preventDeletionMessage;
       } else {
-        const warnDeletionMessages = neu.filter((item) => item.warnDeletionMessage);
+        const warnDeletionMessages = neu.filter(
+          (item) => item.warnDeletionMessage
+        );
 
         if (!!warnDeletionMessages.length) {
           message = warnDeletionMessages[0].warnDeletionMessage;
         }
       }
-      if (typeof message === 'function' ) {
+      if (typeof message === 'function') {
         this.warning = message(this.toRemove);
       } else if (!!message) {
         this.warning = message;
       } else {
         this.warning = '';
       }
-    }
+    },
   },
 
   methods: {
@@ -251,7 +276,9 @@ export default {
           return;
         }
       }
-      const serialRemove = this.toRemove.some((resource) => resource.removeSerially);
+      const serialRemove = this.toRemove.some(
+        (resource) => resource.removeSerially
+      );
 
       if (serialRemove) {
         this.serialRemove(btnCB);
@@ -293,21 +320,31 @@ export default {
       }
     },
     done() {
-      if ( this.cachedDoneLocation && !isEmpty(this.cachedDoneLocation) ) {
+      if (this.cachedDoneLocation && !isEmpty(this.cachedDoneLocation)) {
         this.currentRouter.push(this.cachedDoneLocation);
       }
       this.close();
     },
     getSpoofedTypes(resources) {
-      const uniqueResourceTypes = uniq(this.toRemove.map((resource) => resource.type));
+      const uniqueResourceTypes = uniq(
+        this.toRemove.map((resource) => resource.type)
+      );
 
-      return uniqueResourceTypes.filter(this.$store.getters['type-map/isSpoofed']);
+      return uniqueResourceTypes.filter(
+        this.$store.getters['type-map/isSpoofed']
+      );
     },
 
     // If spoofed we need to reload the values as the server can't have watchers for them.
     refreshSpoofedTypes(types) {
       const inStore = this.$store.getters['currentProduct'].inStore;
-      const promises = types.map((type) => this.$store.dispatch(`${ inStore }/findAll`, { type, opt: { force: true } }, { root: true }));
+      const promises = types.map((type) =>
+        this.$store.dispatch(
+          `${inStore}/findAll`,
+          { type, opt: { force: true } },
+          { root: true }
+        )
+      );
 
       return Promise.all(promises);
     },
@@ -325,149 +362,132 @@ export default {
         this.error = err;
         this.chartsDeleteCrd = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
-  <modal
-    class="remove-modal"
+  <app-modal
+    v-if="showModal"
+    custom-class="remove-modal"
     name="promptRemove"
     :width="400"
     height="auto"
     styles="max-height: 100vh;"
-    @closed="close"
+    @close="close"
   >
-    <Card
-      class="prompt-remove"
-      :show-highlight-border="false"
-    >
-      <h4
-        slot="title"
-        class="text-default-text"
-      >
-        {{ t('promptRemove.title') }}
-      </h4>
-      <div slot="body">
-        <div class="mb-10">
-          <template v-if="!hasCustomRemove">
-            {{ t('promptRemove.attemptingToRemove', { type }) }} <span
-              v-clean-html="resourceNames(names, plusMore, t)"
-            />
-          </template>
-
-          <template>
-            <component
-              :is="removeComponent"
-              v-if="hasCustomRemove"
-              ref="customPrompt"
-              v-model="toRemove"
-              v-bind="_data"
-              :close="close"
-              :needs-confirm="needsConfirm"
-              :value="toRemove"
-              :names="names"
-              :type="type"
-              @errors="e => error = e"
-              @done="done"
-            />
-            <div
-              v-if="needsConfirm"
-              class="mt-10"
-            >
-              <span
-                v-clean-html="t('promptRemove.confirmName', { nameToMatch: escapeHtml(nameToMatch) }, true)"
-              />
-            </div>
-          </template>
-        </div>
-        <LabeledInput
-          v-if="needsConfirm"
-          id="confirm"
-          v-model="confirmName"
-          v-focus
-          :data-testid="componentTestid + '-input'"
-          type="text"
-        >
-          <div class="text-warning mb-10 mt-10">
-            {{ warning }}
-          </div>
-          <div class="text-error mb-10 mt-10">
-            {{ error }}
-          </div>
-          <div
-            v-if="!needsConfirm"
-            class="text-info mt-20"
-          >
-            {{ protip }}
-          </div>
-          <Checkbox
-            v-if="chartsToRemoveIsApp"
-            v-model="chartsDeleteCrd"
-            label-key="promptRemoveApp.removeCrd"
-            class="mt-10 type"
-            @input="chartAddCrdToRemove"
-          />
-        </labeledinput>
-        <template v-else>
-          <div class="text-warning mb-10 mt-10">
-            {{ warning }}
-          </div>
-          <div class="text-error mb-10 mt-10">
-            {{ error }}
-          </div>
+    <a-card :title="t('promptRemove.title')">
+      <div class="mb-10">
+        <template v-if="!hasCustomRemove">
+          {{ t('promptRemove.attemptingToRemove', { type }) }}
+          <span v-clean-html="resourceNames(names, t)" />
         </template>
+
+        <component
+          :is="removeComponent"
+          v-if="hasCustomRemove"
+          ref="customPrompt"
+          v-model:value="toRemove"
+          v-bind="$data"
+          :close="close"
+          :needs-confirm="needsConfirm"
+          :value="toRemove"
+          :names="names"
+          :type="type"
+          :done-location="doneLocation"
+          @errors="(e) => (error = e)"
+          @done="done"
+        />
+        <div v-if="needsConfirm" class="mt-10">
+          <span
+            v-clean-html="
+              t(
+                'promptRemove.confirmName',
+                { nameToMatch: escapeHtml(nameToMatch) },
+                true
+              )
+            "
+          />
+        </div>
       </div>
+      <LabeledInput
+        v-if="needsConfirm"
+        id="confirm"
+        v-model:value="confirmName"
+        v-focus
+        :data-testid="componentTestid + '-input'"
+        type="text"
+        :aria-label="
+          t('promptRemove.confirmName', {
+            nameToMatch: escapeHtml(nameToMatch),
+          })
+        "
+      >
+        <div class="text-warning mb-10 mt-10">
+          {{ warning }}
+        </div>
+        <div class="text-error mb-10 mt-10">
+          {{ error }}
+        </div>
+        <div v-if="!needsConfirm" class="text-info mt-20">
+          {{ protip }}
+        </div>
+      </LabeledInput>
+      <div v-else-if="!hasCustomRemove">
+        <div v-if="warning" class="text-warning mb-10 mt-10">
+          {{ warning }}
+        </div>
+        <div v-if="error" class="text-error mb-10 mt-10">
+          {{ error }}
+        </div>
+      </div>
+      <Checkbox
+        v-if="chartsToRemoveIsApp"
+        v-model:value="chartsDeleteCrd"
+        label-key="promptRemoveApp.removeCrd"
+        class="mt-10 type"
+        @update:value="chartAddCrdToRemove"
+      />
       <template #actions>
-        <button
-          class="btn role-secondary"
-          @click="close"
-        >
+        <a-button @click="close">
           {{ t('generic.cancel') }}
-        </button>
-        <div class="spacer" />
+        </a-button>
+
         <AsyncButton
           mode="delete"
-          class="btn bg-error ml-10"
+          class="!ml-auto"
+          type="primary"
           :disabled="deleteDisabled"
+          :danger="deleteDisabled ? false : true"
           :data-testid="componentTestid + '-confirm-button'"
           @click="remove"
         />
       </template>
-    </Card>
-  </modal>
+    </a-card>
+  </app-modal>
 </template>
 
-<style lang='scss'>
-  .prompt-remove {
-    &.card-container {
-      box-shadow: none;
-    }
-    #confirm {
-      width: 90%;
-      margin-left: 3px;
-    }
+<style lang="scss">
+.prompt-remove {
+  &.card-container {
+    box-shadow: none;
+  }
+  #confirm {
+    width: 90%;
+    margin-left: 3px;
+  }
 
-    .remove-modal {
-        border-radius: var(--border-radius);
-        overflow: scroll;
-        max-height: 100vh;
-        & ::-webkit-scrollbar-corner {
-          background: rgba(0,0,0,0);
-        }
-    }
+  .actions {
+    text-align: right;
+  }
 
-    .actions {
-      text-align: right;
-    }
+  .card-actions {
+    display: flex;
 
-    .card-actions {
-      display: flex;
-
-      .spacer {
-        flex: 1;
-      }
+    .spacer {
+      flex: 1;
     }
   }
+}
 </style>

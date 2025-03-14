@@ -207,7 +207,7 @@ export default {
       <h3>{{ t('namespace.resources') }}</h3>
     </div>
     <ResourceTabs
-      v-model="value"
+      :value="value"
       :mode="mode"
     >
       <Tab :name="t('namespace.resources')">
@@ -220,12 +220,12 @@ export default {
         >
           <template #col:type="{row}">
             <td>
-              <n-link
+              <router-link
                 v-if="typeListLocation(row.schema)"
                 :to="typeListLocation(row.schema)"
               >
                 {{ row.schema.pluralName }}
-              </n-link>
+              </router-link>
               <span v-else>{{ row.schema.pluralName }}</span>
             </td>
           </template>

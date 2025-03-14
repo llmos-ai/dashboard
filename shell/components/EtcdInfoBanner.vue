@@ -55,7 +55,7 @@ export default {
             margin-right: 5px;
         }
 
-        & ::v-deep label {
+        & :deep() label {
             color: var(--info);
         }
     }

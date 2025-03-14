@@ -12,32 +12,37 @@ import { Checkbox } from '@components/Form/Checkbox';
 
 export default {
   components: {
-    ChangePassword, CruResource, GlobalRoleBindings, Loading, LabeledInput, Checkbox
+    ChangePassword,
+    CruResource,
+    GlobalRoleBindings,
+    Loading,
+    LabeledInput,
+    Checkbox,
   },
-  mixins: [
-    CreateEditView
-  ],
+  mixins: [CreateEditView],
 
   data() {
-    const showGlobalRoles = !!this.$store.getters[`management/schemaFor`](MANAGEMENT.GLOBAL_ROLE);
+    const showGlobalRoles = !!this.$store.getters[`management/schemaFor`](
+      MANAGEMENT.GLOBAL_ROLE
+    );
 
     const active = this.value.spec?.active || true;
 
     return {
       showGlobalRoles,
       form: {
-        username:    this.value.spec?.username,
+        username: this.value.spec?.username,
         description: this.value.spec?.description,
         displayName: this.value.spec?.displayName,
         active,
-        password:    {
-          password:          '',
+        password: {
+          password: '',
           userChangeOnLogin: false,
-        }
+        },
       },
       validation: {
-        password:     false,
-        roles:        !showGlobalRoles,
+        password: false,
+        roles: !showGlobalRoles,
         rolesChanged: false,
       },
       roles: [],
@@ -52,7 +57,9 @@ export default {
         return valid;
       }
       if (this.isEdit) {
-        return valid && (this.credentialsChanged || this.validation.rolesChanged);
+        return (
+          valid && (this.credentialsChanged || this.validation.rolesChanged)
+        );
       }
 
       return false;
@@ -74,10 +81,12 @@ export default {
         return true; // Covered by valid
       }
       if (this.isEdit) {
-        return !!this.form.password.password ||
+        return (
+          !!this.form.password.password ||
           this.form.description !== this.value.spec.description ||
           this.form.displayName !== this.value.spec.displayName ||
-          this.form.password.userChangeOnLogin !== this.value.mustChangePassword;
+          this.form.password.userChangeOnLogin !== this.value.mustChangePassword
+        );
       }
 
       return false;
@@ -90,7 +99,7 @@ export default {
     },
     isEdit() {
       return this.mode === _EDIT;
-    }
+    },
   },
 
   mounted() {
@@ -123,20 +132,22 @@ export default {
 
     async createUser() {
       // Ensure username is unique (this does not happen in the backend)
-      const users = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.USER });
+      const users = await this.$store.dispatch('management/findAll', {
+        type: MANAGEMENT.USER,
+      });
 
       if (users.find((u) => u.spec.username === this.form.username)) {
         throw new Error(this.t('user.edit.credentials.username.exists'));
       }
 
       const user = await this.$store.dispatch('management/create', {
-        type:     MANAGEMENT.USER,
+        type: MANAGEMENT.USER,
         metadata: { generateName: 'user-' },
-        spec:     {
-          username:    this.form.username,
-          password:    this.form.password.password,
+        spec: {
+          username: this.form.username,
+          password: this.form.password.password,
           displayName: this.form.displayName,
-          active:      this.form.active,
+          active: this.form.active,
           description: this.form.description,
         },
       });
@@ -151,7 +162,7 @@ export default {
 
       const user = await this.$store.dispatch('management/find', {
         type: MANAGEMENT.USER,
-        id:   this.value.id,
+        id: this.value.id,
       });
 
       // Save change of password
@@ -167,8 +178,8 @@ export default {
 
       return await this.$store.dispatch('management/find', {
         type: MANAGEMENT.USER,
-        id:   this.value.id,
-        opt:  { force: true }
+        id: this.value.id,
+        opt: { force: true },
       });
     },
 
@@ -176,8 +187,8 @@ export default {
       if (this.$refs.grb) {
         await this.$refs.grb.save(userId);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -195,12 +206,12 @@ export default {
     @finish="save"
   >
     <div class="credentials">
-      <h2> {{ t("user.edit.credentials.label") }}</h2>
+      <h2>{{ t('user.edit.credentials.label') }}</h2>
       <div class="row">
         <div class="col span-4">
           <LabeledInput
             ref="name"
-            v-model="form.username"
+            v-model:value="form.username"
             label-key="user.edit.credentials.username.label"
             placeholder-key="user.edit.credentials.username.placeholder"
             :required="isCreate"
@@ -211,7 +222,7 @@ export default {
         </div>
         <div class="col span-4">
           <LabeledInput
-            v-model="form.displayName"
+            v-model:value="form.displayName"
             label-key="user.edit.credentials.displayName.label"
             placeholder-key="user.edit.credentials.displayName.placeholder"
             :disabled="isView"
@@ -221,7 +232,7 @@ export default {
       <div class="row mt-20 mb-10">
         <div class="col span-8">
           <LabeledInput
-            v-model="form.description"
+            v-model:value="form.description"
             label-key="user.edit.credentials.userDescription.label"
             placeholder-key="user.edit.credentials.userDescription.placeholder"
             :disabled="isView"
@@ -232,7 +243,7 @@ export default {
       <div class="row">
         <div class="col span-6">
           <Checkbox
-            v-model="form.active"
+            v-model:value="form.active"
             :mode="mode"
             :label="t('user.edit.isActive')"
           />
@@ -242,16 +253,13 @@ export default {
       <ChangePassword
         v-if="!isView"
         ref="changePassword"
-        v-model="form.password"
+        v-model:value="form.password"
         :mode="mode"
         :must-change-password="value.mustChangePassword"
         @valid="validation.password = $event"
       />
 
-      <div
-        v-if="showGlobalRoles"
-        class="global-permissions"
-      >
+      <div v-if="showGlobalRoles" class="global-permissions">
         <GlobalRoleBindings
           ref="grb"
           :user-id="value.id || liveValue.id"

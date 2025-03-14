@@ -1,9 +1,8 @@
 <script>
-import Vue from 'vue';
-import ProgressBarMulti from '@shell/components/ProgressBarMulti';
-import PlusMinus from '@shell/components/form/PlusMinus';
-import { POD, SCALABLE_WORKLOAD_TYPES } from '@shell/config/types';
-import { ucFirst } from '@shell/utils/string';
+import ProgressBarMulti from "@shell/components/ProgressBarMulti";
+import PlusMinus from "@shell/components/form/PlusMinus";
+import { POD, SCALABLE_WORKLOAD_TYPES } from "@shell/config/types";
+import { ucFirst } from "@shell/utils/string";
 
 const SCALABLE_TYPES = Object.values(SCALABLE_WORKLOAD_TYPES);
 const INVALID_TYPES = [POD];
@@ -13,35 +12,35 @@ export default {
 
   props: {
     row: {
-      type:     Object,
-      required: true
+      type: Object,
+      required: true,
     },
     col: {
-      type:     Object,
-      required: true
+      type: Object,
+      required: true,
     },
     rowKey: {
-      type:     String,
-      required: true
+      type: String,
+      required: true,
     },
   },
 
   beforeDestroy() {
-    document.removeEventListener('click', this.onClickOutside);
+    document.removeEventListener("click", this.onClickOutside);
   },
 
   data() {
     return {
       disabled: false,
       expanded: false,
-      loading:  true,
-      cParts:   [],
+      loading: true,
+      cParts: [],
     };
   },
 
   computed: {
     id() {
-      return `${ this.rowKey }-workload-health-scale`.replaceAll('-', '');
+      return `${this.rowKey}-workload-health-scale`.replaceAll("-", "");
     },
 
     canScale() {
@@ -63,12 +62,15 @@ export default {
         return 5;
       }
 
-      this.cParts = Object.entries(this.row.jobGauges || this.row.podGauges || [])
+      this.cParts = Object.entries(
+        this.row.jobGauges || this.row.podGauges || []
+      )
         .map(([name, value]) => ({
-          color: `bg-${ value.color }`,
+          color: `bg-${value.color}`,
           value: value.count || 0,
-          label: ucFirst(name)
-        })).filter((x) => x.value > 0);
+          label: ucFirst(name),
+        }))
+        .filter((x) => x.value > 0);
 
       return 5;
     },
@@ -78,7 +80,7 @@ export default {
     },
 
     onClickOutside(event) {
-      const { [`root-${ this.id }`]: component } = this.$refs;
+      const { [`root-${this.id}`]: component } = this.$refs;
 
       if (!component || component.contains(event.target)) {
         return;
@@ -95,7 +97,7 @@ export default {
       await this.scale(true);
     },
     async scale(isUp) {
-      Vue.set(this, 'disabled', true);
+      this["disabled"] = true;
       try {
         if (isUp) {
           await this.row.scaleUp();
@@ -103,30 +105,37 @@ export default {
           await this.row.scaleDown();
         }
       } catch (err) {
-        this.$store.dispatch('growl/fromError', {
-          title: this.t('workload.list.errorCannotScale', { direction: isUp ? 'up' : 'down', workloadName: this.row.name }),
-          err
-        },
-        { root: true });
+        this.$store.dispatch(
+          "growl/fromError",
+          {
+            title: this.t("workload.list.errorCannotScale", {
+              direction: isUp ? "up" : "down",
+              workloadName: this.row.name,
+            }),
+            err,
+          },
+          { root: true }
+        );
       }
-      Vue.set(this, 'disabled', false);
+      this["disabled"] = false;
     },
 
     insideBounds(bounding, bounds) {
-      return bounding.top >= bounds.top &&
+      return (
+        bounding.top >= bounds.top &&
         bounding.left >= bounds.left &&
         bounding.right <= bounds.right &&
-        bounding.bottom <= bounds.bottom;
+        bounding.bottom <= bounds.bottom
+      );
     },
-
   },
 
   watch: {
     expanded(neu) {
       if (neu) {
-        document.addEventListener('click', this.onClickOutside);
+        document.addEventListener("click", this.onClickOutside);
       } else {
-        document.removeEventListener('click', this.onClickOutside);
+        document.removeEventListener("click", this.onClickOutside);
       }
 
       // If the drop down content appears outside of the window then move it to be above the trigger
@@ -134,11 +143,12 @@ export default {
       // expanded: false & expanded-checked = false - Content does not appear in DOM
       // expanded: true & expanded-checked = false - Content appears in DOM (so it's location can be calculated to be in or out of an area) but isn't visible (user doesn't see content blip from below to above trigger)
       // expanded: true & expanded-checked = true - Content appears in DOM and is visible (it's final location is known so user can see)
-      setTimeout(() => { // There be beasts without this (classes don't get applied... so drop down never gets shown)
+      setTimeout(() => {
+        // There be beasts without this (classes don't get applied... so drop down never gets shown)
         const dropdown = document.getElementById(this.id);
 
         if (!neu) {
-          dropdown.classList.remove('expanded-checked');
+          dropdown.classList.remove("expanded-checked");
 
           return;
         }
@@ -146,44 +156,36 @@ export default {
         // Ensure drop down will be inside of the window, otherwise show above the trigger
         const bounding = dropdown.getBoundingClientRect();
         const insideWindow = this.insideBounds(bounding, {
-          top:    0,
-          left:   0,
-          right:  window.innerWidth || document.documentElement.clientWidth,
+          top: 0,
+          left: 0,
+          right: window.innerWidth || document.documentElement.clientWidth,
           bottom: window.innerHeight || document.documentElement.clientHeight,
         });
 
         if (insideWindow) {
-          dropdown.classList.remove('out-of-view');
+          dropdown.classList.remove("out-of-view");
         } else {
-          dropdown.classList.add('out-of-view');
+          dropdown.classList.add("out-of-view");
         }
 
         // This will trigger the actual display of the drop down (after we've calculated if it goes below or above trigger)
-        dropdown.classList.add('expanded-checked');
+        dropdown.classList.add("expanded-checked");
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <template>
   <div v-if="!canShow" />
-  <div
-    v-else-if="loading"
-    class="hs-popover__loader"
-  >
+  <div v-else-if="loading" class="hs-popover__loader">
     <i class="icon icon-spinner" />
   </div>
-  <div
-    v-else
-    :id="`root-${id}`"
-    :ref="`root-${id}`"
-    class="hs-popover"
-  >
+  <div v-else :id="`root-${id}`" :ref="`root-${id}`" class="hs-popover">
     <div
       id="trigger"
       class="hs-popover__trigger"
-      :class="{expanded}"
+      :class="{ expanded }"
       @click="expanded = !expanded"
     >
       <ProgressBarMulti
@@ -192,27 +194,22 @@ export default {
         :values="parts"
         :show-zeros="true"
       />
-      <i :class="{icon: true, 'icon-chevron-up': expanded, 'icon-chevron-down': !expanded}" />
+      <i
+        :class="{
+          icon: true,
+          'icon-chevron-up': expanded,
+          'icon-chevron-down': !expanded,
+        }"
+      />
     </div>
-    <div
-      :id="id"
-      class="hs-popover__content"
-      :class="{expanded, [id]:true}"
-    >
+    <div :id="id" class="hs-popover__content" :class="{ expanded, [id]: true }">
       <div>
-        <div
-          v-for="obj in parts"
-          :key="obj.label"
-          class="counts"
-        >
+        <div v-for="(obj, i) in parts" :key="i" class="counts">
           <span class="counts-label">{{ obj.label }}</span>
           <span>{{ obj.value }}</span>
         </div>
-        <div
-          v-if="canScale"
-          class="text-center scale"
-        >
-          <span>{{ t('tableHeaders.scale') }} </span>
+        <div v-if="canScale" class="text-center scale">
+          <span>{{ t("tableHeaders.scale") }} </span>
           <PlusMinus
             :value="row.spec.replicas"
             :disabled="disabled"
@@ -226,7 +223,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 $height: 30px;
 $width: 150px;
 
@@ -328,5 +324,4 @@ $width: 150px;
     }
   }
 }
-
 </style>

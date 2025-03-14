@@ -39,10 +39,10 @@ export default {
     if (this.type === WORKLOAD_TYPES.CRON_JOB) {
       // Initialize both value specs if empty
       if (!this.value.jobTemplate) {
-        this.$set(this.value, 'jobTemplate', { spec: {} });
+        this.value['jobTemplate'] = { spec: {} };
       }
       if (!this.value.jobTemplate.spec.template) {
-        this.$set(this.value.jobTemplate.spec, 'template', { spec: {} });
+        this.value.jobTemplate.spec['template'] = { spec: {} };
       }
       const {
         concurrencyPolicy = 'Allow',
@@ -71,7 +71,7 @@ export default {
       };
     } else {
       if (!this.value.template) {
-        this.$set(this.value, 'template', { spec: {} });
+        this.value['template'] = { spec: {} };
       }
       const {
         completions,
@@ -155,12 +155,12 @@ export default {
         class="col span-6"
       >
         <UnitInput
-          v-model="completions"
+          v-model:value="completions"
           :mode="mode"
           :suffix="t('suffix.times', {count: completions})"
           label-key="workload.job.completions.label"
           tooltip-key="workload.job.completions.tip"
-          @input="update"
+          @update:value="update"
         />
       </div>
       <div
@@ -168,12 +168,12 @@ export default {
         class="col span-6"
       >
         <UnitInput
-          v-model="parallelism"
+          v-model:value="parallelism"
           :mode="mode"
           :suffix="t('suffix.times', {count: parallelism})"
           label-key="workload.job.parallelism.label"
           tooltip-key="workload.job.parallelism.tip"
-          @input="update"
+          @update:value="update"
         />
       </div>
     </div>
@@ -183,12 +183,12 @@ export default {
         class="col span-6"
       >
         <UnitInput
-          v-model="backoffLimit"
+          v-model:value="backoffLimit"
           :mode="mode"
           :suffix="t('suffix.times', {count: backoffLimit})"
           label-key="workload.job.backoffLimit.label"
           tooltip-key="workload.job.backoffLimit.tip"
-          @input="update"
+          @update:value="update"
         />
       </div>
       <div
@@ -196,12 +196,12 @@ export default {
         class="col span-6"
       >
         <UnitInput
-          v-model="activeDeadlineSeconds"
+          v-model:value="activeDeadlineSeconds"
           :mode="mode"
           :suffix="t('suffix.seconds', {count: activeDeadlineSeconds})"
           label-key="workload.job.activeDeadlineSeconds.label"
           tooltip-key="workload.job.activeDeadlineSeconds.tip"
-          @input="update"
+          @update:value="update"
         />
       </div>
     </div>
@@ -217,7 +217,7 @@ export default {
             :mode="mode"
             label-key="workload.job.successfulJobsHistoryLimit.label"
             tooltip-key="workload.job.successfulJobsHistoryLimit.tip"
-            @input="update"
+            @update:value="update"
           />
         </div>
         <div
@@ -229,7 +229,7 @@ export default {
             :mode="mode"
             label-key="workload.job.failedJobsHistoryLimit.label"
             tooltip-key="workload.job.failedJobsHistoryLimit.tip"
-            @input="update"
+            @update:value="update"
           />
         </div>
       </div>
@@ -239,12 +239,12 @@ export default {
           class="col span-6"
         >
           <UnitInput
-            v-model="startingDeadlineSeconds"
+            v-model:value="startingDeadlineSeconds"
             :mode="mode"
             :suffix="t('suffix.seconds', {count: startingDeadlineSeconds})"
             label-key="workload.job.startingDeadlineSeconds.label"
             tooltip-key="workload.job.startingDeadlineSeconds.tip"
-            @input="update"
+            @update:value="update"
           />
         </div>
         <div
@@ -252,11 +252,11 @@ export default {
           class="col span-6"
         >
           <UnitInput
-            v-model="terminationGracePeriodSeconds"
+            v-model:value="terminationGracePeriodSeconds"
             :suffix="terminationGracePeriodSeconds == 1 ? 'Second' : 'Seconds'"
             :label="t('workload.upgrading.activeDeadlineSeconds.label')"
             :mode="mode"
-            @input="update"
+            @update:value="update"
           >
             <template #label>
               <label
@@ -280,13 +280,13 @@ export default {
           class="col span-6"
         >
           <RadioGroup
-            v-model="concurrencyPolicy"
+            v-model:value="concurrencyPolicy"
             :mode="mode"
             :label="t('workload.upgrading.concurrencyPolicy.label')"
             name="concurrency"
             :options="['Allow', 'Forbid', 'Replace']"
             :labels="[t('workload.upgrading.concurrencyPolicy.options.allow'), t('workload.upgrading.concurrencyPolicy.options.forbid'), t('workload.upgrading.concurrencyPolicy.options.replace')]"
-            @input="update"
+            @update:value="update"
           />
         </div>
         <div
@@ -294,13 +294,13 @@ export default {
           class="col span-6"
         >
           <RadioGroup
-            v-model="suspend"
+            v-model:value="suspend"
             :mode="mode"
             :label="t('workload.job.suspend')"
             name="suspend"
             :options="[true, false]"
             :labels="['Yes', 'No']"
-            @input="update"
+            @update:value="update"
           />
         </div>
       </div>
@@ -314,7 +314,7 @@ export default {
         class="col span-6"
       >
         <UnitInput
-          v-model="terminationGracePeriodSeconds"
+          v-model:value="terminationGracePeriodSeconds"
           :suffix="terminationGracePeriodSeconds == 1 ? 'Second' : 'Seconds'"
           :label="t('workload.upgrading.activeDeadlineSeconds.label')"
           :mode="mode"

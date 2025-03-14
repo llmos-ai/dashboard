@@ -5,13 +5,25 @@ import { get } from '@shell/utils/object';
 import { LabeledTooltip } from '@components/LabeledTooltip';
 import VueSelectOverrides from '@shell/mixins/vue-select-overrides';
 import { onClickOption, calculatePosition } from '@shell/utils/select';
-import isEqual from 'lodash/isEqual';
+import { generateRandomAlphaString } from '@shell/utils/string';
+import LabeledSelectPagination from '@shell/components/form/labeled-select-utils/labeled-select-pagination';
+import { LABEL_SELECT_NOT_OPTION_KINDS } from '@shell/types/components/labeledSelect';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'LabeledSelect',
 
+  inheritAttrs: false,
+
   components: { LabeledTooltip },
-  mixins:     [CompactInput, LabeledFormElement, VueSelectOverrides],
+  mixins:     [
+    CompactInput,
+    LabeledFormElement,
+    VueSelectOverrides,
+    LabeledSelectPagination
+  ],
+
+  emits: ['on-open', 'on-close', 'selecting', 'deselecting', 'search', 'update:validation', 'update:value'],
 
   props: {
     appendToBody: {
@@ -67,7 +79,7 @@ export default {
     selectable: {
       default: (opt) => {
         if ( opt ) {
-          if ( opt.disabled || opt.kind === 'group' || opt.kind === 'divider' || opt.loading ) {
+          if ( opt.disabled || LABEL_SELECT_NOT_OPTION_KINDS.includes(opt.kind) || opt.loading ) {
             return false;
           }
         }
@@ -88,33 +100,82 @@ export default {
       default: null,
       type:    [String, Object, Number, Array, Boolean]
     },
+    options: {
+      type:    Array,
+      default: () => ([])
+    },
     closeOnSelect: {
       type:    Boolean,
       default: true
     },
+    noOptionsLabelKey: {
+      type:    String,
+      default: 'labelSelect.noOptions.empty'
+    }
   },
 
   data() {
     return {
       selectedVisibility: 'visible',
-      shouldOpen:         true
+      shouldOpen:         true,
+      uid:                generateRandomAlphaString(10)
     };
   },
 
   computed: {
+    ...mapGetters({ t: 'i18n/t' }),
     hasLabel() {
       return this.isCompact ? false : !!this.label || !!this.labelKey || !!this.$slots.label;
     },
+
+    hasGroupIcon() {
+      // Required for option.icon. Note that we only apply if paginating as well (there might be 2 x performance issues with 2k entries. one to iterate through this list, the other with conditional class per entry in dom)
+      return this.canPaginate ? !!this._options.find((o) => o.kind === 'group' && !!o.icon) : false;
+    },
+
+    _options() {
+      // If we're paginated show the page as provided by `paginate`. See label-select-pagination mixin
+      return this.canPaginate ? this.page : this.options;
+    },
+
+    filteredAttrs() {
+      const {
+        class: _class,
+        ...rest
+      } = this.$attrs;
+
+      return rest;
+    },
+
+    // update placeholder text to inform user they can add their own opts when none are found
+    showTagPrompts() {
+      return !this.options.length && this.$attrs.taggable && this.isSearchable;
+    }
   },
 
   methods: {
     // resizeHandler = in mixin
     focusSearch() {
-      const blurredAgo = Date.now() - this.blurred;
-
-      if (!this.focused && blurredAgo < 250) {
+      if (this.isView || this.disabled || this.loading) {
         return;
       }
+
+      // we need this override as in a "closeOnSelect" type of component
+      // if we don't have this override, it would open again
+      if (this.overridesMixinPreventDoubleTriggerKeysOpen) {
+        this.$nextTick(() => {
+          const el = this.$refs['select'];
+
+          if ( el ) {
+            el.focus();
+          }
+
+          this.overridesMixinPreventDoubleTriggerKeysOpen = false;
+        });
+
+        return;
+      }
+      this.$refs['select-input'].open = true;
 
       this.$nextTick(() => {
         const el = this.$refs['select-input']?.searchEl;
@@ -149,18 +210,6 @@ export default {
         return;
       }
 
-      // This check is only needed if its possible for an option's label to change without the option's value changing - we can skip this if options are just strings or numbers
-      // HOWEVER even if strings are passed to v-select the 'option' in the slot is normalized to {label: <option>} so we have to check the options prop here instead of the 'option' itself
-      if (typeof this.options[0] === 'object') {
-        const newOption = this.getUpdatedOption(option);
-
-        if (newOption) {
-          const label = get(newOption, this.optionLabel);
-
-          return this.localizedLabel ? this.$store.getters['i18n/t'](label) || label : label;
-        }
-      }
-
       if (this.$attrs['get-option-label']) {
         return this.$attrs['get-option-label'](option);
       }
@@ -175,14 +224,6 @@ export default {
       } else {
         return option;
       }
-    },
-
-    // If the option's label changed in parent but value did not, the label wont be automatically updated here
-    // Ensure that the label being shown is still present in the options prop and find the new one if not
-    getUpdatedOption(option) {
-      const isOutdated = this.options && !this.options.find((opt) => option[this.optionLabel] === opt[this.optionLabel]);
-
-      return isOutdated ? this.options.find((opt) => isEqual(this.reduce(option), this.reduce(opt))) : undefined;
     },
 
     positionDropdown(dropdownList, component, { width }) {
@@ -214,10 +255,15 @@ export default {
       return noDrop ? false : open && shouldOpen && !mutableLoading;
     },
 
-    onSearch(newSearchString) {
-      if (newSearchString) {
-        this.dropdownShouldOpen(this.$refs['select-input'], true);
+    onSearch(newSearchString, loading) {
+      if (this.canPaginate) {
+        this.setPaginationFilter(newSearchString);
+      } else {
+        if (newSearchString) {
+          this.dropdownShouldOpen(this.$refs['select-input'], true);
+        }
       }
+      this.$emit('search', newSearchString, loading);
     },
 
     getOptionKey(opt) {
@@ -235,25 +281,34 @@ export default {
   <div
     ref="select"
     class="labeled-select"
-    :class="{
-      disabled: isView || disabled,
-      focused,
-      [mode]: true,
-      [status]: status,
-      taggable: $attrs.taggable,
-      taggable: $attrs.multiple,
-      hoverable: hoverTooltip,
-      'compact-input': isCompact,
-      'no-label': !hasLabel,
-    }"
+    :class="[
+      $attrs.class,
+      {
+        disabled: isView || disabled,
+        focused,
+        [mode]: true,
+        [status]: status,
+        taggable: $attrs.taggable,
+        taggable: $attrs.multiple,
+        hoverable: hoverTooltip,
+        'compact-input': isCompact,
+        'no-label': !hasLabel
+      }
+    ]"
+    :tabindex="isView || disabled ? -1 : 0"
     @click="focusSearch"
-    @focus="focusSearch"
+    @keydown.enter="focusSearch"
+    @keydown.down.prevent="focusSearch"
+    @keydown.space.prevent="focusSearch"
   >
     <div
       :class="{ 'labeled-container': true, raised, empty, [mode]: true }"
       :style="{ border: 'none' }"
     >
-      <label v-if="hasLabel">
+      <label
+        v-if="hasLabel"
+        :id="`labeled-select-uid-${uid}`"
+      >
         <t
           v-if="labelKey"
           :k="labelKey"
@@ -268,35 +323,50 @@ export default {
     </div>
     <v-select
       ref="select-input"
-      v-bind="$attrs"
+      :aria-labelledby="hasLabel ? `labeled-select-uid-${uid}` : ''"
+      v-bind="filteredAttrs"
       class="inline"
       :append-to-body="appendToBody"
       :calculate-position="positionDropdown"
-      :class="{ 'no-label': !(label || '').length }"
+      :class="{ 'no-label': !(label || '').length}"
       :clearable="clearable"
       :disabled="isView || disabled || loading"
       :get-option-key="getOptionKey"
       :get-option-label="(opt) => getOptionLabel(opt)"
       :label="optionLabel"
-      :options="options"
+      :options="_options"
       :map-keydown="mappedKeys"
       :placeholder="placeholder"
       :reduce="(x) => reduce(x)"
+      :filterable="isFilterable"
       :searchable="isSearchable"
       :selectable="selectable"
-      :value="value != null && !loading ? value : ''"
+      :modelValue="value != null && !loading ? value : ''"
       :dropdown-should-open="dropdownShouldOpen"
-      v-on="$listeners"
+      :tabindex="-1"
+      role="listbox"
+      @update:modelValue="$emit('selecting', $event); $emit('update:value', $event)"
       @search:blur="onBlur"
       @search:focus="onFocus"
       @search="onSearch"
       @open="onOpen"
       @close="onClose"
-      @option:selected="$emit('selecting', $event)"
+      @option:selecting="$emit('selecting', $event)"
+      @option:deselecting="$emit('deselecting', $event)"
     >
       <template #option="option">
-        <template v-if="option.kind === 'group'">
+        <template v-if="showTagPrompts">
+          <div class="only-user-opts">
+            {{ t('labeledSelect.pressEnter', {input:getOptionLabel(option.label)}) }}
+          </div>
+        </template>
+        <template v-else-if="option.kind === 'group'">
           <div class="vs__option-kind-group">
+            <i
+              v-if="option.icon"
+              class="icon"
+              :class="{ [option.icon]: true}"
+            />
             <b>{{ getOptionLabel(option) }}</b>
             <div v-if="option.badge">
               {{ option.badge }}
@@ -313,6 +383,8 @@ export default {
         </template>
         <div
           v-else
+          class="vs__option-kind"
+          :class="{ 'has-icon' : hasGroupIcon}"
           @mousedown="(e) => onClickOption(option, e)"
         >
           {{ getOptionLabel(option) }}
@@ -325,13 +397,57 @@ export default {
       </template>
       <!-- Pass down templates provided by the caller -->
       <template
-        v-for="(_, slot) of $scopedSlots"
+        v-for="(_, slot) of $slots"
+        :key="slot"
         #[slot]="scope"
       >
         <slot
           :name="slot"
           v-bind="scope"
         />
+      </template>
+
+      <template #list-footer>
+        <div
+          v-if="canPaginate && totalResults && pages > 1"
+          class="pagination-slot"
+        >
+          <div class="load-more">
+            <i
+              v-if="paginating"
+              class="icon icon-spinner icon-spin"
+            />
+            <div v-else>
+              <a
+                v-if="canLoadMore"
+                @click="loadMore"
+              > {{ t('labelSelect.pagination.more') }}</a>
+            </div>
+          </div>
+
+          <div class="count">
+            {{ optionCounts }}
+          </div>
+        </div>
+      </template>
+      <template #no-options="{ search }">
+        <div class="no-options-slot">
+          <template v-if="showTagPrompts">
+            <span v-if="!searching">{{ t('labeledSelect.startTyping') }}</span>
+          </template>
+          <div
+            v-else-if="paginating"
+            class="paginating"
+          >
+            <i class="icon icon-spinner icon-spin" />
+          </div>
+          <template v-else-if="search">
+            {{ t('labelSelect.noOptions.noMatch') }}
+          </template>
+          <template v-else>
+            {{ t(noOptionsLabelKey) }}
+          </template>
+        </div>
       </template>
     </v-select>
     <i
@@ -362,7 +478,7 @@ export default {
   padding-bottom: 1px;
 
   &.no-label.compact-input {
-    ::v-deep .vs__actions:after {
+    :deep() .vs__actions:after {
       top: -2px;
     }
 
@@ -375,7 +491,7 @@ export default {
     height: $input-height;
     padding-top: 4px;
 
-    ::v-deep .vs__actions:after {
+    :deep() .vs__actions:after {
       top: 0;
     }
   }
@@ -411,21 +527,21 @@ export default {
 
   &.taggable.compact-input {
     min-height: $unlabeled-input-height;
-    ::v-deep .vs__selected-options {
+    :deep() .vs__selected-options {
       padding-top: 8px !important;
     }
   }
 
   &.taggable:not(.compact-input) {
     min-height: $input-height;
-    ::v-deep .vs__selected-options {
+    :deep() .vs__selected-options {
       // Need to adjust margin when there is a label in the control to add space between the label and the tags
       margin-top: 0px;
     }
   }
 
   &:not(.taggable) {
-    ::v-deep .vs__selected-options {
+    :deep() .vs__selected-options {
       // Ensure whole select is clickable to close the select when open
       .vs__selected {
         width: 100%;
@@ -434,7 +550,7 @@ export default {
   }
 
   &.taggable {
-    ::v-deep .vs__selected-options {
+    :deep() .vs__selected-options {
       padding: 3px 0;
       .vs__selected {
         border-color: var(--accent-btn);
@@ -459,30 +575,30 @@ export default {
     }
   }
 
-  ::v-deep .vs__selected-options {
+  :deep() .vs__selected-options {
     margin-top: -5px;
   }
 
-  ::v-deep .v-select:not(.vs--single) {
+  :deep() .v-select:not(.vs--single) {
     .vs__selected-options {
       padding: 5px 0;
     }
   }
 
-  ::v-deep .vs__actions {
+  :deep() .vs__actions {
     &:after {
       position: relative;
       top: -10px;
     }
   }
 
-  ::v-deep .v-select.vs--open {
+  :deep() .v-select.vs--open {
     .vs__dropdown-toggle {
       color: var(--outline) !important;
     }
   }
 
-  ::v-deep &.disabled {
+  :deep() &.disabled {
     .labeled-container,
     .vs__dropdown-toggle,
     input,
@@ -491,7 +607,7 @@ export default {
     }
   }
 
-  .no-label ::v-deep {
+  .no-label :deep() {
     &.v-select:not(.vs--single) {
       min-height: 33px;
     }
@@ -510,21 +626,73 @@ export default {
   }
 }
 
-// Styling for option group badge
-.vs__dropdown-menu .vs__dropdown-option .vs__option-kind-group {
-  display: flex;
-  > b {
-    flex: 1;
+$icon-size: 18px;
+
+// This represents the drop down area. Note - it might be attached to body and NOT the parent label select div
+.vs__dropdown-menu {
+
+  // Styling for individual options
+  .vs__dropdown-option .vs__option-kind {
+    &-group {
+      display: flex;
+      align-items: center;
+
+      i { // icon
+        width: $icon-size;
+      }
+
+      > b { // group label
+        flex: 1;
+      }
+
+      > div { // badge
+        background-color: var(--primary);
+        border-radius: 4px;
+        color: var(--primary-text);
+        font-size: 12px;
+        height: 18px;
+        line-height: 18px;
+        margin-top: 1px;
+        padding: 0 10px;
+      }
+    }
+
+    &.has-icon {
+      padding-left: $icon-size;
+    }
   }
-  > div {
-    background-color: var(--primary);
-    border-radius: 4px;
-    color: var(--primary-text);
-    font-size: 12px;
-    height: 18px;
-    line-height: 18px;
-    margin-top: 1px;
-    padding: 0 10px;
+
+    &.has-icon .vs__option-kind div{
+    padding-left: $icon-size;
+  }
+
+  .pagination-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-top: 5px;
+
+    .load-more {
+      display: flex;
+      align-items: center;
+      height: 19px;
+
+      a {
+        cursor: pointer;
+      }
+    }
+
+    .count {
+      position: absolute;
+      right: 10px;
+    }
+  }
+
+  .no-options-slot .paginating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -546,4 +714,10 @@ export default {
   }
 }
 
+.vs__dropdown-menu .vs__dropdown-option .only-user-opts{
+    color: var(--dropdown-text);
+    background-color: var(--dropdown-bg);
+    margin: 0px calc(-#{$input-padding-sm}/2);
+    padding: 3px 20px;
+}
 </style>

@@ -54,13 +54,11 @@ export default {
 
   data() {
     if ( !this.value.spec ) {
-      this.$set(this.value, 'spec', {
-        policyTypes: [],
+      this.value['spec'] = {policyTypes: [],
         podSelector: {
           matchExpressions: [],
           matchLabels:      {},
-        }
-      });
+        }};
     }
 
     const matchingPods = {
@@ -96,14 +94,14 @@ export default {
         if (hasIngressPolicies) {
           addObject(policyTypes, POLICY_TYPES.INGRESS);
           if (!this.value.spec.ingress) {
-            this.$set(this.value.spec, 'ingress', []);
+            this.value.spec['ingress'] = [];
           }
         } else {
           policyTypes = removeObject(policyTypes, POLICY_TYPES.INGRESS);
-          this.$delete(this.value.spec, 'ingress');
+          delete this.value.spec['ingress'];
         }
 
-        this.$set(this.value.spec, 'policyTypes', policyTypes);
+        this.value.spec['policyTypes'] = policyTypes;
       }
     },
     hasEgressPolicies: {
@@ -116,14 +114,14 @@ export default {
         if (hasEgressPolicies) {
           addObject(policyTypes, POLICY_TYPES.EGRESS);
           if (!this.value.spec.egress) {
-            this.$set(this.value.spec, 'egress', []);
+            this.value.spec['egress'] = [];
           }
         } else {
           policyTypes = removeObject(policyTypes, POLICY_TYPES.EGRESS);
-          this.$delete(this.value.spec, 'egress');
+          delete this.value.spec['egress'];
         }
 
-        this.$set(this.value.spec, 'policyTypes', policyTypes);
+        this.value.spec['policyTypes'] = policyTypes;
       }
     },
     podSelectorExpressions: {
@@ -134,7 +132,7 @@ export default {
         );
       },
       set(podSelectorExpressions) {
-        this.$set(this.value.spec, 'podSelector', simplify(podSelectorExpressions));
+        this.value.spec['podSelector'] = simplify(podSelectorExpressions);
       }
     },
   },
@@ -194,14 +192,14 @@ export default {
               {{ t('networkpolicy.ingress.label') }}
             </h2>
             <Checkbox
-              v-model="hasIngressPolicies"
+              v-model:value="hasIngressPolicies"
               class="mt-20 mb-10"
               :mode="mode"
               :label="t('networkpolicy.ingress.enable')"
             />
             <PolicyRules
               v-if="hasIngressPolicies"
-              v-model="value"
+              v-model:value="value"
               type="ingress"
               :mode="mode"
               :all-namespaces="allNamespaces"
@@ -218,14 +216,14 @@ export default {
               {{ t('networkpolicy.egress.label') }}
             </h2>
             <Checkbox
-              v-model="hasEgressPolicies"
+              v-model:value="hasEgressPolicies"
               class="mt-20 mb-10"
               :mode="mode"
               :label="t('networkpolicy.egress.enable')"
             />
             <PolicyRules
               v-if="hasEgressPolicies"
-              v-model="value"
+              v-model:value="value"
               type="egress"
               :mode="mode"
               :all-namespaces="allNamespaces"
@@ -248,7 +246,7 @@ export default {
             <div class="row">
               <div class="col span-12">
                 <MatchExpressions
-                  v-model="podSelectorExpressions"
+                  v-model:value="podSelectorExpressions"
                   :mode="mode"
                   :show-remove="false"
                   :type="POD"

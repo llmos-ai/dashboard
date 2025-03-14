@@ -5,58 +5,65 @@ import isString from 'lodash/isString';
 import VueSelectOverrides from '@shell/mixins/vue-select-overrides';
 
 export default {
+  emits: ['dd-button-action', 'click-action'],
+
   mixins: [VueSelectOverrides],
-  props:  {
+  props: {
     buttonLabel: {
       default: '',
-      type:    String,
+      type: String,
     },
     closeOnSelect: {
       default: true,
-      type:    Boolean
+      type: Boolean,
     },
     disabled: {
       default: false,
-      type:    Boolean,
+      type: Boolean,
     },
     // array of option objects containing at least a label and link, but also icon and action are available
     dropdownOptions: {
       // required: true,
       default: () => [],
-      type:    Array,
+      type: Array,
     },
     optionKey: {
       default: null,
-      type:    String,
+      type: String,
     },
     optionLabel: {
       default: 'label',
-      type:    String,
+      type: String,
     },
     // sm, null(med), lg - no xs...its so small
     size: {
       default: null,
-      type:    String,
+      type: String,
     },
     value: {
       default: null,
-      type:    String,
+      type: String,
     },
     placement: {
       default: 'bottom-start',
-      type:    String
+      type: String,
     },
     selectable: {
       default: (opt) => {
-        if ( opt ) {
-          if ( opt.disabled || opt.kind === 'group' || opt.kind === 'divider' || opt.loading ) {
+        if (opt) {
+          if (
+            opt.disabled ||
+            opt.kind === 'group' ||
+            opt.kind === 'divider' ||
+            opt.loading
+          ) {
             return false;
           }
         }
 
         return true;
       },
-      type: Function
+      type: Function,
     },
   },
   data() {
@@ -73,7 +80,7 @@ export default {
       const dropWidth = dropdownList.clientWidth;
 
       if (dropWidth < componentWidth) {
-        dropdownList.style.width = `${ componentWidth }px`;
+        dropdownList.style.width = `${componentWidth}px`;
       } else {
         dropdownList.style.width = 'min-content';
       }
@@ -92,13 +99,13 @@ export default {
         placement: this.placement || 'bottom-start',
         modifiers: [
           {
-            name:    'offset',
+            name: 'offset',
             options: { offset: [-2, 2] },
           },
           {
-            name:    'toggleClass',
+            name: 'toggleClass',
             enabled: true,
-            phase:   'write',
+            phase: 'write',
             fn({ state }) {
               component.$el.setAttribute('x-placement', state.placement);
             },
@@ -156,7 +163,7 @@ export default {
       this.$nextTick(() => {
         const el = this.$refs['button-dropdown'].searchEl;
 
-        if ( el ) {
+        if (el) {
           el.focus();
         }
       });
@@ -181,7 +188,7 @@ export default {
     :clearable="false"
     :close-on-select="closeOnSelect"
     :filterable="false"
-    :value="buttonLabel"
+    :modelValue="buttonLabel"
     :options="dropdownOptions"
     :map-keydown="mappedKeys"
     :get-option-key="
@@ -191,40 +198,36 @@ export default {
     :selectable="selectable"
     @search:blur="onBlur"
     @search:focus="onFocus"
-    @input="$emit('click-action', $event)"
+    @update:modelValue="$emit('click-action', $event)"
   >
-    <template slot="no-options">
+    <template #no-options>
       <slot name="no-options" />
     </template>
 
     <template #selected-option="option">
-      <button
+      <a-button
         tabindex="-1"
-        type="button"
-        class="dropdown-button-two btn"
+        data-testid="dropdown-button"
         @click="ddButtonAction(option)"
         @focus="focusSearch"
       >
         {{ option.label }}
-      </button>
+      </a-button>
     </template>
     <!-- Pass down templates provided by the caller -->
-    <template
-      v-for="(_, slot) of $scopedSlots"
-      v-slot:[slot]="scope"
-    >
-      <slot
-        v-if="slot !== 'selected-option'"
-        :name="slot"
-        v-bind="scope"
-      />
+    <template v-for="(_, slot) of $slots" #[slot]="scope" :key="slot">
+      <template
+        v-if="slot !== 'selected-option' && typeof $slots[slot] === 'function'"
+      >
+        <slot :name="slot" v-bind="scope" />
+      </template>
     </template>
   </v-select>
 </template>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .button-dropdown.btn-sm {
-  ::v-deep > .vs__dropdown-toggle {
+  :deep() > .vs__dropdown-toggle {
     .vs__actions {
       &:after {
         font-size: 1.6rem;
@@ -233,7 +236,7 @@ export default {
   }
 }
 .button-dropdown.btn-lg {
-  ::v-deep > .vs__dropdown-toggle {
+  :deep() > .vs__dropdown-toggle {
     .vs__actions {
       &:after {
         font-size: 2.6rem;
@@ -247,28 +250,28 @@ export default {
   color: var(--link);
   padding: 0;
 
-  &.vs--open ::v-deep {
+  &.vs--open :deep() {
     outline: none;
     box-shadow: none;
   }
 
   &:hover {
-    ::v-deep .vs__dropdown-toggle .vs__actions,
-    ::v-deep .vs__selected-options {
+    :deep() .vs__dropdown-toggle .vs__actions,
+    :deep() .vs__selected-options {
       background: var(--accent-btn-hover);
     }
-    ::v-deep .vs__selected-options .vs__selected button {
+    :deep() .vs__selected-options .vs__selected button {
       background-color: transparent;
       color: var(--accent-btn-hover-text);
     }
-    ::v-deep .vs__dropdown-toggle .vs__actions {
+    :deep() .vs__dropdown-toggle .vs__actions {
       &:after {
         color: var(--accent-btn-hover-text);
       }
     }
   }
 
-  ::v-deep > .vs__dropdown-toggle {
+  :deep() > .vs__dropdown-toggle {
     width: 100%;
     display: grid;
     grid-template-columns: 75% 25%;
@@ -276,7 +279,6 @@ export default {
     background: transparent;
 
     .vs__actions {
-
       &:after {
         color: var(--link);
         line-height: 1;
@@ -284,7 +286,7 @@ export default {
     }
   }
 
-  ::v-deep .vs__selected-options {
+  :deep() .vs__selected-options {
     .vs__selected {
       margin: unset;
       border: none;
@@ -305,7 +307,7 @@ export default {
     }
   }
 
-  ::v-deep .vs__dropdown-menu {
+  :deep() .vs__dropdown-menu {
     min-width: unset;
     width: fit-content;
   }

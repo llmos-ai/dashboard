@@ -1,19 +1,23 @@
-<script>
+<script setup>
+import { onBeforeMount } from 'vue';
+import { useStore } from 'vuex'
+import { useRouter, useRoute } from 'vue-router'
 import { NAME as SETTINGS } from '@shell/config/product/settings';
 import { MANAGEMENT } from '@shell/config/types';
 
-export default {
-  layout: 'plain',
+const store = useStore()
+const route = useRoute()
+const router = useRouter()
 
-  middleware({ redirect, route, store } ) {
-    return redirect({
-      name:   'c-cluster-product-resource',
-      params: {
-        ...route.params,
-        product:  SETTINGS,
-        resource: MANAGEMENT.SETTING,
-      }
-    });
-  }
-};
+onBeforeMount(() => {
+  const hasSettings = !!store.getters[`management/schemaFor`](MANAGEMENT.SETTING);
+  router.replace({
+    name:   'c-cluster-product-resource',
+    params: {
+      ...route.params,
+      product:  SETTINGS,
+      resource: hasSettings ? MANAGEMENT.SETTING : MANAGEMENT.FEATURE,
+    }
+  });
+});
 </script>

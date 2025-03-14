@@ -119,7 +119,7 @@ export default {
         />
 
         <ResourceTabs
-          v-model="value"
+          v-model:value="value"
           class="mt-15"
           :need-conditions="false"
           :need-related="false"
@@ -134,21 +134,21 @@ export default {
             <div class="row">
               <div class="col span-6 mb-10">
                 <LabeledSelect
-                  v-model="spec.failureDomain"
+                  v-model:value="spec.failureDomain"
                   label="Failure Domain"
                   :options="['host', 'osd']"
                   required
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
 
               <div class="col span-6 mb-10">
                 <LabeledInput
-                  v-model="spec.deviceClass"
+                  v-model:value="spec.deviceClass"
                   label="Device Class"
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
             </div>
@@ -157,12 +157,12 @@ export default {
             <div class="row">
               <div class="col span-6 mb-10">
                 <LabeledSelect
-                  v-model="type"
+                  v-model:value="type"
                   label="Type"
                   :options="['Replicated', 'Erasure Coded']"
                   required
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
 
@@ -171,12 +171,12 @@ export default {
                 class="col span-6 mb-10"
               >
                 <UnitInput
-                  v-model="spec.replicated.size"
+                  v-model:value="spec.replicated.size"
                   :hide-unit="true"
                   label="Replicas Per Failure Domain"
                   required
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
             </div>
@@ -187,22 +187,22 @@ export default {
             >
               <div class="col span-6 mb-10">
                 <UnitInput
-                  v-model="spec.erasureCoded.dataChunks"
+                  v-model:value="spec.erasureCoded.dataChunks"
                   :hide-unit="true"
                   label="Data Chunks"
                   required
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
               <div class="col span-6 mb-10">
                 <UnitInput
-                  v-model="spec.erasureCoded.codingChunks"
+                  v-model:value="spec.erasureCoded.codingChunks"
                   :hide-unit="true"
                   label="Coding Chunks"
                   required
                   :mode="mode"
-                  @input="update"
+                  @update:value="update"
                 />
               </div>
             </div>
@@ -210,7 +210,7 @@ export default {
             <br>
             <h3>Parameters</h3>
             <KeyValue
-              v-model="spec.parameters"
+              v-model:value="spec.parameters"
               :add-label="t('storage.addParameters')"
               :read-allowed="false"
               :mode="mode"

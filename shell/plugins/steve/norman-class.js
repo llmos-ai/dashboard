@@ -1,6 +1,5 @@
 import { ANNOTATIONS_TO_IGNORE_REGEX, LABELS_TO_IGNORE_REGEX } from '@shell/config/labels-annotations';
 import pickBy from 'lodash/pickBy';
-import Vue from 'vue';
 import { matchesSomeRegex } from '@shell/utils/string';
 import Resource from '@shell/plugins/dashboard-store/resource-class';
 
@@ -11,7 +10,7 @@ export default class NormanModel extends Resource {
       return matchesSomeRegex(key, LABELS_TO_IGNORE_REGEX);
     });
 
-    Vue.set(this, 'labels', { ...wasIgnored, ...val });
+    this['labels'] = { ...wasIgnored, ...val };
   }
 
   setLabel(key, val) {
@@ -20,9 +19,9 @@ export default class NormanModel extends Resource {
         this.labels = {};
       }
 
-      Vue.set(this.labels, key, val);
+      this.labels[key] = val;
     } else if ( this.labels ) {
-      Vue.set(this.labels, key, undefined);
+      this.labels[key] = undefined;
       delete this.labels[key];
     }
   }
@@ -33,7 +32,7 @@ export default class NormanModel extends Resource {
       return matchesSomeRegex(key, ANNOTATIONS_TO_IGNORE_REGEX);
     });
 
-    Vue.set(this, 'annotations', { ...wasIgnored, ...val });
+    this['annotations'] = { ...wasIgnored, ...val };
   }
 
   setAnnotation(key, val) {
@@ -42,9 +41,9 @@ export default class NormanModel extends Resource {
         this.annotations = {};
       }
 
-      Vue.set(this.annotations, key, val);
+      this.annotations[key] = val;
     } else if ( this.annotations ) {
-      Vue.set(this.annotations, key, undefined);
+      this.annotations[key] = undefined;
       delete this.annotations[key];
     }
   }
@@ -53,7 +52,7 @@ export default class NormanModel extends Resource {
     const keys = ['resourceQuota', 'namespaceDefaultResourceQuota'];
 
     keys.forEach((key) => {
-      Vue.set(this, key, { ...spec[key] });
+      this[key] = { ...spec[key] };
     });
   }
 }

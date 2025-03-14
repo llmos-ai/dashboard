@@ -1,122 +1,80 @@
-<script>
-import { mapGetters } from 'vuex';
-import Select from '@shell/components/form/Select.vue';
+<script setup>
+import { computed } from "vue";
+import { useStore } from "vuex";
+import { useI18n } from '@shell/composables/useI18n';
+import Select from "@shell/components/form/Select.vue";
 
-export default {
-  name: 'LocalSelector',
+const props = defineProps({
+  mode: { type: String, default: "" },
+  showIcon: { type: Boolean, default: true },
+});
 
-  components: { Select },
+const store = useStore();
+const { t } = useI18n(store);
 
-  props: {
-    mode: {
-      type:    String,
-      default: ''
-    },
-  },
+const selectedLocaleLabel = computed(() => store.getters["i18n/selectedLocaleLabel"]);
+const availableLocales = computed(() => store.getters["i18n/availableLocales"]);
 
-  computed: {
-    ...mapGetters('i18n', ['selectedLocaleLabel', 'availableLocales']),
+const dev = computed(() => store.getters["prefs/dev"]);
 
-    localesOptions() {
-      return Object.keys(this.availableLocales).map((value) => {
-        return {
-          label: this.t(`locale.${ value }`),
-          value
-        };
-      });
-    },
-
-    selectedOption() {
-      return Object.keys(this.availableLocales)[Object.values(this.availableLocales).indexOf(this.selectedLocaleLabel)];
-    },
-
-    showLocale() {
-      return (this.availableLocales && Object.keys(this.availableLocales).length > 1) || this.dev;
-    },
-
-    showNone() {
-      return !!process.env.dev && this.dev;
-    },
-  },
-
-  methods: {
-    switchLocale($event) {
-      this.$store.dispatch('i18n/switchTo', $event);
-    },
+const allAvailableLocales = computed(() => {
+  if (!!process.env.dev && dev.value) {
+    return {
+      ...availableLocales.value,
+      none: "None",
+    };
   }
+  return availableLocales.value;
+});
+
+const localesOptions = computed(() =>
+  Object.keys(allAvailableLocales.value).map((value) => ({
+    label: t(`locale.${value}`),
+    value,
+  }))
+);
+
+const selectedOption = computed(() => {
+  const option = Object.keys(allAvailableLocales.value)[
+    Object.values(allAvailableLocales.value).indexOf(selectedLocaleLabel.value)
+  ];
+  return option;
+});
+
+const showLocale = computed(() => {
+  return (allAvailableLocales.value && Object.keys(allAvailableLocales.value).length > 1) || dev.value;
+});
+
+const switchLocale = (event) => {
+  store.dispatch("i18n/switchTo", event);
 };
 </script>
 
 <template>
   <div>
     <div v-if="mode === 'login'">
-      <div v-if="showLocale">
-        <v-popover
-          popover-class="localeSelector"
-          placement="top"
-          trigger="click"
-        >
-          <a
-            data-testid="locale-selector"
-            class="locale-chooser"
-          >
+      <div v-if="showLocale" role="menu" :aria-label="t('locale.menu')" class="locale-login-container">
+        <a-dropdown trigger="click">
+          <a class="cursor-pointer" @click.prevent>
             {{ selectedLocaleLabel }}
-            <i class="icon icon-fw icon-sort-down" />
+            <i v-if="showIcon" class="icon icon-fw icon-sort-down" />
           </a>
-          <template slot="popover">
-            <ul
-              class="list-unstyled dropdown"
-              style="margin: -1px;"
-            >
-              <li
-                v-if="showNone"
-                v-t="'locale.none'"
-                class="hand"
-                @click="switchLocale('none')"
-              />
-              <li
-                v-for="(label, name) in availableLocales"
+          <template #overlay>
+            <a-menu>
+              <a-menu-item
+                v-for="(label, name) in allAvailableLocales"
                 :key="name"
-                class="hand"
-                @click="switchLocale(name)"
+                @click.stop="switchLocale(name)"
               >
                 {{ label }}
-              </li>
-            </ul>
+              </a-menu-item>
+            </a-menu>
           </template>
-        </v-popover>
+        </a-dropdown>
       </div>
     </div>
     <div v-else>
-      <Select
-        :value="selectedOption"
-        :options="localesOptions"
-        @input="switchLocale($event)"
-      />
+      <Select v-model:value="selectedOption" :options="localesOptions" @update:modelValue="switchLocale" />
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.advanced {
-  user-select: none;
-  padding: 0 5px;
-  line-height: 40px;
-  font-size: 15px;
-  font-weight: 500;
-}
-.content {
-  background: var(--nav-active);
-  padding: 10px;
-  margin-top: 6px;
-  border-radius: 4px;
-}
-
-.locale-chooser {
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: none;
-  }
-}
-</style>

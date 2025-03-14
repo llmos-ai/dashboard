@@ -60,7 +60,7 @@ export default {
   >
     <NameNsDescription
       ref="nd"
-      v-model="value"
+      v-model:value="value"
       :mode="mode"
     />
 
@@ -77,7 +77,7 @@ export default {
       >
         <KeyValue
           key="config"
-          v-model="config"
+          v-model:value="config"
           :mode="mode"
           :read-allowed="false"
           :value-multiline="false"

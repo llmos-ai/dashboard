@@ -118,9 +118,10 @@ export default {
 </style>
 
 <style scoped lang="scss">
-@import 'node_modules/diff2html/bundles/css/diff2html.min.css';
+// TODO
+// @import 'node_modules/diff2html/bundles/css/diff2html.min.css';
 
-::v-deep .d2h-wrapper {
+:deep() .d2h-wrapper {
   .d2h-file-header {
     display: none;
   }

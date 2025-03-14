@@ -4,7 +4,12 @@ import { LabeledInput } from '@components/Form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import LocaleSelector from '@shell/components/LocaleSelector';
 import { Banner } from '@components/Banner';
-import { LOCAL, LOGGED_OUT, TIMED_OUT, _FLAGGED } from '@shell/config/query-params';
+import {
+  LOCAL,
+  LOGGED_OUT,
+  TIMED_OUT,
+  _FLAGGED,
+} from '@shell/config/query-params';
 import { Checkbox } from '@components/Form/Checkbox';
 import Password from '@shell/components/form/Password';
 import { mapGetters } from 'vuex';
@@ -15,8 +20,8 @@ import { getVendor, getProduct } from '@shell/config/private-label';
 import { SETTING } from '@shell/config/settings';
 
 export default {
-  name:       'Login',
-  layout:     'unauthenticated',
+  name: 'Login',
+  layout: 'unauthenticated',
   components: {
     AsyncButton,
     CopyCode,
@@ -24,35 +29,26 @@ export default {
     LocaleSelector,
     Checkbox,
     Banner,
-    LabeledInput
-  },
-
-  async asyncData({ route, redirect, store }) {
-    const publicUIInfo = await store.dispatch('auth/getPublicUIInfo');
-    const firstLogin = publicUIInfo[SETTING.FIRST_LOGIN] === 'true';
-
-    return {
-      vendor:             getVendor(publicUIInfo[SETTING.PL]),
-      hasLocal:           true,
-      showLocal:          true,
-      showLocaleSelector: true,
-      publicUIInfo,
-      firstLogin,
-    };
+    LabeledInput,
   },
 
   data({ $cookies }) {
     const username = $cookies.get(USERNAME, { parseJSON: false }) || '';
 
     return {
-      product:          getProduct(),
+      product: getProduct(),
       username,
-      password:         '',
-      remember:         !!username,
-      timedOut:         this.$route.query[TIMED_OUT] === _FLAGGED,
-      loggedOut:        this.$route.query[LOGGED_OUT] === _FLAGGED,
-      err:              this.$route.query.err,
+      password: '',
+      remember: !!username,
+      timedOut: this.$route.query[TIMED_OUT] === _FLAGGED,
+      loggedOut: this.$route.query[LOGGED_OUT] === _FLAGGED,
+      err: this.$route.query.err,
       customLoginError: {},
+      hasLocal: true,
+      showLocal: true,
+      showLocaleSelector: true,
+      firstLogin: false,
+      vendor: '',
     };
   },
 
@@ -60,22 +56,31 @@ export default {
     ...mapGetters({ t: 'i18n/t' }),
 
     kubectlCmd() {
-      return "kubectl get secret --namespace llmos-system llmos-bootstrap-passwd -o go-template='{{.data.password|base64decode}}{{\"\\n\"}}'";
+      return 'kubectl get secret --namespace llmos-system llmos-bootstrap-passwd -o go-template=\'{{.data.password|base64decode}}{{"\\n"}}\'';
     },
 
     errorMessage() {
       if (this.err === LOGIN_ERRORS.CLIENT_UNAUTHORIZED) {
         return this.t('login.clientError');
-      } else if (this.err === LOGIN_ERRORS.CLIENT || this.err === LOGIN_ERRORS.SERVER) {
+      } else if (
+        this.err === LOGIN_ERRORS.CLIENT ||
+        this.err === LOGIN_ERRORS.SERVER
+      ) {
         return this.t('login.error');
       }
 
-      return this.err?.length ? this.t('login.specificError', { msg: this.err }) : '';
+      return this.err?.length
+        ? this.t('login.specificError', { msg: this.err })
+        : '';
     },
 
     errorToDisplay() {
-      if (this.customLoginError?.showMessage === 'true' && this.customLoginError?.message && this.errorMessage) {
-        return `${ this.customLoginError.message } \n ${ this.errorMessage }`;
+      if (
+        this.customLoginError?.showMessage === 'true' &&
+        this.customLoginError?.message &&
+        this.errorMessage
+      ) {
+        return `${this.customLoginError.message} \n ${this.errorMessage}`;
       }
 
       if (this.errorMessage) {
@@ -87,14 +92,23 @@ export default {
 
     hasLoginMessage() {
       return this.errorToDisplay || this.loggedOut || this.timedOut;
-    }
-
+    },
   },
 
   async fetch() {
-    const { value } = await this.$store.dispatch('management/find', { type: MANAGEMENT.SETTING, id: SETTING.BANNERS });
+    const publicUIInfo = await this.$store.dispatch('auth/getPublicUIInfo');
+    const firstLogin = publicUIInfo[SETTING.FIRST_LOGIN] === 'true';
+    this.vendor = getVendor(publicUIInfo[SETTING.PL]);
+
+    const { value } = await this.$store.dispatch('management/find', {
+      type: MANAGEMENT.SETTING,
+      id: SETTING.BANNERS,
+    });
 
     this.customLoginError = JSON.parse(value).loginError;
+
+    this.publicUIInfo = publicUIInfo;
+    this.firstLogin = firstLogin;
   },
 
   mounted() {
@@ -106,7 +120,7 @@ export default {
 
   methods: {
     displayName(provider) {
-      return this.t(`model.authConfig.provider.${ provider }`);
+      return this.t(`model.authConfig.provider.${provider}`);
     },
 
     toggleLocal() {
@@ -118,23 +132,23 @@ export default {
     },
 
     focusSomething() {
-      if ( !this.showLocal ) {
+      if (!this.showLocal) {
         // One of the provider components will handle it
         return;
       }
 
       let elem;
 
-      if ( this.username ) {
+      if (this.username) {
         elem = this.$refs.password;
       } else {
         elem = this.$refs.username;
       }
 
-      if ( elem?.focus ) {
+      if (elem?.focus) {
         elem.focus();
 
-        if ( elem.select ) {
+        if (elem.select) {
           elem.select();
         }
       }
@@ -144,29 +158,29 @@ export default {
       try {
         await this.$store.dispatch('auth/login', {
           provider: 'local',
-          body:     {
-            username:     this.username,
-            password:     this.password,
-            responseType: 'cookie'
-          }
+          body: {
+            username: this.username,
+            password: this.password,
+            responseType: 'cookie',
+          },
         });
 
         const users = await this.$store.dispatch('management/findAll', {
           type: MANAGEMENT.USER,
-          opt:  { url: `/v1/${ MANAGEMENT.USER }?me=true` }
+          opt: { url: `/v1/${MANAGEMENT.USER}?me=true` },
         });
 
         if (!!users?.[0]) {
           this.$store.dispatch('auth/gotUser', users[0]);
         }
 
-        if ( this.remember ) {
+        if (this.remember) {
           this.$cookies.set(USERNAME, this.username, {
-            encode:   (x) => x,
-            maxAge:   86400 * 365,
-            path:     '/',
+            encode: (x) => x,
+            maxAge: 86400 * 365,
+            path: '/',
             sameSite: true,
-            secure:   true,
+            secure: true,
           });
         } else {
           this.$cookies.remove(USERNAME);
@@ -175,7 +189,7 @@ export default {
         if (this.firstLogin) {
           this.$router.push({ name: 'auth-setup' });
         } else {
-          this.$router.replace('/');
+          this.$router.push({ name: 'index' });
         }
       } catch (err) {
         this.err = err;
@@ -185,7 +199,7 @@ export default {
         buttonCb(false);
       }
     },
-  }
+  },
 };
 </script>
 
@@ -194,28 +208,18 @@ export default {
     <div class="row gutless mb-20">
       <div class="col span-12 p-20">
         <h1 class="text-center login-welcome">
-          {{ t('login.welcome', {vendor}) }}
+          {{ t('login.welcome', { vendor }) }}
         </h1>
         <div
           class="login-messages"
           data-testid="login__messages"
-          :class="{'login-messages--hasContent': hasLoginMessage}"
+          :class="{ 'login-messages--hasContent': hasLoginMessage }"
         >
-          <Banner
-            v-if="errorToDisplay"
-            :label="errorToDisplay"
-            color="error"
-          />
-          <h4
-            v-else-if="loggedOut"
-            class="text-success text-center"
-          >
+          <Banner v-if="errorToDisplay" :label="errorToDisplay" color="error" />
+          <h4 v-else-if="loggedOut" class="text-success text-center">
             {{ t('login.loggedOut') }}
           </h4>
-          <h4
-            v-else-if="timedOut"
-            class="text-error text-center"
-          >
+          <h4 v-else-if="timedOut" class="text-error text-center">
             {{ t('login.loginAgain') }}
           </h4>
         </div>
@@ -223,42 +227,33 @@ export default {
         <div
           v-if="firstLogin"
           class="first-login-message pl-10 pr-10"
-          :class="{'mt-30': !hasLoginMessage}"
+          :class="{ 'mt-30': !hasLoginMessage }"
           data-testid="first-login-message"
         >
-          <t
-            k="setup.defaultPassword.intro"
-            :raw="true"
-          />
+          <t k="setup.defaultPassword.intro" :raw="true" />
 
           <div>
-            <t
-              k="setup.defaultPassword.scriptPrefix"
-              :raw="true"
-            />
+            <t k="setup.defaultPassword.scriptPrefix" :raw="true" />
           </div>
           <CopyCode class="copy-code">
             {{ kubectlCmd }}
           </CopyCode>
           <div>
-            <t
-              k="setup.defaultPassword.dockerSuffix"
-              :raw="true"
-            />
+            <t k="setup.defaultPassword.dockerSuffix" :raw="true" />
           </div>
         </div>
-
         <template v-if="hasLocal">
           <form
             v-if="showLocal"
-            :class="{'mt-30': !hasLoginMessage}"
+            :class="{ 'mt-30': !hasLoginMessage }"
+            @submit.prevent
           >
             <div class="span-6 offset-3">
               <div class="mb-20">
                 <LabeledInput
                   id="username"
                   ref="username"
-                  v-model.trim="username"
+                  v-model:value.trim="username"
                   data-testid="local-login-username"
                   :label="t('login.username')"
                   autocomplete="username"
@@ -268,10 +263,12 @@ export default {
                 <Password
                   id="password"
                   ref="password"
-                  v-model="password"
+                  v-model:value="password"
                   data-testid="local-login-password"
                   :label="t('login.password')"
                   autocomplete="password"
+                  htmlType="password"
+                  @keyup.enter="loginLocal"
                 />
               </div>
             </div>
@@ -280,19 +277,18 @@ export default {
                 <AsyncButton
                   id="submit"
                   data-testid="login-submit"
-                  type="submit"
+                  type="primary"
+                  ref="loginLocalButton"
+                  size="large"
                   :action-label="t('login.loginWithLocal')"
                   :waiting-label="t('login.loggingIn')"
                   :success-label="t('login.loggedIn')"
                   :error-label="t('asyncButton.default.error')"
                   @click="loginLocal"
                 />
-                <div
-                  v-if="!firstLogin"
-                  class="mt-20"
-                >
+                <div v-if="!firstLogin" class="mt-20">
                   <Checkbox
-                    v-model="remember"
+                    v-model:value="remember"
                     :label="t('login.remember.label')"
                     type="checkbox"
                   />
@@ -300,10 +296,7 @@ export default {
               </div>
             </div>
           </form>
-          <div
-            v-if="hasLocal && !showLocal"
-            class="mt-20 text-center"
-          >
+          <div v-if="hasLocal && !showLocal" class="mt-20 text-center">
             <a
               id="login-useLocal"
               data-testid="login-useLocal"
@@ -314,10 +307,7 @@ export default {
             </a>
           </div>
         </template>
-        <div
-          v-if="showLocaleSelector"
-          class="locale-elector text-center"
-        >
+        <div v-if="showLocaleSelector" class="locale-elector text-center">
           <LocaleSelector mode="login" />
         </div>
       </div>
@@ -326,76 +316,77 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  .login {
-    overflow: hidden;
-    margin: auto;
-    width: 750px;
+.login {
+  overflow: hidden;
+  margin: auto;
+  width: 750px;
 
-    .row {
-      align-items: center;
-    }
-
-    .landscape {
-      height: 100vh;
-      margin: 0;
-      object-fit: cover;
-    }
-
-    .login-welcome {
-      margin: 0
-    }
-
-    .login-messages {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .banner {
-        margin: 5px;
-      }
-      h4 {
-        margin: 0;
-      }
-      &--hasContent {
-        min-height: 70px;
-      }
-
-      .text-error, .banner {
-        max-width: 80%;
-      }
-    }
-
-    .first-login-message {
-      .banner {
-        margin-bottom: 0;
-        border-left: 0;
-
-        ::v-deep code {
-          font-size: 12px;
-          padding: 0;
-        }
-      }
-    }
+  .row {
+    align-items: center;
   }
 
-  .gutless {
+  .landscape {
     height: 100vh;
-    & > .span-6 {
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      place-content: center;
+    margin: 0;
+    object-fit: cover;
+  }
+
+  .login-welcome {
+    margin: 0;
+  }
+
+  .login-messages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .banner {
+      margin: 5px;
+    }
+    h4 {
+      margin: 0;
+    }
+    &--hasContent {
+      min-height: 70px;
+    }
+
+    .text-error,
+    .banner {
+      max-width: 80%;
     }
   }
-  .locale-elector {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0 auto;
+
+  .first-login-message {
+    .banner {
+      margin-bottom: 0;
+      border-left: 0;
+
+      :deep() code {
+        font-size: 12px;
+        padding: 0;
+      }
+    }
   }
-  .copy-code {
-    margin: 10px 0 20px 0;
+}
+
+.gutless {
+  height: 100vh;
+  & > .span-6 {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    place-content: center;
   }
+}
+.locale-elector {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0 auto;
+}
+.copy-code {
+  margin: 10px 0 20px 0;
+}
 </style>

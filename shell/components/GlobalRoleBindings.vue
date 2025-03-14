@@ -5,7 +5,6 @@ import { _CREATE, _VIEW } from '@shell/config/query-params';
 import { addObjects, isArray } from '@shell/utils/array';
 import Loading from '@shell/components/Loading';
 import { Checkbox } from '@components/Form/Checkbox';
-import { Card } from '@components/Card';
 
 /**
  * Display checkboxes for each global role, checked for given user or principal (group). Can save changes.
@@ -14,41 +13,42 @@ export default {
   components: {
     Loading,
     Checkbox,
-    Card
   },
   props: {
     mode: {
-      type:    String,
+      type: String,
       default: _VIEW,
     },
     realMode: {
-      type:    String,
+      type: String,
       default: _VIEW,
     },
     assignOnly: {
-      type:    Boolean,
+      type: Boolean,
       default: false,
     },
     type: {
-      type:    String,
+      type: String,
       default: 'group',
       validator(val) {
         return val === 'group' || val === 'user';
-      }
+      },
     },
     userId: {
-      type:    String,
-      default: ''
+      type: String,
+      default: '',
     },
   },
   async fetch() {
     try {
-      this.allRoles = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.GLOBAL_ROLE });
+      this.allRoles = await this.$store.dispatch('management/findAll', {
+        type: MANAGEMENT.GLOBAL_ROLE,
+      });
       if (!this.sortedRoles) {
         this.sortedRoles = {
-          global:  [],
+          global: [],
           builtin: [],
-          custom:  []
+          custom: [],
         };
 
         this.allRoles.forEach((role) => {
@@ -59,31 +59,32 @@ export default {
           }
         });
 
-        const sort = (a, b) => a.spec.displayName.localeCompare(b.spec.displayName);
+        const sort = (a, b) =>
+          a.spec.displayName.localeCompare(b.spec.displayName);
 
         this.sortedRoles.builtin = this.sortedRoles.builtin.sort(sort);
         this.sortedRoles.custom = this.sortedRoles.custom.sort(sort);
 
         if (!this.isCreate) {
-          this.roleTemplateBindings = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.ROLE_TEMPLATE_BINDING, opt: { force: true } });
+          this.roleTemplateBindings = await this.$store.dispatch(
+            'management/findAll',
+            { type: MANAGEMENT.ROLE_TEMPLATE_BINDING, opt: { force: true } }
+          );
         }
 
         this.update();
       }
-    } catch (e) { }
+    } catch (e) {}
   },
   data() {
     return {
-      globalPermissions: [
-        'admin',
-        'user',
-      ],
-      roleTemplateBindings:  null,
-      sortedRoles:           null,
-      selectedRoles:         [],
+      globalPermissions: ['admin', 'user'],
+      roleTemplateBindings: null,
+      sortedRoles: null,
+      selectedRoles: [],
       startingSelectedRoles: [],
-      assignOnlyRoles:       {},
-      roleChanges:           {}
+      assignOnlyRoles: {},
+      roleChanges: {},
     };
   },
   computed: {
@@ -95,7 +96,7 @@ export default {
 
     isUser() {
       return this.type === 'user';
-    }
+    },
   },
   watch: {
     groupprincipalid(groupprincipalid, oldgroupprincipalid) {
@@ -116,7 +117,7 @@ export default {
       }
     },
     getUnique(...ids) {
-      return `${ this.userId }-${ ids.join('-') }`;
+      return `${this.userId}-${ids.join('-')}`;
     },
 
     selectDefaults() {
@@ -148,13 +149,15 @@ export default {
 
         Object.values(this.sortedRoles).forEach((roles) => {
           roles.forEach((mappedRole) => {
-            const boundRole = boundRoles.find((boundRole) => boundRole.roleTemplateRef.name === mappedRole.id);
+            const boundRole = boundRoles.find(
+              (boundRole) => boundRole.roleTemplateRef.name === mappedRole.id
+            );
 
             if (!!boundRole) {
               this.selectedRoles.push(mappedRole.id);
               this.startingSelectedRoles.push({
-                roleId:    mappedRole.id,
-                bindingId: boundRole.id
+                roleId: mappedRole.id,
+                bindingId: boundRole.id,
               });
               // Checkboxes should be disabled, besides normal 'mode' ways, if we're only assigning and not removing existing roles
               this.assignOnlyRoles[mappedRole.id] = this.assignOnly;
@@ -173,62 +176,93 @@ export default {
     },
 
     checkboxChanged() {
-      const addRoles = this.selectedRoles
-        .filter((selected) => !this.startingSelectedRoles.find((startingRole) => startingRole.roleId === selected));
+      const addRoles = this.selectedRoles.filter(
+        (selected) =>
+          !this.startingSelectedRoles.find(
+            (startingRole) => startingRole.roleId === selected
+          )
+      );
       const removeBindings = this.startingSelectedRoles
-        .filter((startingRole) => !this.selectedRoles.find((selected) => selected === startingRole.roleId))
+        .filter(
+          (startingRole) =>
+            !this.selectedRoles.find(
+              (selected) => selected === startingRole.roleId
+            )
+        )
         .map((startingRole) => startingRole.bindingId);
 
       this.roleChanges = {
         initialRoles: this.startingSelectedRoles,
         addRoles,
-        removeBindings
+        removeBindings,
       };
 
-      this.$emit('hasChanges', !!this.roleChanges.addRoles.length || !!this.roleChanges.removeBindings.length);
+      this.$emit(
+        'hasChanges',
+        !!this.roleChanges.addRoles.length ||
+          !!this.roleChanges.removeBindings.length
+      );
       this.$emit('canLogIn', this.confirmUserCanLogIn());
       this.$emit('changed', this.roleChanges);
     },
 
     async saveAddedRoles(userId) {
       const requestOptions = {
-        type:     MANAGEMENT.ROLE_TEMPLATE_BINDING,
+        type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
         metadata: {
           generateName: `rtb-`,
-          labels:       { 'auth.management.llmos.ai/user-id': userId || this.userId },
+          labels: { 'auth.management.llmos.ai/user-id': userId || this.userId },
         },
         roleTemplateRef: {
           apiGroup: MANAGEMENT_GROUP,
-          kind:     'GlobalRole',
-          name:     '', // a placeholder of the role name
+          kind: 'GlobalRole',
+          name: '', // a placeholder of the role name
         },
-        subjects: [{
-          apiGroup: RBAC_GROUP,
-          kind:     'User',
-          name:     userId || this.userId,
-        }]
+        subjects: [
+          {
+            apiGroup: RBAC_GROUP,
+            kind: 'User',
+            name: userId || this.userId,
+          },
+        ],
       };
 
-      const newBindings = await Promise.all(this.roleChanges.addRoles.map((role) => this.$store.dispatch(`management/create`, {
-        ...requestOptions,
-        roleTemplateRef: {
-          ...requestOptions.roleTemplateRef,
-          name: role, // Pass roleName dynamically here
-        },
-      })));
+      const newBindings = await Promise.all(
+        this.roleChanges.addRoles.map((role) =>
+          this.$store.dispatch(`management/create`, {
+            ...requestOptions,
+            roleTemplateRef: {
+              ...requestOptions.roleTemplateRef,
+              name: role, // Pass roleName dynamically here
+            },
+          })
+        )
+      );
 
       // Save all changes (and ensure user isn't logged out if they don't have permissions to make a change)
-      await Promise.all(newBindings.map((newBinding) => newBinding.save({ redirectUnauthorized: false })));
+      await Promise.all(
+        newBindings.map((newBinding) =>
+          newBinding.save({ redirectUnauthorized: false })
+        )
+      );
     },
 
     async saveRemovedRoles() {
-      const existingBindings = await Promise.all(this.roleChanges.removeBindings.map((bindingId) => this.$store.dispatch('management/find', {
-        type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
-        id:   bindingId
-      })));
+      const existingBindings = await Promise.all(
+        this.roleChanges.removeBindings.map((bindingId) =>
+          this.$store.dispatch('management/find', {
+            type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
+            id: bindingId,
+          })
+        )
+      );
 
       // Save all changes (and ensure user isn't logged out if they don't have permissions to make a change)
-      await Promise.all(existingBindings.map((existingBinding) => existingBinding.remove({ redirectUnauthorized: false })));
+      await Promise.all(
+        existingBindings.map((existingBinding) =>
+          existingBinding.remove({ redirectUnauthorized: false })
+        )
+      );
     },
 
     /**
@@ -238,10 +272,14 @@ export default {
       // Ensure roles are added before removed (in case by removing one user is unable to add another)
       await this.saveAddedRoles(userId);
       await this.saveRemovedRoles();
-      await this.$store.dispatch('management/findAll', {
-        type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
-        opt:  { force: true }
-      }, { force: true });
+      await this.$store.dispatch(
+        'management/findAll',
+        {
+          type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
+          opt: { force: true },
+        },
+        { force: true }
+      );
     },
 
     confirmUserCanLogIn() {
@@ -262,7 +300,11 @@ export default {
       // return true
       // Brought over from Ember
 
-      if (( rule.resources || [] ).some(resourceValidator) && ( rule.apiGroups || [] ).some(apiGroupValidator) && verbsValidator(( rule.verbs || [] ))) {
+      if (
+        (rule.resources || []).some(resourceValidator) &&
+        (rule.apiGroups || []).some(apiGroupValidator) &&
+        verbsValidator(rule.verbs || [])
+      ) {
         return true;
       }
 
@@ -295,8 +337,7 @@ export default {
         return verbsRequiredForLogin.includes(verbs[0]);
       }
     },
-
-  }
+  },
 };
 </script>
 
@@ -307,96 +348,91 @@ export default {
     <form v-if="selectedRoles">
       <div
         v-for="(sortedRole, roleType) in sortedRoles"
-        :key="getUnique(roleType)"
+        :key="roleType"
         class="role-group mb-10"
       >
-        <Card
-          v-if="Object.keys(sortedRole).length"
-          :show-highlight-border="false"
-          :show-actions="false"
-        >
+        <a-card v-if="Object.keys(sortedRole).length" :show-actions="false">
           <template v-slot:title>
             <div class="type-title">
-              <h3>{{ t(`rbac.globalRoles.types.${roleType}.label`) }}</h3>
+              <span>{{ t(`rbac.globalRoles.types.${roleType}.label`) }}</span>
               <div class="type-description">
-                {{ t(`rbac.globalRoles.types.${roleType}.description`, { isUser }) }}
+                {{
+                  t(`rbac.globalRoles.types.${roleType}.description`, {
+                    isUser,
+                  })
+                }}
               </div>
             </div>
           </template>
-          <template v-slot:body>
+          <div
+            class="checkbox-section"
+            :class="'checkbox-section--' + roleType"
+          >
             <div
-              class="checkbox-section"
-              :class="'checkbox-section--' + roleType"
+              v-for="(role, i) in sortedRoles[roleType]"
+              :key="i"
+              class="checkbox mb-10 mr-10"
             >
-              <div
-                v-for="role in sortedRoles[roleType]"
-                :key="getUnique(roleType, role.id)"
-                class="checkbox mb-10 mr-10"
+              <Checkbox
+                v-model:value="selectedRoles"
+                :value-when-true="role.id"
+                :disabled="!!assignOnlyRoles[role.id]"
+                :label="role.nameDisplay"
+                :description="role.descriptionDisplay"
+                :mode="mode"
+                @update:value="checkboxChanged"
               >
-                <Checkbox
-                  :key="getUnique(roleType, role.id, 'checkbox')"
-                  v-model="selectedRoles"
-                  :value-when-true="role.id"
-                  :disabled="!!assignOnlyRoles[role.id]"
-                  :label="role.nameDisplay"
-                  :description="role.descriptionDisplay"
-                  :mode="mode"
-                  @input="checkboxChanged"
-                >
-                  <template #label>
-                    <div class="checkbox-label-slot">
-                      <span class="checkbox-label">{{ role.nameDisplay }}</span>
-                      <i
-                        v-if="!!assignOnlyRoles[role.id]"
-                        v-clean-tooltip="t('rbac.globalRoles.assignOnlyRole')"
-                        class="checkbox-info icon icon-info icon-lg"
-                      />
-                    </div>
-                  </template>
-                </Checkbox>
-              </div>
+                <template #label>
+                  <div class="checkbox-label-slot">
+                    <span class="checkbox-label">{{ role.nameDisplay }}</span>
+                    <i
+                      v-if="!!assignOnlyRoles[role.id]"
+                      v-clean-tooltip="t('rbac.globalRoles.assignOnlyRole')"
+                      class="checkbox-info icon icon-info icon-lg"
+                    />
+                  </div>
+                </template>
+              </Checkbox>
             </div>
-          </template>
-        </Card>
+          </div>
+        </a-card>
       </div>
     </form>
   </div>
 </template>
-<style lang='scss'>
+<style lang="scss">
 .role-group {
   .card-container {
     margin: 0;
   }
 }
 </style>
-<style lang='scss' scoped>
-  $detailSize: 11px;
-  .role-group {
-    .type-title {
-      display: flex;
-      flex-direction: column;
-      .type-description {
-        font-size: $detailSize;
-      }
-    }
-
-    .checkbox-section {
-      display: grid;
-
-      grid-template-columns: repeat(3, 1fr);
-
-      &--global {
-        grid-template-columns: 100%;
-      }
-
-      .checkbox-label {
-        &-slot {
-          display: inline-flex;
-          align-items: center;
-        }
-        color: var(--body-text);
-        margin: 0;
-      }
+<style lang="scss" scoped>
+$detailSize: 11px;
+.role-group {
+  .type-title {
+    .type-description {
+      font-size: $detailSize;
     }
   }
+
+  .checkbox-section {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    &--global {
+      grid-template-columns: 100%;
+    }
+
+    .checkbox-label {
+      &-slot {
+        display: inline-flex;
+        align-items: center;
+      }
+      color: var(--body-text);
+      margin: 0;
+    }
+  }
+}
 </style>

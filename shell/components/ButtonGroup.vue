@@ -1,102 +1,117 @@
-<script>
-export default {
-  props: {
-    value: {
-      type:     [String, Number, Boolean, Object],
-      required: true,
-    },
+<script setup>
+import { computed, defineProps, defineEmits } from 'vue';
+import { useStore } from 'vuex';
+import { useI18n } from '@shell/composables/useI18n';
 
-    inactiveClass: {
-      type:    String,
-      default: 'bg-disabled',
-    },
+const store = useStore();
+const { t } = useI18n(store);
 
-    activeClass: {
-      type:    String,
-      default: 'bg-primary',
-    },
+const props = defineProps({
+  value: {
+    type: [String, Number, Boolean, Object],
+    required: true,
+  },
+  buttonStyle: {
+    type: String,
+    default: 'solid',
+  },
+  inactiveClass: {
+    type: String,
+    default: '',
+  },
+  activeClass: {
+    type: String,
+    default: 'primary',
+  },
+  options: {
+    type: Array,
+    required: true,
+  },
+  size: {
+    type: String,
+    default: 'large',
+  },
+  iconSize: {
+    type: String,
+    default: null,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-    options: {
-      type:     Array,
-      required: true,
-    },
+const emit = defineEmits(['update:value']);
 
-    iconSize: {
-      type:    String,
-      default: null,
-    },
+const optionObjects = computed(() => {
+  const value = props.value;
 
-    disabled: {
-      type:    Boolean,
-      default: false,
+  return props.options.map((opt) => {
+    let out;
+
+    if (opt && typeof opt === 'object' && typeof opt.value !== 'undefined') {
+      out = { ...opt };
+    } else {
+      out = { label: opt, value: opt };
     }
 
-  },
+    const active = value === out.value;
 
-  computed: {
-    optionObjects() {
-      const value = this.value;
+    out.class = {
+      btn: true,
+      [props.inactiveClass]: !active,
+      [props.activeClass]: active,
+      active: active ? props.activeClass : props.inactiveClass,
+    };
 
-      return this.options.map((opt) => {
-        let out;
+    return out;
+  });
+});
 
-        if ( opt && typeof opt === 'object' && typeof opt.value !== 'undefined' ) {
-          out = Object.assign({}, opt);
-        } else {
-          out = { label: opt, value: opt };
-        }
+const change = (value) => {
+  emit('update:value', value);
+};
 
-        const active = value === out.value;
+const actionDescription = (opt) => {
+  const tooltip = opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip;
+  const label = opt.labelKey ? t(opt.labelKey) : opt.label;
+  return tooltip || label || '';
+};
 
-        out.class = {
-          btn:                  true,
-          [this.inactiveClass]: !active,
-          [this.activeClass]:   active,
-        };
-
-        return out;
-      });
-    },
-  },
-
-  methods: {
-    change(value) {
-      this.$emit('input', value);
-    }
-  }
+const actionAriaLabel = (opt) => {
+  const ariaLabel = opt.ariaLabel;
+  const label = opt.labelKey ? t(opt.labelKey) : opt.label;
+  const tooltip = opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip;
+  return ariaLabel || tooltip || label || undefined;
 };
 </script>
 
 <template>
-  <div
-    v-trim-whitespace
-    class="btn-group"
-  >
-    <button
-      v-for="(opt,idx) in optionObjects"
+  <a-radio-group :value="value" :button-style="buttonStyle">
+    <a-radio-button
+      v-for="(opt, idx) in optionObjects"
       :key="idx"
+      :value="opt.value"
       v-clean-tooltip="opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip"
-      :data-testid="`button-group-child-${idx}`"
-      type="button"
-      :class="opt.class"
-      :disabled="disabled || opt.disabled"
+      :type="opt.active"
+      :size="size"
+      :aria-label="actionAriaLabel(opt)"
       @click="change(opt.value)"
     >
-      <slot
-        name="option"
-        :label="opt.label"
-        :value="opt.value"
-      >
-        <i
-          v-if="opt.icon"
-          :class="{icon: true, [opt.icon]: true, [`icon-${iconSize}`]: !!iconSize }"
-        />
-        <t
-          v-if="opt.labelKey"
-          :k="opt.labelKey"
-        />
-        <span v-else-if="opt.label">{{ opt.label }}</span>
-      </slot>
-    </button>
-  </div>
+      <i
+        v-if="opt.icon"
+        :class="{
+          icon: true,
+          [opt.icon]: true,
+          [`icon-${props.iconSize}`]: !!props.iconSize,
+        }"
+        :alt="actionAriaLabel(opt)"
+      />
+
+      <span v-if="opt.labelKey">
+        {{ t(opt.labelKey) }}
+      </span>
+      <span v-else-if="opt.label">{{ opt.label }}</span>
+    </a-radio-button>
+  </a-radio-group>
 </template>

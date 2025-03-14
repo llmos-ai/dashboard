@@ -4,21 +4,23 @@ import debounce from 'lodash/debounce';
 const displayType = 'inline-block';
 
 export default {
-
   data() {
     return {
-      bulkActionsClass:            'bulk',
-      bulkActionClass:             'bulk-action',
-      bulkActionsDropdownClass:    'bulk-actions-dropdown',
+      bulkActionsClass: 'bulk',
+      bulkActionClass: 'bulk-action',
+      bulkActionsDropdownClass: 'bulk-actions-dropdown',
       bulkActionAvailabilityClass: 'action-availability',
 
       hiddenActions: [],
 
-      updateHiddenBulkActions: debounce(this.protectedUpdateHiddenBulkActions, 10)
+      updateHiddenBulkActions: debounce(
+        this.protectedUpdateHiddenBulkActions,
+        10
+      ),
     };
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('resize', this.onWindowResize);
   },
 
@@ -50,7 +52,9 @@ export default {
         return null;
       }
 
-      return this.t('sortableTable.actionAvailability.selected', { actionable: this.selectedRows.length });
+      return this.t('sortableTable.actionAvailability.selected', {
+        actionable: this.selectedRows.length,
+      });
     },
 
     // Shows a tooltip if the bulk action that the user is hovering over can not be applied to all selected rows
@@ -59,7 +63,9 @@ export default {
         return null;
       }
 
-      const runnableTotal = this.selectedRows.filter(this.canRunBulkActionOfInterest).length;
+      const runnableTotal = this.selectedRows.filter(
+        this.canRunBulkActionOfInterest
+      ).length;
 
       if (runnableTotal === this.selectedRows.length) {
         return null;
@@ -67,7 +73,7 @@ export default {
 
       return this.t('sortableTable.actionAvailability.some', {
         actionable: runnableTotal,
-        total:      this.selectedRows.length,
+        total: this.selectedRows.length,
       });
     },
   },
@@ -86,19 +92,27 @@ export default {
         return;
       }
 
-      const actionsContainer = this.$refs.container.querySelector(`.${ this.bulkActionsClass }`);
-      const actionsDropdown = this.$refs.container.querySelector(`.${ this.bulkActionsDropdownClass }`);
+      const actionsContainer = this.$refs.container.querySelector(
+        `.${this.bulkActionsClass}`
+      );
+      const actionsDropdown = this.$refs.container.querySelector(
+        `.${this.bulkActionsDropdownClass}`
+      );
 
       if (!actionsContainer || !actionsDropdown) {
         return;
       }
 
       const actionsContainerWidth = actionsContainer.offsetWidth;
-      const actionsHTMLCollection = this.$refs.container.querySelectorAll(`.${ this.bulkActionClass }`);
+      const actionsHTMLCollection = this.$refs.container.querySelectorAll(
+        `.${this.bulkActionClass}`
+      );
       const actions = Array.from(actionsHTMLCollection || []);
 
       // Determine if the 'x selected' label should show and it's size
-      const selectedRowsText = this.$refs.container.querySelector(`.${ this.bulkActionAvailabilityClass }`);
+      const selectedRowsText = this.$refs.container.querySelector(
+        `.${this.bulkActionAvailabilityClass}`
+      );
       let selectedRowsTextWidth = 0;
 
       if (this.selectedRowsText) {
@@ -134,12 +148,17 @@ export default {
             i = -1;
             cumulativeWidth = 0;
             showActionsDropdown = true;
-            totalAvailableWidth = actionsContainerWidth - actionsDropdown.offsetWidth - selectedRowsTextWidth;
+            totalAvailableWidth =
+              actionsContainerWidth -
+              actionsDropdown.offsetWidth -
+              selectedRowsTextWidth;
           } else {
             // Collate the actions in an array and hide in the normal row
             const id = ba.attributes.getNamedItem('id').value;
 
-            this.hiddenActions.push(this.availableActions.find((aa) => aa.action === id));
+            this.hiddenActions.push(
+              this.availableActions.find((aa) => aa.action === id)
+            );
             ba.style.display = 'none';
           }
         }
@@ -148,6 +167,6 @@ export default {
       if (!showActionsDropdown) {
         actionsDropdown.style.display = 'none';
       }
-    }
-  }
+    },
+  },
 };

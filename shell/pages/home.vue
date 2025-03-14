@@ -24,9 +24,10 @@ export default {
 
   fetch() {
     if ( this.$store.getters['management/schemaFor'](MANAGEMENT.CLUSTER) ) {
-      this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER });
+       this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER });
     }
   },
+
 
   data() {
     const fullVersion = getVersionInfo(this.$store).fullVersion;
@@ -169,7 +170,7 @@ export default {
   }
 
   .set-login-page, .whats-new {
-    > ::v-deep .banner__content {
+    > :deep() .banner__content {
       display: flex;
 
       > div {

@@ -1,9 +1,15 @@
-HTML, BODY {
+HTML,
+BODY {
   font-family: $body-font;
-  font-size: 14px;
+  font-size: 16px;
 }
 
-H1, H2, H3, H4, H5, H6 {
+H1,
+H2,
+H3,
+H4,
+H5,
+H6 {
   color: var(--body-text);
   font-style: normal;
   font-weight: 400;
@@ -43,7 +49,10 @@ P {
 }
 
 //code
-code, samp, kbd, .monospace {
+code,
+samp,
+kbd,
+.monospace {
   font-family: $mono-font;
   text-align: left;
 }
