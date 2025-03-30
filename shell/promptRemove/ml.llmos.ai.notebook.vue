@@ -134,12 +134,12 @@ export default {
         v-for="name in removeNameArr[value[0].id]"
         :key="name"
       >
-        <label class="checkbox-container mr-15"><input
+        <label class="checkbox-container mr-15"><a-input
                                                   v-model="checkedList"
                                                   type="checkbox"
                                                   :label="name"
                                                   :value="name"
-                                                >
+                                                />
           <span
             class="checkbox-custom mr-5"
             role="checkbox"
@@ -150,10 +150,10 @@ export default {
     </div>
 
     <div v-else>
-      <label class="checkbox-container mr-15"><input
+      <label class="checkbox-container mr-15"><a-input
                                                 v-model:value="checkAll"
                                                 type="checkbox"
-                                              >
+                                              />
         <span
           class="checkbox-custom mr-5"
           role="checkbox"

@@ -35,12 +35,13 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
     const hash = await allHash({
       modelServiceDefaultImage: this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.MODEL_SERVICE_DEFAULT_IMAGE),
-      systemImageRegistry:      this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING, id: SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY }),
+      settings:      this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING }),
     });
 
     if (!this.container.image) {
+      const systemImageRegistry = hash.settings?.find(item => item.id === SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY);
       const msDefaultImage = hash.modelServiceDefaultImage.value || hash.modelServiceDefaultImage.default;
-      const registry = hash.systemImageRegistry?.value || 'ghcr.io';
+      const registry = systemImageRegistry?.value || 'ghcr.io';
 
       const image = this.processImageString(msDefaultImage, registry);
 
@@ -55,7 +56,6 @@ export default {
       'VLLM_USE_MODELSCOPE',
     ];
 
-    this.initializeModelService();
     const container = this.value.spec?.template?.spec?.containers[0];
     let hfToken = container.env.find((env) => env.name === 'HUGGING_FACE_HUB_TOKEN');
 
@@ -90,18 +90,6 @@ export default {
   },
 
   methods: {
-    initializeModelService() {
-      const container = this.value.spec.template.spec.containers[0];
-
-      if (!container.env) {
-        container['env'] = [];
-      }
-
-      if (!this.value.spec.volumeClaimTemplates) {
-        this.value.spec['volumeClaimTemplates'] = [];
-      }
-    },
-
     willSave() {
       this.errors = [];
       this.update();
@@ -172,7 +160,7 @@ export default {
     />
 
     <ResourceTabs
-      v-model:value="value"
+      :value="value"
       class="mt-15"
       :need-conditions="false"
       :need-related="false"
@@ -184,9 +172,10 @@ export default {
         label="General"
         class="bordered-table"
         :weight="tabWeightMap.general"
-      >
-        <div class="row">
-          <div class="col span-6 mb-10">
+      > 
+        <!-- TODO: gutter ? -->
+        <a-row :gutter="[16]" class="mb-[16px]">
+          <a-col :span="12">
             <LabeledSelect
               v-model:value="spec.modelRegistry"
               label="Source"
@@ -194,47 +183,43 @@ export default {
               :mode="mode"
               required
             />
-          </div>
+          </a-col>
 
-          <div class="col span-6">
+          <a-col :span="12">
             <LabeledInput
               v-model:value="spec.model"
               :required="true"
               :localized-label="true"
               :mode="mode"
-              class="mb-20"
               :label="t('modelService.model')"
               :tooltip="t('modelService.modelTooltip')"
               :placeholder="t('modelService.modelPlaceholder')"
             />
-          </div>
-        </div>
+          </a-col>
+        </a-row>
 
-        <div class="row mb-20">
-          <div class="col span-6">
+        <a-row :gutter="[16, 24]" class="mb-[16px]">
+          <a-col :span="12">
             <LabeledInput
               v-model:value="spec.servedModelName"
               :localized-label="true"
               :mode="mode"
-              class="mb-20"
               :label="t('modelService.modelName')"
               :tooltip="t('modelService.modelNamePlaceholder')"
             />
-          </div>
-          <div class="col span-6">
-            <slot name="command">
-              <ShellInput
-                v-model:value="container.args"
-                :mode="mode"
-                :label="t('workload.container.command.args')"
-                :placeholder="t('generic.placeholder', {text: '--dtype=half --cpu-offload-gb=10'}, true)"
-                @update:value="update"
-              />
-            </slot>
-          </div>
-        </div>
+          </a-col>
+          <a-col :span="12">
+            <ShellInput
+              v-model:value="container.args"
+              :mode="mode"
+              :label="t('workload.container.command.args')"
+              :placeholder="t('generic.placeholder', {text: '--dtype=half --cpu-offload-gb=10'}, true)"
+              @update:value="update"
+            />
+          </a-col>
+        </a-row>
 
-        <h4>Hugging Face Hub Token</h4>
+        <h4>{{ t('modelService.huggingFaceToken') }}</h4>
         <div class="row">
           <div class="col span-6">
             <ValueFromResource

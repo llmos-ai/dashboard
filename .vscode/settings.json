@@ -8,7 +8,6 @@
   },
   "eslint.format.enable": true,
   "eslint.run": "onSave",
-  "eslint.packageManager": "yarn",
   "eslint.validate": [
     "vue",
     "html",

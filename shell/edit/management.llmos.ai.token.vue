@@ -196,12 +196,12 @@ export default {
           name="expiryGroup"
         />
         <div class="ml-20 mt-10 expiry">
-          <input
+          <a-input
             v-model:value="form.customExpiry"
             :disabled="form.expiryType !== 'custom'"
             type="number"
             :mode="mode"
-          >
+          />
           <Select
             v-model:value="form.customExpiryUnits"
             :disabled="form.expiryType !== 'custom'"
