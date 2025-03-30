@@ -167,7 +167,7 @@ export default {
       />
 
       <ResourceTabs
-        v-model:value="value"
+        :value="value"
         class="mt-15"
         :need-conditions="false"
         :need-related="false"

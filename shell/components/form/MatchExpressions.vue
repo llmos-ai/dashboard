@@ -295,13 +295,13 @@ export default {
         <div v-if="isView">
           {{ row.key }}
         </div>
-        <input
+        <a-input
           v-else-if="!hasKeySelectOptions"
           v-model:value="row.key"
           :mode="mode"
           :data-testid="`input-match-expression-key-control-${index}`"
           @update:value="update"
-        >
+        />
         <LabeledSelect
           v-else
           v-model:value="row.key"
