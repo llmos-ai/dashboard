@@ -30,12 +30,12 @@ const forcedNamespaceValidTypes = [
 export default {
   data() {
     return {
-      isOpen: false,
-      filter: '',
-      hidden: 0,
-      total: 0,
-      activeElement: null,
-      cachedFiltered: [],
+      isOpen:              false,
+      filter:              '',
+      hidden:              0,
+      total:               0,
+      activeElement:       null,
+      cachedFiltered:      [],
       NAMESPACE_FILTER_KINDS,
       namespaceFilterMode: undefined,
     };
@@ -48,7 +48,7 @@ export default {
     // - added it as a computed caused massive amounts of churn around the `filtered` watcher
     await this.$store.dispatch('management/find', {
       type: MANAGEMENT.SETTING,
-      id: SETTING.UI_PERFORMANCE,
+      id:   SETTING.UI_PERFORMANCE,
     });
     this.namespaceFilterMode = this.calcNamespaceFilterMode();
   },
@@ -62,10 +62,8 @@ export default {
 
     paginatedListFilterMode() {
       return this.$store.getters[
-        `${this.currentProduct.inStore}/paginationEnabled`
-      ](this.$route.params?.resource)
-        ? paginationUtils.validNsProjectFilters
-        : null;
+        `${ this.currentProduct.inStore }/paginationEnabled`
+      ](this.$route.params?.resource) ? paginationUtils.validNsProjectFilters : null;
     },
 
     filtered() {
@@ -76,8 +74,7 @@ export default {
         if (this.namespaceFilterMode?.length) {
           // We always show dividers, projects and namespaces
           if (!forcedNamespaceValidTypes.includes(item.kind)) {
-            const validCustomType = this.namespaceFilterMode.find((prefix) =>
-              item.kind.startsWith(prefix)
+            const validCustomType = this.namespaceFilterMode.find((prefix) => item.kind.startsWith(prefix)
             );
 
             if (!validCustomType) {
@@ -141,15 +138,15 @@ export default {
       let tooltip = '<div class="ns-filter-tooltip">';
 
       (this.value || []).forEach((v) => {
-        tooltip += `<div class="ns-filter-tooltip-item"><div>${v.label}</div></div>`;
+        tooltip += `<div class="ns-filter-tooltip-item"><div>${ v.label }</div></div>`;
       });
 
       tooltip += '</div>';
 
       return {
-        content: tooltip,
+        content:   tooltip,
         placement: 'bottom',
-        delay: { show: 500 },
+        delay:     { show: 500 },
       };
     },
 
@@ -183,18 +180,18 @@ export default {
 
         // The namespace display on the list and edit pages should be the same as in the namespaceFilter component
         if (
-          this.$store.getters[`${this.currentProduct.inStore}/filterNamespace`]
+          this.$store.getters[`${ this.currentProduct.inStore }/filterNamespace`]
         ) {
           const allNamespaces =
             this.$store.getters[
-              `${this.currentProduct.inStore}/filterNamespace`
+              `${ this.currentProduct.inStore }/filterNamespace`
             ](notFilterNamespaces);
 
           this.$store.commit('changeAllNamespaces', allNamespaces);
         }
 
         return this.$store.getters[
-          `${this.currentProduct.inStore}/namespaceFilterOptions`
+          `${ this.currentProduct.inStore }/namespaceFilterOptions`
         ]({
           addNamespace,
           divider,
@@ -206,28 +203,28 @@ export default {
       if (!this.currentProduct?.hideSystemResources) {
         out = [
           {
-            id: ALL,
-            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
+            id:    ALL,
+            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.all'),
           },
           {
-            id: ALL_USER,
-            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
+            id:    ALL_USER,
+            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.user'),
           },
           {
-            id: ALL_SYSTEM,
-            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
+            id:    ALL_SYSTEM,
+            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.system'),
           },
           {
-            id: NAMESPACED_YES,
-            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
+            id:    NAMESPACED_YES,
+            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.namespaced'),
           },
           {
-            id: NAMESPACED_NO,
-            kind: NAMESPACE_FILTER_KINDS.SPECIAL,
+            id:    NAMESPACED_NO,
+            kind:  NAMESPACE_FILTER_KINDS.SPECIAL,
             label: t('nav.ns.clusterLevel'),
           },
         ];
@@ -240,7 +237,7 @@ export default {
       }
 
       let namespaces = sortBy(
-        this.$store.getters[`${inStore}/all`](NAMESPACE),
+        this.$store.getters[`${ inStore }/all`](NAMESPACE),
         ['nameDisplay']
       );
 
@@ -254,9 +251,7 @@ export default {
         );
 
         projects = projects.filter((p) => {
-          return this.currentProduct?.hideSystemResources
-            ? !p.isSystem && p.spec.clusterName === cluster.id
-            : p.spec.clusterName === cluster.id;
+          return this.currentProduct?.hideSystemResources ? !p.isSystem && p.spec.clusterName === cluster.id : p.spec.clusterName === cluster.id;
         });
         projects = sortBy(filterBy(projects, 'spec.clusterName', cluster.id), [
           'nameDisplay',
@@ -297,8 +292,8 @@ export default {
           }
 
           out.push({
-            id: `${NAMESPACE_FILTER_P_FULL_PREFIX}${id}`,
-            kind: NAMESPACE_FILTER_KINDS.PROJECT,
+            id:    `${ NAMESPACE_FILTER_P_FULL_PREFIX }${ id }`,
+            kind:  NAMESPACE_FILTER_KINDS.PROJECT,
             label: t('nav.ns.project', { name: project.nameDisplay }),
           });
 
@@ -315,9 +310,9 @@ export default {
           }
 
           out.push({
-            id: ALL_ORPHANS,
-            kind: NAMESPACE_FILTER_KINDS.PROJECT,
-            label: t('nav.ns.orphan'),
+            id:       ALL_ORPHANS,
+            kind:     NAMESPACE_FILTER_KINDS.PROJECT,
+            label:    t('nav.ns.orphan'),
             disabled: true,
           });
 
@@ -338,8 +333,8 @@ export default {
           out,
           namespaces.map((namespace) => {
             return {
-              id: `${NAMESPACE_FILTER_NS_FULL_PREFIX}${namespace.id}`,
-              kind: NAMESPACE_FILTER_KINDS.NAMESPACE,
+              id:    `${ NAMESPACE_FILTER_NS_FULL_PREFIX }${ namespace.id }`,
+              kind:  NAMESPACE_FILTER_KINDS.NAMESPACE,
               label: t('nav.ns.namespace', { name: namespace.nameDisplay }),
             };
           })
@@ -348,8 +343,8 @@ export default {
 
       function divider(out) {
         out.push({
-          kind: NAMESPACE_FILTER_KINDS.DIVIDER,
-          label: `Divider ${out.length}`,
+          kind:     NAMESPACE_FILTER_KINDS.DIVIDER,
+          label:    `Divider ${ out.length }`,
           disabled: true,
         });
       }
@@ -552,22 +547,22 @@ export default {
     },
     inputKeyHandler(e) {
       switch (e.keyCode) {
-        case KEY.DOWN:
-          e.preventDefault();
-          e.stopPropagation();
-          this.down(true);
-          break;
-        case KEY.TAB:
-          // Tab out of the input box
-          this.close();
-          e.target.blur();
-          break;
-        case KEY.CR:
-          if (this.filtered.length === 1) {
-            this.selectOption(this.filtered[0]);
-            this.filter = '';
-          }
-          break;
+      case KEY.DOWN:
+        e.preventDefault();
+        e.stopPropagation();
+        this.down(true);
+        break;
+      case KEY.TAB:
+        // Tab out of the input box
+        this.close();
+        e.target.blur();
+        break;
+      case KEY.CR:
+        if (this.filtered.length === 1) {
+          this.selectOption(this.filtered[0]);
+          this.filter = '';
+        }
+        break;
       }
     },
     mouseOver(event) {
@@ -740,7 +735,11 @@ export default {
     @mousedown.prevent
     @focus="open()"
   >
-    <div v-if="isOpen" class="ns-glass" @click="close()" />
+    <div
+      v-if="isOpen"
+      class="ns-glass"
+      @click="close()"
+    />
 
     <!-- Select Dropdown control -->
     <div
@@ -814,13 +813,27 @@ export default {
       >
         {{ t('namespaceFilter.more', { more: hidden }) }}
       </div>
-      <i v-if="!isOpen" class="icon icon-chevron-down" />
-      <i v-else class="icon icon-chevron-up" />
+      <i
+        v-if="!isOpen"
+        class="icon icon-chevron-down"
+      />
+      <i
+        v-else
+        class="icon icon-chevron-up"
+      />
     </div>
-    <a-button v-shortkey.once="['n']" class="hide" @shortkey="open()" />
+    <a-button
+      v-shortkey.once="['n']"
+      class="hide"
+      @shortkey="open()"
+    />
 
     <!-- Dropdown menu -->
-    <div v-if="isOpen" class="ns-dropdown-menu" data-testid="namespaces-menu">
+    <div
+      v-if="isOpen"
+      class="ns-dropdown-menu"
+      data-testid="namespaces-menu"
+    >
       <div class="ns-controls">
         <div class="ns-input">
           <input
@@ -830,25 +843,38 @@ export default {
             class="ns-filter-input"
             @click="focusFilter"
             @keydown="inputKeyHandler($event)"
-          />
+          >
           <i
             v-if="hasFilter"
             class="ns-filter-clear icon icon-close"
             @click="filter = ''"
           />
         </div>
-        <div v-if="namespaceFilterMode" class="ns-singleton-info">
+        <div
+          v-if="namespaceFilterMode"
+          class="ns-singleton-info"
+        >
           <i
             v-clean-tooltip="t('resourceList.nsFilterToolTip')"
             class="icon icon-info"
           />
         </div>
-        <div v-else class="ns-clear">
-          <i class="icon icon-close" @click="clear()" />
+        <div
+          v-else
+          class="ns-clear"
+        >
+          <i
+            class="icon icon-close"
+            @click="clear()"
+          />
         </div>
       </div>
       <div class="ns-divider mt-0" />
-      <div ref="options" class="ns-options" role="list">
+      <div
+        ref="options"
+        class="ns-options"
+        role="list"
+      >
         <div
           v-for="(opt, i) in cachedFiltered"
           :id="opt.elementId"
@@ -869,13 +895,19 @@ export default {
             v-if="opt.kind === NAMESPACE_FILTER_KINDS.DIVIDER"
             class="ns-divider"
           />
-          <div v-else class="ns-item">
+          <div
+            v-else
+            class="ns-item"
+          >
             <i
               v-if="opt.kind === NAMESPACE_FILTER_KINDS.NAMESPACE"
               class="icon icon-folder"
             />
             <div>{{ opt.label }}</div>
-            <i v-if="opt.selected" class="icon icon-checkmark" />
+            <i
+              v-if="opt.selected"
+              class="icon icon-checkmark"
+            />
           </div>
         </div>
         <div

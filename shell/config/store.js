@@ -1,36 +1,36 @@
-import { createStore } from "vuex";
+import { createStore } from 'vuex';
 
-const VUEX_PROPERTIES = ["state", "getters", "actions", "mutations"];
+const VUEX_PROPERTIES = ['state', 'getters', 'actions', 'mutations'];
 
 let store = {};
 
 (function updateModules() {
-  store = normalizeRoot(require("../store/index.js"), "store/index.js");
+  store = normalizeRoot(require('../store/index.js'), 'store/index.js');
 
   // If store is an exported method = classic mode (deprecated)
 
-  if (typeof store === "function") {
+  if (typeof store === 'function') {
     return console.warn(
-      "Classic mode for store/ is deprecated and will be removed in Nuxt 3."
+      'Classic mode for store/ is deprecated and will be removed in Nuxt 3.'
     ); // eslint-disable-line no-console
   }
 
   // Enforce store modules
   store.modules = store.modules || {};
 
-  resolveStoreModules(require("../store/action-menu.js"), "action-menu.js");
-  resolveStoreModules(require("../store/auth.js"), "auth.js");
-  resolveStoreModules(require("../store/growl.js"), "growl.js");
-  resolveStoreModules(require("../store/i18n.js"), "i18n.js");
-  resolveStoreModules(require("../store/prefs.js"), "prefs.js");
+  resolveStoreModules(require('../store/action-menu.js'), 'action-menu.js');
+  resolveStoreModules(require('../store/auth.js'), 'auth.js');
+  resolveStoreModules(require('../store/growl.js'), 'growl.js');
+  resolveStoreModules(require('../store/i18n.js'), 'i18n.js');
+  resolveStoreModules(require('../store/prefs.js'), 'prefs.js');
   resolveStoreModules(
-    require("../store/resource-fetch.js"),
-    "resource-fetch.js"
+    require('../store/resource-fetch.js'),
+    'resource-fetch.js'
   );
-  resolveStoreModules(require("../store/type-map.js"), "type-map.js");
-  resolveStoreModules(require("../store/wm.js"), "wm.js");
-  resolveStoreModules(require("../store/customisation.js"), "customisation.js");
-  resolveStoreModules(require("../store/cru-resource.ts"), "cru-resource.ts");
+  resolveStoreModules(require('../store/type-map.js'), 'type-map.js');
+  resolveStoreModules(require('../store/wm.js'), 'wm.js');
+  resolveStoreModules(require('../store/customisation.js'), 'customisation.js');
+  resolveStoreModules(require('../store/cru-resource.ts'), 'cru-resource.ts');
 
   // If the environment supports hot reloading...
 
@@ -38,17 +38,17 @@ let store = {};
     // Whenever any Vuex module is updated...
     module.hot.accept(
       [
-        "../store/action-menu.js",
-        "../store/auth.js",
-        "../store/growl.js",
-        "../store/i18n.js",
-        "../store/index.js",
-        "../store/prefs.js",
-        "../store/resource-fetch.js",
-        "../store/type-map.js",
-        "../store/wm.js",
-        "../store/customisation.js",
-        "../store/cru-resource.ts",
+        '../store/action-menu.js',
+        '../store/auth.js',
+        '../store/growl.js',
+        '../store/i18n.js',
+        '../store/index.js',
+        '../store/prefs.js',
+        '../store/resource-fetch.js',
+        '../store/type-map.js',
+        '../store/wm.js',
+        '../store/customisation.js',
+        '../store/cru-resource.ts',
       ],
       () => {
         // Update `root.modules` with the latest definitions.
@@ -62,27 +62,25 @@ let store = {};
 
 // extendStore
 export const extendStore =
-  store instanceof Function
-    ? store
-    : () => {
-        return createStore(
-          Object.assign(
-            { strict: process.env.NODE_ENV !== "production" },
-            store
-          )
-        );
-      };
+  store instanceof Function ? store : () => {
+    return createStore(
+      Object.assign(
+        { strict: process.env.NODE_ENV !== 'production' },
+        store
+      )
+    );
+  };
 
 function normalizeRoot(moduleData, filePath) {
   moduleData = moduleData.default || moduleData;
 
   if (moduleData.commit) {
     throw new Error(
-      `[nuxt] ${filePath} should export a method that returns a Vuex instance.`
+      `[nuxt] ${ filePath } should export a method that returns a Vuex instance.`
     );
   }
 
-  if (typeof moduleData !== "function") {
+  if (typeof moduleData !== 'function') {
     // Avoid TypeError: setting a property that has only a getter when overwriting top level keys
     moduleData = Object.assign({}, moduleData);
   }
@@ -91,9 +89,9 @@ function normalizeRoot(moduleData, filePath) {
 }
 
 function normalizeModule(moduleData, filePath) {
-  if (moduleData.state && typeof moduleData.state !== "function") {
+  if (moduleData.state && typeof moduleData.state !== 'function') {
     console.warn(
-      `'state' should be a method that returns an object in ${filePath}`
+      `'state' should be a method that returns an object in ${ filePath }`
     ); // eslint-disable-line no-console
 
     const state = Object.assign({}, moduleData.state);
@@ -108,22 +106,18 @@ function normalizeModule(moduleData, filePath) {
 function resolveStoreModules(moduleData, filename) {
   moduleData = moduleData.default || moduleData;
   // Remove store src + extension (./foo/index.js -> foo/index)
-  const namespace = filename.replace(/\.(js|mjs|ts)$/, "");
-  const namespaces = namespace.split("/");
+  const namespace = filename.replace(/\.(js|mjs|ts)$/, '');
+  const namespaces = namespace.split('/');
   let moduleName = namespaces[namespaces.length - 1];
-  const filePath = `store/${filename}`;
+  const filePath = `store/${ filename }`;
 
   moduleData =
-    moduleName === "state"
-      ? normalizeState(moduleData, filePath)
-      : normalizeModule(moduleData, filePath);
+    moduleName === 'state' ? normalizeState(moduleData, filePath) : normalizeModule(moduleData, filePath);
 
   // If src is a known Vuex property
   if (VUEX_PROPERTIES.includes(moduleName)) {
     const property = moduleName;
-    const propertyStoreModule = getStoreModule(store, namespaces, {
-      isProperty: true,
-    });
+    const propertyStoreModule = getStoreModule(store, namespaces, { isProperty: true });
 
     // Replace state since it's a function
     mergeProperty(propertyStoreModule, moduleData, property);
@@ -132,7 +126,7 @@ function resolveStoreModules(moduleData, filename) {
   }
 
   // If file is foo/index.js, it should be saved as foo
-  const isIndexModule = moduleName === "index";
+  const isIndexModule = moduleName === 'index';
 
   if (isIndexModule) {
     namespaces.pop();
@@ -151,8 +145,8 @@ function resolveStoreModules(moduleData, filename) {
 }
 
 function normalizeState(moduleData, filePath) {
-  if (typeof moduleData !== "function") {
-    console.warn(`${filePath} should export a method that returns an object`); // eslint-disable-line no-console
+  if (typeof moduleData !== 'function') {
+    console.warn(`${ filePath } should export a method that returns an object`); // eslint-disable-line no-console
     const state = Object.assign({}, moduleData);
 
     return () => state;
@@ -174,9 +168,7 @@ function getStoreModule(storeModule, namespaces, { isProperty = false } = {}) {
   storeModule.modules[namespace].modules =
     storeModule.modules[namespace].modules || {};
 
-  return getStoreModule(storeModule.modules[namespace], namespaces, {
-    isProperty,
-  });
+  return getStoreModule(storeModule.modules[namespace], namespaces, { isProperty });
 }
 
 function mergeProperty(storeModule, moduleData, property) {
@@ -184,7 +176,7 @@ function mergeProperty(storeModule, moduleData, property) {
     return;
   }
 
-  if (property === "state") {
+  if (property === 'state') {
     storeModule.state = moduleData || storeModule.state;
   } else {
     storeModule[property] = Object.assign(

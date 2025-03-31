@@ -14,81 +14,81 @@ export default {
   ],
 
   components: { Checkbox, LabeledSelect },
-  props: {
+  props:      {
     columns: {
-      type: Array,
+      type:     Array,
       required: true,
     },
     sortBy: {
-      type: String,
+      type:     String,
       required: true,
     },
     defaultSortBy: {
-      type: String,
+      type:    String,
       default: '',
     },
     group: {
-      type: String,
+      type:    String,
       default: '',
     },
     groupOptions: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
     descending: {
-      type: Boolean,
+      type:     Boolean,
       required: true,
     },
     hasAdvancedFiltering: {
-      type: Boolean,
+      type:     Boolean,
       required: false,
     },
     tableColsOptions: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
     tableActions: {
-      type: Boolean,
+      type:     Boolean,
       required: true,
     },
     rowActions: {
-      type: Boolean,
+      type:     Boolean,
       required: true,
     },
     howMuchSelected: {
-      type: String,
+      type:     String,
       required: true,
     },
     checkWidth: {
-      type: Number,
+      type:    Number,
       default: 30,
     },
     rowActionsWidth: {
-      type: Number,
+      type:     Number,
       required: true,
     },
     subExpandColumn: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     expandWidth: {
-      type: Number,
+      type:    Number,
       default: 30,
     },
     labelFor: {
-      type: Function,
+      type:     Function,
       required: true,
     },
     noRows: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     noResults: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     loading: {
-      type: Boolean,
+      type:     Boolean,
       required: false,
     },
   },
@@ -96,7 +96,7 @@ export default {
   data() {
     return {
       tableColsOptionsVisibility: false,
-      tableColsMenuPosition: null,
+      tableColsMenuPosition:      null,
     };
   },
 
@@ -170,9 +170,7 @@ export default {
 
     ariaSort(col) {
       if (this.isCurrent(col)) {
-        return this.descending
-          ? this.t('generic.descending')
-          : this.t('generic.ascending');
+        return this.descending ? this.t('generic.descending') : this.t('generic.ascending');
       }
 
       return this.t('generic.none');
@@ -184,9 +182,9 @@ export default {
       const elem = document.querySelector('.table-options-btn');
 
       this.tableColsMenuPosition = fitOnScreen(menu, ev || elem, {
-        overlapX: true,
-        fudgeX: 326,
-        fudgeY: -22,
+        overlapX:  true,
+        fudgeX:    326,
+        fudgeY:    -22,
         positionX: CENTER,
         positionY: AUTO,
       });
@@ -227,7 +225,10 @@ export default {
 <template>
   <thead>
     <tr :class="{ loading: loading, 'top-aligned': hasColumnWithSubLabel }">
-      <th v-if="tableActions" :width="checkWidth">
+      <th
+        v-if="tableActions"
+        :width="checkWidth"
+      >
         <Checkbox
           v-model:value="isAll"
           class="check"
@@ -237,7 +238,10 @@ export default {
           :alternate-label="t('sortableTable.genericGroupCheckbox')"
         />
       </th>
-      <th v-if="subExpandColumn" :width="expandWidth" />
+      <th
+        v-if="subExpandColumn"
+        :width="expandWidth"
+      />
       <th
         v-for="col in columns"
         v-show="
@@ -258,13 +262,23 @@ export default {
           class="table-header-container"
           :class="{ 'not-filterable': hasAdvancedFiltering && !col.isFilter }"
         >
-          <div v-clean-tooltip="tooltip(col)" class="content">
+          <div
+            v-clean-tooltip="tooltip(col)"
+            class="content"
+          >
             <span v-clean-html="labelFor(col)" />
-            <span v-if="col.subLabel" class="text-muted">
+            <span
+              v-if="col.subLabel"
+              class="text-muted"
+            >
               {{ col.subLabel }}
             </span>
           </div>
-          <div v-if="col.sort" class="sort" aria-hidden="true">
+          <div
+            v-if="col.sort"
+            class="sort"
+            aria-hidden="true"
+          >
             <i
               v-show="hasAdvancedFiltering && !col.isFilter"
               v-clean-tooltip="t('sortableTable.tableHeader.noFilter')"
@@ -288,7 +302,10 @@ export default {
         v-if="rowActions && hasAdvancedFiltering && tableColsOptions.length"
         :width="rowActionsWidth"
       >
-        <div ref="table-options" class="table-options-group">
+        <div
+          ref="table-options"
+          class="table-options-group"
+        >
           <a-button
             aria-haspopup="true"
             aria-expanded="false"
@@ -302,10 +319,11 @@ export default {
             class="table-options-container"
             :style="tableColsMenuPosition"
           >
-            <div v-if="hasAdvGrouping" class="table-options-grouping">
-              <span class="table-options-col-subtitle"
-                >{{ t('sortableTable.tableHeader.groupBy') }}:</span
-              >
+            <div
+              v-if="hasAdvGrouping"
+              class="table-options-grouping"
+            >
+              <span class="table-options-col-subtitle">{{ t('sortableTable.tableHeader.groupBy') }}:</span>
               <LabeledSelect
                 v-model:value="advGroup"
                 class="table-options-grouping-select"
@@ -340,7 +358,10 @@ export default {
           </div>
         </div>
       </th>
-      <th v-else-if="rowActions" :width="rowActionsWidth" />
+      <th
+        v-else-if="rowActions"
+        :width="rowActionsWidth"
+      />
     </tr>
   </thead>
 </template>

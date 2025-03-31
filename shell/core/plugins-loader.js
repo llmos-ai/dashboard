@@ -1,14 +1,16 @@
-import $ from "jquery";
-import JSZip from "jszip";
-import jsyaml from "js-yaml";
+import $ from 'jquery';
+import JSZip from 'jszip';
+import jsyaml from 'js-yaml';
 
 // Load any plugins that are present as npm modules
 // The 'dynamic' module is generated in webpack to load each package
 
-const dynamicLoader = require("@rancher/dynamic");
+const dynamicLoader = require('@rancher/dynamic');
 
-export default function (
-  { app, store, $axios, redirect, $plugin, nuxt },
+export default function(
+  {
+    app, store, $axios, redirect, $plugin, nuxt
+  },
   inject
 ) {
   if (dynamicLoader) {

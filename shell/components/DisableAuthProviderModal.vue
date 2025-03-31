@@ -7,13 +7,13 @@ export default {
   emits: ['disable'],
 
   components: { AppModal },
-  props: {
+  props:      {
     /**
      * Inherited global identifier prefix for tests
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'disable-auth-provider',
     },
   },
@@ -45,7 +45,10 @@ export default {
     styles="max-height: 100vh;"
     @close="close"
   >
-    <a-card class="disable-auth-provider" :title="t('promptRemove.title')">
+    <a-card
+      class="disable-auth-provider"
+      :title="t('promptRemove.title')"
+    >
       <template #body>
         <div class="mb-10">
           <p
@@ -56,7 +59,10 @@ export default {
         </div>
       </template>
       <template #actions>
-        <button class="btn role-secondary" @click="close">
+        <button
+          class="btn role-secondary"
+          @click="close"
+        >
           {{ t('generic.cancel') }}
         </button>
         <div class="spacer" />

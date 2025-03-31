@@ -4,22 +4,22 @@ import { Checkbox } from '@components/Form/Checkbox';
 import { mapGetters } from 'vuex';
 import { removeObject } from '@shell/utils/array';
 export default {
-  name: 'Mount',
+  name:       'Mount',
   components: { LabeledInput, Checkbox },
-  props: {
+  props:      {
     mode: {
-      type: String,
+      type:    String,
       default: 'create',
     },
 
     // volume name
     name: {
-      type: String,
+      type:    String,
       default: '',
     },
 
     container: {
-      type: Object,
+      type:     Object,
       required: true,
     },
   },
@@ -73,7 +73,10 @@ export default {
 
 <template>
   <div>
-    <div v-if="volumeMounts.length" class="mount-headers">
+    <div
+      v-if="volumeMounts.length"
+      class="mount-headers"
+    >
       <span>
         {{ t('workload.storage.mountPoint') }}
         <span class="text-error">*</span>
@@ -86,7 +89,11 @@ export default {
       </span>
       <span />
     </div>
-    <div v-for="(volumeMount, i) in volumeMounts" :key="i" class="mount-rows">
+    <div
+      v-for="(volumeMount, i) in volumeMounts"
+      :key="i"
+      class="mount-rows"
+    >
       <div>
         <LabeledInput
           :id="`mount-path-${i}`"
@@ -95,10 +102,16 @@ export default {
         />
       </div>
       <div>
-        <LabeledInput v-model:value="volumeMount.subPath" :mode="mode" />
+        <LabeledInput
+          v-model:value="volumeMount.subPath"
+          :mode="mode"
+        />
       </div>
       <div class="read-only">
-        <Checkbox v-model:value="volumeMount.readOnly" :mode="mode" />
+        <Checkbox
+          v-model:value="volumeMount.readOnly"
+          :mode="mode"
+        />
       </div>
       <div class="remove">
         <button
@@ -113,7 +126,11 @@ export default {
       </div>
     </div>
     <div class="row">
-      <a-button v-if="mode !== 'view'" id="add-mount" @click="add()">
+      <a-button
+        v-if="mode !== 'view'"
+        id="add-mount"
+        @click="add()"
+      >
         {{ t('workload.storage.addMount') }}
       </a-button>
     </div>

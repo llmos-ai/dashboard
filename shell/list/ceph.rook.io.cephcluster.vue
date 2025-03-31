@@ -74,7 +74,7 @@ export default {
       if (this.clusters.length === 0) {
         return {
           type: 'warning',
-          msg: this.t('ceph.enableNotification', { url: this.cephAddonUrl }, true),
+          msg:  this.t('ceph.enableNotification', { url: this.cephAddonUrl }, true),
         };
       }
 
@@ -107,5 +107,4 @@ export default {
       :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
     />
   </div>
-
 </template>

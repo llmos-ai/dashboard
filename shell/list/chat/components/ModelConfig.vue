@@ -11,7 +11,7 @@ const emits = defineEmits(['update:model', ['reset:messages']]);
 const config = defineModel('config');
 const props = defineProps({
   messages: {
-    type: Array,
+    type:    Array,
     default: [],
   },
 });
@@ -23,7 +23,7 @@ const modelOptions = modelService.map((model) => {
   return {
     label: model.spec.model,
     value: model.spec.model,
-    model: model,
+    model,
   };
 });
 
@@ -56,6 +56,7 @@ const changeModel = (value, option) => {
 };
 
 const previousModel = ref('');
+
 watch(
   () => config.value.model,
   (newValue, oldValue) => {
@@ -83,15 +84,17 @@ watch(
     @cancel="cancel"
   >
     <a-select
-      class="w-full mb-10"
       v-model:value="config.model"
+      class="w-full mb-10"
       :options="modelOptions"
       @change="changeModel"
     />
   </a-popconfirm>
-  <hr class="mb-10" />
+  <hr class="mb-10">
 
-  <h4 class="mb-10">{{ t('generic.parameters') }}</h4>
+  <h4 class="mb-10">
+    {{ t('generic.parameters') }}
+  </h4>
   <div class="row mb-10">
     <div class="col span-12">
       <SliderInput

@@ -1,12 +1,12 @@
 <script>
-import LabeledSelect from "@shell/components/form/LabeledSelect";
-import Principal from "@shell/components/auth/Principal";
-import debounce from "lodash/debounce";
-import { _EDIT } from "@shell/config/query-params";
-import { MANAGEMENT } from "@shell/config/types";
+import LabeledSelect from '@shell/components/form/LabeledSelect';
+import Principal from '@shell/components/auth/Principal';
+import debounce from 'lodash/debounce';
+import { _EDIT } from '@shell/config/query-params';
+import { MANAGEMENT } from '@shell/config/types';
 
 export default {
-  emits: ["add"],
+  emits:      ['add'],
   components: {
     LabeledSelect,
     Principal,
@@ -14,32 +14,32 @@ export default {
 
   props: {
     mode: {
-      type: String,
+      type:    String,
       default: _EDIT,
     },
 
     showMyGroupTypes: {
       type: Array,
       default(props) {
-        return ["group", "user"];
+        return ['group', 'user'];
       },
     },
 
     searchGroupTypes: {
-      type: String,
+      type:    String,
       default: null,
       validator(val) {
-        return val === null || val === "group" || val === "user";
+        return val === null || val === 'group' || val === 'user';
       },
     },
 
     retainSelection: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     project: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -48,17 +48,17 @@ export default {
 
   data() {
     return {
-      principals: [],
-      searchStr: "",
-      options: [],
-      newValue: "",
+      principals:     [],
+      searchStr:      '',
+      options:        [],
+      newValue:       '',
       tooltipContent: null,
     };
   },
 
   computed: {
     principalId() {
-      return this.$store.getters["auth/principalId"];
+      return this.$store.getters['auth/principalId'];
     },
     suggested() {
       const out = this.principals
@@ -70,15 +70,11 @@ export default {
     },
 
     label() {
-      return this.retainSelection
-        ? this.t("cluster.memberRoles.addClusterMember.labelSelect")
-        : this.t("cluster.memberRoles.addClusterMember.labelAdd");
+      return this.retainSelection ? this.t('cluster.memberRoles.addClusterMember.labelSelect') : this.t('cluster.memberRoles.addClusterMember.labelAdd');
     },
 
     placeholder() {
-      return this.project
-        ? this.t("projectMembers.projectPermissions.searchForMember")
-        : this.t("cluster.memberRoles.addClusterMember.placeholder");
+      return this.project ? this.t('projectMembers.projectPermissions.searchForMember') : this.t('cluster.memberRoles.addClusterMember.placeholder');
     },
   },
 
@@ -111,14 +107,14 @@ export default {
         return;
       }
 
-      this.$emit("add", id);
+      this.$emit('add', id);
       if (!this.retainSelection) {
-        this.newValue = "";
+        this.newValue = '';
       }
     },
 
     onSearch(str, loading, vm) {
-      str = (str || "").trim();
+      str = (str || '').trim();
 
       this.searchStr = str;
 
@@ -139,10 +135,10 @@ export default {
       }
 
       try {
-        const res = await this.$store.dispatch("management/collectionAction", {
-          type: MANAGEMENT.USER,
-          actionName: "search",
-          body: { name: str },
+        const res = await this.$store.dispatch('management/collectionAction', {
+          type:       MANAGEMENT.USER,
+          actionName: 'search',
+          body:       { name: str },
         });
 
         if (this.searchStr === str) {
@@ -198,11 +194,21 @@ export default {
     </template>
 
     <template #option="option">
-      <Principal :value="option.label" :use-muted="false" />
+      <Principal
+        :value="option.label"
+        :use-muted="false"
+      />
     </template>
 
-    <template v-if="retainSelection" #selected-option="option">
-      <Principal :value="option.label" :use-muted="false" class="mt-10 mb-10" />
+    <template
+      v-if="retainSelection"
+      #selected-option="option"
+    >
+      <Principal
+        :value="option.label"
+        :use-muted="false"
+        class="mt-10 mb-10"
+      />
     </template>
   </LabeledSelect>
 </template>

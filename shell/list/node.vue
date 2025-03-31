@@ -67,6 +67,7 @@ export default {
       canViewNodeMetrics: !!this.$store.getters['cluster/schemaFor'](METRIC.NODE),
       canViewGPUDevice:   !!this.$store.getters['cluster/schemaFor'](LLMOS.GPUDEVICE),
       gpuDevices:         [],
+      shown:              false
     };
   },
 

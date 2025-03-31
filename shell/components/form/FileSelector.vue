@@ -3,7 +3,7 @@ import { _EDIT, _VIEW } from '@shell/config/query-params';
 import { set } from '@shell/utils/object';
 
 export function createOnSelected(field) {
-  return function (contents) {
+  return function(contents) {
     set(this, field, contents);
   };
 }
@@ -11,57 +11,57 @@ export function createOnSelected(field) {
 export default {
   props: {
     label: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     mode: {
-      type: String,
+      type:    String,
       default: _EDIT,
     },
 
     disabled: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     includeFileName: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     showGrowlError: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     multiple: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     byteLimit: {
-      type: Number,
+      type:    Number,
       default: 0,
     },
 
     readAsDataUrl: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     directory: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     rawData: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     accept: {
-      type: String,
+      type:    String,
       default: '*',
     },
   },
@@ -88,7 +88,7 @@ export default {
           if (file.size > this.byteLimit) {
             this.$emit(
               'error',
-              `${file.name} exceeds the file size limit of ${this.byteLimit} bytes`
+              `${ file.name } exceeds the file size limit of ${ this.byteLimit } bytes`
             );
 
             return;
@@ -109,9 +109,7 @@ export default {
         const asyncFileContents = files.map(this.getFileContents);
         const fileContents = await Promise.all(asyncFileContents);
         const unboxedContents =
-          !this.multiple && fileContents.length === 1
-            ? fileContents[0]
-            : fileContents;
+          !this.multiple && fileContents.length === 1 ? fileContents[0] : fileContents;
 
         this.$emit('selected', unboxedContents);
       } catch (error) {
@@ -168,6 +166,6 @@ export default {
       :webkitdirectory="directory"
       :accept="accept"
       @change="fileChange"
-    />
+    >
   </a-button>
 </template>

@@ -1,44 +1,44 @@
-import { MANAGEMENT } from "@shell/config/types";
-import { md5 } from "@shell/utils/crypto";
-import Identicon from "identicon.js";
-import { ucFirst } from "@shell/utils/string";
-import SteveModel from "@shell/plugins/steve/steve-class";
+import { MANAGEMENT } from '@shell/config/types';
+import { md5 } from '@shell/utils/crypto';
+import Identicon from 'identicon.js';
+import { ucFirst } from '@shell/utils/string';
+import SteveModel from '@shell/plugins/steve/steve-class';
 
-import { set } from "@shell/utils/object";
+import { set } from '@shell/utils/object';
 
 export default class User extends SteveModel {
   applyDefaults() {
     const value = {
-      apiVersion: "management.llmos.ai/v1",
-      kind: "User",
-      metadata: {
-        generateName: "user-",
-        labels: {},
-        annotations: {},
+      apiVersion: 'management.llmos.ai/v1',
+      kind:       'User',
+      metadata:   {
+        generateName: 'user-',
+        labels:       {},
+        annotations:  {},
       },
       spec: {
-        username: "",
-        password: "",
-        active: true,
+        username: '',
+        password: '',
+        active:   true,
       },
     };
 
-    this["metadata"] = value.metadata;
-    set(this, "spec", this.spec || value.spec);
+    this['metadata'] = value.metadata;
+    set(this, 'spec', this.spec || value.spec);
   }
 
   get loginName() {
-    return this.metadata?.labels["management.llmos.ai/username"] || "";
+    return this.metadata?.labels['management.llmos.ai/username'] || '';
   }
 
   get isSystem() {
-    const p = this.$rootGetters["auth/principalId"];
+    const p = this.$rootGetters['auth/principalId'];
 
-    return p.startsWith("system://");
+    return p.startsWith('system://');
   }
 
   get isCurrentUser() {
-    return this.$rootGetters["auth/principalId"] === this.user.id;
+    return this.$rootGetters['auth/principalId'] === this.user.id;
   }
 
   get nameDisplay() {
@@ -52,17 +52,17 @@ export default class User extends SteveModel {
     if (name === id) {
       return id;
     } else {
-      return `${name} (${id})`;
+      return `${ name } (${ id })`;
     }
   }
 
   get provider() {
-    return "local";
+    return 'local';
   }
 
   get providerDisplay() {
-    return this.$rootGetters["i18n/withFallback"](
-      `model.authConfig.provider."${this.provider}"`,
+    return this.$rootGetters['i18n/withFallback'](
+      `model.authConfig.provider."${ this.provider }"`,
       null,
       this.provider
     );
@@ -70,14 +70,14 @@ export default class User extends SteveModel {
 
   get state() {
     if (this.status?.isActive === false) {
-      return "inactive";
+      return 'inactive';
     }
 
     if (this.status?.isActive === true) {
-      return "active";
+      return 'active';
     }
 
-    return this.metadata?.state?.name || "unknown";
+    return this.metadata?.state?.name || 'unknown';
   }
 
   get description() {
@@ -101,14 +101,14 @@ export default class User extends SteveModel {
   }
 
   async save(opt) {
-    const clone = await this.$dispatch("clone", { resource: this });
+    const clone = await this.$dispatch('clone', { resource: this });
 
     return clone._save(opt);
   }
 
   async setEnabled(enabled) {
     const clone = await this.$dispatch(
-      "management/clone",
+      'management/clone',
       { resource: this.user },
       { root: true }
     );
@@ -126,8 +126,8 @@ export default class User extends SteveModel {
   }
 
   canActivate(state) {
-    const stateOk = state ? this.state === "inactive" : this.state === "active";
-    const permissionOk = this.hasLink("update"); // Not canUpdate, only gate on api not whether editable pages should be visible
+    const stateOk = state ? this.state === 'inactive' : this.state === 'active';
+    const permissionOk = this.hasLink('update'); // Not canUpdate, only gate on api not whether editable pages should be visible
 
     return stateOk && permissionOk && !this.isCurrentUser;
   }
@@ -135,22 +135,22 @@ export default class User extends SteveModel {
   get _availableActions() {
     return [
       {
-        action: "activate",
-        label: this.t("action.activate"),
-        icon: "icon icon-play",
-        bulkable: true,
-        bulkAction: "activateBulk",
-        enabled: this.canActivate(true),
-        weight: 2,
+        action:     'activate',
+        label:      this.t('action.activate'),
+        icon:       'icon icon-play',
+        bulkable:   true,
+        bulkAction: 'activateBulk',
+        enabled:    this.canActivate(true),
+        weight:     2,
       },
       {
-        action: "deactivate",
-        label: this.t("action.deactivate"),
-        icon: "icon icon-pause",
-        bulkable: true,
-        bulkAction: "deactivateBulk",
-        enabled: this.canActivate(false),
-        weight: 1,
+        action:     'deactivate',
+        label:      this.t('action.deactivate'),
+        icon:       'icon icon-pause',
+        bulkable:   true,
+        bulkAction: 'deactivateBulk',
+        enabled:    this.canActivate(false),
+        weight:     1,
       },
       { divider: true },
       ...super._availableActions,
@@ -160,9 +160,9 @@ export default class User extends SteveModel {
   get details() {
     return [
       {
-        label: this.t("user.detail.username"),
-        formatter: "CopyToClipboard",
-        content: this.spec.username,
+        label:     this.t('user.detail.username'),
+        formatter: 'CopyToClipboard',
+        content:   this.spec.username,
       },
       ...this._details,
     ];
@@ -173,34 +173,34 @@ export default class User extends SteveModel {
   }
 
   get user() {
-    return this.$rootGetters["management/byId"](MANAGEMENT.USER, this.id);
+    return this.$rootGetters['management/byId'](MANAGEMENT.USER, this.id);
   }
 
   get canDelete() {
-    return this.user?.hasLink("remove") && !this.isCurrentUser;
+    return this.user?.hasLink('remove') && !this.isCurrentUser;
   }
 
   get avatarSrc() {
-    let id = this.id || "Unknown";
+    let id = this.id || 'Unknown';
 
-    id = id.replace(/[^:]+:\/\//, "");
+    id = id.replace(/[^:]+:\/\//, '');
 
-    const hash = md5(id, "hex");
-    const out = `data:image/png;base64,${new Identicon(
+    const hash = md5(id, 'hex');
+    const out = `data:image/png;base64,${ new Identicon(
       hash,
       80,
       0.01
-    ).toString()}`;
+    ).toString() }`;
 
     return out;
   }
 
   get roundAvatar() {
-    return this.provider === "github";
+    return this.provider === 'github';
   }
 
   get providerSpecificType() {
-    const parts = this.id.replace(/:.*$/, "").split("_", 2);
+    const parts = this.id.replace(/:.*$/, '').split('_', 2);
 
     if (parts.length === 2) {
       return parts[1];
@@ -210,12 +210,12 @@ export default class User extends SteveModel {
   }
 
   get displayType() {
-    const provider = this.$rootGetters["i18n/withFallback"](
-      `model.authConfig.provider."${this.provider}"`,
+    const provider = this.$rootGetters['i18n/withFallback'](
+      `model.authConfig.provider."${ this.provider }"`,
       null,
       this.provider
     );
 
-    return `${provider} ${ucFirst(this.providerSpecificType)}`;
+    return `${ provider } ${ ucFirst(this.providerSpecificType) }`;
   }
 }

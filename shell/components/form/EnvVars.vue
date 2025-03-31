@@ -12,32 +12,32 @@ export default {
      * Form mode for the component
      */
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
     configMaps: {
-      type: Array,
+      type:     Array,
       required: true,
     },
     secrets: {
-      type: Array,
+      type:     Array,
       required: true,
     },
     loading: {
       default: false,
-      type: Boolean,
+      type:    Boolean,
     },
     /**
      * Container spec
      */
     value: {
-      type: Object,
+      type:    Object,
       default: () => {
         return {};
       },
     },
     excludes: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
   },
@@ -110,7 +110,7 @@ export default {
     addFromReference() {
       this.allEnv.push({
         value: { name: '', valueFrom: {} },
-        id: randomStr(4),
+        id:    randomStr(4),
       });
     },
   },
@@ -118,7 +118,10 @@ export default {
 </script>
 <template>
   <div :style="{ width: '100%' }">
-    <div v-for="(row, i) in allEnv" :key="i">
+    <div
+      v-for="(row, i) in allEnv"
+      :key="i"
+    >
       <ValueFromResource
         v-model:value="row.value"
         :all-secrets="secrets"

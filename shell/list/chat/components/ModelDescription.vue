@@ -37,7 +37,10 @@ const updateModel = (_model) => {
   >
     <div class="h-[40px] flex justify-between items-center">
       <div class="flex items-center">
-        <img class="size-[30px] mr-4" :src="modelLogo" />
+        <img
+          class="size-[30px] mr-4"
+          :src="modelLogo"
+        >
         <span class="text-lg font-bold">{{ props.name }}</span>
       </div>
 
@@ -57,7 +60,10 @@ const updateModel = (_model) => {
         :open="open"
         @close="toggleDrawer"
       >
-        <ModelConfig v-model:config="config" @update:model="updateModel" />
+        <ModelConfig
+          v-model:config="config"
+          @update:model="updateModel"
+        />
       </a-drawer>
     </div>
   </a-card>

@@ -1,14 +1,14 @@
 <script>
-import { mapState } from "vuex";
-import { isArray } from "@shell/utils/array";
-import AppModal from "@shell/components/AppModal.vue";
+import { mapState } from 'vuex';
+import { isArray } from '@shell/utils/array';
+import AppModal from '@shell/components/AppModal.vue';
 
 /**
  * @name PromptModal
  * @description Modal component.
  */
 export default {
-  name: "PromptModal",
+  name: 'PromptModal',
 
   components: { AppModal },
 
@@ -17,7 +17,7 @@ export default {
   },
 
   computed: {
-    ...mapState("action-menu", ["showModal", "modalData"]),
+    ...mapState('action-menu', ['showModal', 'modalData']),
 
     resources() {
       let resources = this.modalData?.resources;
@@ -31,25 +31,26 @@ export default {
 
     modalWidth() {
       // property set from workload.js to overwrite modal default width of 600px, with fallback value as well
-      return this.modalData?.modalWidth || "600px";
+      return this.modalData?.modalWidth || '600px';
     },
     component() {
       // Looks for a dialog component by looking up in plugins and @shell/dialog/${name}.
       console.log(
-        this.$store.getters["type-map/importDialog"](this.modalData?.component)
+        this.$store.getters['type-map/importDialog'](this.modalData?.component)
       );
-      return this.$store.getters["type-map/importDialog"](
+
+      return this.$store.getters['type-map/importDialog'](
         this.modalData?.component
       );
     },
     cssProps() {
       // this computed property lets us generate a scss var that we can use in the style
-      return `--prompt-modal-width: ${this.modalWidth}`;
+      return `--prompt-modal-width: ${ this.modalWidth }`;
     },
     stickyProps() {
       const isSticky = !!this.modalData?.modalSticky;
 
-      return !isSticky ? "" : "display: flex; flex-direction: column; ";
+      return !isSticky ? '' : 'display: flex; flex-direction: column; ';
     },
     closeOnClickOutside() {
       return this.modalData?.closeOnClickOutside;
@@ -69,7 +70,7 @@ export default {
       }
 
       this.errors = [];
-      this.$store.commit("action-menu/togglePromptModal");
+      this.$store.commit('action-menu/togglePromptModal');
       if (this.backgroundClosing) {
         this.backgroundClosing();
       }
@@ -79,7 +80,7 @@ export default {
 
     // We're using register instead of just making use of $refs because the $refs is always undefined when referencing the component
     registerBackgroundClosing(fn) {
-      this["backgroundClosing"] = fn;
+      this['backgroundClosing'] = fn;
     },
   },
 };

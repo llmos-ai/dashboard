@@ -397,7 +397,10 @@ export default {
   <nav class="side-nav">
     <!-- Actual nav -->
     <div class="nav">
-      <template  v-for="(g) in groups" :key="g.name" >
+      <template
+        v-for="(g) in groups"
+        :key="g.name"
+      >
         <Group
           ref="groups"
           id-prefix=""

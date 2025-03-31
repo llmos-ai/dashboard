@@ -198,8 +198,11 @@ export default {
       <h3>{{ t('gpuDevice.detail.info.label') }}</h3>
       <div class="device-detail">
         <ul class="device-detail-info">
-          <template  v-for="(info, i) in statusInfo" :key="i" >
-            <li >
+          <template
+            v-for="(info, i) in statusInfo"
+            :key="i"
+          >
+            <li>
               <div v-if="info.key === 'uuid'">
                 <span class="label">{{ info.label }}:</span>
                 <span class="value">

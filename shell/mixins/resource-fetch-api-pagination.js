@@ -2,19 +2,19 @@ import {
   NAMESPACE_FILTER_NAMESPACED_YES,
   NAMESPACE_FILTER_NAMESPACED_NO,
   NAMESPACE_FILTER_ALL,
-} from "@shell/utils/namespace-filter";
-import { NAMESPACE } from "@shell/config/types";
-import { ALL_NAMESPACES } from "@shell/store/prefs";
-import { mapGetters } from "vuex";
-import { ResourceListComponentName } from "../components/ResourceList/resource-list.config";
-import paginationUtils from "@shell/utils/pagination-utils";
-import debounce from "lodash/debounce";
+} from '@shell/utils/namespace-filter';
+import { NAMESPACE } from '@shell/config/types';
+import { ALL_NAMESPACES } from '@shell/store/prefs';
+import { mapGetters } from 'vuex';
+import { ResourceListComponentName } from '../components/ResourceList/resource-list.config';
+import paginationUtils from '@shell/utils/pagination-utils';
+import debounce from 'lodash/debounce';
 import {
   PaginationParamFilter,
   PaginationFilterField,
   PaginationArgs,
-} from "@shell/types/store/pagination.types";
-import stevePaginationUtils from "@shell/plugins/steve/steve-pagination-utils";
+} from '@shell/types/store/pagination.types';
+import stevePaginationUtils from '@shell/plugins/steve/steve-pagination-utils';
 
 /**
  * Companion mixin used with `resource-fetch` for `ResourceList` to determine if the user needs to filter the list by a single namespace
@@ -22,7 +22,7 @@ import stevePaginationUtils from "@shell/plugins/steve/steve-pagination-utils";
 export default {
   props: {
     namespaced: {
-      type: Boolean,
+      type:    Boolean,
       default: null, // Automatic from schema
     },
 
@@ -30,7 +30,7 @@ export default {
      * Where in the ui this mixin is used. For instance the home page cluster list would be `home`
      */
     context: {
-      type: String,
+      type:    String,
       default: null,
     },
   },
@@ -41,15 +41,15 @@ export default {
       /**
        * This of type `OptPagination`
        */
-      pPagination: null,
+      pPagination:               null,
       // Avoid scenarios where namespace is updated just before other pagination changes come in
-      debouncedSetPagination: debounce(this.setPagination, 50),
+      debouncedSetPagination:    debounce(this.setPagination, 50),
 
       /**
        * Apply these additional filters given the ns / project header selection
        */
       requestFilters: {
-        filters: [],
+        filters:              [],
         projectsOrNamespaces: [],
       },
     };
@@ -66,26 +66,23 @@ export default {
     },
 
     paginationChanged(event) {
-      const searchFilters = event.filter.searchQuery
-        ? event.filter.searchFields.map(
-            (field) =>
-              new PaginationFilterField({
-                field,
-                value: event.filter.searchQuery,
-                exact: false,
-              })
-          )
-        : [];
+      const searchFilters = event.filter.searchQuery ? event.filter.searchFields.map(
+        (field) => new PaginationFilterField({
+          field,
+          value: event.filter.searchQuery,
+          exact: false,
+        })
+      ) : [];
 
       const pagination = new PaginationArgs({
-        page: event.page,
+        page:     event.page,
         pageSize: event.perPage,
-        sort: event.sort?.map((field) => ({
+        sort:     event.sort?.map((field) => ({
           field,
           asc: !event.descending,
         })),
         projectsOrNamespaces: this.requestFilters.projectsOrNamespaces,
-        filters: [
+        filters:              [
           new PaginationParamFilter({ fields: searchFilters }),
           ...this.requestFilters.filters, // Apply the additional filters. these aren't from the user but from ns filtering
         ],
@@ -102,12 +99,12 @@ export default {
       const { projectsOrNamespaces, filters } =
         stevePaginationUtils.createParamsFromNsFilter({
           allNamespaces:
-            this.$store.getters[`${this.currentProduct?.inStore}/all`](
+            this.$store.getters[`${ this.currentProduct?.inStore }/all`](
               NAMESPACE
             ),
-          selection: neu,
-          isAllNamespaces: this.isAllNamespaces,
-          isLocalCluster: this.$store.getters["currentCluster"].isLocal,
+          selection:                    neu,
+          isAllNamespaces:              this.isAllNamespaces,
+          isLocalCluster:               this.$store.getters['currentCluster'].isLocal,
           showDynamicRancherNamespaces: this.showDynamicRancherNamespaces,
           productHidesSystemNamespaces: this.productHidesSystemNamespaces,
         });
@@ -140,7 +137,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["currentProduct", "isAllNamespaces"]),
+    ...mapGetters(['currentProduct', 'isAllNamespaces']),
 
     /**
      * Why is this a specific getter and not not in mapGetters?
@@ -148,7 +145,7 @@ export default {
      * Adding it to mapGetters means the kubewarden unit tests fail as they don't mock it....
      */
     namespaceFilters() {
-      return this.$store.getters["namespaceFilters"];
+      return this.$store.getters['namespaceFilters'];
     },
 
     /**
@@ -183,7 +180,7 @@ export default {
         return;
       }
 
-      return this.canPaginate ? this.pPagination : "";
+      return this.canPaginate ? this.pPagination : '';
     },
 
     /**
@@ -199,13 +196,13 @@ export default {
       }
 
       const args = {
-        id: this.resource.id || this.resource,
+        id:      this.resource.id || this.resource,
         context: this.context,
       };
 
       return (
         this.resource &&
-        this.$store.getters[`${this.inStore}/paginationEnabled`]?.(args)
+        this.$store.getters[`${ this.inStore }/paginationEnabled`]?.(args)
       );
     },
 
@@ -222,7 +219,7 @@ export default {
         return;
       }
 
-      return this.$store.getters[`${this.inStore}/havePage`](this.resource);
+      return this.$store.getters[`${ this.inStore }/havePage`](this.resource);
     },
 
     /**
@@ -236,7 +233,7 @@ export default {
      * Links to ns.isObscure and covers things like `c-`, `user-`, etc (see OBSCURE_NAMESPACE_PREFIX)
      */
     showDynamicRancherNamespaces() {
-      return this.$store.getters["prefs/get"](ALL_NAMESPACES);
+      return this.$store.getters['prefs/get'](ALL_NAMESPACES);
     },
 
     isNamespaced() {
@@ -366,9 +363,9 @@ export default {
 
       await this.fetchPageSecondaryResources({
         canPaginate: this.canPaginate,
-        force: false,
-        page: this.rows,
-        pagResult: this.paginationResult,
+        force:       false,
+        page:        this.rows,
+        pagResult:   this.paginationResult,
       });
     },
   },

@@ -40,7 +40,7 @@ export default {
 
     if (alertmanagerConfigId) {
       const alertmanagerConfigResource = await this.$store.dispatch(
-        `${inStore}/find`,
+        `${ inStore }/find`,
         { type: MONITORING.ALERTMANAGER_CONFIG, id: alertmanagerConfigId }
       );
 
@@ -68,37 +68,37 @@ export default {
     );
 
     return {
-      actionMenuTargetElement: null,
-      actionMenuTargetEvent: null,
-      config: _CONFIG,
-      create: _CREATE,
-      createReceiverLink: this.value.getCreateReceiverRoute(),
+      actionMenuTargetElement:  null,
+      actionMenuTargetEvent:    null,
+      config:                   _CONFIG,
+      create:                   _CREATE,
+      createReceiverLink:       this.value.getCreateReceiverRoute(),
       defaultReceiverValues,
       receiverActionMenuIsOpen: false,
-      receiverTableHeaders: [
+      receiverTableHeaders:     [
         {
-          name: 'name',
-          labelKey: 'tableHeaders.name',
-          value: 'name',
-          sort: ['nameSort'],
-          formatter: 'LinkDetail',
+          name:          'name',
+          labelKey:      'tableHeaders.name',
+          value:         'name',
+          sort:          ['nameSort'],
+          formatter:     'LinkDetail',
           canBeVariable: true,
         },
         {
-          name: 'type',
-          labelKey: 'tableHeaders.type',
-          value: 'name',
-          formatter: 'ReceiverIcons',
+          name:          'type',
+          labelKey:      'tableHeaders.type',
+          value:         'name',
+          formatter:     'ReceiverIcons',
           canBeVariable: true,
         },
         // Add more columns
       ],
-      newReceiverType: null,
-      receiverActions: [],
+      newReceiverType:      null,
+      receiverActions:      [],
       receiverOptions,
       selectedReceiverName: '',
-      selectedRowValue: null,
-      view: _VIEW,
+      selectedRowValue:     null,
+      view:                 _VIEW,
     };
   },
 
@@ -215,7 +215,11 @@ export default {
     />
 
     <Tabbed>
-      <Tab :label="t('monitoring.route.label')" :weight="1" name="route">
+      <Tab
+        :label="t('monitoring.route.label')"
+        :weight="1"
+        name="route"
+      >
         <RouteConfig
           :value="value.spec.route"
           :mode="mode"

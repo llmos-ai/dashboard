@@ -52,7 +52,7 @@ export default {
 
   props: {
     simple: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -62,20 +62,20 @@ export default {
     const shellShortcut = '(Ctrl+`)';
 
     return {
-      show: false,
-      showTooltip: false,
-      kubeConfigCopying: false,
+      show:                   false,
+      showTooltip:            false,
+      kubeConfigCopying:      false,
       searchShortcut,
       shellShortcut,
       LOGGED_OUT,
-      navHeaderRight: null,
+      navHeaderRight:         null,
       extensionHeaderActions: getApplicableExtensionEnhancements(
         this,
         ExtensionPoint.ACTION,
         ActionLocation.HEADER,
         this.$route
       ),
-      ctx: this,
+      ctx:             this,
       showImportModal: false,
       showSearchModal: false,
     };
@@ -105,6 +105,7 @@ export default {
 
     generateLogoutRoute() {
       console.log('---aaa');
+
       return { name: 'auth-logout', query: { [LOGGED_OUT]: true } };
     },
 
@@ -114,6 +115,7 @@ export default {
           MANAGEMENT.USER,
           this.$store.getters['auth/principalId']
         ) || {};
+
       return user;
     },
 
@@ -188,7 +190,7 @@ export default {
       const name = this.currentProduct.name;
 
       return this.$store.getters['i18n/withFallback'](
-        `product."${name}"`,
+        `product."${ name }"`,
         null,
         ucFirst(name)
       );
@@ -196,7 +198,7 @@ export default {
 
     category() {
       return this.$store.getters['i18n/withFallback'](
-        `product.${this.currentProduct.category}.label`,
+        `product.${ this.currentProduct.category }.label`,
         null,
         this.currentProduct.category
       );
@@ -211,12 +213,10 @@ export default {
     },
 
     nameTooltip() {
-      return !this.showTooltip
-        ? {}
-        : {
-            content: this.currentCluster?.nameDisplay,
-            delay: 400,
-          };
+      return !this.showTooltip ? {} : {
+        content: this.currentCluster?.nameDisplay,
+        delay:   400,
+      };
     },
   },
 
@@ -252,7 +252,7 @@ export default {
     this.$nextTick(() => this.layoutHeader(null, true));
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('resize', this.debouncedLayoutHeader);
   },
 
@@ -282,7 +282,7 @@ export default {
         const w = Math.max(32, product.offsetWidth - overflow);
 
         // Set exact width on the product div so that the content in it fits that available space
-        product.style.width = `${w}px`;
+        product.style.width = `${ w }px`;
       }
     },
 
@@ -337,7 +337,7 @@ export default {
 
       // Make sure we wait at least 1 second so that the user can see the visual indication that the config has been copied
       allHash({
-        copy: this.currentCluster.copyKubeConfig(),
+        copy:     this.currentCluster.copyKubeConfig(),
         minDelay: wait(1000),
       }).finally(() => {
         this.kubeConfigCopying = false;
@@ -353,13 +353,11 @@ export default {
       const opts = {
         event,
         action,
-        isAlt: isAlternate(event),
+        isAlt:   isAlternate(event),
         product: this.currentProduct.name,
         cluster: this.currentCluster,
       };
-      const enabled = action.enabled
-        ? action.enabled.apply(this, [this.ctx])
-        : true;
+      const enabled = action.enabled ? action.enabled.apply(this, [this.ctx]) : true;
 
       if (fn && enabled) {
         fn.apply(this, [opts, [], { $route: this.$route }]);
@@ -368,12 +366,10 @@ export default {
 
     handleExtensionTooltip(action) {
       if (action.tooltipKey || action.tooltip) {
-        const tooltip = action.tooltipKey
-          ? this.t(action.tooltipKey)
-          : action.tooltip;
+        const tooltip = action.tooltipKey ? this.t(action.tooltipKey) : action.tooltip;
         const shortcut = action.shortcutLabel ? action.shortcutLabel() : '';
 
-        return `${tooltip} ${shortcut}`;
+        return `${ tooltip } ${ shortcut }`;
       }
 
       return null;
@@ -383,13 +379,21 @@ export default {
 </script>
 
 <template>
-  <header ref="header" class="flex" data-testid="header">
+  <header
+    ref="header"
+    class="flex"
+    data-testid="header"
+  >
     <!-- side menu -->
     <div>
       <TopLevelMenu v-if="showTopLevelMenu" />
     </div>
 
-    <div v-if="!simple" ref="product" class="product">
+    <div
+      v-if="!simple"
+      ref="product"
+      class="product"
+    >
       <div
         v-if="currentProduct && currentProduct.showClusterSwitcher"
         v-clean-tooltip="nameTooltip"
@@ -400,7 +404,11 @@ export default {
           :cluster="currentCluster"
           class="mr-10"
         />
-        <div v-if="currentCluster" ref="clusterName" class="cluster-name">
+        <div
+          v-if="currentCluster"
+          ref="clusterName"
+          class="cluster-name"
+        >
           {{ currentCluster.displayName }}
         </div>
         <ClusterBadge
@@ -408,8 +416,14 @@ export default {
           :cluster="currentCluster"
           class="ml-10"
         />
-        <div v-if="!currentCluster" class="simple-title">
-          <BrandImage class="side-menu-logo-img" file-name="logo.svg" />
+        <div
+          v-if="!currentCluster"
+          class="simple-title"
+        >
+          <BrandImage
+            class="side-menu-logo-img"
+            file-name="logo.svg"
+          />
         </div>
       </div>
 
@@ -423,16 +437,22 @@ export default {
           :src="currentProduct.iconHeader"
           class="cluster-os-logo mr-10"
           style="width: 44px; height: 36px"
-        />
+        >
         <div class="product-name">
           {{ prod }}
         </div>
       </div>
     </div>
 
-    <div v-else class="simple-title">
+    <div
+      v-else
+      class="simple-title"
+    >
       <div class="side-menu-logo">
-        <BrandImage class="side-menu-logo-img" file-name="logo.svg" />
+        <BrandImage
+          class="side-menu-logo-img"
+          file-name="logo.svg"
+        />
       </div>
     </div>
 
@@ -441,23 +461,29 @@ export default {
     <div class="rd-header-right">
       <component :is="navHeaderRight" />
 
-      <div v-if="showFilter" class="top">
+      <div
+        v-if="showFilter"
+        class="top"
+      >
         <NamespaceFilter
           v-if="
             clusterReady &&
-            currentProduct &&
-            (currentProduct.showNamespaceFilter || isExplorer)
+              currentProduct &&
+              (currentProduct.showNamespaceFilter || isExplorer)
           "
         />
         <WorkspaceSwitcher
           v-else-if="
             clusterReady &&
-            currentProduct &&
-            currentProduct.showWorkspaceSwitcher
+              currentProduct &&
+              currentProduct.showWorkspaceSwitcher
           "
         />
       </div>
-      <div v-if="currentCluster && !simple" class="header-buttons">
+      <div
+        v-if="currentCluster && !simple"
+        class="header-buttons"
+      >
         <template v-if="currentProduct && currentProduct.showClusterSwitcher">
           <a-button
             v-if="showImportYaml"
@@ -477,7 +503,10 @@ export default {
             styles="max-height: 90vh;"
             @close="closeImport"
           >
-            <Import :cluster="currentCluster" @close="closeImport" />
+            <Import
+              :cluster="currentCluster"
+              @close="closeImport"
+            />
           </app-modal>
 
           <a-button
@@ -510,19 +539,25 @@ export default {
             type="text"
             @click="copyKubeConfig($event)"
           >
-            <i v-if="kubeConfigCopying" class="icon icon-checkmark icon-lg" />
-            <i v-else class="icon icon-copy icon-lg" />
+            <i
+              v-if="kubeConfigCopying"
+              class="icon icon-checkmark icon-lg"
+            />
+            <i
+              v-else
+              class="icon icon-copy icon-lg"
+            />
           </a-button>
         </template>
 
         <a-button
           v-if="showSearch"
+          id="header-btn-search"
           v-clean-tooltip="
             t('nav.resourceSearch.toolTip', { key: searchShortcut })
           "
           v-shortkey="{ windows: ['ctrl', 'k'], mac: ['meta', 'k'] }"
           type="text"
-          id="header-btn-search"
           @shortkey="openSearch()"
           @click="openSearch()"
         >
@@ -543,7 +578,10 @@ export default {
       </div>
 
       <!-- Extension header actions -->
-      <div v-if="extensionHeaderActions.length" class="header-buttons">
+      <div
+        v-if="extensionHeaderActions.length"
+        class="header-buttons"
+      >
         <a-button
           v-for="(action, i) in extensionHeaderActions"
           :key="`${action.label}${i}`"
@@ -569,7 +607,10 @@ export default {
 
         <!-- userMenu action -->
         <!-- TODO: use option refactor -->
-        <a-dropdown v-if="showUserMenu" trigger="click">
+        <a-dropdown
+          v-if="showUserMenu"
+          trigger="click"
+        >
           <div>
             <img
               v-if="loggedInUser && loggedInUser.avatarSrc"
@@ -577,14 +618,20 @@ export default {
               :class="{ 'avatar-round': loggedInUser.roundAvatar }"
               width="36"
               height="36"
+            >
+            <i
+              v-else
+              class="icon icon-user icon-3x avatar"
             />
-            <i v-else class="icon icon-user icon-3x avatar" />
           </div>
 
           <template #overlay>
             <a-menu>
               <a-menu-item class="w-3xs">
-                <div class="user-info" v-if="authEnabled">
+                <div
+                  v-if="authEnabled"
+                  class="user-info"
+                >
                   <div class="user-name">
                     <i class="icon icon-lg icon-user" />
                     {{ loggedInUser.loginName }}

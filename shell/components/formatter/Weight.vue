@@ -1,20 +1,20 @@
 <script>
-import { LabeledInput } from "@components/Form/LabeledInput";
+import { LabeledInput } from '@components/Form/LabeledInput';
 
 export default {
   components: { LabeledInput },
 
   props: {
     value: {
-      type: Number,
+      type:    Number,
       default: 0,
     },
     row: {
-      type: Object,
+      type:     Object,
       required: true,
     },
     col: {
-      type: Object,
+      type:    Object,
       default: () => {},
     },
   },
@@ -91,7 +91,10 @@ export default {
     @apply-show="onShown"
   >
     <div>
-      <span v-if="totalForApp.count === 1" class="text-muted"> &mdash; </span>
+      <span
+        v-if="totalForApp.count === 1"
+        class="text-muted"
+      > &mdash; </span>
       <span
         v-else
         v-trim-whitespace
@@ -106,7 +109,10 @@ export default {
     </div>
 
     <template #popover>
-      <div v-if="canAdjust" class="text-center pb-5">
+      <div
+        v-if="canAdjust"
+        class="text-center pb-5"
+      >
         <form>
           <LabeledInput
             ref="newPercent"
@@ -119,7 +125,9 @@ export default {
             style="width: 100px"
           >
             <template #suffix>
-              <div class="addon">%</div>
+              <div class="addon">
+                %
+              </div>
             </template>
           </LabeledInput>
           <button

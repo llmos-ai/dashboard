@@ -25,7 +25,7 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'prompt-remove',
     },
   },
@@ -34,17 +34,17 @@ export default {
 
     return {
       hasCustomRemove: false,
-      randomPosition: Math.random(),
-      confirmName: '',
-      error: '',
-      warning: '',
-      preventDelete: false,
+      randomPosition:  Math.random(),
+      confirmName:     '',
+      error:           '',
+      warning:         '',
+      preventDelete:   false,
       removeComponent: shallowRef(
         this.$store.getters['type-map/importCustomPromptRemove'](resource)
       ),
       chartsToRemoveIsApp: false,
-      chartsDeleteCrd: false,
-      showModal: false,
+      chartsDeleteCrd:     false,
+      showModal:           false,
     };
   },
   computed: {
@@ -79,7 +79,7 @@ export default {
       const schema = this.toRemove[0]?.schema;
 
       if (!schema) {
-        return `resource${this.toRemove.length === 1 ? '' : 's'}`;
+        return `resource${ this.toRemove.length === 1 ? '' : 's' }`;
       }
 
       return this.$store.getters['type-map/labelFor'](
@@ -338,12 +338,11 @@ export default {
     // If spoofed we need to reload the values as the server can't have watchers for them.
     refreshSpoofedTypes(types) {
       const inStore = this.$store.getters['currentProduct'].inStore;
-      const promises = types.map((type) =>
-        this.$store.dispatch(
-          `${inStore}/findAll`,
-          { type, opt: { force: true } },
-          { root: true }
-        )
+      const promises = types.map((type) => this.$store.dispatch(
+        `${ inStore }/findAll`,
+        { type, opt: { force: true } },
+        { root: true }
+      )
       );
 
       return Promise.all(promises);
@@ -399,7 +398,10 @@ export default {
           @errors="(e) => (error = e)"
           @done="done"
         />
-        <div v-if="needsConfirm" class="mt-10">
+        <div
+          v-if="needsConfirm"
+          class="mt-10"
+        >
           <span
             v-clean-html="
               t(
@@ -430,15 +432,24 @@ export default {
         <div class="text-error mb-10 mt-10">
           {{ error }}
         </div>
-        <div v-if="!needsConfirm" class="text-info mt-20">
+        <div
+          v-if="!needsConfirm"
+          class="text-info mt-20"
+        >
           {{ protip }}
         </div>
       </LabeledInput>
       <div v-else-if="!hasCustomRemove">
-        <div v-if="warning" class="text-warning mb-10 mt-10">
+        <div
+          v-if="warning"
+          class="text-warning mb-10 mt-10"
+        >
           {{ warning }}
         </div>
-        <div v-if="error" class="text-error mb-10 mt-10">
+        <div
+          v-if="error"
+          class="text-error mb-10 mt-10"
+        >
           {{ error }}
         </div>
       </div>

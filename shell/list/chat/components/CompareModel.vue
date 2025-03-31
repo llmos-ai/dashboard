@@ -6,18 +6,14 @@ import ModelCard from './ModelCard.vue';
 
 const props = defineProps({
   question: {
-    type: String,
+    type:     String,
     required: true,
   },
 });
 
 const configs = reactive([
-  {
-    ...ModelParamConfig,
-  },
-  {
-    ...ModelParamConfig,
-  },
+  { ...ModelParamConfig },
+  { ...ModelParamConfig },
 ]);
 const modelCompsRef = useTemplateRef('modelComp');
 
@@ -27,23 +23,21 @@ const addModel = () => {
   }
 };
 
-const handleSend = async (_question, fileList) => {
+const handleSend = async(_question, fileList) => {
   modelCompsRef.value.forEach((item) => {
     item.handleSend(_question, fileList);
   });
 };
 
-defineExpose({
-  handleSend,
-});
+defineExpose({ handleSend });
 
 const actions = [
   {
-    label: '单一模型进行调试',
+    label:  '单一模型进行调试',
     action: 'singleModel',
   },
   {
-    label: '移除',
+    label:  '移除',
     action: 'remove',
   },
 ];
@@ -62,6 +56,7 @@ const handleAction = (action, index) => {
     singleModel,
     remove,
   };
+
   return actionsMap[action](index);
 };
 </script>
@@ -70,28 +65,37 @@ const handleAction = (action, index) => {
   <div class="h-full flex flex-col">
     <a-row>
       <a-col :span="24">
-        <a-button type="link" class="role-link float-right" @click="addModel">
+        <a-button
+          type="link"
+          class="role-link float-right"
+          @click="addModel"
+        >
           + {{ t('chat.addModel') }} ({{ configs.length }} / 4)
         </a-button>
       </a-col>
     </a-row>
 
-    <a-row :gutter="[16, 16]" class="flex-grow">
+    <a-row
+      :gutter="[16, 16]"
+      class="flex-grow"
+    >
       <a-col
-        class="flex"
-        :span="12"
         v-for="(config, idx) in configs"
         :key="idx"
+        class="flex"
+        :span="12"
       >
         <ModelCard
+          ref="modelComp"
           :idx="idx"
           :config="config"
           :actions="actions"
-          @handle:action="handleAction"
-          ref="modelComp"
           :question="props.question"
+          @handle:action="handleAction"
         >
-          <template #title> # {{ idx + 1 }} </template>
+          <template #title>
+            # {{ idx + 1 }}
+          </template>
         </ModelCard>
       </a-col>
     </a-row>

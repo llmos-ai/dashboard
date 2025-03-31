@@ -8,11 +8,11 @@ export default {
   },
   props: {
     resources: {
-      type: Array,
+      type:     Array,
       required: true,
     },
     registerBackgroundClosing: {
-      type: Function,
+      type:     Function,
       required: true,
     },
   },
@@ -44,8 +44,14 @@ export default {
 </script>
 
 <template>
-  <Card class="prompt-restore" :show-highlight-border="false">
-    <h4 slot="title" class="text-default-text">
+  <Card
+    class="prompt-restore"
+    :show-highlight-border="false"
+  >
+    <h4
+      slot="title"
+      class="text-default-text"
+    >
       {{ t('addonConfigConfirmation.title') }}
     </h4>
 
@@ -55,12 +61,22 @@ export default {
       </slot>
     </template>
 
-    <div slot="actions" class="bottom">
+    <div
+      slot="actions"
+      class="bottom"
+    >
       <div class="buttons">
-        <button type="button" class="btn role-secondary mr-10" @click="close">
+        <button
+          type="button"
+          class="btn role-secondary mr-10"
+          @click="close"
+        >
           {{ t('generic.cancel') }}
         </button>
-        <AsyncButton mode="continue" @click="apply" />
+        <AsyncButton
+          mode="continue"
+          @click="apply"
+        />
       </div>
     </div>
   </Card>

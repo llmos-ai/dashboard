@@ -8,35 +8,35 @@ const { t } = useI18n(store);
 
 const props = defineProps({
   value: {
-    type: [String, Number, Boolean, Object],
+    type:     [String, Number, Boolean, Object],
     required: true,
   },
   buttonStyle: {
-    type: String,
+    type:    String,
     default: 'solid',
   },
   inactiveClass: {
-    type: String,
+    type:    String,
     default: '',
   },
   activeClass: {
-    type: String,
+    type:    String,
     default: 'primary',
   },
   options: {
-    type: Array,
+    type:     Array,
     required: true,
   },
   size: {
-    type: String,
+    type:    String,
     default: 'large',
   },
   iconSize: {
-    type: String,
+    type:    String,
     default: null,
   },
   disabled: {
-    type: Boolean,
+    type:    Boolean,
     default: false,
   },
 });
@@ -58,10 +58,10 @@ const optionObjects = computed(() => {
     const active = value === out.value;
 
     out.class = {
-      btn: true,
+      btn:                   true,
       [props.inactiveClass]: !active,
-      [props.activeClass]: active,
-      active: active ? props.activeClass : props.inactiveClass,
+      [props.activeClass]:   active,
+      active:                active ? props.activeClass : props.inactiveClass,
     };
 
     return out;
@@ -75,6 +75,7 @@ const change = (value) => {
 const actionDescription = (opt) => {
   const tooltip = opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip;
   const label = opt.labelKey ? t(opt.labelKey) : opt.label;
+
   return tooltip || label || '';
 };
 
@@ -82,17 +83,21 @@ const actionAriaLabel = (opt) => {
   const ariaLabel = opt.ariaLabel;
   const label = opt.labelKey ? t(opt.labelKey) : opt.label;
   const tooltip = opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip;
+
   return ariaLabel || tooltip || label || undefined;
 };
 </script>
 
 <template>
-  <a-radio-group :value="value" :button-style="buttonStyle">
+  <a-radio-group
+    :value="value"
+    :button-style="buttonStyle"
+  >
     <a-radio-button
       v-for="(opt, idx) in optionObjects"
       :key="idx"
-      :value="opt.value"
       v-clean-tooltip="opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip"
+      :value="opt.value"
       :type="opt.active"
       :size="size"
       :aria-label="actionAriaLabel(opt)"

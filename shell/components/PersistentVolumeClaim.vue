@@ -118,7 +118,7 @@ export default {
     // }
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     this.$emit('removePvcForm', this.savePvcHookName + this.uniqueId);
   },
 

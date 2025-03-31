@@ -37,18 +37,18 @@ export default {
   },
   props: {
     workload: {
-      type: Object,
+      type:     Object,
       required: true,
     },
   },
   data() {
     return {
-      errors: [],
+      errors:           [],
       selectedRevision: null,
-      currentRevision: null,
-      revisions: [],
-      editorMode: EDITOR_MODES.DIFF_CODE,
-      showDiff: false,
+      currentRevision:  null,
+      revisions:        [],
+      editorMode:       EDITOR_MODES.DIFF_CODE,
+      showDiff:         false,
     };
   },
   computed: {
@@ -64,9 +64,7 @@ export default {
       return this.workload.kind.toLowerCase();
     },
     revisionsType() {
-      return this.workloadType === 'deployment'
-        ? WORKLOAD_TYPES.REPLICA_SET
-        : 'apps.controllerrevision';
+      return this.workloadType === 'deployment' ? WORKLOAD_TYPES.REPLICA_SET : 'apps.controllerrevision';
     },
     selectedRevisionId() {
       return this.selectedRevision.id;
@@ -82,7 +80,7 @@ export default {
         this.$store.getters['prefs/get'](TIME_FORMAT)
       );
 
-      return `${dateFormat}, ${timeFormat}`;
+      return `${ dateFormat }, ${ timeFormat }`;
     },
   },
   fetch() {
@@ -100,7 +98,7 @@ export default {
               const isRevisionOfCurrentWorkload =
                 relationship.fromId &&
                 relationship.fromId ===
-                  `${this.workloadNamespace}/${this.workloadName}`;
+                  `${ this.workloadNamespace }/${ this.workloadName }`;
 
               return isRevisionOfCurrentWorkload;
             }
@@ -156,10 +154,8 @@ export default {
       const createdDateFormatted = createdDate.format(this.timeFormatStr);
 
       const revisionAgeObject = diffFrom(createdDate, now, this.t);
-      const revisionAge = `${createdDateFormatted}, ${revisionAgeObject.label}`;
-      const units = this.t(revisionAgeObject.unitsKey, {
-        count: revisionAgeObject.label,
-      });
+      const revisionAge = `${ createdDateFormatted }, ${ revisionAgeObject.label }`;
+      const units = this.t(revisionAgeObject.unitsKey, { count: revisionAgeObject.label });
       const currentLabel = this.t('promptRollback.currentLabel');
 
       const optionLabel = this.t('promptRollback.revisionOption', {
@@ -170,8 +166,8 @@ export default {
       });
 
       return {
-        label: optionLabel,
-        value: revision,
+        label:    optionLabel,
+        value:    revision,
         disabled: isCurrentRevision,
         revisionNumber,
       };
@@ -195,7 +191,7 @@ export default {
       }
 
       Object.keys(obj).forEach((key) => {
-        const keyPath = !path ? key : `${path}.${key}`;
+        const keyPath = !path ? key : `${ path }.${ key }`;
 
         if (!REMOVE_KEYS[keyPath]) {
           res[key] = obj[key];
@@ -213,11 +209,20 @@ export default {
 </script>
 
 <template>
-  <Card class="prompt-rollback" :show-highlight-border="false">
-    <h4 slot="title" class="text-default-text">
+  <Card
+    class="prompt-rollback"
+    :show-highlight-border="false"
+  >
+    <h4
+      slot="title"
+      class="text-default-text"
+    >
       {{ t('promptRollback.modalTitle', { workloadName }, true) }}
     </h4>
-    <div slot="body" class="pl-10 pr-10">
+    <div
+      slot="body"
+      class="pl-10 pr-10"
+    >
       <Banner
         v-if="revisions.length === 1"
         color="info"
@@ -250,7 +255,10 @@ export default {
         :as-object="true"
       />
     </div>
-    <div slot="actions" class="buttons">
+    <div
+      slot="actions"
+      class="buttons"
+    >
       <div class="left">
         <button
           :disabled="!selectedRevision"
@@ -268,7 +276,10 @@ export default {
         </button>
       </div>
       <div class="right">
-        <button class="btn role-secondary mr-10" @click="close">
+        <button
+          class="btn role-secondary mr-10"
+          @click="close"
+        >
           {{ t('generic.cancel') }}
         </button>
         <AsyncButton

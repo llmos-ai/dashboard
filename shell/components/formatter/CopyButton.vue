@@ -1,20 +1,16 @@
-<script>
+<script setup>
 import CopyToClipboard from '@shell/components/CopyToClipboard';
 
-export default {
-  components: { CopyToClipboard },
-
-  props: {
-    value: {
-      type:    String,
-      default: ''
-    },
-    showLabel: {
-      type:    Boolean,
-      default: true,
-    }
+defineProps({
+  value: {
+    type:    String,
+    default: ''
+  },
+  showLabel: {
+    type:    Boolean,
+    default: true
   }
-};
+});
 </script>
 
 <template>

@@ -3,8 +3,8 @@
 // At the time of writing this the released plugin was emitting debug console messages and
 // there was a PR open for about 1 year to address this https://github.com/rodrigopv/vue3-shortkey/pull/1
 // If another library becomes available I think we should use it instead
-import "element-matches";
-import "custom-event-polyfill";
+import 'element-matches';
+import 'custom-event-polyfill';
 
 const ShortKey = {};
 const mapFunctions = {};
@@ -15,9 +15,9 @@ let keyPressed = false;
 
 const parseValue = (value) => {
   value =
-    typeof value === "string" ? JSON.parse(value.replace(/\'/gi, '"')) : value;
+    typeof value === 'string' ? JSON.parse(value.replace(/\'/gi, '"')) : value;
   if (value instanceof Array) {
-    return { "": value };
+    return { '': value };
   }
 
   return value;
@@ -37,7 +37,7 @@ const bindValue = (value, el, binding, vnode) => {
     objAvoided.push(el);
   } else {
     mappingFunctions({
-      b: value,
+      b:  value,
       push,
       once,
       focus,
@@ -66,7 +66,7 @@ ShortKey.install = (Vue, options) => {
   containerAvoided = [
     ...(options && options.preventContainer ? options.preventContainer : []),
   ];
-  Vue.directive("shortkey", {
+  Vue.directive('shortkey', {
     beforeMount: (el, binding, vnode) => {
       // Mapping the commands
       const value = parseValue(binding.value);
@@ -94,115 +94,116 @@ ShortKey.decodeKey = (pKey) => createShortcutIndex(pKey);
 ShortKey.encodeKey = (pKey) => {
   const shortKey = {};
 
-  shortKey.shiftKey = pKey.includes("shift");
-  shortKey.ctrlKey = pKey.includes("ctrl");
-  shortKey.metaKey = pKey.includes("meta");
-  shortKey.altKey = pKey.includes("alt");
+  shortKey.shiftKey = pKey.includes('shift');
+  shortKey.ctrlKey = pKey.includes('ctrl');
+  shortKey.metaKey = pKey.includes('meta');
+  shortKey.altKey = pKey.includes('alt');
   let indexedKeys = createShortcutIndex(shortKey);
   const vKey = pKey.filter(
-    (item) => !["shift", "ctrl", "meta", "alt"].includes(item)
+    (item) => !['shift', 'ctrl', 'meta', 'alt'].includes(item)
   );
 
-  indexedKeys += vKey.join("");
+  indexedKeys += vKey.join('');
 
   return indexedKeys;
 };
 
 const createShortcutIndex = (pKey) => {
-  let k = "";
+  let k = '';
 
-  if (pKey.key === "Shift" || pKey.shiftKey) {
-    k += "shift";
+  if (pKey.key === 'Shift' || pKey.shiftKey) {
+    k += 'shift';
   }
-  if (pKey.key === "Control" || pKey.ctrlKey) {
-    k += "ctrl";
+  if (pKey.key === 'Control' || pKey.ctrlKey) {
+    k += 'ctrl';
   }
-  if (pKey.key === "Meta" || pKey.metaKey) {
-    k += "meta";
+  if (pKey.key === 'Meta' || pKey.metaKey) {
+    k += 'meta';
   }
-  if (pKey.key === "Alt" || pKey.altKey) {
-    k += "alt";
+  if (pKey.key === 'Alt' || pKey.altKey) {
+    k += 'alt';
   }
-  if (pKey.key === "ArrowUp") {
-    k += "arrowup";
+  if (pKey.key === 'ArrowUp') {
+    k += 'arrowup';
   }
-  if (pKey.key === "ArrowLeft") {
-    k += "arrowleft";
+  if (pKey.key === 'ArrowLeft') {
+    k += 'arrowleft';
   }
-  if (pKey.key === "ArrowRight") {
-    k += "arrowright";
+  if (pKey.key === 'ArrowRight') {
+    k += 'arrowright';
   }
-  if (pKey.key === "ArrowDown") {
-    k += "arrowdown";
+  if (pKey.key === 'ArrowDown') {
+    k += 'arrowdown';
   }
-  if (pKey.key === "AltGraph") {
-    k += "altgraph";
+  if (pKey.key === 'AltGraph') {
+    k += 'altgraph';
   }
-  if (pKey.key === "Escape") {
-    k += "esc";
+  if (pKey.key === 'Escape') {
+    k += 'esc';
   }
-  if (pKey.key === "Enter") {
-    k += "enter";
+  if (pKey.key === 'Enter') {
+    k += 'enter';
   }
-  if (pKey.key === "Tab") {
-    k += "tab";
+  if (pKey.key === 'Tab') {
+    k += 'tab';
   }
-  if (pKey.key === " ") {
-    k += "space";
+  if (pKey.key === ' ') {
+    k += 'space';
   }
-  if (pKey.key === "PageUp") {
-    k += "pageup";
+  if (pKey.key === 'PageUp') {
+    k += 'pageup';
   }
-  if (pKey.key === "PageDown") {
-    k += "pagedown";
+  if (pKey.key === 'PageDown') {
+    k += 'pagedown';
   }
-  if (pKey.key === "Home") {
-    k += "home";
+  if (pKey.key === 'Home') {
+    k += 'home';
   }
-  if (pKey.key === "End") {
-    k += "end";
+  if (pKey.key === 'End') {
+    k += 'end';
   }
-  if (pKey.key === "Delete") {
-    k += "del";
+  if (pKey.key === 'Delete') {
+    k += 'del';
   }
-  if (pKey.key === "Backspace") {
-    k += "backspace";
+  if (pKey.key === 'Backspace') {
+    k += 'backspace';
   }
-  if (pKey.key === "Insert") {
-    k += "insert";
+  if (pKey.key === 'Insert') {
+    k += 'insert';
   }
-  if (pKey.key === "NumLock") {
-    k += "numlock";
+  if (pKey.key === 'NumLock') {
+    k += 'numlock';
   }
-  if (pKey.key === "CapsLock") {
-    k += "capslock";
+  if (pKey.key === 'CapsLock') {
+    k += 'capslock';
   }
-  if (pKey.key === "Pause") {
-    k += "pause";
+  if (pKey.key === 'Pause') {
+    k += 'pause';
   }
-  if (pKey.key === "ContextMenu") {
-    k += "contextmenu";
+  if (pKey.key === 'ContextMenu') {
+    k += 'contextmenu';
   }
-  if (pKey.key === "ScrollLock") {
-    k += "scrolllock";
+  if (pKey.key === 'ScrollLock') {
+    k += 'scrolllock';
   }
-  if (pKey.key === "BrowserHome") {
-    k += "browserhome";
+  if (pKey.key === 'BrowserHome') {
+    k += 'browserhome';
   }
-  if (pKey.key === "MediaSelect") {
-    k += "mediaselect";
+  if (pKey.key === 'MediaSelect') {
+    k += 'mediaselect';
   }
   if (
-    (pKey.key && pKey.key !== " " && pKey.key.length === 1) ||
+    (pKey.key && pKey.key !== ' ' && pKey.key.length === 1) ||
     /F\d{1,2}|\//g.test(pKey.key)
-  )
+  ) {
     k += pKey.key.toLowerCase();
+  }
 
   return k;
 };
 
 const dispatchShortkeyEvent = (pKey) => {
-  const e = new CustomEvent("shortkey", { bubbles: false });
+  const e = new CustomEvent('shortkey', { bubbles: false });
 
   if (mapFunctions[pKey].key) e.srcKey = mapFunctions[pKey].key;
   const elm = mapFunctions[pKey].el;
@@ -223,10 +224,10 @@ ShortKey.keyDown = (pKey) => {
   }
 };
 
-if (process && process.env && process.env.NODE_ENV !== "test") {
-  (function () {
+if (process && process.env && process.env.NODE_ENV !== 'test') {
+  (function() {
     document.addEventListener(
-      "keydown",
+      'keydown',
       (pKey) => {
         const decodedKey = ShortKey.decodeKey(pKey);
 
@@ -251,7 +252,7 @@ if (process && process.env && process.env.NODE_ENV !== "test") {
     );
 
     document.addEventListener(
-      "keyup",
+      'keyup',
       (pKey) => {
         const decodedKey = ShortKey.decodeKey(pKey);
 
@@ -271,7 +272,9 @@ if (process && process.env && process.env.NODE_ENV !== "test") {
   })();
 }
 
-const mappingFunctions = ({ b, push, once, focus, propagte, el }) => {
+const mappingFunctions = ({
+  b, push, once, focus, propagte, el
+}) => {
   for (const key in b) {
     const k = ShortKey.encodeKey(b[key]);
     const elm = mapFunctions[k] && mapFunctions[k].el ? mapFunctions[k].el : [];
@@ -284,7 +287,7 @@ const mappingFunctions = ({ b, push, once, focus, propagte, el }) => {
       focus,
       key,
       propagte: propagated || propagte,
-      el: elm,
+      el:       elm,
     };
   }
 };
@@ -294,11 +297,9 @@ const availableElement = (decodedKey) => {
     (r) => r === document.activeElement
   );
   const filterAvoided = !!elementAvoided.find(
-    (selector) =>
-      document.activeElement && document.activeElement.matches(selector)
+    (selector) => document.activeElement && document.activeElement.matches(selector)
   );
-  const filterAvoidedContainer = !!containerAvoided.find((selector) =>
-    isActiveElementChildOf(selector)
+  const filterAvoidedContainer = !!containerAvoided.find((selector) => isActiveElementChildOf(selector)
   );
 
   return (

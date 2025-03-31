@@ -8,11 +8,11 @@ export default {
 
   props: {
     isCancelModal: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     isForm: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -60,7 +60,10 @@ export default {
   >
     <div class="header">
       <h4 class="text-default-text">
-        <t v-if="isCancelModal" k="generic.cancel" />
+        <t
+          v-if="isCancelModal"
+          k="generic.cancel"
+        />
         <span v-else>{{ t('cruResource.backToForm') }}</span>
       </h4>
     </div>
@@ -76,7 +79,10 @@ export default {
       <a-button @click="cancelCancel">
         {{ isForm ? t('cruResource.reviewForm') : t('cruResource.reviewYaml') }}
       </a-button>
-      <a-button type="primary" @click="confirmCancel">
+      <a-button
+        type="primary"
+        @click="confirmCancel"
+      >
         <span v-if="isCancelModal">{{ t('cruResource.confirmCancel') }}</span>
         <span v-else>{{ t('cruResource.confirmBack') }}</span>
       </a-button>

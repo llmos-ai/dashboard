@@ -39,47 +39,47 @@ export default {
 
   props: {
     doneRoute: {
-      type: [String, Object],
+      type:    [String, Object],
       default: null,
     },
 
     cancelEvent: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     showCancel: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     resource: {
-      type: [String, Object],
+      type:     [String, Object],
       required: true,
     },
 
     subtypes: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
 
     selectedSubtype: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     validationPassed: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     errors: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
 
@@ -87,64 +87,64 @@ export default {
      * Set of maps to convert error messages to something more user friendly and apply icons
      */
     errorsMap: {
-      type: Object,
+      type:    Object,
       default: null,
     },
 
     // Is the edit as yaml button allowed
     canYaml: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     // Call this function instead of the normal one to convert the resource into yaml to display
     generateYaml: {
-      type: Function,
+      type:    Function,
       default: null,
     },
 
     // Override the set of labels shown on the button from the default save/create.
     finishButtonMode: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     preventEnterSubmit: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     applyHooks: {
-      type: Function,
+      type:    Function,
       default: null,
     },
 
     steps: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
 
     stepsOptions: {
-      type: Object,
+      type:    Object,
       default: () => ({ editFirstStep: true }),
     },
 
     // The set of labels to display for the finish AsyncButton
     finishMode: {
-      type: String,
+      type:    String,
       default: 'finish',
     },
 
     // Used to prevent cancel and create buttons from moving
     // as form validation errors appear and disappear.
     minHeight: {
-      type: String,
+      type:    String,
       default: '',
     },
 
     // Location of `namespace` value within the resource. Used when creating the namespace
     namespaceKey: {
-      type: String,
+      type:    String,
       default: 'metadata.namespace',
     },
 
@@ -153,43 +153,43 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'form',
     },
 
     description: {
-      type: String,
+      type:    String,
       default: '',
     },
 
     yamlModifiers: {
-      type: Object,
+      type:    Object,
       default: undefined,
     },
   },
 
   data(props) {
     const inStore = this.$store.getters['currentStore'](this.resource);
-    const schema = this.$store.getters[`${inStore}/schemaFor`](
+    const schema = this.$store.getters[`${ inStore }/schemaFor`](
       this.resource.type
     );
 
     return {
-      isCancelModal: false,
-      showAsForm: this.$route.query[AS] !== _YAML,
+      isCancelModal:   false,
+      showAsForm:      this.$route.query[AS] !== _YAML,
       /**
        * Initialised on demand (given that it needs to make a request to fetch schema definition)
        */
-      resourceYaml: null,
+      resourceYaml:    null,
       /**
        * Initialised on demand (given that it needs to make a request to fetch schema definition)
        */
-      initialYaml: null,
+      initialYaml:     null,
       /**
        * Save a copy of the initial resource. This is used to calc the initial yaml later on
        */
       initialResource: clone(this.resource),
-      abbrSizes: {
+      abbrSizes:       {
         3: '24px',
         4: '18px',
         5: '16px',
@@ -273,15 +273,13 @@ export default {
      * Replace returned string with new picked value and icon
      */
     mappedErrors() {
-      return !this.errors
-        ? {}
-        : this.errorsMap ||
+      return !this.errors ? {} : this.errorsMap ||
             this.errors.reduce(
               (acc, error) => ({
                 ...acc,
                 [error]: {
                   message: error,
-                  icon: null,
+                  icon:    null,
                 },
               }),
               {}
@@ -332,7 +330,7 @@ export default {
         const { resource = this.resource.type } = this.$route.params;
         const doneOverride = this.resource.doneOverride;
         const doneDefault = {
-          name: this.doneRoute,
+          name:   this.doneRoute,
           params: { resource },
         };
 
@@ -348,7 +346,7 @@ export default {
         return this.generateYaml.apply(this, resource);
       } else {
         const inStore = this.$store.getters['currentStore'](resource);
-        const schemas = this.$store.getters[`${inStore}/all`](SCHEMA);
+        const schemas = this.$store.getters[`${ inStore }/all`](SCHEMA);
         const clonedResource = clone(resource);
 
         const out = createYamlWithOptions(
@@ -425,7 +423,7 @@ export default {
         // This is in a try-catch block because the call to fetch
         // a namespace throws an error if the namespace is not found.
         namespaceAlreadyExists = !!(await this.$store.dispatch(
-          `${inStore}/find`,
+          `${ inStore }/find`,
           { type: NAMESPACE, id: newNamespaceName }
         ));
       } catch {}
@@ -433,7 +431,7 @@ export default {
       if (this.createNamespace && !namespaceAlreadyExists) {
         try {
           const newNamespace = await this.$store.dispatch(
-            `${inStore}/createNamespace`,
+            `${ inStore }/createNamespace`,
             { name: newNamespaceName },
             { root: true }
           );
@@ -443,7 +441,7 @@ export default {
         } catch (e) {
           // this.errors = exceptionToErrorsArray(e);
           this.$emit('error', exceptionToErrorsArray(e));
-          throw new Error(`Could not create the new namespace. ${e.message}`);
+          throw new Error(`Could not create the new namespace. ${ e.message }`);
         }
       }
     },
@@ -478,7 +476,10 @@ export default {
 <template>
   <section class="cru">
     <slot name="noticeBanner" />
-    <p v-if="description" class="description">
+    <p
+      v-if="description"
+      class="description"
+    >
       {{ description }}
     </p>
     <component
@@ -489,7 +490,11 @@ export default {
       @submit.prevent
       @keydown.enter="onPressEnter($event)"
     >
-      <div v-if="hasErrors" id="cru-errors" class="cru__errors">
+      <div
+        v-if="hasErrors"
+        id="cru-errors"
+        class="cru__errors"
+      >
         <Banner
           v-for="(err, i) in errors"
           :key="i"
@@ -501,8 +506,14 @@ export default {
           @close="closeError(i)"
         />
       </div>
-      <div v-if="showSubtypeSelection" class="subtypes-container cru__content">
-        <slot name="subtypes" :subtypes="subtypes">
+      <div
+        v-if="showSubtypeSelection"
+        class="subtypes-container cru__content"
+      >
+        <slot
+          name="subtypes"
+          :subtypes="subtypes"
+        >
           <div
             v-for="(subtype, i) in subtypes"
             :key="i"
@@ -528,24 +539,28 @@ export default {
                     :src="subtype.bannerImage"
                     :alt="
                       (resource.type ? resource.type + ': ' : '') +
-                      (subtype.label || '')
+                        (subtype.label || '')
                     "
-                  />
-                  <div v-else class="round-image">
-                    <div v-if="subtype.bannerAbbrv" class="banner-abbrv">
+                  >
+                  <div
+                    v-else
+                    class="round-image"
+                  >
+                    <div
+                      v-if="subtype.bannerAbbrv"
+                      class="banner-abbrv"
+                    >
                       <span
                         v-if="
                           $store.getters['i18n/exists'](subtype.bannerAbbrv)
                         "
-                        >{{ t(subtype.bannerAbbrv) }}</span
-                      >
+                      >{{ t(subtype.bannerAbbrv) }}</span>
                       <span
                         v-else
                         :style="{
                           fontSize: abbrSizes[subtype.bannerAbbrv.length],
                         }"
-                        >{{ subtype.bannerAbbrv }}</span
-                      >
+                      >{{ subtype.bannerAbbrv }}</span>
                     </div>
                     <div v-else>
                       {{ subtype.id.slice(0, 1).toUpperCase() }}
@@ -570,12 +585,14 @@ export default {
                       target="_blank"
                       rel="noopener nofollow"
                       class="flex-right"
-                      >{{ t('generic.moreInfo') }}
-                      <i class="icon icon-external-link"
-                    /></a>
+                    >{{ t('generic.moreInfo') }}
+                      <i class="icon icon-external-link" /></a>
                   </div>
-                  <hr v-if="subtype.description" />
-                  <div v-if="subtype.description" class="description">
+                  <hr v-if="subtype.description">
+                  <div
+                    v-if="subtype.description"
+                    class="description"
+                  >
                     <span
                       v-if="$store.getters['i18n/exists'](subtype.description)"
                       v-clean-html="t(subtype.description, {}, true)"
@@ -605,8 +622,14 @@ export default {
             class="wizard"
             @error="(e) => (errors = e)"
           >
-            <template #stepContainer="{ activeStep }" class="step-container">
-              <template v-for="(step, i) in steps" :key="i">
+            <template
+              #stepContainer="{ activeStep }"
+              class="step-container"
+            >
+              <template
+                v-for="(step, i) in steps"
+                :key="i"
+              >
                 <div
                   v-if="step.name === activeStep.name || step.hidden"
                   :key="step.name"
@@ -615,7 +638,10 @@ export default {
                     hide: step.name !== activeStep.name && step.hidden,
                   }"
                 >
-                  <slot :step="step" :name="step.name" />
+                  <slot
+                    :step="step"
+                    :name="step.name"
+                  />
                 </div>
               </template>
             </template>
@@ -644,7 +670,10 @@ export default {
                   :key="slot"
                 >
                   <template v-if="shouldProvideSlot(slot)">
-                    <slot :name="slot" v-bind="scope" />
+                    <slot
+                      :name="slot"
+                      v-bind="scope"
+                    />
                   </template>
                 </template>
                 <div class="controls-steps">
@@ -656,7 +685,10 @@ export default {
                   >
                     <t k="cruResource.previewYaml" />
                   </a-button>
-                  <template v-if="showPrevious" name="back">
+                  <template
+                    v-if="showPrevious"
+                    name="back"
+                  >
                     <a-button
                       type="button"
                       class="btn role-secondary"
@@ -677,7 +709,10 @@ export default {
                       @click="$emit('finish', $event)"
                     />
                   </template>
-                  <template v-else name="next">
+                  <template
+                    v-else
+                    name="next"
+                  >
                     <a-button
                       :disabled="!canNext"
                       type="button"
@@ -712,12 +747,22 @@ export default {
             @cancel-confirmed="confirmCancel"
           >
             <!-- Pass down templates provided by the caller -->
-            <template v-for="(_, slot) of $slots" #[slot]="scope" :key="slot">
+            <template
+              v-for="(_, slot) of $slots"
+              #[slot]="scope"
+              :key="slot"
+            >
               <template v-if="shouldProvideSlot(slot)">
-                <slot :name="slot" v-bind="scope" />
+                <slot
+                  :name="slot"
+                  v-bind="scope"
+                />
               </template>
             </template>
-            <template v-if="!isView" #default>
+            <template
+              v-if="!isView"
+              #default
+            >
               <div>
                 <a-button
                   v-if="showYaml"

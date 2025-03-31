@@ -1,28 +1,28 @@
 <script>
-import ProgressBarMulti from "@shell/components/ProgressBarMulti";
+import ProgressBarMulti from '@shell/components/ProgressBarMulti';
 import {
   colorForState,
   stateDisplay,
   stateSort,
-} from "@shell/plugins/dashboard-store/resource-class";
-import { sortBy } from "@shell/utils/sort";
+} from '@shell/plugins/dashboard-store/resource-class';
+import { sortBy } from '@shell/utils/sort';
 
 export default {
   components: { ProgressBarMulti },
 
   props: {
     row: {
-      type: Object,
+      type:     Object,
       required: true,
     },
 
     labelKey: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     linkTo: {
-      type: Object,
+      type:    Object,
       default: null,
     },
   },
@@ -38,7 +38,7 @@ export default {
       for (const r of this.row.deployedResources) {
         const textColor = colorForState(r.state, r.error, r.transitioning);
         const state = stateDisplay(r.state);
-        const key = `${textColor}/${state}`;
+        const key = `${ textColor }/${ state }`;
 
         if (out[key]) {
           out[key].value += 1;
@@ -46,15 +46,15 @@ export default {
           out[key] = {
             key,
             label: state,
-            color: textColor.replace(/text-/, "bg-"),
+            color: textColor.replace(/text-/, 'bg-'),
             textColor,
             value: 1,
-            sort: stateSort(textColor, state),
+            sort:  stateSort(textColor, state),
           };
         }
       }
 
-      return sortBy(Object.values(out), "sort:desc");
+      return sortBy(Object.values(out), 'sort:desc');
     },
 
     colorParts() {
@@ -67,12 +67,12 @@ export default {
           out[p.color] = {
             color: p.color,
             value: p.value,
-            sort: p.sort,
+            sort:  p.sort,
           };
         }
       }
 
-      return sortBy(Object.values(out), "sort:desc");
+      return sortBy(Object.values(out), 'sort:desc');
     },
 
     displayLabel() {
@@ -82,7 +82,7 @@ export default {
         return this.t(this.labelKey, { count });
       }
 
-      return `${count}`;
+      return `${ count }`;
     },
   },
 };
@@ -97,17 +97,32 @@ export default {
     :triggers="show ? ['click'] : []"
     offset="1"
   >
-    <ProgressBarMulti :values="colorParts" class="mb-5" />
-    <router-link v-if="linkTo" :to="linkTo">
+    <ProgressBarMulti
+      :values="colorParts"
+      class="mb-5"
+    />
+    <router-link
+      v-if="linkTo"
+      :to="linkTo"
+    >
       {{ displayLabel }}
     </router-link>
     <span v-else>{{ displayLabel }}</span>
 
     <template #popper>
-      <table v-if="show" class="fixed">
+      <table
+        v-if="show"
+        class="fixed"
+      >
         <tbody>
-          <tr v-for="(obj, i) in stateParts" :key="i">
-            <td class="text-left pr-20" :class="{ [obj.textColor]: true }">
+          <tr
+            v-for="(obj, i) in stateParts"
+            :key="i"
+          >
+            <td
+              class="text-left pr-20"
+              :class="{ [obj.textColor]: true }"
+            >
               {{ obj.label }}
             </td>
             <td class="text-right">
@@ -118,7 +133,12 @@ export default {
       </table>
     </template>
   </v-dropdown>
-  <div v-else class="text-center text-muted">&mdash;</div>
+  <div
+    v-else
+    class="text-center text-muted"
+  >
+    &mdash;
+  </div>
 </template>
 
 <style lang="scss">

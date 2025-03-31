@@ -22,8 +22,8 @@ export default class PVC extends SteveModel {
     this['spec'] = {
       accessModes,
       storageClassName: '',
-      volumeName: '',
-      resources: { requests: { storage } },
+      volumeName:       '',
+      resources:        { requests: { storage } },
     };
   }
 
@@ -42,10 +42,10 @@ export default class PVC extends SteveModel {
     // Add backwards, each one to the top
     insertAt(out, 0, { divider: true });
     insertAt(out, 0, {
-      action: 'goToEditVolumeSize',
+      action:  'goToEditVolumeSize',
       enabled: this.expandable && this.bound,
-      icon: 'icon icon-fw icon-plus',
-      label: this.t('persistentVolumeClaim.expand.label'),
+      icon:    'icon icon-fw icon-plus',
+      label:   this.t('persistentVolumeClaim.expand.label'),
     });
 
     return out;
@@ -56,8 +56,8 @@ export default class PVC extends SteveModel {
 
     location.query = {
       ...location.query,
-      [MODE]: _EDIT,
-      [AS]: _UNFLAG,
+      [MODE]:  _EDIT,
+      [AS]:    _UNFLAG,
       [FOCUS]: 'volumeclaim',
     };
 
@@ -84,9 +84,7 @@ export default class PVC extends SteveModel {
   }
 
   get parentNameOverride() {
-    return this.$rootGetters['i18n/t'](`typeLabel."${LLMOS.VOLUME}"`, {
-      count: 1,
-    }).trim();
+    return this.$rootGetters['i18n/t'](`typeLabel."${ LLMOS.VOLUME }"`, { count: 1 }).trim();
   }
 
   get parentLocationOverride() {

@@ -21,7 +21,7 @@ export function canViewMembershipEditor(store, needsProject = false) {
 }
 
 export default {
-  emits: ['membership-update'],
+  emits:      ['membership-update'],
   components: {
     ArrayList,
     Loading,
@@ -30,52 +30,48 @@ export default {
 
   props: {
     addMemberDialogName: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     parentKey: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     parentId: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     type: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     defaultBindingHandler: {
-      type: Function,
+      type:    Function,
       default: null,
     },
 
     modalSticky: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
 
   async fetch() {
     const userHydration = [
-      this.schema
-        ? this.$store.dispatch(`management/findAll`, {
-            type: this.type,
-            opt: { force: true },
-          })
-        : [],
-      this.$store.dispatch(`management/findAll`, {
-        type: MANAGEMENT.ROLE_TEMPLATE,
-      }),
+      this.schema ? this.$store.dispatch(`management/findAll`, {
+        type: this.type,
+        opt:  { force: true },
+      }) : [],
+      this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.ROLE_TEMPLATE }),
       this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.USER }),
     ];
     const [allBindings] = await Promise.all(userHydration);
@@ -103,8 +99,8 @@ export default {
 
   data() {
     return {
-      schema: this.$store.getters[`management/schemaFor`](this.type),
-      bindings: [],
+      schema:            this.$store.getters[`management/schemaFor`](this.type),
+      bindings:          [],
       lastSavedBindings: [],
     };
   },
@@ -125,21 +121,18 @@ export default {
       const removedBindings = this.removedBindings;
 
       return {
-        newBindings: this.newBindings,
+        newBindings:     this.newBindings,
         removedBindings: this.removedBindings,
-        save: (parentId) => {
+        save:            (parentId) => {
           const savedPromises = newBindings.map((binding) => {
-            set(binding, 'metadata.generateName', `${parentId}-rtb-`);
-            set(binding, 'metadata.labels', {
-              'auth.management.llmos.ai/namespace-id': parentId,
-            });
+            set(binding, 'metadata.generateName', `${ parentId }-rtb-`);
+            set(binding, 'metadata.labels', { 'auth.management.llmos.ai/namespace-id': parentId });
             set(binding, this.parentKey, parentId);
 
             return binding.save();
           });
 
-          const removedPromises = removedBindings.map((binding) =>
-            binding.remove()
+          const removedPromises = removedBindings.map((binding) => binding.remove()
           );
 
           return Promise.all([...savedPromises, ...removedPromises]);
@@ -167,9 +160,9 @@ export default {
   methods: {
     addMember() {
       this.$store.dispatch('cluster/promptModal', {
-        component: this.addMemberDialogName,
+        component:      this.addMemberDialogName,
         componentProps: { onAdd: this.onAddMember },
-        modalSticky: this.modalSticky,
+        modalSticky:    this.modalSticky,
       });
     },
 
@@ -185,7 +178,12 @@ export default {
 </script>
 <template>
   <Loading v-if="$fetchState.pending" />
-  <ArrayList v-else v-model:value="bindings" :mode="mode" :show-header="true">
+  <ArrayList
+    v-else
+    v-model:value="bindings"
+    :mode="mode"
+    :show-header="true"
+  >
     <template #column-headers>
       <div class="box mb-0">
         <div class="column-headers row">
@@ -209,13 +207,22 @@ export default {
       </div>
     </template>
     <template #add>
-      <a-button class="mt-10" type="primary" @click="addMember">
+      <a-button
+        class="mt-10"
+        type="primary"
+        @click="addMember"
+      >
         {{ t('generic.add') }}
       </a-button>
     </template>
     <template #remove-button="{ remove, i }">
       <span v-if="(isCreate && i === 0) || isView" />
-      <a-button v-else type="link" :disabled="isView" @click="remove">
+      <a-button
+        v-else
+        type="link"
+        :disabled="isView"
+        @click="remove"
+      >
         {{ t('generic.remove') }}
       </a-button>
     </template>

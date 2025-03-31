@@ -11,19 +11,19 @@ export default {
   },
   props: {
     applyAction: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
     applyMode: {
-      type: String,
+      type:    String,
       default: 'create',
     },
     title: {
-      type: String,
+      type:    String,
       default: '',
     },
     body: {
-      type: String,
+      type:    String,
       default: '',
     },
 
@@ -31,7 +31,7 @@ export default {
      * Callback to identify response of the prompt
      */
     confirm: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
   },
@@ -69,15 +69,28 @@ export default {
         class="pl-10 pr-10"
         style="min-height: 50px; display: flex"
       />
-      <Banner v-for="(err, i) in errors" :key="i" color="error" :label="err" />
+      <Banner
+        v-for="(err, i) in errors"
+        :key="i"
+        color="error"
+        :label="err"
+      />
     </slot>
 
     <template #actions>
-      <a-button class="btn role-secondary mr-10" @click="close">
+      <a-button
+        class="btn role-secondary mr-10"
+        @click="close"
+      >
         {{ t('generic.cancel') }}
       </a-button>
 
-      <AsyncButton :mode="applyMode" type="primary" danger @click="apply" />
+      <AsyncButton
+        :mode="applyMode"
+        type="primary"
+        danger
+        @click="apply"
+      />
     </template>
   </a-card>
 </template>

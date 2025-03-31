@@ -1,19 +1,19 @@
 <script>
-import { saveAs } from "file-saver";
-import AnsiUp from "ansi_up";
-import { addParams } from "@shell/utils/url";
-import { base64DecodeToBuffer } from "@shell/utils/crypto";
-import { LOGS_RANGE, LOGS_TIME, LOGS_WRAP } from "@shell/store/prefs";
-import LabeledSelect from "@shell/components/form/LabeledSelect";
-import { Checkbox } from "@components/Form/Checkbox";
-import AsyncButton from "@shell/components/AsyncButton";
-import Select from "@shell/components/form/Select";
-import VirtualList from "vue3-virtual-scroll-list";
-import LogItem from "@shell/components/LogItem";
-import { shallowRef } from "vue";
-import { debounce } from "lodash";
+import { saveAs } from 'file-saver';
+import AnsiUp from 'ansi_up';
+import { addParams } from '@shell/utils/url';
+import { base64DecodeToBuffer } from '@shell/utils/crypto';
+import { LOGS_RANGE, LOGS_TIME, LOGS_WRAP } from '@shell/store/prefs';
+import LabeledSelect from '@shell/components/form/LabeledSelect';
+import { Checkbox } from '@components/Form/Checkbox';
+import AsyncButton from '@shell/components/AsyncButton';
+import Select from '@shell/components/form/Select';
+import VirtualList from 'vue3-virtual-scroll-list';
+import LogItem from '@shell/components/LogItem';
+import { shallowRef } from 'vue';
+import { debounce } from 'lodash';
 
-import { escapeRegex } from "@shell/utils/string";
+import { escapeRegex } from '@shell/utils/string';
 
 import Socket, {
   EVENT_CONNECTED,
@@ -21,15 +21,15 @@ import Socket, {
   EVENT_MESSAGE,
   //  EVENT_FRAME_TIMEOUT,
   EVENT_CONNECT_ERROR,
-} from "@shell/utils/socket";
-import Window from "./Window";
+} from '@shell/utils/socket';
+import Window from './Window';
 
 let lastId = 1;
 const ansiup = new AnsiUp();
 // Convert arrayBuffer(Uint8Array) to string
 // ref: https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
 // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/of
-const ab2str = (input, outputEncoding = "utf8") => {
+const ab2str = (input, outputEncoding = 'utf8') => {
   const decoder = new TextDecoder(outputEncoding);
 
   return decoder.decode(input);
@@ -95,55 +95,55 @@ export default {
   props: {
     // The definition of the tab itself
     tab: {
-      type: Object,
+      type:     Object,
       required: true,
     },
 
     // Is this tab currently displayed
     active: {
-      type: Boolean,
+      type:     Boolean,
       required: true,
     },
 
     // The height of the window
     height: {
-      type: Number,
+      type:     Number,
       required: true,
     },
 
     // The pod to connect to
     pod: {
-      type: Object,
+      type:     Object,
       required: true,
     },
 
     url: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     // The container in the pod to initially show
     initialContainer: {
-      type: String,
+      type:    String,
       default: null,
     },
   },
 
   data() {
     return {
-      container: this.initialContainer || this.pod?.defaultContainerName,
-      socket: null,
-      isOpen: false,
-      isFollowing: true,
-      scrollThreshold: 80,
-      timestamps: this.$store.getters["prefs/get"](LOGS_TIME),
-      wrap: this.$store.getters["prefs/get"](LOGS_WRAP),
-      previous: false,
-      search: "",
-      backlog: [],
-      lines: [],
-      now: new Date(),
-      logItem: shallowRef(LogItem),
+      container:           this.initialContainer || this.pod?.defaultContainerName,
+      socket:              null,
+      isOpen:              false,
+      isFollowing:         true,
+      scrollThreshold:     80,
+      timestamps:          this.$store.getters['prefs/get'](LOGS_TIME),
+      wrap:                this.$store.getters['prefs/get'](LOGS_WRAP),
+      previous:            false,
+      search:              '',
+      backlog:             [],
+      lines:               [],
+      now:                 new Date(),
+      logItem:             shallowRef(LogItem),
       isContainerMenuOpen: false,
     };
   },
@@ -151,13 +151,13 @@ export default {
   fetch() {
     // See https://github.com/rancher/dashboard/issues/6122. At some point prior to 2.6.5 LOGS_RANGE has become polluted with something
     // invalid. To avoid everyone having to manually remove invalid user preferences fix it automatically here
-    const originalRange = this.$store.getters["prefs/get"](LOGS_RANGE);
+    const originalRange = this.$store.getters['prefs/get'](LOGS_RANGE);
 
     this.range = originalRange.value || originalRange;
 
     if (originalRange !== this.range) {
       // Rancher was broken, so persist the fix
-      this.$store.dispatch("prefs/set", { key: LOGS_RANGE, value: this.range });
+      this.$store.dispatch('prefs/set', { key: LOGS_RANGE, value: this.range });
     }
   },
 
@@ -173,7 +173,7 @@ export default {
 
     rangeOptions() {
       const out = [];
-      const t = this.$store.getters["i18n/t"];
+      const t = this.$store.getters['i18n/t'];
 
       const current = this.range;
       let found = false;
@@ -183,37 +183,37 @@ export default {
       const hours = [1, 12, 24];
 
       for (const x of lines) {
-        value = `${x} lines`;
+        value = `${ x } lines`;
         out.push({
-          label: t("wm.containerLogs.range.lines", { value: x }),
+          label: t('wm.containerLogs.range.lines', { value: x }),
           value,
         });
         updateFound(value);
       }
 
       for (const x of minutes) {
-        value = `${x} minutes`;
+        value = `${ x } minutes`;
         out.push({
-          label: t("wm.containerLogs.range.minutes", { value: x }),
+          label: t('wm.containerLogs.range.minutes', { value: x }),
           value,
         });
         updateFound(value);
       }
 
       for (const x of hours) {
-        value = `${x} hours`;
+        value = `${ x } hours`;
         out.push({
-          label: t("wm.containerLogs.range.hours", { value: x }),
+          label: t('wm.containerLogs.range.hours', { value: x }),
           value,
         });
         updateFound(value);
       }
 
       out.push({
-        label: t("wm.containerLogs.range.all"),
-        value: "all",
+        label: t('wm.containerLogs.range.all'),
+        value: 'all',
       });
-      updateFound("all");
+      updateFound('all');
 
       if (!found && current) {
         out.push({
@@ -225,8 +225,8 @@ export default {
       return out;
 
       function updateFound(entry) {
-        entry = entry.replace(/[, ]/g, "").replace(/s$/, "");
-        const normalized = current.replace(/[, ]/g, "").replace(/s$/, "");
+        entry = entry.replace(/[, ]/g, '').replace(/s$/, '');
+        const normalized = current.replace(/[, ]/g, '').replace(/s$/, '');
 
         if (entry === normalized) {
           found = true;
@@ -239,7 +239,7 @@ export default {
         return this.lines;
       }
 
-      const re = new RegExp(escapeRegex(this.search), "img");
+      const re = new RegExp(escapeRegex(this.search), 'img');
       const out = [];
 
       for (const line of this.lines) {
@@ -252,21 +252,21 @@ export default {
 
         const parts = msg.split(re);
 
-        msg = "";
+        msg = '';
         while (parts.length || matches.length) {
           if (parts.length) {
             msg += ansiup.ansi_to_html(parts.shift()); // This also escapes
           }
 
           if (matches.length) {
-            msg += `<span class="highlight">${ansiup.ansi_to_html(
+            msg += `<span class="highlight">${ ansiup.ansi_to_html(
               matches.shift()
-            )}</span>`;
+            ) }</span>`;
           }
         }
 
         out.push({
-          id: line.id,
+          id:   line.id,
           time: line.time,
           msg,
         });
@@ -320,10 +320,10 @@ export default {
       }
 
       let params = {
-        previous: this.previous,
-        follow: true,
+        previous:   this.previous,
+        follow:     true,
         timestamps: true,
-        pretty: true,
+        pretty:     true,
       };
 
       if (this.container) {
@@ -334,11 +334,11 @@ export default {
 
       params = { ...params, ...rangeParams };
 
-      let url = this.url || `${this.pod.links.view}/log`;
+      let url = this.url || `${ this.pod.links.view }/log`;
 
-      url = addParams(url.replace(/^http/, "ws"), params);
+      url = addParams(url.replace(/^http/, 'ws'), params);
 
-      this.socket = new Socket(url, false, 0, "base64.binary.k8s.io");
+      this.socket = new Socket(url, false, 0, 'base64.binary.k8s.io');
       this.socket.addEventListener(EVENT_CONNECTED, (e) => {
         this.isOpen = true;
       });
@@ -349,16 +349,15 @@ export default {
 
       this.socket.addEventListener(EVENT_CONNECT_ERROR, (e) => {
         this.isOpen = false;
-        console.error("Connect Error", e); // eslint-disable-line no-console
+        console.error('Connect Error', e); // eslint-disable-line no-console
       });
 
       let logBuffer = [];
-      let truncatedLog = "";
+      let truncatedLog = '';
 
       this.socket.addEventListener(EVENT_MESSAGE, (e) => {
-        const decodedData = e.detail?.data || "";
-        const replacedData = decodedData.replace(/[-_]/g, (char) =>
-          char === "-" ? "+" : "/"
+        const decodedData = e.detail?.data || '';
+        const replacedData = decodedData.replace(/[-_]/g, (char) => char === '-' ? '+' : '/'
         );
         const b = base64DecodeToBuffer(replacedData);
         const isTruncated = isLogTruncated(b);
@@ -385,11 +384,11 @@ export default {
         let data = d;
 
         if (truncatedLog) {
-          data = `${truncatedLog}${d}`;
-          truncatedLog = "";
+          data = `${ truncatedLog }${ d }`;
+          truncatedLog = '';
         }
 
-        if (!d.endsWith("\n")) {
+        if (!d.endsWith('\n')) {
           const lines = data.split(/\n/);
 
           if (lines.length === 1) {
@@ -397,18 +396,18 @@ export default {
 
             return;
           }
-          data = lines.slice(0, -1).join("\n");
+          data = lines.slice(0, -1).join('\n');
           truncatedLog = lines.slice(-1);
         }
         // Websocket message may contain multiple lines - loop through each line, one by one
         data
-          .split("\n")
+          .split('\n')
           .filter((line) => line)
           .forEach((line) => {
             let msg = line;
             let time = null;
 
-            const idx = line.indexOf(" ");
+            const idx = line.indexOf(' ');
 
             if (idx > 0) {
               const timeStr = line.substr(0, idx);
@@ -421,8 +420,8 @@ export default {
             }
 
             const parsedLine = {
-              id: lastId++,
-              msg: ansiup.ansi_to_html(msg),
+              id:     lastId++,
+              msg:    ansiup.ansi_to_html(msg),
               rawMsg: msg,
               time,
             };
@@ -448,7 +447,7 @@ export default {
       }
     },
 
-    updateFollowing: debounce(function () {
+    updateFollowing: debounce(function() {
       const virtualList = this.$refs.virtualList;
 
       if (virtualList) {
@@ -463,7 +462,7 @@ export default {
     }, 100),
 
     parseRange(range) {
-      range = `${range}`.trim().toLowerCase();
+      range = `${ range }`.trim().toLowerCase();
       const match = range.match(/^(\d+)?\s*(.*?)s?$/);
 
       const out = {};
@@ -473,23 +472,23 @@ export default {
         const unit = match[2];
 
         switch (unit) {
-          case "all":
-            break;
-          case "line":
-            out.tailLines = count;
-            break;
-          case "second":
-            out.sinceSeconds = count;
-            break;
-          case "minute":
-            out.sinceSeconds = count * 60;
-            break;
-          case "hour":
-            out.sinceSeconds = count * 60 * 60;
-            break;
-          case "day":
-            out.sinceSeconds = count * 60 * 60 * 24;
-            break;
+        case 'all':
+          break;
+        case 'line':
+          out.tailLines = count;
+          break;
+        case 'second':
+          out.sinceSeconds = count;
+          break;
+        case 'minute':
+          out.sinceSeconds = count * 60;
+          break;
+        case 'hour':
+          out.sinceSeconds = count * 60 * 60;
+          break;
+        case 'day':
+          out.sinceSeconds = count * 60 * 60 * 24;
+          break;
         }
       } else {
         out.tailLines = 100;
@@ -503,26 +502,26 @@ export default {
     },
 
     async download(btnCb) {
-      let url = this.url || `${this.pod.links.view}/log`;
+      let url = this.url || `${ this.pod.links.view }/log`;
 
       if (this.container) {
         url = addParams(url, { container: this.container });
       }
 
       url = addParams(url, {
-        previous: this.previous,
-        pretty: true,
+        previous:   this.previous,
+        pretty:     true,
         limitBytes: 750 * 1024 * 1024,
       });
 
       try {
-        const inStore = this.$store.getters["currentStore"]();
-        const res = await this.$store.dispatch(`${inStore}/request`, {
+        const inStore = this.$store.getters['currentStore']();
+        const res = await this.$store.dispatch(`${ inStore }/request`, {
           url,
-          responseType: "blob",
+          responseType: 'blob',
         });
         // const blob = new Blob([res], { type: 'text/plain;charset=utf-8' });
-        const fileName = `${this.pod.nameDisplay}_${this.container}.log`;
+        const fileName = `${ this.pod.nameDisplay }_${ this.container }.log`;
 
         saveAs(res.data, fileName);
         btnCb(true);
@@ -542,7 +541,7 @@ export default {
 
     toggleWrap(on) {
       this.wrap = on;
-      this.$store.dispatch("prefs/set", { key: LOGS_WRAP, value: this.wrap });
+      this.$store.dispatch('prefs/set', { key: LOGS_WRAP, value: this.wrap });
     },
 
     togglePrevious(on) {
@@ -553,15 +552,15 @@ export default {
 
     toggleTimestamps(on) {
       this.timestamps = on;
-      this.$store.dispatch("prefs/set", {
-        key: LOGS_TIME,
+      this.$store.dispatch('prefs/set', {
+        key:   LOGS_TIME,
         value: this.timestamps,
       });
     },
 
     toggleRange(range) {
       this.range = range;
-      this.$store.dispatch("prefs/set", { key: LOGS_RANGE, value: this.range });
+      this.$store.dispatch('prefs/set', { key: LOGS_RANGE, value: this.range });
       this.connect();
     },
 
@@ -577,7 +576,10 @@ export default {
 </script>
 
 <template>
-  <Window :active="active" :before-close="cleanup">
+  <Window
+    :active="active"
+    :before-close="cleanup"
+  >
     <template #title>
       <div class="wm-button-bar">
         <Select
@@ -606,7 +608,10 @@ export default {
             :disabled="isFollowing"
             @click="follow"
           >
-            <t class="wm-btn-large" k="wm.containerLogs.follow" />
+            <t
+              class="wm-btn-large"
+              k="wm.containerLogs.follow"
+            />
             <i class="wm-btn-small icon icon-chevron-end" />
           </button>
           <button
@@ -615,7 +620,10 @@ export default {
             :aria-label="t('wm.containerLogs.clear')"
             @click="clear"
           >
-            <t class="wm-btn-large" k="wm.containerLogs.clear" />
+            <t
+              class="wm-btn-large"
+              k="wm.containerLogs.clear"
+            />
             <i class="wm-btn-small icon icon-close" />
           </button>
           <AsyncButton
@@ -715,7 +723,7 @@ export default {
             role="textbox"
             :aria-label="t('wm.containerLogs.searchLogs')"
             :placeholder="t('wm.containerLogs.search')"
-          />
+          >
         </div>
 
         <div class="status log-action p-10">

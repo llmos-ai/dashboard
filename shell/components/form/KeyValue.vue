@@ -26,132 +26,132 @@ export default {
   },
   props: {
     value: {
-      type: [Array, Object],
+      type:    [Array, Object],
       default: null,
     },
     defaultValue: {
-      type: [Array, Object],
+      type:    [Array, Object],
       default: null,
     },
     // If the user supplies this array, then it indicates which keys should be shown as binary
     binaryValueKeys: {
-      type: [Array, Object],
+      type:    [Array, Object],
       default: null,
     },
     mode: {
-      type: String,
+      type:    String,
       default: _EDIT,
     },
     asMap: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     initialEmptyRow: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     title: {
-      type: String,
+      type:    String,
       default: '',
     },
 
     titleProtip: {
-      type: String,
+      type:    String,
       default: '',
     },
 
     protip: {
-      type: [String, Boolean],
+      type:    [String, Boolean],
       default: '',
     },
     // For asMap=false, the name of the field that goes into the row objects
     keyName: {
-      type: String,
+      type:    String,
       default: 'key',
     },
     keyLabel: {
-      type: String,
+      type:    String,
       default: '',
     },
     keyEditable: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     // Offer a set of suggestions for the keys as a Select instead of Input
     keyOptions: {
-      type: Array,
+      type:    Array,
       default: null,
     },
     // If false and keyOptions are provided, the key MUST be one of the keyOptions.
     keyTaggable: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     keyOptionUnique: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     keyPlaceholder: {
-      type: String,
+      type:    String,
       default: '',
     },
     /**
      * List of keys which needs to be disabled and hidden based on toggler
      */
     protectedKeys: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
     /**
      * Conditionally display protected keys, if any
      */
     toggleFilter: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     separatorLabel: {
-      type: String,
+      type:    String,
       default: '',
     },
     // For asMap=false, the name of the field that goes into the row objects
     valueName: {
-      type: String,
+      type:    String,
       default: 'value',
     },
     valueLabel: {
-      type: String,
+      type:    String,
       default: '',
     },
     valuePlaceholder: {
-      type: String,
+      type:    String,
       default: '',
     },
     valueCanBeEmpty: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     displayValuesAsBinary: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     valueMarkdownMultiline: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     valueMultiline: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     valueTrim: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     handleBase64: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     valueConcealed: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     // On initial reading of the existing value, this function is called
@@ -159,86 +159,86 @@ export default {
     // This is mainly useful for resources like envVars that have a valueFrom
     // you want to preserve but not support editing
     supported: {
-      type: Function,
+      type:    Function,
       default: (v) => true,
     },
     // For asMap=false, preserve (copy) these keys from the original value into the emitted value.
     // Also useful for valueFrom as above.
     preserveKeys: {
-      type: Array,
+      type:    Array,
       default: null,
     },
     extraColumns: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
     defaultAddData: {
-      type: Object,
+      type:    Object,
       default: () => {},
     },
     addLabel: {
-      type: String,
+      type:    String,
       default: '',
     },
     addIcon: {
-      type: String,
+      type:    String,
       default: '',
     },
     addAllowed: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     readIcon: {
-      type: String,
+      type:    String,
       default: 'icon-upload',
     },
     readAllowed: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     readAccept: {
-      type: String,
+      type:    String,
       default: '*',
     },
     readMultiple: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     removeLabel: {
-      type: String,
+      type:    String,
       default: '',
     },
     removeIcon: {
-      type: String,
+      type:    String,
       default: 'icon-minus',
     },
     removeAllowed: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     fileModifier: {
-      type: Function,
+      type:    Function,
       default: (name, value) => ({ name, value }),
     },
     parserSeparators: {
-      type: Array,
+      type:    Array,
       default: () => [':', '='],
     },
     loading: {
       default: false,
-      type: Boolean,
+      type:    Boolean,
     },
     parseLinesFromFile: {
       default: false,
-      type: Boolean,
+      type:    Boolean,
     },
     parseValueFromFile: {
       default: false,
-      type: Boolean,
+      type:    Boolean,
     },
     disabled: {
       default: false,
-      type: Boolean,
+      type:    Boolean,
     },
   },
   data() {
@@ -247,7 +247,7 @@ export default {
     return {
       rows,
       codeMirrorFocus: {},
-      lastUpdated: null,
+      lastUpdated:     null,
     };
   },
   computed: {
@@ -277,7 +277,7 @@ export default {
       const gap = this.canRemove ? ' 50px' : '';
       const size = 2 + this.extraColumns.length;
 
-      return `grid-template-columns: repeat(${size}, 1fr)${gap};`;
+      return `grid-template-columns: repeat(${ size }, 1fr)${ gap };`;
     },
     usedKeyOptions() {
       return this.rows.map((row) => row[this.keyName]);
@@ -365,7 +365,7 @@ export default {
             value = base64Decode(value);
           }
           const entry = {
-            [this.keyName]: row[this.keyName] || '',
+            [this.keyName]:   row[this.keyName] || '',
             [this.valueName]: value,
             binary:
               this.displayValuesAsBinary || (this.handleBase64 && !asciiValue),
@@ -383,11 +383,11 @@ export default {
       }
       if (rows && !rows.length && this.initialEmptyRow) {
         rows.push({
-          [this.keyName]: '',
+          [this.keyName]:   '',
           [this.valueName]: '',
-          binary: false,
-          canEncode: this.handleBase64,
-          supported: true,
+          binary:           false,
+          canEncode:        this.handleBase64,
+          supported:        true,
         });
       }
 
@@ -397,7 +397,7 @@ export default {
     add(key = '', value = '') {
       const obj = {
         ...this.defaultAddData,
-        [this.keyName]: key,
+        [this.keyName]:   key,
         [this.valueName]: value,
       };
 
@@ -497,7 +497,7 @@ export default {
             value = base64Encode(value);
           }
           const entry = {
-            [this.keyName]: row[this.keyName],
+            [this.keyName]:   row[this.keyName],
             [this.valueName]: value,
           };
 
@@ -519,8 +519,7 @@ export default {
       const lines = text.split('\n');
       const splits = lines
         .map((line) => {
-          const splitter = this.parserSeparators.find((sep) =>
-            line.includes(sep)
+          const splitter = this.parserSeparators.find((sep) => line.includes(sep)
           );
 
           return splitter ? line.split(splitter) : '';
@@ -535,11 +534,11 @@ export default {
       }
       event.preventDefault();
       const keyValues = splits.map((split) => ({
-        [this.keyName]: (split[0] || '').trim(),
+        [this.keyName]:   (split[0] || '').trim(),
         [this.valueName]: (split[1] || '').trim(),
-        supported: true,
-        canEncode: this.handleBase64,
-        binary: this.displayValuesAsBinary,
+        supported:        true,
+        canEncode:        this.handleBase64,
+        binary:           this.displayValuesAsBinary,
       }));
 
       this.rows.splice(index, 1, ...keyValues);
@@ -565,8 +564,7 @@ export default {
      * Update 'rows' variable with the user's input and prevents to update queue before the row model is updated
      */
     onInputMarkdownMultiline(idx, value) {
-      this.rows = this.rows.map((row, i) =>
-        i === idx ? { ...row, value } : row
+      this.rows = this.rows.map((row, i) => i === idx ? { ...row, value } : row
       );
       this.queueUpdate();
     },
@@ -592,7 +590,10 @@ export default {
 </script>
 <template>
   <div class="key-value">
-    <div v-if="title || $slots.title" class="clearfix">
+    <div
+      v-if="title || $slots.title"
+      class="clearfix"
+    >
       <slot name="title">
         <h3>
           {{ title }}
@@ -614,7 +615,10 @@ export default {
       <template v-if="rows.length || isView">
         <div class="rowgroup">
           <div class="row">
-            <label class="text-label" role="columnheader">
+            <label
+              class="text-label"
+              role="columnheader"
+            >
               {{ _keyLabel }}
               <i
                 v-if="_protip && !isView && addAllowed"
@@ -627,13 +631,23 @@ export default {
                 tabindex="0"
               />
             </label>
-            <label class="text-label" role="columnheader">
+            <label
+              class="text-label"
+              role="columnheader"
+            >
               {{ _valueLabel }}
             </label>
-            <label v-for="(c, i) in extraColumns" :key="i" role="columnheader">
+            <label
+              v-for="(c, i) in extraColumns"
+              :key="i"
+              role="columnheader"
+            >
               <slot :name="'label:' + c">{{ c }}</slot>
             </label>
-            <slot v-if="canRemove" name="remove">
+            <slot
+              v-if="canRemove"
+              name="remove"
+            >
               <span />
             </slot>
           </div>
@@ -642,12 +656,26 @@ export default {
       <template v-if="!rows.length && isView">
         <div class="rowgroup">
           <div class="row">
-            <div class="kv-item key text-muted" role="gridcell">&mdash;</div>
-            <div class="kv-item key text-muted" role="gridcell">&mdash;</div>
+            <div
+              class="kv-item key text-muted"
+              role="gridcell"
+            >
+              &mdash;
+            </div>
+            <div
+              class="kv-item key text-muted"
+              role="gridcell"
+            >
+              &mdash;
+            </div>
           </div>
         </div>
       </template>
-      <template v-for="(row, i) in rows" v-else :key="i">
+      <template
+        v-for="(row, i) in rows"
+        v-else
+        :key="i"
+      >
         <div
           class="rowgroup"
           :class="{ hide: isProtected(row.key) && !toggleFilter }"
@@ -766,13 +794,13 @@ export default {
                     :data-testid="`input-kv-item-value-${i}`"
                     :aria-label="t('generic.ariaLabel.value', { index: i })"
                     @input="queueUpdate"
-                  />
+                  >
                   <FileSelector
                     v-if="
                       parseValueFromFile &&
-                      readAllowed &&
-                      !isView &&
-                      isValueFieldEmpty(row[valueName])
+                        readAllowed &&
+                        !isView &&
+                        isValueFieldEmpty(row[valueName])
                     "
                     class="btn btn-sm role-secondary file-selector"
                     :label="t('generic.upload')"
@@ -807,7 +835,12 @@ export default {
               :aria-colindex="extraColumns.length + 3"
               :data-testid="`remove-column-${i}`"
             >
-              <slot name="removeButton" :remove="remove" :row="row" :i="i">
+              <slot
+                name="removeButton"
+                :remove="remove"
+                :row="row"
+                :i="i"
+              >
                 <a-button
                   type="link"
                   class="role-link"
@@ -824,8 +857,14 @@ export default {
         </div>
       </template>
     </div>
-    <div v-if="(addAllowed || readAllowed) && !isView" class="footer mt-10">
-      <slot name="add" :add="add">
+    <div
+      v-if="(addAllowed || readAllowed) && !isView"
+      class="footer mt-10"
+    >
+      <slot
+        name="add"
+        :add="add"
+      >
         <a-button
           v-if="addAllowed"
           role="button"
@@ -834,8 +873,8 @@ export default {
           data-testid="add_row_item_button"
           :disabled="
             loading ||
-            disabled ||
-            (keyOptions && filteredKeyOptions.length === 0)
+              disabled ||
+              (keyOptions && filteredKeyOptions.length === 0)
           "
           :aria-label="_addLabel"
           @click="add()"

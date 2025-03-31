@@ -1,11 +1,11 @@
 <script>
-import { KEYMAP } from "@shell/store/prefs";
-import { _EDIT, _VIEW } from "@shell/config/query-params";
+import { KEYMAP } from '@shell/store/prefs';
+import { _EDIT, _VIEW } from '@shell/config/query-params';
 
 export default {
-  name: "CodeMirror",
+  name: 'CodeMirror',
 
-  emits: ["onReady", "onInput", "onChanges", "onFocus", "validationChanged"],
+  emits: ['onReady', 'onInput', 'onChanges', 'onFocus', 'validationChanged'],
 
   props: {
     /**
@@ -13,35 +13,35 @@ export default {
      * @values _EDIT, _VIEW
      */
     mode: {
-      type: String,
+      type:    String,
       default: _EDIT,
     },
     value: {
-      type: String,
+      type:     String,
       required: true,
     },
     options: {
-      type: Object,
+      type:    Object,
       default: () => {},
     },
     asTextArea: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     showKeyMapBox: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
 
   data() {
     return {
-      codeMirrorRef: null,
-      loaded: false,
-      removeKeyMapBox: false,
-      hasLintErrors: false,
-      currFocusedElem: undefined,
-      isCodeMirrorFocused: false,
+      codeMirrorRef:          null,
+      loaded:                 false,
+      removeKeyMapBox:        false,
+      hasLintErrors:          false,
+      currFocusedElem:        undefined,
+      isCodeMirrorFocused:    false,
       codeMirrorContainerRef: undefined,
     };
   },
@@ -52,24 +52,24 @@ export default {
     },
 
     combinedOptions() {
-      const theme = this.$store.getters["prefs/theme"];
-      const keymap = this.$store.getters["prefs/get"](KEYMAP);
+      const theme = this.$store.getters['prefs/theme'];
+      const keymap = this.$store.getters['prefs/get'](KEYMAP);
 
       const out = {
         // codemirror default options
-        tabSize: 2,
-        indentWithTabs: false,
-        mode: "yaml",
-        keyMap: keymap,
-        theme: `base16-${theme}`,
-        lineNumbers: true,
-        line: true,
-        styleActiveLine: false,
-        lineWrapping: true,
-        foldGutter: true,
-        styleSelectedText: true,
+        tabSize:                 2,
+        indentWithTabs:          false,
+        mode:                    'yaml',
+        keyMap:                  keymap,
+        theme:                   `base16-${ theme }`,
+        lineNumbers:             true,
+        line:                    true,
+        styleActiveLine:         false,
+        lineWrapping:            true,
+        foldGutter:              true,
+        styleSelectedText:       true,
         showCursorWhenSelecting: true,
-        autocorrect: false,
+        autocorrect:             false,
       };
 
       if (this.asTextArea) {
@@ -88,23 +88,23 @@ export default {
 
       // fixes https://github.com/rancher/dashboard/issues/13653
       // we can't use the inert HTML prop on the parent because it disables all interaction
-      out.readOnly = this.isDisabled ? "nocursor" : false;
+      out.readOnly = this.isDisabled ? 'nocursor' : false;
 
       return out;
     },
 
     keyMapTooltip() {
       if (this.combinedOptions?.keyMap) {
-        const name = this.t(`prefs.keymap.${this.combinedOptions.keyMap}`);
+        const name = this.t(`prefs.keymap.${ this.combinedOptions.keyMap }`);
 
-        return this.t("codeMirror.keymap.indicatorToolip", { name });
+        return this.t('codeMirror.keymap.indicatorToolip', { name });
       }
 
       return null;
     },
 
     isNonDefaultKeyMap() {
-      return this.combinedOptions?.keyMap !== "sublime";
+      return this.combinedOptions?.keyMap !== 'sublime';
     },
 
     isCodeMirrorContainerFocused() {
@@ -122,26 +122,26 @@ export default {
         this.loaded = true;
       });
     } else {
-      console.error("Code mirror loader not available"); // eslint-disable-line no-console
+      console.error('Code mirror loader not available'); // eslint-disable-line no-console
     }
   },
 
   async mounted() {
     const el = this.$refs.codeMirrorContainer;
 
-    el.addEventListener("keydown", this.handleKeyPress);
+    el.addEventListener('keydown', this.handleKeyPress);
     this.codeMirrorContainerRef = this.$refs.codeMirrorContainer;
   },
 
   beforeUnmount() {
     const el = this.$refs.codeMirrorContainer;
 
-    el.removeEventListener("keydown", this.handleKeyPress);
+    el.removeEventListener('keydown', this.handleKeyPress);
   },
 
   watch: {
     hasLintErrors(neu) {
-      this.$emit("validationChanged", !neu);
+      this.$emit('validationChanged', !neu);
     },
 
     isCodeMirrorContainerFocused: {
@@ -167,13 +167,13 @@ export default {
 
     handleKeyPress(ev) {
       // allows pressing escape in the editor, useful for modal editing with vim
-      if (this.isCodeMirrorFocused && ev.code === "Escape") {
+      if (this.isCodeMirrorFocused && ev.code === 'Escape') {
         ev.preventDefault();
         ev.stopPropagation();
       }
 
       // make focus leave the editor for it's parent container so that we can tab
-      const didPressEscapeSequence = ev.shiftKey && ev.code === "Escape";
+      const didPressEscapeSequence = ev.shiftKey && ev.code === 'Escape';
 
       if (this.isCodeMirrorFocused && didPressEscapeSequence) {
         this.$refs?.codeMirrorContainer?.focus();
@@ -182,7 +182,7 @@ export default {
       // if parent container is focused and we press a trigger, focus goes to the editor inside
       if (
         this.isCodeMirrorContainerFocused &&
-        (ev.code === "Enter" || ev.code === "Space")
+        (ev.code === 'Enter' || ev.code === 'Space')
       ) {
         this.codeMirrorRef.focus();
       }
@@ -195,7 +195,7 @@ export default {
      */
     handleLintErrors(diagnostics = []) {
       const hasLintErrors =
-        diagnostics.filter((d) => !d.severity || d.severity === "error")
+        diagnostics.filter((d) => !d.severity || d.severity === 'error')
           .length > 0;
 
       this.hasLintErrors = hasLintErrors;
@@ -214,31 +214,31 @@ export default {
     },
 
     onReady(codeMirrorRef) {
-      this.$emit("validationChanged", true);
+      this.$emit('validationChanged', true);
 
       this.$nextTick(() => {
         codeMirrorRef.refresh();
         this.codeMirrorRef = codeMirrorRef;
       });
-      this.$emit("onReady", codeMirrorRef);
+      this.$emit('onReady', codeMirrorRef);
     },
 
     onInput(newCode) {
-      this.$emit("onInput", newCode);
+      this.$emit('onInput', newCode);
     },
 
     onChanges(codeMirrorRef, changes) {
-      this.$emit("onChanges", codeMirrorRef, changes);
+      this.$emit('onChanges', codeMirrorRef, changes);
     },
 
     onFocus() {
       this.isCodeMirrorFocused = true;
-      this.$emit("onFocus", true);
+      this.$emit('onFocus', true);
     },
 
     onBlur() {
       this.isCodeMirrorFocused = false;
-      this.$emit("onFocus", false);
+      this.$emit('onFocus', false);
     },
 
     updateValue(value) {
@@ -267,9 +267,9 @@ export default {
       <div
         v-if="
           showKeyMapBox &&
-          !removeKeyMapBox &&
-          keyMapTooltip &&
-          isNonDefaultKeyMap
+            !removeKeyMapBox &&
+            keyMapTooltip &&
+            isNonDefaultKeyMap
         "
         class="keymap overlay"
       >
@@ -303,10 +303,11 @@ export default {
         class="escape-text"
         role="alert"
         :aria-describedby="t('wm.containerShell.escapeText')"
-        >{{ t("codeMirror.escapeText") }}</span
-      >
+      >{{ t("codeMirror.escapeText") }}</span>
     </div>
-    <div v-else>Loading...</div>
+    <div v-else>
+      Loading...
+    </div>
   </div>
 </template>
 

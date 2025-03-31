@@ -41,10 +41,10 @@ export default {
   data() {
     return {
       noLocaleShortcut: process.env.dev || false,
-      wantNavSync: false,
-      unwatchPin: undefined,
-      wmPin: null,
-      draggable: false,
+      wantNavSync:      false,
+      unwatchPin:       undefined,
+      wmPin:            null,
+      draggable:        false,
     };
   },
 
@@ -78,7 +78,7 @@ export default {
 
       if (canSetAsHome) {
         pageActions.push({
-          label: this.t('nav.header.setLoginPage'),
+          label:  this.t('nav.header.setLoginPage'),
           action: SET_LOGIN_ACTION,
         });
       }
@@ -96,10 +96,8 @@ export default {
      */
     clusterAndRouteReady() {
       const targetRoute = this.$store.getters['targetRoute'];
-      const routeReady = targetRoute
-        ? this.currentProduct?.name === getProductFromRoute(this.$route) &&
-          this.currentProduct?.name === getProductFromRoute(targetRoute)
-        : this.currentProduct?.name === getProductFromRoute(this.$route);
+      const routeReady = targetRoute ? this.currentProduct?.name === getProductFromRoute(this.$route) &&
+          this.currentProduct?.name === getProductFromRoute(targetRoute) : this.currentProduct?.name === getProductFromRoute(this.$route);
 
       return (
         this.clusterReady &&
@@ -109,7 +107,7 @@ export default {
     },
 
     pinClass() {
-      return `pin-${this.wmPin}`;
+      return `pin-${ this.wmPin }`;
     },
   },
 
@@ -138,7 +136,7 @@ export default {
 
     getLoginRoute() {
       return {
-        name: this.$route.name,
+        name:   this.$route.name,
         params: this.$route.params,
       };
     },
@@ -166,7 +164,7 @@ export default {
 
       const cluster = await this.$store.dispatch('management/find', {
         type: MANAGEMENT.CLUSTER,
-        id: clusterId,
+        id:   clusterId,
       });
 
       if (!cluster) {
@@ -188,9 +186,18 @@ export default {
       :class="{ [pinClass]: true, 'dashboard-padding-left': showTopLevelMenu }"
     >
       <Header />
-      <SideNav v-if="clusterReady" class="default-side-nav" />
-      <main v-if="clusterAndRouteReady" class="main-layout">
-        <router-view :key="$route.path" class="outlet" />
+      <SideNav
+        v-if="clusterReady"
+        class="default-side-nav"
+      />
+      <main
+        v-if="clusterAndRouteReady"
+        class="main-layout"
+      >
+        <router-view
+          :key="$route.path"
+          class="outlet"
+        />
         <ActionMenu />
         <PromptRemove />
         <PromptModal />
@@ -218,8 +225,14 @@ export default {
         />
       </main>
       <!-- Ensure there's an outlet to show the error (404) page -->
-      <main v-else-if="unmatchedRoute" class="main-layout">
-        <router-view :key="$route.path" class="outlet" />
+      <main
+        v-else-if="unmatchedRoute"
+        class="main-layout"
+      >
+        <router-view
+          :key="$route.path"
+          class="outlet"
+        />
       </main>
       <div
         v-if="$refs.draggableZone"

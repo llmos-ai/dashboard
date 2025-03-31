@@ -1,11 +1,11 @@
 <script>
-import { KUBERNETES, PROJECT } from "@shell/config/labels-annotations";
-import { NAMESPACE, MANAGEMENT } from "@shell/config/types";
-import ButtonGroup from "@shell/components/ButtonGroup";
-import { BadgeState } from "@components/BadgeState";
-import { Banner } from "@components/Banner";
-import { get } from "@shell/utils/object";
-import { HIDE_SENSITIVE } from "@shell/store/prefs";
+import { KUBERNETES, PROJECT } from '@shell/config/labels-annotations';
+import { NAMESPACE, MANAGEMENT } from '@shell/config/types';
+import ButtonGroup from '@shell/components/ButtonGroup';
+import { BadgeState } from '@components/BadgeState';
+import { Banner } from '@components/Banner';
+import { get } from '@shell/utils/object';
+import { HIDE_SENSITIVE } from '@shell/store/prefs';
 import {
   AS,
   _DETAIL,
@@ -17,10 +17,10 @@ import {
   _VIEW,
   _UNFLAG,
   _GRAPH,
-} from "@shell/config/query-params";
-import { ExtensionPoint, PanelLocation } from "@shell/core/types";
-import ExtensionPanel from "@shell/components/ExtensionPanel";
-import TabTitle from "@shell/components/TabTitle";
+} from '@shell/config/query-params';
+import { ExtensionPoint, PanelLocation } from '@shell/core/types';
+import ExtensionPanel from '@shell/components/ExtensionPanel';
+import TabTitle from '@shell/components/TabTitle';
 
 // i18n-uses resourceDetail.header.*
 
@@ -30,7 +30,7 @@ import TabTitle from "@shell/components/TabTitle";
  * ToDo: this component seem to be picking up a lot of logic from special cases, could be simplified down to parameters and then customized per use-case via wrapper component
  */
 export default {
-  name: "MastheadResourceDetail",
+  name: 'MastheadResourceDetail',
 
   components: {
     BadgeState,
@@ -41,87 +41,87 @@ export default {
   },
   props: {
     value: {
-      type: Object,
+      type:    Object,
       default: () => {
         return {};
       },
     },
 
     mode: {
-      type: String,
-      default: "create",
+      type:    String,
+      default: 'create',
     },
 
     realMode: {
-      type: String,
-      default: "create",
+      type:    String,
+      default: 'create',
     },
 
     as: {
-      type: String,
+      type:    String,
       default: _YAML,
     },
 
     hasGraph: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     hasDetail: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     hasEdit: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     storeOverride: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     resource: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     resourceSubtype: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     parentRouteOverride: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     canViewYaml: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
 
   data() {
     return {
-      DETAIL_VIEW: _DETAIL,
-      extensionType: ExtensionPoint.PANEL,
+      DETAIL_VIEW:       _DETAIL,
+      extensionType:     ExtensionPoint.PANEL,
       extensionLocation: PanelLocation.DETAILS_MASTHEAD,
     };
   },
 
   computed: {
     dev() {
-      return this.$store.getters["prefs/dev"];
+      return this.$store.getters['prefs/dev'];
     },
 
     schema() {
       const inStore =
         this.storeOverride ||
-        this.$store.getters["currentStore"](this.resource);
+        this.$store.getters['currentStore'](this.resource);
 
-      return this.$store.getters[`${inStore}/schemaFor`](this.resource);
+      return this.$store.getters[`${ inStore }/schemaFor`](this.resource);
     },
 
     isView() {
@@ -162,7 +162,7 @@ export default {
 
     shouldHifenize() {
       return (
-        (this.mode === "view" || this.mode === "edit") &&
+        (this.mode === 'view' || this.mode === 'edit') &&
         this.resourceSubtype?.length &&
         this.value?.nameDisplay?.length
       );
@@ -172,12 +172,12 @@ export default {
       if (!this.isNamespace) {
         return (
           this.value.namespaceLocation || {
-            name: "c-cluster-product-resource-id",
+            name:   'c-cluster-product-resource-id',
             params: {
-              cluster: this.$route.params.cluster,
-              product: this.$store.getters["productId"],
+              cluster:  this.$route.params.cluster,
+              product:  this.$store.getters['productId'],
               resource: NAMESPACE,
-              id: this.$route.params.namespace,
+              id:       this.$route.params.namespace,
             },
           }
         );
@@ -188,14 +188,14 @@ export default {
 
     project() {
       if (this.isNamespace) {
-        const cluster = this.$store.getters["currentCluster"];
+        const cluster = this.$store.getters['currentCluster'];
 
         if (cluster) {
           const id = (this.value?.metadata?.labels || {})[PROJECT];
 
-          return this.$store.getters["management/byId"](
+          return this.$store.getters['management/byId'](
             MANAGEMENT.PROJECT,
-            `${cluster.id}/${id}`
+            `${ cluster.id }/${ id }`
           );
         }
       }
@@ -206,33 +206,33 @@ export default {
     banner() {
       if (this.value?.stateObj?.error) {
         const defaultErrorMessage = this.t(
-          "resourceDetail.masthead.defaultBannerMessage.error",
+          'resourceDetail.masthead.defaultBannerMessage.error',
           undefined,
           true
         );
 
         return {
-          color: "error",
+          color:   'error',
           message: this.value.stateObj.message || defaultErrorMessage,
         };
       }
 
       if (this.value?.spec?.paused) {
         return {
-          color: "info",
-          message: this.t("asyncButton.pause.description"),
+          color:   'info',
+          message: this.t('asyncButton.pause.description'),
         };
       }
 
       if (this.value?.stateObj?.transitioning) {
         const defaultTransitioningMessage = this.t(
-          "resourceDetail.masthead.defaultBannerMessage.transitioning",
+          'resourceDetail.masthead.defaultBannerMessage.transitioning',
           undefined,
           true
         );
 
         return {
-          color: "info",
+          color:   'info',
           message: this.value.stateObj.message || defaultTransitioningMessage,
         };
       }
@@ -243,11 +243,11 @@ export default {
     parent() {
       const displayName =
         this.value?.parentNameOverride ||
-        this.$store.getters["type-map/labelFor"](this.schema);
-      const product = this.$store.getters["currentProduct"].name;
+        this.$store.getters['type-map/labelFor'](this.schema);
+      const product = this.$store.getters['currentProduct'].name;
 
       const defaultLocation = {
-        name: "c-cluster-product-resource",
+        name:   'c-cluster-product-resource',
         params: {
           resource: this.resource,
           product,
@@ -273,20 +273,20 @@ export default {
     },
 
     hideSensitiveData() {
-      return this.$store.getters["prefs/get"](HIDE_SENSITIVE);
+      return this.$store.getters['prefs/get'](HIDE_SENSITIVE);
     },
 
     sensitiveOptions() {
       return [
         {
-          tooltipKey: "resourceDetail.masthead.sensitive.hide",
-          icon: "icon-hide",
-          value: true,
+          tooltipKey: 'resourceDetail.masthead.sensitive.hide',
+          icon:       'icon-hide',
+          value:      true,
         },
         {
-          tooltipKey: "resourceDetail.masthead.sensitive.show",
-          icon: "icon-show",
-          value: false,
+          tooltipKey: 'resourceDetail.masthead.sensitive.show',
+          icon:       'icon-show',
+          value:      false,
         },
       ];
     },
@@ -296,29 +296,29 @@ export default {
 
       if (this.hasDetail) {
         out.push({
-          labelKey: "resourceDetail.masthead.detail",
-          value: _DETAIL,
+          labelKey: 'resourceDetail.masthead.detail',
+          value:    _DETAIL,
         });
       }
 
       if (this.hasEdit && this.parent?.showConfigView !== false) {
         out.push({
-          labelKey: "resourceDetail.masthead.config",
-          value: _CONFIG,
+          labelKey: 'resourceDetail.masthead.config',
+          value:    _CONFIG,
         });
       }
 
       if (this.hasGraph) {
         out.push({
-          labelKey: "resourceDetail.masthead.graph",
-          value: _GRAPH,
+          labelKey: 'resourceDetail.masthead.graph',
+          value:    _GRAPH,
         });
       }
 
       if (this.canViewYaml) {
         out.push({
-          labelKey: "resourceDetail.masthead.yaml",
-          value: _YAML,
+          labelKey: 'resourceDetail.masthead.yaml',
+          value:    _YAML,
         });
       }
 
@@ -336,30 +336,30 @@ export default {
 
       set(val) {
         switch (val) {
-          case _DETAIL:
-            this.$router.applyQuery({
-              [MODE]: _UNFLAG,
-              [AS]: _UNFLAG,
-            });
-            break;
-          case _CONFIG:
-            this.$router.applyQuery({
-              [MODE]: _UNFLAG,
-              [AS]: _CONFIG,
-            });
-            break;
-          case _GRAPH:
-            this.$router.applyQuery({
-              [MODE]: _UNFLAG,
-              [AS]: _GRAPH,
-            });
-            break;
-          case _YAML:
-            this.$router.applyQuery({
-              [MODE]: _UNFLAG,
-              [AS]: _YAML,
-            });
-            break;
+        case _DETAIL:
+          this.$router.applyQuery({
+            [MODE]: _UNFLAG,
+            [AS]:   _UNFLAG,
+          });
+          break;
+        case _CONFIG:
+          this.$router.applyQuery({
+            [MODE]: _UNFLAG,
+            [AS]:   _CONFIG,
+          });
+          break;
+        case _GRAPH:
+          this.$router.applyQuery({
+            [MODE]: _UNFLAG,
+            [AS]:   _GRAPH,
+          });
+          break;
+        case _YAML:
+          this.$router.applyQuery({
+            [MODE]: _UNFLAG,
+            [AS]:   _YAML,
+          });
+          break;
         }
       },
     },
@@ -376,23 +376,23 @@ export default {
       const { value } = this;
       const labels = value?.metadata?.labels || {};
 
-      const managedBy = labels[KUBERNETES.MANAGED_BY] || "";
+      const managedBy = labels[KUBERNETES.MANAGED_BY] || '';
       const appName =
-        labels[KUBERNETES.MANAGED_NAME] || labels[KUBERNETES.INSTANCE] || "";
+        labels[KUBERNETES.MANAGED_NAME] || labels[KUBERNETES.INSTANCE] || '';
 
       return {
-        show: this.mode === _EDIT && !!managedBy,
-        type: value?.kind || "",
-        hasName: appName ? "yes" : "no",
+        show:    this.mode === _EDIT && !!managedBy,
+        type:    value?.kind || '',
+        hasName: appName ? 'yes' : 'no',
         appName,
         managedBy,
       };
     },
 
     displayName() {
-      let displayName = this.value.nameDisplay;
+      const displayName = this.value.nameDisplay;
 
-      return this.shouldHifenize ? ` - ${displayName}` : displayName;
+      return this.shouldHifenize ? ` - ${ displayName }` : displayName;
     },
 
     location() {
@@ -403,7 +403,7 @@ export default {
 
     hideNamespaceLocation() {
       return (
-        this.$store.getters["currentProduct"].hideNamespaceLocation ||
+        this.$store.getters['currentProduct'].hideNamespaceLocation ||
         this.value.namespaceLocation === null
       );
     },
@@ -417,14 +417,14 @@ export default {
     get,
 
     showActions() {
-      this.$store.commit("action-menu/show", {
+      this.$store.commit('action-menu/show', {
         resources: this.value,
-        elem: this.$refs.actions,
+        elem:      this.$refs.actions,
       });
     },
 
     toggleSensitiveData(e) {
-      this.$store.dispatch("prefs/set", { key: HIDE_SENSITIVE, value: !!e });
+      this.$store.dispatch('prefs/set', { key: HIDE_SENSITIVE, value: !!e });
     },
 
     invokeDetailsAction() {
@@ -448,10 +448,16 @@ export default {
       <div class="title">
         <div class="primaryheader">
           <h1>
-            <TabTitle v-if="isCreate" :showChild="false">
+            <TabTitle
+              v-if="isCreate"
+              :showChild="false"
+            >
               {{ parent.displayName }}
             </TabTitle>
-            <TabTitle v-else :showChild="false">
+            <TabTitle
+              v-else
+              :showChild="false"
+            >
               {{ displayName }}
             </TabTitle>
             <router-link
@@ -467,10 +473,9 @@ export default {
             <span
               v-if="
                 value?.detailPageHeaderActionOverride &&
-                value?.detailPageHeaderActionOverride(realMode)
+                  value?.detailPageHeaderActionOverride(realMode)
               "
-              >{{ value?.detailPageHeaderActionOverride(realMode) }}</span
-            >
+            >{{ value?.detailPageHeaderActionOverride(realMode) }}</span>
             <t
               v-else
               class="masthead-resource-title"
@@ -510,13 +515,14 @@ export default {
             </a>
           </h1>
         </div>
-        <div v-if="!isCreate" class="subheader">
-          <span v-if="isNamespace && project"
-            >{{ t("resourceDetail.masthead.project") }}:
+        <div
+          v-if="!isCreate"
+          class="subheader"
+        >
+          <span v-if="isNamespace && project">{{ t("resourceDetail.masthead.project") }}:
             <router-link :to="project.detailLocation">{{
               project.nameDisplay
-            }}</router-link></span
-          >
+            }}</router-link></span>
           <span v-else-if="namespace && !hasMultipleNamespaces">
             {{ t("resourceDetail.masthead.namespace") }}:
             <router-link
@@ -532,7 +538,10 @@ export default {
           </span>
           <span v-if="parent.showAge">
             {{ t("resourceDetail.masthead.age") }}:
-            <LiveDate class="live-date" :value="value.creationTimestamp" />
+            <LiveDate
+              class="live-date"
+              :value="value.creationTimestamp"
+            />
           </span>
           <span
             v-if="value.showCreatedBy"
@@ -546,17 +555,17 @@ export default {
             >
               {{ value.createdBy.displayName }}
             </router-link>
-            <span v-else data-testid="masthead-subheader-createdBy_plain-text">
+            <span
+              v-else
+              data-testid="masthead-subheader-createdBy_plain-text"
+            >
               {{ value.createdBy.displayName }}
             </span>
           </span>
-          <span v-if="value.showPodRestarts"
-            >{{ t("resourceDetail.masthead.restartCount") }}:<span
-              class="live-data"
-            >
-              {{ value.restartCount }}</span
-            ></span
+          <span v-if="value.showPodRestarts">{{ t("resourceDetail.masthead.restartCount") }}:<span
+            class="live-data"
           >
+            {{ value.restartCount }}</span></span>
         </div>
       </div>
       <slot name="right">

@@ -16,7 +16,7 @@ import { AGE, STATE } from '@shell/config/table-headers';
 const API_ENDPOINT = '/v1';
 
 export default {
-  layout: 'plain',
+  layout:     'plain',
   components: {
     CopyToClipboardText,
     BackLink,
@@ -31,15 +31,13 @@ export default {
     this.canChangePassword = await this.calcCanChangePassword();
 
     if (this.apiKeySchema) {
-      this.rows = await this.$store.dispatch('management/findAll', {
-        type: MANAGEMENT.TOKEN,
-      });
+      this.rows = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.TOKEN });
     }
 
     // Get server url setting
     const serverUrlSetting = await this.$store.dispatch('management/find', {
       type: MANAGEMENT.SETTING,
-      id: SETTING.SERVER_URL,
+      id:   SETTING.SERVER_URL,
     });
 
     this.serverUrlSetting = serverUrlSetting?.value;
@@ -49,8 +47,8 @@ export default {
     const principalId = this.$store.getters['auth/principalId'];
 
     return {
-      serverUrlSetting: null,
-      rows: [],
+      serverUrlSetting:  null,
+      rows:              [],
       canChangePassword: false,
       principalId,
     };
@@ -74,20 +72,20 @@ export default {
 
     apiKeyheaders() {
       const NAME = {
-        name: 'name',
+        name:  'name',
         label: 'Access Key',
         value: 'name',
       };
       const DESCRIPTION = {
-        name: 'description',
+        name:  'description',
         label: 'Description',
         value: 'description',
       };
 
       const EXPIRES = {
-        name: 'expires',
-        label: 'Expires',
-        value: 'expiresAt',
+        name:      'expires',
+        label:     'Expires',
+        value:     'expiresAt',
         formatter: 'LiveDate',
       };
 
@@ -101,11 +99,11 @@ export default {
 
       // If the URL is relative, add on the current base URL from the browser
       if (url.indexOf('http') !== 0) {
-        url = `${window.location.origin}/${url.replace(/^\/+/, '')}`;
+        url = `${ window.location.origin }/${ url.replace(/^\/+/, '') }`;
       }
 
       // URL must end in a single slash
-      url = `${url.replace(/\/+$/, '')}/`;
+      url = `${ url.replace(/\/+$/, '') }/`;
 
       return url;
     },
@@ -114,7 +112,7 @@ export default {
       const base = this.apiUrlBase;
       const path = API_ENDPOINT.replace(/^\/+/, '');
 
-      return `${base}${path}`;
+      return `${ base }${ path }`;
     },
 
     apiKeySchema() {
@@ -162,8 +160,8 @@ export default {
 
       const users = await this.$store.dispatch('management/findAll', {
         type: MANAGEMENT.USER,
-        opt: {
-          url: `/v1/${MANAGEMENT.USER}?me=true`,
+        opt:  {
+          url:  `/v1/${ MANAGEMENT.USER }?me=true`,
           load: _MULTI,
         },
       });
@@ -186,7 +184,11 @@ export default {
 
     <h2 v-t="'accountAndKeys.account.title'" />
     <div class="account">
-      <Principal :value="loggedInUser" :use-muted="false" :show-labels="true" />
+      <Principal
+        :value="loggedInUser"
+        :use-muted="false"
+        :show-labels="true"
+      />
       <div>
         <a-button
           v-if="canChangePassword"
@@ -200,7 +202,7 @@ export default {
     </div>
     <PromptChangePassword ref="promptChangePassword" />
 
-    <hr />
+    <hr>
     <div class="keys-header">
       <div>
         <h2 v-t="'accountAndKeys.apiKeys.title'" />
@@ -218,7 +220,10 @@ export default {
         {{ t('accountAndKeys.apiKeys.add.label') }}
       </a-button>
     </div>
-    <div v-if="apiKeySchema" class="keys">
+    <div
+      v-if="apiKeySchema"
+      class="keys"
+    >
       <ResourceTable
         :schema="apiKeySchema"
         :rows="apiKeys"
@@ -231,7 +236,10 @@ export default {
       />
     </div>
     <div v-else>
-      <Banner color="warning" :label="t('accountAndKeys.apiKeys.notAllowed')" />
+      <Banner
+        color="warning"
+        :label="t('accountAndKeys.apiKeys.notAllowed')"
+      />
     </div>
   </div>
 </template>

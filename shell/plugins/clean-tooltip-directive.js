@@ -1,14 +1,14 @@
-import { createApp } from "vue";
+import { createApp } from 'vue';
+import { VTooltip } from 'v-clean-tooltip';
+import { purifyHTML } from './clean-html';
 const vueApp = createApp({});
-import { VTooltip } from "v-clean-tooltip";
-import { purifyHTML } from "./clean-html";
 
 function purifyContent(value) {
   const type = typeof value;
 
-  if (type === "string") {
+  if (type === 'string') {
     return purifyHTML(value);
-  } else if (value && type === "object" && typeof value.content === "string") {
+  } else if (value && type === 'object' && typeof value.content === 'string') {
     return { ...value, content: purifyHTML(value.content) };
   } else {
     return value;
@@ -31,4 +31,4 @@ export const VCleanTooltip = {
   update: bind,
 };
 
-vueApp.directive("clean-tooltip", VCleanTooltip);
+vueApp.directive('clean-tooltip', VCleanTooltip);

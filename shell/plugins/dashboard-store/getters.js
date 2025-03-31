@@ -264,6 +264,7 @@ export default {
 
   typeRegistered: (state, getters) => (type) => {
     type = getters.normalizeType(type);
+
     return !!state.types[type];
   },
 

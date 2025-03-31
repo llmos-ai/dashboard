@@ -18,16 +18,13 @@ import useChat from './composables/useChat';
 
 const store = useStore();
 
-const loadFetch = async () => {
-  await store.dispatch('cluster/findAll', {
-    type: ML_WORKLOAD_TYPES.MODEL_SERVICE,
-  });
+const loadFetch = async() => {
+  await store.dispatch('cluster/findAll', { type: ML_WORKLOAD_TYPES.MODEL_SERVICE });
 };
+
 loadFetch();
 
-const config = ref({
-  ...ModelParamConfig,
-});
+const config = ref({ ...ModelParamConfig });
 
 const url = ref('');
 const question = ref('');
@@ -66,6 +63,7 @@ const updateModel = (_model) => {
 
 const icon = ref('');
 const modelDisplayName = ref('');
+
 watch(model, () => {
   if (model.value) {
     modelDisplayName.value = model.value.modelName;
@@ -79,20 +77,23 @@ watch(model, () => {
 
   <div class="wrapper">
     <ModelDescription
+      v-if="isChatType"
+      v-model:config="config"
       :name="modelDisplayName"
       :icon="icon"
-      v-model:config="config"
       @update:model="updateModel"
-      v-if="isChatType"
     />
 
-    <a-row class="chat-stream mb-10" justify="center">
+    <a-row
+      class="chat-stream mb-10"
+      justify="center"
+    >
       <a-col
+        v-if="isChatType"
         :md="22"
         :lg="20"
         :xl="16"
         :xxl="12"
-        v-if="isChatType"
         class="h-full"
       >
         <div class="overflow-y-scroll hide-scrollbar h-full">
@@ -114,12 +115,19 @@ watch(model, () => {
         :xxl="18"
         class="h-full overflow-hidden"
       >
-        <CompareModel ref="compareRef" :question="copyQuestion" />
+        <CompareModel
+          ref="compareRef"
+          :question="copyQuestion"
+        />
       </a-col>
     </a-row>
 
     <div class="footer">
-      <ChatInput v-model="question" :loading="loading" @submit="submit" />
+      <ChatInput
+        v-model="question"
+        :loading="loading"
+        @submit="submit"
+      />
     </div>
   </div>
 </template>

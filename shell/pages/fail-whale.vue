@@ -16,9 +16,7 @@ export default {
       this.$router.replace('/');
     }
 
-    return {
-      previousRoute: '',
-    };
+    return { previousRoute: '' };
   },
 
   computed: {
@@ -53,8 +51,13 @@ export default {
         <h1 v-if="error.status">
           HTTP Error {{ error.status }}: {{ error.statusText }}
         </h1>
-        <h1 v-else>Error</h1>
-        <h2 v-if="error" class="text-secondary mt-20">
+        <h1 v-else>
+          Error
+        </h1>
+        <h2
+          v-if="error"
+          class="text-secondary mt-20"
+        >
           {{ displayError }}
         </h2>
         <p class="mt-20">
@@ -62,9 +65,14 @@ export default {
             {{ t('nav.home') }}
           </a-button>
         </p>
-        <a-divider style="border-color: #1677ff" dashed>{{
-          t('nav.failWhale.separator')
-        }}</a-divider>
+        <a-divider
+          style="border-color: #1677ff"
+          dashed
+        >
+          {{
+            t('nav.failWhale.separator')
+          }}
+        </a-divider>
         <p class="mt-20">
           <a-button @click="$router.push(previousRoute.fullPath)">
             {{ t('nav.failWhale.reload') }}

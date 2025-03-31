@@ -66,7 +66,7 @@ export default {
     this.fetchDeps();
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     this.alertManagerPoller.stop();
   },
 

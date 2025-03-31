@@ -1,21 +1,21 @@
-import { MANAGEMENT } from "@shell/config/types";
+import { MANAGEMENT } from '@shell/config/types';
 
 const definitions = {};
 
-export const create = function (name, defaultValue) {
+export const create = function(name, defaultValue) {
   definitions[name] = { def: defaultValue };
 
   return name;
 };
 
-export const mapFeature = function (name) {
+export const mapFeature = function(name) {
   return {
     get() {
-      return this.$store.getters["features/get"](name);
+      return this.$store.getters['features/get'](name);
     },
 
     set(value) {
-      throw new Error("The feature store only supports getting");
+      throw new Error('The feature store only supports getting');
     },
   };
 };
@@ -24,31 +24,31 @@ export const mapFeature = function (name) {
 // The default (2nd arg) is used only if the flag is missing entirely from the server.
 //    This is mainly useful for development before the flag has been created in the API..
 
-export const MULTI_CLUSTER = create("multi-cluster-management", true);
-export const LEGACY = create("legacy", false);
-export const RKE2 = create("rke2", true);
-export const RKE1_UI = create("rke1-ui", true);
+export const MULTI_CLUSTER = create('multi-cluster-management', true);
+export const LEGACY = create('legacy', false);
+export const RKE2 = create('rke2', true);
+export const RKE1_UI = create('rke1-ui', true);
 export const UNSUPPORTED_STORAGE_DRIVERS = create(
-  "unsupported-storage-drivers",
+  'unsupported-storage-drivers',
   false
 );
-export const HARVESTER = create("harvester", true);
+export const HARVESTER = create('harvester', true);
 export const HARVESTER_CONTAINER = create(
-  "harvester-baremetal-container-workload",
+  'harvester-baremetal-container-workload',
   false
 );
 export const FLEET_WORKSPACE_BACK = create(
-  "provisioningv2-fleet-workspace-back-population",
+  'provisioningv2-fleet-workspace-back-population',
   false
 );
-export const STEVE_CACHE = create("ui-sql-cache", false);
-export const UIEXTENSION = create("uiextension", true);
+export const STEVE_CACHE = create('ui-sql-cache', false);
+export const UIEXTENSION = create('uiextension', true);
 export const PROVISIONING_PRE_BOOTSTRAP = create(
-  "provisioningprebootstrap",
+  'provisioningprebootstrap',
   false
 );
 export const SCHEDULING_CUSTOMIZATION = create(
-  "cluster-agent-scheduling-customization",
+  'cluster-agent-scheduling-customization',
   false
 );
 
@@ -65,10 +65,10 @@ export const getters = {
     const definition = definitions[name];
 
     if (!definition) {
-      throw new Error(`Unknown feature: ${name}`);
+      throw new Error(`Unknown feature: ${ name }`);
     }
 
-    const entry = rootGetters["management/byId"](MANAGEMENT.FEATURE, name);
+    const entry = rootGetters['management/byId'](MANAGEMENT.FEATURE, name);
 
     if (entry) {
       return entry.enabled;
@@ -80,9 +80,9 @@ export const getters = {
 
 export const actions = {
   async loadServer({ rootGetters, dispatch }) {
-    if (rootGetters["management/canList"](MANAGEMENT.FEATURE)) {
+    if (rootGetters['management/canList'](MANAGEMENT.FEATURE)) {
       return await dispatch(
-        "management/findAll",
+        'management/findAll',
         { type: MANAGEMENT.FEATURE, opt: { watch: false } },
         { root: true }
       );

@@ -1,16 +1,16 @@
 <script>
-import ProgressBarMulti from "@shell/components/ProgressBarMulti";
+import ProgressBarMulti from '@shell/components/ProgressBarMulti';
 
 export default {
   components: { ProgressBarMulti },
 
   props: {
     row: {
-      type: Object,
+      type:     Object,
       required: true,
     },
     horizontal: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -39,8 +39,14 @@ export default {
     <template #popper>
       <table class="fixed">
         <tbody>
-          <tr v-for="(obj, i) in row.stateParts" :key="i">
-            <td class="text-left pr-20" :class="{ [obj.textColor]: true }">
+          <tr
+            v-for="(obj, i) in row.stateParts"
+            :key="i"
+          >
+            <td
+              class="text-left pr-20"
+              :class="{ [obj.textColor]: true }"
+            >
               {{ obj.label }}
             </td>
             <td class="text-right">
@@ -51,14 +57,23 @@ export default {
       </table>
     </template>
 
-    <div class="content" :class="{ horizontal }">
+    <div
+      class="content"
+      :class="{ horizontal }"
+    >
       <ProgressBarMulti
         v-if="row.stateParts"
         :values="row.stateParts"
         class="progress-bar"
       />
-      <span v-if="row.desired === ready" class="count">{{ ready }}</span>
-      <span v-else class="count">{{ ready }} of {{ row.desired }}</span>
+      <span
+        v-if="row.desired === ready"
+        class="count"
+      >{{ ready }}</span>
+      <span
+        v-else
+        class="count"
+      >{{ ready }} of {{ row.desired }}</span>
     </div>
   </v-dropdown>
 </template>

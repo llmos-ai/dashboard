@@ -277,6 +277,7 @@ export default {
       };
 
       const createOverhead = this.canCreateNamespace || this.createNamespaceOverride ? [createButton, divider] : [];
+
       return [
         ...createOverhead,
         ...sortedByLabel

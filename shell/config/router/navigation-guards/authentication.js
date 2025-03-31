@@ -22,6 +22,7 @@ export async function authenticate(to, from, next, { store }) {
 
     // In newer versions the API calls return the auth state instead of having to make a new call all the time.
     const fromHeader = store.getters['auth/fromHeader'];
+
     if ( fromHeader === 'none' ) {
       noAuth(store);
     } else if ( fromHeader === 'true' ) {
@@ -36,6 +37,7 @@ export async function authenticate(to, from, next, { store }) {
       // Older versions look at principals and see what happens
       try {
         const me = await findMe(store);
+
         isLoggedIn(store, me);
       } catch (e) {
         const status = e?._status;

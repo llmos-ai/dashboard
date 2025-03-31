@@ -39,12 +39,12 @@ export default {
     };
 
     return {
-      setting: ALLOWED_SETTINGS[this.value.id],
-      description: t(`advancedSettings.descriptions.${this.value.id}`),
-      editHelp: t(`advancedSettings.editHelp.${this.value.id}`),
-      enumOptions: [],
-      canReset: false,
-      errors: [],
+      setting:        ALLOWED_SETTINGS[this.value.id],
+      description:    t(`advancedSettings.descriptions.${ this.value.id }`),
+      editHelp:       t(`advancedSettings.editHelp.${ this.value.id }`),
+      enumOptions:    [],
+      canReset:       false,
+      errors:         [],
       fvFormRuleSets: [],
       cmOptions,
     };
@@ -64,20 +64,18 @@ export default {
     this.enumOptions =
       this.setting?.kind === 'enum'
         ? this.setting.options.map((id) => ({
-            // i18n-uses advancedSettings.enum.*
-            label: `advancedSettings.enum.${this.value.id}.${id}`,
-            value: id,
-          }))
+          // i18n-uses advancedSettings.enum.*
+          label: `advancedSettings.enum.${ this.value.id }.${ id }`,
+          value: id,
+        }))
         : [];
     this.canReset = this.setting?.canReset || !!this.value.default;
-    this.fvFormRuleSets = this.setting?.ruleSet
-      ? [
-          {
-            path: 'value',
-            rules: this.setting.ruleSet.map(({ name }) => name),
-          },
-        ]
-      : [];
+    this.fvFormRuleSets = this.setting?.ruleSet ? [
+      {
+        path:  'value',
+        rules: this.setting.ruleSet.map(({ name }) => name),
+      },
+    ] : [];
 
     // Don't allow the user to reset the server URL if there is no default
     // helps to ensure that a value is always set
@@ -93,14 +91,14 @@ export default {
       // We map the setting rulesets to use values to define validation from factory
       return this.setting?.ruleSet
         ? mapValues(
-            keyBy(this.setting.ruleSet, 'name'),
-            // The validation is curried and may require the factory argument for the ValidatorFactory
-            ({ key, name, factoryArg }) => {
-              const rule = formRulesGenerator(t, key ? { key } : {})[name];
+          keyBy(this.setting.ruleSet, 'name'),
+          // The validation is curried and may require the factory argument for the ValidatorFactory
+          ({ key, name, factoryArg }) => {
+            const rule = formRulesGenerator(t, key ? { key } : {})[name];
 
-              return factoryArg ? rule(factoryArg) : rule;
-            }
-          )
+            return factoryArg ? rule(factoryArg) : rule;
+          }
+        )
         : {};
     },
 
@@ -119,7 +117,7 @@ export default {
 
   methods: {
     convertToString(event) {
-      this.value.value = `${event.target.value}`;
+      this.value.value = `${ event.target.value }`;
     },
 
     saveSettings(done) {
@@ -187,7 +185,11 @@ export default {
 
     <h4>{{ description }}</h4>
 
-    <h5 v-if="editHelp" v-clean-html="editHelp" class="edit-help" />
+    <h5
+      v-if="editHelp"
+      v-clean-html="editHelp"
+      class="edit-help"
+    />
 
     <div class="edit-change mt-20">
       <h5 v-t="'advancedSettings.edit.changeSetting'" />

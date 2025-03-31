@@ -11,9 +11,7 @@ export default {
 
   async fetch() {
     const viewInApi = this.$store.getters['prefs/get'](VIEW_IN_API);
-    const rows = await this.$store.dispatch(`management/findAll`, {
-      type: MANAGEMENT.SETTING,
-    });
+    const rows = await this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.SETTING });
     const t = this.$store.getters['i18n/t'];
     // Map settings from array to object keyed by id
     const settingsMap = rows.reduce((res, s) => {
@@ -36,8 +34,8 @@ export default {
       const s = {
         ...ALLOWED_SETTINGS[id],
         id,
-        description: t(`advancedSettings.descriptions.${id}`),
-        data: setting,
+        description: t(`advancedSettings.descriptions.${ id }`),
+        data:        setting,
         customized:
           !readonly && setting.value && setting.value !== setting.default,
         fromEnv: setting.fromEnv,
@@ -54,7 +52,7 @@ export default {
       } else if (s.kind === 'enum') {
         const v = s.data.value || s.data.default;
 
-        s.enum = `advancedSettings.enum.${id}.${v}`;
+        s.enum = `advancedSettings.enum.${ id }.${ v }`;
       }
       // There are only 2 actions that can be enabled - Edit Setting or View in API
       // If neither is available for this setting then we hide the action menu button
@@ -79,7 +77,7 @@ export default {
 
       this.$store.commit(`action-menu/show`, {
         resources: setting.data,
-        elem: actionElement,
+        elem:      actionElement,
       });
     },
   },
@@ -89,7 +87,10 @@ export default {
 <template>
   <Loading v-if="!settings" />
   <div v-else>
-    <Banner color="warning" class="settings-banner">
+    <Banner
+      color="warning"
+      class="settings-banner"
+    >
       <div>
         {{ t('advancedSettings.subtext') }}
       </div>
@@ -103,21 +104,28 @@ export default {
         <div class="title">
           <div class="text-base">
             {{ setting.id }}
-            <span v-if="setting.fromEnv" class="modified"
-              >Set by Environment Variable</span
-            >
-            <span v-else-if="setting.customized" class="modified">{{
+            <span
+              v-if="setting.fromEnv"
+              class="modified"
+            >Set by Environment Variable</span>
+            <span
+              v-else-if="setting.customized"
+              class="modified"
+            >{{
               t('advancedSettings.modified')
             }}</span>
           </div>
           <div
-            class="text-xs font-light"
             v-clean-html="
               t(`advancedSettings.descriptions.${setting.id}`, {}, true)
             "
+            class="text-xs font-light"
           />
         </div>
-        <div v-if="setting.hasActions" class="action">
+        <div
+          v-if="setting.hasActions"
+          class="action"
+        >
           <a-button
             aria-haspopup="true"
             aria-expanded="false"
@@ -139,7 +147,10 @@ export default {
             {{ t('advancedSettings.show') }} {{ setting.id }}
           </a-button>
         </div>
-        <div v-else class="settings-value mb-5">
+        <div
+          v-else
+          class="settings-value mb-5"
+        >
           <pre v-if="setting.kind === 'json'">{{ setting.json }}</pre>
           <pre v-else-if="setting.kind === 'multiline'">{{
             setting.data.value || setting.data.default
@@ -148,9 +159,11 @@ export default {
           <pre v-else-if="setting.data.value || setting.data.default">{{
             setting.data.value || setting.data.default
           }}</pre>
-          <pre v-else class="text-muted">
-&lt;{{ t('advancedSettings.none') }}&gt;</pre
+          <pre
+            v-else
+            class="text-muted"
           >
+&lt;{{ t('advancedSettings.none') }}&gt;</pre>
         </div>
         <div v-if="setting.canHide && !setting.hide">
           <a-button

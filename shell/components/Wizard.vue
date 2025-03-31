@@ -332,7 +332,10 @@ export default {
               @keyup.right.stop="selectNext(1)"
               @keyup.left.stop="selectNext(-1)"
             >
-              <template v-for="(step, idx ) in visibleSteps" :key="idx">
+              <template
+                v-for="(step, idx ) in visibleSteps"
+                :key="idx"
+              >
                 <li
 
                   :id="step.name"
@@ -370,7 +373,10 @@ export default {
         name="stepContainer"
         :activeStep="activeStep"
       >
-        <template  v-for="(step, i) in steps" :key="i" >
+        <template
+          v-for="(step, i) in steps"
+          :key="i"
+        >
           <div
             v-if="step.name === activeStep.name || step.hidden"
             :key="step.name"
@@ -398,7 +404,9 @@ export default {
         :activeStep="activeStep"
       >
         <div
-          v-for="(err,idx) in errorStrings" :key="idx">
+          v-for="(err,idx) in errorStrings"
+          :key="idx"
+        >
           <Banner
             color="error"
             :label="err"

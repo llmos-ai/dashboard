@@ -1,5 +1,7 @@
 <script setup>
-import { ref, watch, useTemplateRef, nextTick, computed } from 'vue';
+import {
+  ref, watch, useTemplateRef, nextTick, computed
+} from 'vue';
 import useAutoScrollWithControl from '@shell/composables/useAutoScrollWithControl';
 import useChat from '@shell/list/chat/composables/useChat';
 import ModelConfig from '@shell/list/chat/components/ModelConfig.vue';
@@ -8,20 +10,20 @@ import { matchModelString } from '@shell/utils/ai-model';
 import { useModelLogo } from '../composables/useModelLogo';
 const props = defineProps({
   actions: {
-    type: Array,
+    type:     Array,
     required: true,
   },
 
   config: {
-    type: Object,
+    type:    Object,
     default: () => ({}),
   },
   idx: {
-    type: Number,
+    type:    Number,
     default: 0,
   },
   question: {
-    type: String,
+    type:     String,
     required: true,
   },
 });
@@ -33,6 +35,7 @@ useAutoScrollWithControl(scrollContainer, observerTarget);
 
 const config = ref(props.config);
 const refQuestion = ref(props.question);
+
 watch(
   () => props.question,
   () => {
@@ -40,7 +43,9 @@ watch(
   }
 );
 const url = ref('');
-const { send, messages, loading, handleMessages } = useChat(
+const {
+  send, messages, loading, handleMessages
+} = useChat(
   url,
   config,
   refQuestion
@@ -53,9 +58,7 @@ const handleSend = (_question, fileList) => {
   });
 };
 
-defineExpose({
-  handleSend,
-});
+defineExpose({ handleSend });
 
 const emit = defineEmits(['handle:action']);
 
@@ -96,7 +99,7 @@ const scHeight = ref(0);
     <template #title>
       <div class="flex justify-between align-center items-baseline">
         <span class="text-lg italic">
-          <slot name="title"></slot>
+          <slot name="title" />
         </span>
         <a-popover
           v-model:open="visible"
@@ -104,8 +107,15 @@ const scHeight = ref(0);
           trigger="click"
           placement="bottom"
         >
-          <a-button size="small" type="link" class="role-link !flex">
-            <img class="size-[20px] mr-4" :src="modelLogo" />
+          <a-button
+            size="small"
+            type="link"
+            class="role-link !flex"
+          >
+            <img
+              class="size-[20px] mr-4"
+              :src="modelLogo"
+            >
             <span v-if="config.model">
               {{ modelDisplayName }}
             </span>
@@ -119,8 +129,8 @@ const scHeight = ref(0);
                 <div class="col span-12">
                   <ModelConfig
                     v-model:config="config"
-                    @update:model="updateModel"
                     :messages="messages"
+                    @update:model="updateModel"
                     @reset:messages="resetMessages"
                   />
                 </div>
@@ -130,7 +140,10 @@ const scHeight = ref(0);
         </a-popover>
 
         <span class="action">
-          <a-dropdown trigger="click" placement="bottomRight">
+          <a-dropdown
+            trigger="click"
+            placement="bottomRight"
+          >
             <a @click.prevent>
               <i class="icon icon-actions text-xl text-black mt-[4px]" />
             </a>
@@ -161,7 +174,7 @@ const scHeight = ref(0);
         :message="message"
         :showCard="false"
       />
-      <div ref="observerTarget"></div>
+      <div ref="observerTarget" />
     </div>
   </a-card>
 </template>

@@ -1,6 +1,6 @@
 <script>
-import { SEEN_WHATS_NEW } from "@shell/store/prefs";
-import { getVersionInfo } from "@shell/utils/version";
+import { SEEN_WHATS_NEW } from '@shell/store/prefs';
+import { getVersionInfo } from '@shell/utils/version';
 
 const resolveRoute = (route, router) => {
   try {
@@ -16,22 +16,22 @@ const validRoute = (route, router) => {
 
 export default {
   beforeMount() {
-    const seenWhatsNew = this.$store.getters["prefs/get"](SEEN_WHATS_NEW);
+    const seenWhatsNew = this.$store.getters['prefs/get'](SEEN_WHATS_NEW);
     const versionInfo = getVersionInfo(this.$store);
-    const isSingleProduct = this.$store.getters["isSingleProduct"];
-    const dashboardHome = { name: "home" };
+    const isSingleProduct = this.$store.getters['isSingleProduct'];
+    const dashboardHome = { name: 'home' };
 
     // If this is a new version, then take the user to the home page to view the release notes
     if (versionInfo.fullVersion !== seenWhatsNew && !isSingleProduct) {
       return this.$router.replace(dashboardHome);
     }
 
-    const afterLoginRouteObject = this.$store.getters["prefs/afterLoginRoute"];
+    const afterLoginRouteObject = this.$store.getters['prefs/afterLoginRoute'];
     const targetRoute = resolveRoute(afterLoginRouteObject, this.$router);
 
     // If target route is /, then we will loop with endless redirect - so detect that here and
     // redirect to /home, which is what we would do below, if there was no `afterLoginRouteObject`
-    if (targetRoute?.fullPath === "/") {
+    if (targetRoute?.fullPath === '/') {
       return this.$router.replace(dashboardHome);
     }
 

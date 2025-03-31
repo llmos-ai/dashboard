@@ -378,7 +378,9 @@ export default {
   </div>
   <div v-else>
     <div
-      v-for="(row, idx) in unremovedRows" :key="idx" class="role-row"
+      v-for="(row, idx) in unremovedRows"
+      :key="idx"
+      class="role-row"
       :class="{[mode]: true}"
     >
       <div class="subject">

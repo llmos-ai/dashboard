@@ -19,7 +19,7 @@ export default {
   },
   props: {
     editorMode: {
-      type: String,
+      type:    String,
       default: EDITOR_MODES.EDIT_CODE,
       validator(value) {
         return Object.values(EDITOR_MODES).includes(value);
@@ -27,27 +27,27 @@ export default {
     },
 
     asObject: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     initialYamlValues: {
-      type: [String, Object],
+      type:    [String, Object],
       default: '',
     },
 
     scrolling: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     value: {
-      type: [String, Object],
+      type:    [String, Object],
       default: '',
     },
 
     hidePreviewButtons: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
@@ -56,13 +56,13 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'yaml-editor',
     },
 
     // Allow the editor to be disabled
     disabled: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -106,14 +106,14 @@ export default {
       return {
         readOnly,
         gutters,
-        mode: 'yaml',
-        lint: !readOnly,
-        lineNumbers: !readOnly,
+        mode:            'yaml',
+        lint:            !readOnly,
+        lineNumbers:     !readOnly,
         styleActiveLine: true,
-        tabSize: 2,
-        indentWithTabs: false,
+        tabSize:         2,
+        indentWithTabs:  false,
         cursorBlinkRate: readOnly ? -1 : 530,
-        extraKeys: {
+        extraKeys:       {
           'Ctrl-Space': 'autocomplete',
 
           Tab: (cm) => {
@@ -217,9 +217,16 @@ export default {
         v-trim-whitespace
         class="mt-10"
       >
-        <a-radio-group v-model:value="diffMode" size="small">
-          <a-radio-button value="unified">Unified</a-radio-button>
-          <a-radio-button value="split">Split</a-radio-button>
+        <a-radio-group
+          v-model:value="diffMode"
+          size="small"
+        >
+          <a-radio-button value="unified">
+            Unified
+          </a-radio-button>
+          <a-radio-button value="split">
+            Split
+          </a-radio-button>
         </a-radio-group>
       </a-space>
     </div>

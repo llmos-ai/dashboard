@@ -1,43 +1,44 @@
 <script setup>
-import { computed } from "vue";
-import { useStore } from "vuex";
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
-import Select from "@shell/components/form/Select.vue";
+import Select from '@shell/components/form/Select.vue';
 
 const props = defineProps({
-  mode: { type: String, default: "" },
+  mode:     { type: String, default: '' },
   showIcon: { type: Boolean, default: true },
 });
 
 const store = useStore();
 const { t } = useI18n(store);
 
-const selectedLocaleLabel = computed(() => store.getters["i18n/selectedLocaleLabel"]);
-const availableLocales = computed(() => store.getters["i18n/availableLocales"]);
+const selectedLocaleLabel = computed(() => store.getters['i18n/selectedLocaleLabel']);
+const availableLocales = computed(() => store.getters['i18n/availableLocales']);
 
-const dev = computed(() => store.getters["prefs/dev"]);
+const dev = computed(() => store.getters['prefs/dev']);
 
 const allAvailableLocales = computed(() => {
   if (!!process.env.dev && dev.value) {
     return {
       ...availableLocales.value,
-      none: "None",
+      none: 'None',
     };
   }
+
   return availableLocales.value;
 });
 
-const localesOptions = computed(() =>
-  Object.keys(allAvailableLocales.value).map((value) => ({
-    label: t(`locale.${value}`),
-    value,
-  }))
+const localesOptions = computed(() => Object.keys(allAvailableLocales.value).map((value) => ({
+  label: t(`locale.${ value }`),
+  value,
+}))
 );
 
 const selectedOption = computed(() => {
   const option = Object.keys(allAvailableLocales.value)[
     Object.values(allAvailableLocales.value).indexOf(selectedLocaleLabel.value)
   ];
+
   return option;
 });
 
@@ -46,18 +47,29 @@ const showLocale = computed(() => {
 });
 
 const switchLocale = (event) => {
-  store.dispatch("i18n/switchTo", event);
+  store.dispatch('i18n/switchTo', event);
 };
 </script>
 
 <template>
   <div>
     <div v-if="mode === 'login'">
-      <div v-if="showLocale" role="menu" :aria-label="t('locale.menu')" class="locale-login-container">
+      <div
+        v-if="showLocale"
+        role="menu"
+        :aria-label="t('locale.menu')"
+        class="locale-login-container"
+      >
         <a-dropdown trigger="click">
-          <a class="cursor-pointer" @click.prevent>
+          <a
+            class="cursor-pointer"
+            @click.prevent
+          >
             {{ selectedLocaleLabel }}
-            <i v-if="showIcon" class="icon icon-fw icon-sort-down" />
+            <i
+              v-if="showIcon"
+              class="icon icon-fw icon-sort-down"
+            />
           </a>
           <template #overlay>
             <a-menu>
@@ -74,7 +86,11 @@ const switchLocale = (event) => {
       </div>
     </div>
     <div v-else>
-      <Select v-model:value="selectedOption" :options="localesOptions" @update:modelValue="switchLocale" />
+      <Select
+        v-model:value="selectedOption"
+        :options="localesOptions"
+        @update:modelValue="switchLocale"
+      />
     </div>
   </div>
 </template>

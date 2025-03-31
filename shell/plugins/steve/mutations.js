@@ -1,5 +1,5 @@
-import { addObject } from "@shell/utils/array";
-import { NAMESPACE, POD, SCHEMA } from "@shell/config/types";
+import { addObject } from '@shell/utils/array';
+import { NAMESPACE, POD, SCHEMA } from '@shell/config/types';
 import {
   forgetType,
   resetStore,
@@ -9,10 +9,10 @@ import {
   batchChanges,
   replace,
   loadAdd,
-} from "@shell/plugins/dashboard-store/mutations";
-import { perfLoadAll } from "@shell/plugins/steve/performanceTesting";
-import { classify } from "@shell/plugins/dashboard-store/classify";
-import SteveSchema from "@shell/models/steve-schema";
+} from '@shell/plugins/dashboard-store/mutations';
+import { perfLoadAll } from '@shell/plugins/steve/performanceTesting';
+import { classify } from '@shell/plugins/dashboard-store/classify';
+import SteveSchema from '@shell/models/steve-schema';
 
 function registerNamespace(state, namespace) {
   let cache = state.podsByNamespace[namespace];
@@ -20,7 +20,7 @@ function registerNamespace(state, namespace) {
   if (!cache) {
     cache = {
       list: [],
-      map: new Map(),
+      map:  new Map(),
     };
 
     state.podsByNamespace[namespace] = cache;
@@ -94,8 +94,8 @@ export default {
             // resource.remove (note - we've already lost the resource in the store, so pass through mocked one)
             cleanPodsByNamespaceCache(state, {
               id,
-              type: POD,
-              namespace: id.substring(0, id.indexOf("/")),
+              type:      POD,
+              namespace: id.substring(0, id.indexOf('/')),
             });
           }
 
@@ -122,7 +122,9 @@ export default {
 
   loadAll(
     state,
-    { type, data, ctx, skipHaveAll, namespace, revision, pagination }
+    {
+      type, data, ctx, skipHaveAll, namespace, revision, pagination
+    }
   ) {
     // Performance testing in dev and when env var is set
     if (process.env.dev && !!process.env.perfTest) {
@@ -170,7 +172,7 @@ export default {
 
     resetStore(state, this.commit);
 
-    this.commit(`${state.config.namespace}/resetSubscriptions`);
+    this.commit(`${ state.config.namespace }/resetSubscriptions`);
 
     // Clear the podsByNamespace cache
     state.podsByNamespace = {};

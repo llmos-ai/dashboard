@@ -20,21 +20,19 @@ export default {
 
   props: {
     value: {
-      type: Object,
+      type:     Object,
       required: true,
     },
 
     useTwoColumnsForCustom: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
   async fetch() {
     const [, roleTemplates] = await Promise.all([
       this.$store.dispatch('management/findAll', { type: MANAGEMENT.USER }),
-      this.$store.dispatch('management/findAll', {
-        type: MANAGEMENT.ROLE_TEMPLATE,
-      }),
+      this.$store.dispatch('management/findAll', { type: MANAGEMENT.ROLE_TEMPLATE }),
     ]);
 
     this.roleTemplates = roleTemplates;
@@ -44,7 +42,7 @@ export default {
 
     return {
       customPermissions: [],
-      roleTemplates: [],
+      roleTemplates:     [],
     };
   },
   computed: {
@@ -57,21 +55,21 @@ export default {
     options() {
       return [
         {
-          label: this.t('projectMembers.projectPermissions.owner.label'),
+          label:       this.t('projectMembers.projectPermissions.owner.label'),
           description: this.t(
             'projectMembers.projectPermissions.owner.description'
           ),
           value: 'owner',
         },
         {
-          label: this.t('projectMembers.projectPermissions.readOnly.label'),
+          label:       this.t('projectMembers.projectPermissions.readOnly.label'),
           description: this.t(
             'projectMembers.projectPermissions.readOnly.description'
           ),
           value: 'read-only',
         },
         {
-          label: this.t('projectMembers.projectPermissions.custom.label'),
+          label:       this.t('projectMembers.projectPermissions.custom.label'),
           description: this.t(
             'projectMembers.projectPermissions.custom.description'
           ),
@@ -87,7 +85,7 @@ export default {
             role.metadata?.annotations?.[DESCRIPTION] ||
             this.t('projectMembers.projectPermissions.noDescription')
         ),
-        key: this.purifyOption(role.id),
+        key:   this.purifyOption(role.id),
         label: this.purifyOption(role.id),
         value: false,
       }));
@@ -156,7 +154,10 @@ export default {
         />
       </div>
     </div>
-    <a-card class="m-0" :show-actions="false">
+    <a-card
+      class="m-0"
+      :show-actions="false"
+    >
       <template v-slot:title>
         <div class="type-title">
           <h3>{{ t('projectMembers.projectPermissions.label') }}</h3>
@@ -176,7 +177,10 @@ export default {
         :class="{ 'two-column': useTwoColumnsForCustom }"
       >
         <div v-if="customRoles.length > 0">
-          <div v-for="(permission, i) in customPermissionsUpdate" :key="i">
+          <div
+            v-for="(permission, i) in customPermissionsUpdate"
+            :key="i"
+          >
             <Checkbox
               v-model:value="permission.value"
               :disabled="permission.locked"

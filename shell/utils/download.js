@@ -1,12 +1,12 @@
-import JSZip from "jszip";
+import JSZip from 'jszip';
 
 export async function downloadFile(
   fileName,
   content,
-  contentType = "text/plain;charset=utf-8"
+  contentType = 'text/plain;charset=utf-8'
 ) {
   const blob = new Blob([content], { type: contentType });
-  const saveAs = (await import("file-saver")).default;
+  const saveAs = (await import('file-saver')).default;
 
   return saveAs(blob, fileName);
 }
@@ -20,17 +20,17 @@ export function generateZip(files) {
     zip.file(fileName, files[fileName]);
   }
 
-  return zip.generateAsync({ type: "blob" }).then((contents) => {
+  return zip.generateAsync({ type: 'blob' }).then((contents) => {
     return contents;
   });
 }
 
-export function downloadUrl(url, id = "__downloadIframe") {
+export function downloadUrl(url, id = '__downloadIframe') {
   let iframe = document.getElementById(id);
 
   if (!iframe) {
-    iframe = document.createElement("iframe");
-    iframe.style.display = "none";
+    iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
     iframe.id = id;
     document.body.appendChild(iframe);
   }

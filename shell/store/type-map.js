@@ -124,34 +124,34 @@
 //   mapWeight,
 //   continueOnMatch
 // )
-import { defineAsyncComponent } from "vue";
+import { defineAsyncComponent } from 'vue';
 import {
   AGE,
   NAME,
   NAMESPACE as NAMESPACE_COL,
   STATE,
-} from "@shell/config/table-headers";
-import { COUNT, SCHEMA, MANAGEMENT } from "@shell/config/types";
+} from '@shell/config/table-headers';
+import { COUNT, SCHEMA, MANAGEMENT } from '@shell/config/types';
 import {
   VIEW_IN_API,
   EXPANDED_GROUPS,
   FAVORITE_TYPES,
-} from "@shell/store/prefs";
+} from '@shell/store/prefs';
 import {
   addObject,
   findBy,
   isArray,
   removeObject,
   filterBy,
-} from "@shell/utils/array";
-import { clone, get } from "@shell/utils/object";
+} from '@shell/utils/array';
+import { clone, get } from '@shell/utils/object';
 import {
   ensureRegex,
   escapeHtml,
   escapeRegex,
   ucFirst,
   pluralize,
-} from "@shell/utils/string";
+} from '@shell/utils/string';
 import {
   importList,
   importDetail,
@@ -166,18 +166,19 @@ import {
   importLogin,
   resolveDetail,
   importDialog,
-} from "@shell/utils/dynamic-importer";
+} from '@shell/utils/dynamic-importer';
 
-import { NAME as LLMOS } from "@shell/config/product/llmos";
-import isObject from "lodash/isObject";
-import { normalizeType } from "@shell/plugins/dashboard-store/normalize";
-import { sortBy } from "@shell/utils/sort";
-import { haveMonitoring } from "@shell/utils/monitoring";
-import { createHeaders, rowValueGetter } from "@shell/store/type-map.utils";
+import { NAME as LLMOS } from '@shell/config/product/llmos';
+import isObject from 'lodash/isObject';
+import { normalizeType } from '@shell/plugins/dashboard-store/normalize';
+import { sortBy } from '@shell/utils/sort';
+import { haveMonitoring } from '@shell/utils/monitoring';
+import { createHeaders, rowValueGetter } from '@shell/store/type-map.utils';
+import cloneDeep from 'lodash/cloneDeep';
 
-export const NAMESPACED = "namespaced";
-export const CLUSTER_LEVEL = "cluster";
-export const BOTH = "both";
+export const NAMESPACED = 'namespaced';
+export const CLUSTER_LEVEL = 'cluster';
+export const BOTH = 'both';
 
 export const TYPE_MODES = {
   /**
@@ -185,7 +186,7 @@ export const TYPE_MODES = {
    *
    * getTree usage: Remove ignored schemas, resources not applicable to ns, etc
    */
-  ALL: "all",
+  ALL:      'all',
   /**
    * Represents resource types that should be shown at the top of the side nav.
    *
@@ -197,7 +198,7 @@ export const TYPE_MODES = {
    *
    * getTree usage: Remove ignored schemas, resources not applicable to ns, etc
    */
-  BASIC: "basic",
+  BASIC:    'basic',
   /**
    * Represents any type of resource type that has been favourited
    *
@@ -207,7 +208,7 @@ export const TYPE_MODES = {
    *
    * getTree usage: Remove ignored schemas, resources not applicable to ns, etc
    */
-  FAVORITE: "favorite",
+  FAVORITE: 'favorite',
   /**
    * Represents no virtual or spoofed types that have a count.
    *
@@ -219,44 +220,44 @@ export const TYPE_MODES = {
    *
    * getTree usage: Remove types with no counts. Remove ignored schemas, resources not applicable to ns, etc
    */
-  USED: "used",
+  USED:     'used',
 };
 
-export const ROOT = "root";
+export const ROOT = 'root';
 
-export const SPOOFED_PREFIX = "__[[spoofed]]__";
-export const SPOOFED_API_PREFIX = "__[[spoofedapi]]__";
+export const SPOOFED_PREFIX = '__[[spoofed]]__';
+export const SPOOFED_API_PREFIX = '__[[spoofedapi]]__';
 
 const instanceMethods = {};
 const graphConfigMap = {};
 
 export const IF_HAVE = {
-  MONITORING: "monitoring",
-  PROJECT: "project",
-  NO_PROJECT: "no-project",
-  MULTI_CLUSTER: "multi-cluster",
-  ADMIN: "admin-user",
-  LLMOS_NAMESPACE: "llmos-system",
+  MONITORING:      'monitoring',
+  PROJECT:         'project',
+  NO_PROJECT:      'no-project',
+  MULTI_CLUSTER:   'multi-cluster',
+  ADMIN:           'admin-user',
+  LLMOS_NAMESPACE: 'llmos-system',
 };
 
-export function DSL(store, product, module = "type-map") {
+export function DSL(store, product, module = 'type-map') {
   return {
     product(inOpt) {
       const opt = {
-        name: product,
-        weight: 1,
-        inStore: "cluster",
-        inExplorer: false,
-        removable: true,
+        name:                product,
+        weight:              1,
+        inStore:             'cluster',
+        inExplorer:          false,
+        removable:           true,
         showClusterSwitcher: true,
         showNamespaceFilter: false,
-        public: true,
-        filterMode: "namespaces",
+        public:              true,
+        filterMode:          'namespaces',
         ...inOpt,
       };
 
       // Convert strings to regex's - we do this once here for efficiency
-      for (const k of ["ifHaveGroup", "ifHaveType"]) {
+      for (const k of ['ifHaveGroup', 'ifHaveType']) {
         if (opt[k]) {
           if (Array.isArray(opt[k])) {
             opt[k] = opt[k].map((r) => regexToString(ensureRegex(r)));
@@ -266,7 +267,7 @@ export function DSL(store, product, module = "type-map") {
         }
       }
 
-      store.commit(`${module}/product`, opt);
+      store.commit(`${ module }/product`, opt);
     },
 
     basicType(types, group) {
@@ -275,7 +276,7 @@ export function DSL(store, product, module = "type-map") {
         types = Object.values(types);
       }
 
-      store.commit(`${module}/basicType`, {
+      store.commit(`${ module }/basicType`, {
         product,
         types,
         group,
@@ -284,7 +285,7 @@ export function DSL(store, product, module = "type-map") {
 
     // Type- and Group-dependent
     groupBy(type, field) {
-      store.commit(`${module}/groupBy`, { type, field });
+      store.commit(`${ module }/groupBy`, { type, field });
     },
 
     headers(type, headers, paginationHeaders = []) {
@@ -299,12 +300,12 @@ export function DSL(store, product, module = "type-map") {
         delete header.getValue;
       });
 
-      store.commit(`${module}/headers`, { type, headers });
-      store.commit(`${module}/paginationHeaders`, { type, paginationHeaders });
+      store.commit(`${ module }/headers`, { type, headers });
+      store.commit(`${ module }/paginationHeaders`, { type, paginationHeaders });
     },
 
     hideBulkActions(type, field) {
-      store.commit(`${module}/hideBulkActions`, { type, field });
+      store.commit(`${ module }/hideBulkActions`, { type, field });
     },
 
     configureType(match, options) {
@@ -312,30 +313,30 @@ export function DSL(store, product, module = "type-map") {
         graphConfigMap[match] = options.graphConfig;
         delete options.graphConfig;
       }
-      store.commit(`${module}/configureType`, { ...options, match });
+      store.commit(`${ module }/configureType`, { ...options, match });
     },
 
     componentForType(match, replace) {
-      store.commit(`${module}/componentForType`, { match, replace });
+      store.commit(`${ module }/componentForType`, { match, replace });
     },
 
     ignoreType(regexOrString) {
-      store.commit(`${module}/ignoreType`, regexOrString);
+      store.commit(`${ module }/ignoreType`, regexOrString);
     },
 
     ignoreGroup(regexOrString, cb) {
-      store.commit(`${module}/ignoreGroup`, { regexOrString, cb });
+      store.commit(`${ module }/ignoreGroup`, { regexOrString, cb });
     },
 
     weightGroup(input, weight, forBasic) {
       if (isArray(input)) {
-        store.commit(`${module}/weightGroup`, {
+        store.commit(`${ module }/weightGroup`, {
           groups: input,
           weight,
           forBasic,
         });
       } else {
-        store.commit(`${module}/weightGroup`, {
+        store.commit(`${ module }/weightGroup`, {
           group: input,
           weight,
           forBasic,
@@ -345,12 +346,12 @@ export function DSL(store, product, module = "type-map") {
 
     setGroupDefaultType(input, defaultType) {
       if (isArray(input)) {
-        store.commit(`${module}/setGroupDefaultType`, {
+        store.commit(`${ module }/setGroupDefaultType`, {
           groups: input,
           defaultType,
         });
       } else {
-        store.commit(`${module}/setGroupDefaultType`, {
+        store.commit(`${ module }/setGroupDefaultType`, {
           group: input,
           defaultType,
         });
@@ -359,13 +360,13 @@ export function DSL(store, product, module = "type-map") {
 
     weightType(input, weight, forBasic) {
       if (isArray(input)) {
-        store.commit(`${module}/weightType`, {
+        store.commit(`${ module }/weightType`, {
           types: input,
           weight,
           forBasic,
         });
       } else {
-        store.commit(`${module}/weightType`, {
+        store.commit(`${ module }/weightType`, {
           type: input,
           weight,
           forBasic,
@@ -374,7 +375,7 @@ export function DSL(store, product, module = "type-map") {
     },
 
     mapGroup(match, replace, weight = 5, continueOnMatch = false) {
-      store.commit(`${module}/mapGroup`, {
+      store.commit(`${ module }/mapGroup`, {
         match,
         replace,
         weight,
@@ -383,7 +384,7 @@ export function DSL(store, product, module = "type-map") {
     },
 
     mapType(match, replace, weight = 5, continueOnMatch = false) {
-      store.commit(`${module}/mapType`, {
+      store.commit(`${ module }/mapType`, {
         match,
         replace,
         weight,
@@ -392,7 +393,7 @@ export function DSL(store, product, module = "type-map") {
     },
 
     moveType(match, group, weight = 5, continueOnMatch = false) {
-      store.commit(`${module}/moveType`, {
+      store.commit(`${ module }/moveType`, {
         match,
         group,
         weight,
@@ -400,11 +401,11 @@ export function DSL(store, product, module = "type-map") {
     },
 
     virtualType(obj) {
-      store.commit(`${module}/virtualType`, { product, obj });
+      store.commit(`${ module }/virtualType`, { product, obj });
     },
 
     spoofedType(obj) {
-      store.commit(`${module}/spoofedType`, { product, obj });
+      store.commit(`${ module }/spoofedType`, { product, obj });
     },
   };
 }
@@ -432,39 +433,39 @@ export function productsLoaded() {
   return called;
 }
 
-export const state = function () {
+export const state = function() {
   return {
-    products: [],
-    virtualTypes: {},
-    spoofedTypes: {},
-    basicTypes: {},
-    groupIgnore: [],
-    groupWeights: {},
-    groupDefaultTypes: {},
-    basicGroupWeights: { [ROOT]: 1000 },
-    groupMappings: [],
-    typeIgnore: [],
-    basicTypeWeights: {},
-    typeWeights: {},
-    typeMappings: [],
-    typeMoveMappings: [],
+    products:                [],
+    virtualTypes:            {},
+    spoofedTypes:            {},
+    basicTypes:              {},
+    groupIgnore:             [],
+    groupWeights:            {},
+    groupDefaultTypes:       {},
+    basicGroupWeights:       { [ROOT]: 1000 },
+    groupMappings:           [],
+    typeIgnore:              [],
+    basicTypeWeights:        {},
+    typeWeights:             {},
+    typeMappings:            [],
+    typeMoveMappings:        [],
     typeToComponentMappings: [],
-    typeOptions: [],
-    groupBy: {},
-    headers: {},
-    paginationHeaders: {},
-    hideBulkActions: {},
-    schemaGeneration: 1,
-    cache: {
-      typeMove: {},
-      groupLabel: {},
-      ignore: {},
-      list: {},
-      chart: {},
-      detail: {},
-      edit: {},
-      componentFor: {},
-      promptRemove: {},
+    typeOptions:             [],
+    groupBy:                 {},
+    headers:                 {},
+    paginationHeaders:       {},
+    hideBulkActions:         {},
+    schemaGeneration:        1,
+    cache:                   {
+      typeMove:         {},
+      groupLabel:       {},
+      ignore:           {},
+      list:             {},
+      chart:            {},
+      detail:           {},
+      edit:             {},
+      componentFor:     {},
+      promptRemove:     {},
       windowComponents: {},
     },
   };
@@ -477,14 +478,14 @@ export const getters = {
   // Turns a type name into a display label (e.g. management.cattle.io.cluster -> Cluster)
   labelFor(state, getters, rootState, rootGetters) {
     return (schema, count = 1, language = null) => {
-      return _applyMapping(schema, state.typeMappings, "id", false, () => {
-        const key = `typeLabel."${schema.id.toLowerCase()}"`;
+      return _applyMapping(schema, state.typeMappings, 'id', false, () => {
+        const key = `typeLabel."${ schema.id.toLowerCase() }"`;
 
-        if (rootGetters["i18n/exists"](key, language)) {
-          return rootGetters["i18n/t"](key, { count }, language).trim();
+        if (rootGetters['i18n/exists'](key, language)) {
+          return rootGetters['i18n/t'](key, { count }, language).trim();
         }
 
-        const out = schema?.attributes?.kind || schema.id || "?";
+        const out = schema?.attributes?.kind || schema.id || '?';
 
         // Add spaces, but breaks typing names into jump menu naturally
         // out = ucFirst(out.replace(/([a-z])([A-Z])/g,'$1 $2'));
@@ -504,7 +505,7 @@ export const getters = {
     return (schemaOrName) => {
       let group = schemaOrName;
 
-      if (typeof schemaOrName === "object") {
+      if (typeof schemaOrName === 'object') {
         let moved = false;
 
         for (const rule of state.typeMoveMappings) {
@@ -521,7 +522,7 @@ export const getters = {
         }
       }
 
-      if (typeof group !== "string") {
+      if (typeof group !== 'string') {
         return null;
       }
 
@@ -537,7 +538,7 @@ export const getters = {
             return match[1]
               .split(/\./)
               .map((x) => ucFirst(x))
-              .join(".");
+              .join('.');
           }
 
           return group;
@@ -556,18 +557,18 @@ export const getters = {
 
   optionsFor(state) {
     const def = {
-      isCreatable: true,
-      isEditable: true,
-      isRemovable: true,
-      showState: true,
-      showAge: true,
-      canYaml: true,
-      namespaced: null,
-      listGroups: [],
-      depaginate: false,
-      customRoute: undefined,
+      isCreatable:          true,
+      isEditable:           true,
+      isRemovable:          true,
+      showState:            true,
+      showAge:              true,
+      canYaml:              true,
+      namespaced:           null,
+      listGroups:           [],
+      depaginate:           false,
+      customRoute:          undefined,
       resourceEditMasthead: true,
-      createButtonLabel: "",
+      createButtonLabel:    '',
     };
 
     return (schemaOrType, pagination) => {
@@ -578,7 +579,7 @@ export const getters = {
       }
 
       const type =
-        typeof schemaOrType === "object" ? schemaOrType.id : schemaOrType;
+        typeof schemaOrType === 'object' ? schemaOrType.id : schemaOrType;
       const found = state.typeOptions.find((entry) => {
         const re = stringToRegex(entry.match);
 
@@ -592,17 +593,15 @@ export const getters = {
         return opts;
       }
 
-      const storeOptionsFor = schemaOrType?.$ctx?.getters?.["optionsFor"];
-      const storeOpts = storeOptionsFor
-        ? storeOptionsFor(
-            { getters, state },
-            {
-              schema: schemaOrType,
-              pagination,
-              opts,
-            }
-          )
-        : {};
+      const storeOptionsFor = schemaOrType?.$ctx?.getters?.['optionsFor'];
+      const storeOpts = storeOptionsFor ? storeOptionsFor(
+        { getters, state },
+        {
+          schema: schemaOrType,
+          pagination,
+          opts,
+        }
+      ) : {};
 
       return {
         ...opts,
@@ -614,7 +613,7 @@ export const getters = {
   isFavorite(state, getters, rootState, rootGetters) {
     return (schemaId) => {
       return (
-        rootGetters["prefs/get"](FAVORITE_TYPES).includes(schemaId) || false
+        rootGetters['prefs/get'](FAVORITE_TYPES).includes(schemaId) || false
       );
     };
   },
@@ -674,7 +673,7 @@ export const getters = {
       let searchRegex;
 
       if (search) {
-        searchRegex = new RegExp(`^(.*)(${escapeRegex(search)})(.*)$`, "i");
+        searchRegex = new RegExp(`^(.*)(${ escapeRegex(search) })(.*)$`, 'i');
       }
 
       const root = { children: [] };
@@ -684,8 +683,8 @@ export const getters = {
       const keys = Object.keys(allTypes).sort((a, b) => a.length - b.length);
 
       // Set these for later
-      const currentLocal = rootGetters["i18n/current"]();
-      const defaultLocal = rootGetters["i18n/default"]();
+      const currentLocal = rootGetters['i18n/current']();
+      const defaultLocal = rootGetters['i18n/default']();
 
       for (const type of keys) {
         const typeObj = allTypes[type];
@@ -707,7 +706,7 @@ export const getters = {
 
         const inStore = rootGetters.currentStore(typeObj.name);
 
-        const count = rootGetters[`${inStore}/count`](typeObj);
+        const count = rootGetters[`${ inStore }/count`](typeObj);
         const groupForBasicType = getters.groupForBasicType(
           productId,
           typeObj.name
@@ -724,9 +723,7 @@ export const getters = {
           continue;
         }
 
-        const label = typeObj.labelKey
-          ? rootGetters["i18n/t"](typeObj.labelKey) || typeObj.label
-          : typeObj.label;
+        const label = typeObj.labelKey ? rootGetters['i18n/t'](typeObj.labelKey) || typeObj.label : typeObj.label;
 
         const labelDisplay = highlightLabel(label, count, typeObj.schema);
 
@@ -740,12 +737,12 @@ export const getters = {
         if (isBasic) {
           group = _ensureGroup(root, groupForBasicType, true);
         } else if (mode === TYPE_MODES.FAVORITE) {
-          group = _ensureGroup(root, "starred");
+          group = _ensureGroup(root, 'starred');
           group.weight = 1000;
         } else if (mode === TYPE_MODES.USED) {
           group = _ensureGroup(
             root,
-            `inUse::${getters.groupLabelFor(typeObj.schema)}`
+            `inUse::${ getters.groupLabelFor(typeObj.schema) }`
           );
         } else {
           group = _ensureGroup(root, typeObj.schema || typeObj.group || ROOT);
@@ -756,10 +753,10 @@ export const getters = {
         // Make the default route if one isn't set
         if (!route) {
           route = {
-            name: "c-cluster-product-resource",
+            name:   'c-cluster-product-resource',
             params: {
-              product: productId,
-              cluster: clusterId,
+              product:  productId,
+              cluster:  clusterId,
               resource: typeObj.name,
             },
           };
@@ -768,21 +765,25 @@ export const getters = {
         }
 
         // Cluster ID and Product should always be set
-        if (route && typeof route === "object") {
+        if (route && typeof route === 'object') {
           route.params = route.params || {};
           route.params.cluster = clusterId;
-          route.params.product = productId;
+          if (route.name?.includes('-product')) {
+            // delete vue warnging
+            // https://github.com/vuejs/router/blob/main/packages/router/CHANGELOG.md#414-2022-08-22
+            route.params.product = productId;
+          }
         }
 
         group.children.push({
           label,
           labelDisplay,
-          mode: typeObj.mode,
-          exact: typeObj.exact || false,
-          "exact-path": typeObj["exact-path"] || false,
+          mode:         typeObj.mode,
+          exact:        typeObj.exact || false,
+          'exact-path': typeObj['exact-path'] || false,
           namespaced,
           route,
-          name: typeObj.name,
+          name:         typeObj.name,
           weight:
             typeObj.weight ||
             getters.typeWeightFor(typeObj.schema?.id || label, isBasic),
@@ -799,31 +800,31 @@ export const getters = {
 
       function _ensureGroup(tree, schemaOrName, forBasic = false) {
         let name = getters.groupLabelFor(schemaOrName);
-        const isRoot = name === ROOT || name.startsWith(`${ROOT}::`);
+        const isRoot = name === ROOT || name.startsWith(`${ ROOT }::`);
 
-        if (name && name.includes("::")) {
+        if (name && name.includes('::')) {
           let parent;
 
-          [parent, name] = name.split("::", 2);
+          [parent, name] = name.split('::', 2);
           tree = _ensureGroup(tree, parent);
         }
 
         // Translate if an entry exists
         let label = name;
         // i18n-uses nav.group.*
-        const key = `nav.group."${name}"`;
+        const key = `nav.group."${ name }"`;
 
-        if (rootGetters["i18n/exists"](key)) {
-          label = rootGetters["i18n/t"](key);
+        if (rootGetters['i18n/exists'](key)) {
+          label = rootGetters['i18n/t'](key);
         }
 
-        let group = findBy(tree.children, "name", name);
+        let group = findBy(tree.children, 'name', name);
 
         if (!group) {
           group = {
             name,
             label,
-            weight: getters.groupWeightFor(name, forBasic),
+            weight:      getters.groupWeightFor(name, forBasic),
             defaultType: getters.groupDefaultTypeFor(name),
           };
 
@@ -856,18 +857,18 @@ export const getters = {
               );
 
               if (defaultLabel && defaultLabel !== label) {
-                label += ` (${defaultLabel})`;
+                label += ` (${ defaultLabel })`;
                 match = label.match(searchRegex);
               }
             }
           }
 
           if (match) {
-            label = `${escapeHtml(
+            label = `${ escapeHtml(
               match[1]
-            )}<span class="highlight">${escapeHtml(
+            ) }<span class="highlight">${ escapeHtml(
               match[2]
-            )}</span>${escapeHtml(match[3])}`;
+            ) }</span>${ escapeHtml(match[3]) }`;
           } else {
             return null;
           }
@@ -880,7 +881,7 @@ export const getters = {
 
   isSpoofed(state, getters, rootState, rootGetters) {
     return (type, product) => {
-      product = product || rootGetters["productId"];
+      product = product || rootGetters['productId'];
       const productSpoofedTypes = state.spoofedTypes[product] || [];
 
       return productSpoofedTypes.some((st) => st.type === type);
@@ -889,7 +890,7 @@ export const getters = {
 
   isVirtual(state, getters, rootState, rootGetters) {
     return (name, product) => {
-      product = product || rootGetters["productId"];
+      product = product || rootGetters['productId'];
       const productVirtualTypes = state.virtualTypes[product] || [];
 
       return productVirtualTypes.some((st) => st.name === name);
@@ -897,22 +898,22 @@ export const getters = {
   },
 
   getSpoofedInstances(state, getters, rootState, rootGetters) {
-    return async (type, product) => {
-      product = product || rootGetters["productId"];
+    return async(type, product) => {
+      product = product || rootGetters['productId'];
       const getInstances = instanceMethods[product]?.[type] || (() => []);
       const instances = await getInstances();
 
       instances.forEach((instance) => {
         const type = instance.type;
         const id = instance.id;
-        const link = `/${SPOOFED_PREFIX}/${type}/${id}`;
-        const apiLink = `/${SPOOFED_API_PREFIX}/${type}/${id}`;
+        const link = `/${ SPOOFED_PREFIX }/${ type }/${ id }`;
+        const apiLink = `/${ SPOOFED_API_PREFIX }/${ type }/${ id }`;
 
         instance.links = {
           remove: instance.links?.remove || link,
-          self: instance.links?.self || link,
+          self:   instance.links?.self || link,
           update: instance.links?.update || link,
-          view: instance.links?.view || apiLink,
+          view:   instance.links?.view || apiLink,
         };
         instance.isSpoofed = true;
       });
@@ -922,7 +923,7 @@ export const getters = {
   },
 
   getSpoofedInstance(state, getters, rootState, rootGetters) {
-    return async (type, product, id) => {
+    return async(type, product, id) => {
       const productInstances = await getters.getSpoofedInstances(type, product);
 
       return productInstances.find((instance) => instance.id === id);
@@ -966,11 +967,11 @@ export const getters = {
     return function allTypes(product, modes = [TYPE_MODES.ALL]) {
       // const module = findBy(state.products, 'name', product)?.inStore;
       const module = state.products.find((p) => p.name === product)?.inStore;
-      const schemas = rootGetters[`${module}/all`](SCHEMA);
+      const schemas = rootGetters[`${ module }/all`](SCHEMA);
       const isLocal = !rootGetters.currentCluster?.isLocal;
       // const isDev = rootGetters['prefs/get'](VIEW_IN_API);
       // const isBasic = mode === TYPE_MODES.BASIC;
-      const counts = rootGetters[`${module}/all`](COUNT)?.[0]?.counts || {};
+      const counts = rootGetters[`${ module }/all`](COUNT)?.[0]?.counts || {};
 
       const out = {};
 
@@ -986,7 +987,7 @@ export const getters = {
         });
 
         const attrs = schema.attributes || {};
-        const typeOptions = getters["optionsFor"](schema);
+        const typeOptions = getters['optionsFor'](schema);
 
         schemaModes[TYPE_MODES.BASIC] =
           schemaModes[TYPE_MODES.BASIC] &&
@@ -1039,18 +1040,15 @@ export const getters = {
               mode === TYPE_MODES.BASIC
             ),
             schema,
-            name: schema.id,
+            name:       schema.id,
             namespaced:
-              typeOptions.namespaced === null
-                ? attrs.namespaced
-                : typeOptions.namespaced,
+              typeOptions.namespaced === null ? attrs.namespaced : typeOptions.namespaced,
             route: typeOptions.customRoute,
           };
         });
       }
-
       const nonUsedModes = modes.filter((m) => m !== TYPE_MODES.USED);
-      const isDev = rootGetters["prefs/get"](VIEW_IN_API);
+      const isDev = rootGetters['prefs/get'](VIEW_IN_API);
 
       // Add virtual and spoofed types
       if (nonUsedModes.length) {
@@ -1071,7 +1069,7 @@ export const getters = {
             }
           });
 
-          if (item["public"] === false && !isDev) {
+          if (item['public'] === false && !isDev) {
             continue;
           }
 
@@ -1080,24 +1078,20 @@ export const getters = {
           }
 
           if (item.ifHaveType) {
-            const ifHaveTypeArray = Array.isArray(item.ifHaveType)
-              ? item.ifHaveType
-              : [item.ifHaveType];
+            const ifHaveTypeArray = Array.isArray(item.ifHaveType) ? item.ifHaveType : [item.ifHaveType];
             let satisfiesIfHave = true;
 
             // Support an array of required types that the user must have access to
             for (let i = 0; i < ifHaveTypeArray.length; i++) {
               const ifHaveType = ifHaveTypeArray[i];
               const targetedSchemas =
-                typeof ifHaveType === "string"
-                  ? schemas
-                  : rootGetters[`${ifHaveType.store}/all`](SCHEMA);
+                typeof ifHaveType === 'string' ? schemas : rootGetters[`${ ifHaveType.store }/all`](SCHEMA);
               const type =
-                typeof ifHaveType === "string" ? ifHaveType : ifHaveType?.type;
+                typeof ifHaveType === 'string' ? ifHaveType : ifHaveType?.type;
 
               const haveIds = filterBy(
                 targetedSchemas,
-                "id",
+                'id',
                 normalizeType(type)
               ).map((s) => s.id);
 
@@ -1122,7 +1116,7 @@ export const getters = {
 
           if (item.ifHaveSubTypes) {
             const hasSome = (item.ifHaveSubTypes || []).some((type) => {
-              return !!findBy(schemas, "id", normalizeType(type));
+              return !!findBy(schemas, 'id', normalizeType(type));
             });
 
             if (!hasSome) {
@@ -1131,21 +1125,21 @@ export const getters = {
           }
 
           if (
-            typeof item.ifRancherCluster !== "undefined" &&
+            typeof item.ifRancherCluster !== 'undefined' &&
             item.ifRancherCluster !== rootGetters.isRancher
           ) {
             continue;
           }
 
           if (item.ifFeature) {
-            if (item.ifFeature[0] === "!") {
-              const feature = item.ifFeature.replace("!", "");
+            if (item.ifFeature[0] === '!') {
+              const feature = item.ifFeature.replace('!', '');
 
-              if (rootGetters["features/get"](feature)) {
+              if (rootGetters['features/get'](feature)) {
                 continue;
               }
             } else {
-              if (!rootGetters["features/get"](item.ifFeature)) {
+              if (!rootGetters['features/get'](item.ifFeature)) {
                 continue;
               }
             }
@@ -1174,10 +1168,8 @@ export const getters = {
 
           // Ensure labelKey is taken into account... with a mock count
           // This is harmless if the translation doesn't require count
-          if (item.labelKey && rootGetters["i18n/exists"](item.labelKey)) {
-            item.label = rootGetters["i18n/t"](item.labelKey, {
-              count: 2,
-            }).trim();
+          if (item.labelKey && rootGetters['i18n/exists'](item.labelKey)) {
+            item.label = rootGetters['i18n/t'](item.labelKey, { count: 2 }).trim();
             delete item.labelKey; // Label should really take precedence over labelKey, but it doesn't, so remove it
           } else {
             item.label = item.label || item.name;
@@ -1217,7 +1209,7 @@ export const getters = {
   headersFor(state, getters, rootState, rootGetters) {
     return (schema, pagination) => {
       if (pagination) {
-        const storeHeadersFor = schema?.$ctx?.getters?.["headersFor"];
+        const storeHeadersFor = schema?.$ctx?.getters?.['headersFor'];
 
         if (storeHeadersFor) {
           const res = storeHeadersFor(
@@ -1234,14 +1226,14 @@ export const getters = {
       return createHeaders(
         { rootGetters },
         {
-          headers: state.headers,
-          typeOptions: getters["optionsFor"](schema, false),
+          headers:     state.headers,
+          typeOptions: getters['optionsFor'](schema, false),
           schema,
-          columns: {
-            state: STATE,
-            name: NAME,
+          columns:     {
+            state:     STATE,
+            name:      NAME,
             namespace: NAMESPACE_COL,
-            age: AGE,
+            age:       AGE,
           },
           pagination,
         }
@@ -1261,8 +1253,7 @@ export const getters = {
     return (rawType) => {
       const key = getters.componentFor(rawType);
 
-      return hasCustom(state, rootState, "list", key, (key) =>
-        resolveList(key)
+      return hasCustom(state, rootState, 'list', key, (key) => resolveList(key)
       );
     };
   },
@@ -1271,15 +1262,14 @@ export const getters = {
     return (rawType, subType) => {
       const key = getters.componentFor(rawType, subType);
 
-      return hasCustom(state, rootState, "detail", key, (key) =>
-        resolveDetail(key)
+      return hasCustom(state, rootState, 'detail', key, (key) => resolveDetail(key)
       );
     };
   },
 
   hasGraph(state, getters) {
     return (resource) => {
-      const typeOptions = getters["optionsFor"](resource);
+      const typeOptions = getters['optionsFor'](resource);
 
       if (typeOptions && typeOptions.hasGraph) {
         return graphConfigMap[resource];
@@ -1293,16 +1283,14 @@ export const getters = {
     return (rawType, subType) => {
       const key = getters.componentFor(rawType, subType);
 
-      return hasCustom(state, rootState, "edit", key, (key) =>
-        resolveEdit(key)
+      return hasCustom(state, rootState, 'edit', key, (key) => resolveEdit(key)
       );
     };
   },
 
   hasComponent(state, getters, rootState) {
     return (path) => {
-      return hasCustom(state, rootState, "edit", path, (path) =>
-        resolveEdit(path)
+      return hasCustom(state, rootState, 'edit', path, (path) => resolveEdit(path)
       );
     };
   },
@@ -1311,8 +1299,7 @@ export const getters = {
     return (rawType, subType) => {
       const key = getters.componentFor(rawType, subType);
 
-      return hasCustom(state, rootState, "promptRemove", key, () =>
-        require.resolve(`@shell/promptRemove/${key}`)
+      return hasCustom(state, rootState, 'promptRemove', key, () => require.resolve(`@shell/promptRemove/${ key }`)
       );
     };
   },
@@ -1321,8 +1308,7 @@ export const getters = {
     return (rawType, subType) => {
       const key = getters.componentFor(rawType, subType);
 
-      return hasCustom(state, rootState, "windowComponents", key, (key) =>
-        resolveWindowComponent(key)
+      return hasCustom(state, rootState, 'windowComponents', key, (key) => resolveWindowComponent(key)
       );
     };
   },
@@ -1337,7 +1323,7 @@ export const getters = {
     return (rawType, subType) => {
       return loadExtension(
         rootState,
-        "dialog",
+        'dialog',
         getters.componentFor(rawType, subType),
         importDialog
       );
@@ -1348,7 +1334,7 @@ export const getters = {
     return (rawType) => {
       return loadExtension(
         rootState,
-        "list",
+        'list',
         getters.componentFor(rawType),
         importList
       );
@@ -1359,7 +1345,7 @@ export const getters = {
     return (rawType, subType) => {
       return loadExtension(
         rootState,
-        "detail",
+        'detail',
         getters.componentFor(rawType, subType),
         importDetail
       );
@@ -1370,7 +1356,7 @@ export const getters = {
     return (rawType, subType) => {
       return loadExtension(
         rootState,
-        "edit",
+        'edit',
         getters.componentFor(rawType, subType),
         importEdit
       );
@@ -1381,7 +1367,7 @@ export const getters = {
     return (rawType, subType) => {
       return loadExtension(
         rootState,
-        "promptRemove",
+        'promptRemove',
         getters.componentFor(rawType, subType),
         importCustomPromptRemove
       );
@@ -1392,7 +1378,7 @@ export const getters = {
     return (rawType, subType) => {
       return loadExtension(
         rootState,
-        "windowComponents",
+        'windowComponents',
         getters.componentFor(rawType, subType),
         importWindowComponent
       );
@@ -1401,7 +1387,7 @@ export const getters = {
 
   importLogin(state, getters, rootState) {
     return (authType) => {
-      return loadExtension(rootState, "login", authType, importLogin);
+      return loadExtension(rootState, 'login', authType, importLogin);
     };
   },
 
@@ -1410,7 +1396,7 @@ export const getters = {
       let key = type;
 
       if (subType) {
-        key = `${type}/${subType}`;
+        key = `${ type }/${ subType }`;
       }
 
       if (state.cache.componentFor[key] !== undefined) {
@@ -1455,7 +1441,7 @@ export const getters = {
 
         if (
           group &&
-          typeof rule === "string" &&
+          typeof rule === 'string' &&
           group.match(stringToRegex(rule))
         ) {
           out = true;
@@ -1481,7 +1467,7 @@ export const getters = {
   activeProducts(state, getters, rootState, rootGetters) {
     const knownTypes = {};
     const knownGroups = {};
-    const isDev = rootGetters["prefs/get"](VIEW_IN_API);
+    const isDev = rootGetters['prefs/get'](VIEW_IN_API);
 
     if (state.schemaGeneration < 0) {
       // This does nothing, but makes activeProducts depend on schemaGeneration
@@ -1492,7 +1478,7 @@ export const getters = {
     return state.products.filter((p) => {
       const module = p.inStore;
 
-      if (p["public"] === false && !isDev) {
+      if (p['public'] === false && !isDev) {
         return false;
       }
 
@@ -1501,7 +1487,7 @@ export const getters = {
       }
 
       if (!knownTypes[module]) {
-        const schemas = rootGetters[`${module}/all`](SCHEMA);
+        const schemas = rootGetters[`${ module }/all`](SCHEMA);
 
         knownTypes[module] = [];
         knownGroups[module] = [];
@@ -1520,8 +1506,7 @@ export const getters = {
       }
 
       if (p.ifHaveType) {
-        const haveIds = knownTypes[module].filter((t) =>
-          t.match(stringToRegex(p.ifHaveType))
+        const haveIds = knownTypes[module].filter((t) => t.match(stringToRegex(p.ifHaveType))
         );
 
         if (!haveIds.length) {
@@ -1549,7 +1534,7 @@ export const getters = {
 
   isProductActive(state, getters) {
     return (name) => {
-      if (findBy(getters["activeProducts"], "name", name)) {
+      if (findBy(getters['activeProducts'], 'name', name)) {
         return true;
       }
 
@@ -1646,7 +1631,7 @@ export const mutations = {
 
     // We make an assumption that if the store for a product is 'cluster' it will be displayed within cluster explorer
     // Detect that here and set rootProduct and inExporer in this case
-    if (!existing?.rootProduct && existing?.inStore === "cluster") {
+    if (!existing?.rootProduct && existing?.inStore === 'cluster') {
       existing.rootProduct = LLMOS;
       // existing.inExplorer = (existing.rootProduct === EXPLORER);
     }
@@ -1661,7 +1646,7 @@ export const mutations = {
 
     copy.virtual = true;
 
-    const existing = findBy(state.virtualTypes[product], "name", copy.name);
+    const existing = findBy(state.virtualTypes[product], 'name', copy.name);
 
     if (existing) {
       Object.assign(existing, copy);
@@ -1686,12 +1671,12 @@ export const mutations = {
     copy.virtual = true;
     copy.schemas.forEach((schema) => {
       schema.links = {
-        collection: `/${SPOOFED_PREFIX}/${schema.id}`,
+        collection: `/${ SPOOFED_PREFIX }/${ schema.id }`,
         ...(schema.links || {}),
       };
     });
 
-    const existing = findBy(state.spoofedTypes[product], "type", copy.type);
+    const existing = findBy(state.spoofedTypes[product], 'type', copy.type);
 
     if (existing) {
       Object.assign(existing, copy);
@@ -1725,12 +1710,10 @@ export const mutations = {
   ignoreGroup(state, { regexOrString: match, cb }) {
     match = ensureRegex(match);
     // State shouldn't contain actual RegExp objects, because they don't serialize
-    cb
-      ? state.groupIgnore.push({
-          type: regexToString(match),
-          cb,
-        })
-      : state.groupIgnore.push(regexToString(match));
+    cb ? state.groupIgnore.push({
+      type: regexToString(match),
+      cb,
+    }) : state.groupIgnore.push(regexToString(match));
   },
 
   ignoreType(state, match) {
@@ -1756,7 +1739,9 @@ export const mutations = {
 
   // weightGroup({group: 'core', weight: 99}); -- higher groups are shown first
   // These operate on group names *after* mapping but *before* translation
-  weightGroup(state, { group, groups, weight, forBasic }) {
+  weightGroup(state, {
+    group, groups, weight, forBasic
+  }) {
     if (!groups) {
       groups = [];
     }
@@ -1792,7 +1777,9 @@ export const mutations = {
 
   // weightType('Cluster' 99); -- higher groups are shown first
   // These operate on *schema* type names, before mapping
-  weightType(state, { type, types, weight, forBasic }) {
+  weightType(state, {
+    type, types, weight, forBasic
+  }) {
     if (!types) {
       types = [];
     }
@@ -1811,11 +1798,15 @@ export const mutations = {
   // mapGroup('ugly.thing', 'Nice Thing', 1);
   // mapGroup(/ugly.thing.(stuff)', '$1', 2);
   // mapGroup(/ugly.thing.(stuff)', function(groupStr, ruleObj, regexMatch, typeObj) { return ucFirst(group.id) } , 2);
-  mapGroup(state, { match, replace, weight = 5, continueOnMatch = false }) {
+  mapGroup(state, {
+    match, replace, weight = 5, continueOnMatch = false
+  }) {
     _addMapping(state.groupMappings, match, replace, weight, continueOnMatch);
   },
 
-  mapType(state, { match, replace, weight = 5, continueOnMatch = false }) {
+  mapType(state, {
+    match, replace, weight = 5, continueOnMatch = false
+  }) {
     _addMapping(state.typeMappings, match, replace, weight, continueOnMatch);
   },
 
@@ -1849,35 +1840,35 @@ export const mutations = {
 
 export const actions = {
   removeProduct({ commit }, metadata) {
-    commit("remove", metadata);
+    commit('remove', metadata);
   },
 
   addFavorite({ dispatch, rootGetters }, type) {
-    const types = rootGetters["prefs/get"](FAVORITE_TYPES) || [];
+    const types = rootGetters['prefs/get'](FAVORITE_TYPES) || [];
 
     addObject(types, type);
 
     dispatch(
-      "prefs/set",
+      'prefs/set',
       { key: FAVORITE_TYPES, value: types },
       { root: true }
     );
   },
 
   removeFavorite({ dispatch, rootGetters }, type) {
-    const types = rootGetters["prefs/get"](FAVORITE_TYPES) || [];
+    const types = rootGetters['prefs/get'](FAVORITE_TYPES) || [];
 
     removeObject(types, type);
 
     dispatch(
-      "prefs/set",
+      'prefs/set',
       { key: FAVORITE_TYPES, value: types },
       { root: true }
     );
   },
 
   toggleGroup({ dispatch, rootGetters }, { group, expanded }) {
-    const groups = rootGetters["prefs/get"](EXPANDED_GROUPS);
+    const groups = rootGetters['prefs/get'](EXPANDED_GROUPS);
 
     if (expanded) {
       addObject(groups, group);
@@ -1886,19 +1877,19 @@ export const actions = {
     }
 
     dispatch(
-      "prefs/set",
+      'prefs/set',
       { key: EXPANDED_GROUPS, value: groups },
       { root: true }
     );
   },
 
   configureType({ commit }, options) {
-    commit("configureType", options);
+    commit('configureType', options);
   },
 };
 
 function _sortGroup(tree, mode) {
-  const by = ["weight:desc", "namespaced", "label"];
+  const by = ['weight:desc', 'namespaced', 'label'];
 
   tree.children = sortBy(tree.children, by);
 
@@ -1914,13 +1905,13 @@ function _applyMapping(objOrValue, mappings, keyField, cache, defaultFn) {
   let found = false;
 
   if (keyField) {
-    if (typeof objOrValue !== "object") {
+    if (typeof objOrValue !== 'object') {
       return objOrValue;
     }
 
     key = get(objOrValue, keyField);
 
-    if (typeof key !== "string") {
+    if (typeof key !== 'string') {
       return null;
     }
   }
@@ -1929,7 +1920,7 @@ function _applyMapping(objOrValue, mappings, keyField, cache, defaultFn) {
     return cache[key];
   }
 
-  let out = `${key}`;
+  let out = `${ key }`;
 
   for (const rule of mappings) {
     const re = stringToRegex(rule.match);
@@ -1999,31 +1990,31 @@ function stringToRegex(str) {
 
 function ifHave(getters, option) {
   switch (option) {
-    case IF_HAVE.MONITORING: {
-      return haveMonitoring(getters);
-    }
-    case IF_HAVE.PROJECT: {
-      return !!project(getters);
-    }
-    case IF_HAVE.NO_PROJECT: {
-      return !project(getters);
-    }
-    case IF_HAVE.MULTI_CLUSTER: {
-      return getters.isMultiCluster;
-    }
-    case IF_HAVE.ADMIN: {
-      return isAdminUser(getters);
-    }
-    default:
-      return false;
+  case IF_HAVE.MONITORING: {
+    return haveMonitoring(getters);
+  }
+  case IF_HAVE.PROJECT: {
+    return !!project(getters);
+  }
+  case IF_HAVE.NO_PROJECT: {
+    return !project(getters);
+  }
+  case IF_HAVE.MULTI_CLUSTER: {
+    return getters.isMultiCluster;
+  }
+  case IF_HAVE.ADMIN: {
+    return isAdminUser(getters);
+  }
+  default:
+    return false;
   }
 }
 
 // Could list a larger set of resources that typically only an admin user would have
 export function isAdminUser(getters) {
   const canEditSettings = (
-    getters["management/schemaFor"](MANAGEMENT.SETTING)?.resourceMethods || []
-  ).includes("PUT");
+    getters['management/schemaFor'](MANAGEMENT.SETTING)?.resourceMethods || []
+  ).includes('PUT');
 
   return canEditSettings;
 }
@@ -2032,20 +2023,19 @@ function _findColumnByName(schema, colName) {
   const attributes = schema.attributes || {};
   const columns = attributes.columns || [];
 
-  return findBy(columns, "name", colName);
+  return findBy(columns, 'name', colName);
 }
 
 function ifHaveVerb(rootGetters, module, verb, haveIds) {
   for (const haveId of haveIds) {
-    const schema = rootGetters[`${module}/schemaFor`](haveId);
+    const schema = rootGetters[`${ module }/schemaFor`](haveId);
     const want = verb.toLowerCase();
     const collectionMethods = schema.collectionMethods || [];
     const resourceMethods = schema.resourceMethods || [];
-    const have = [...collectionMethods, ...resourceMethods].map((x) =>
-      x.toLowerCase()
+    const have = [...collectionMethods, ...resourceMethods].map((x) => x.toLowerCase()
     );
 
-    if (!have.includes(want) && !have.includes(`blocked-${want}`)) {
+    if (!have.includes(want) && !have.includes(`blocked-${ want }`)) {
       return false;
     }
   }
@@ -2055,26 +2045,26 @@ function ifHaveVerb(rootGetters, module, verb, haveIds) {
 
 // Look at the namespace filters to determine if a project is selected
 export function project(getters) {
-  const clusterId = getters["currentCluster"]?.id;
+  const clusterId = getters['currentCluster']?.id;
 
   if (!clusterId) {
     return null;
   }
 
-  const filters = getters["namespaceFilters"];
+  const filters = getters['namespaceFilters'];
   const namespaces = [];
   let projectName = null;
 
   for (const filter of filters) {
-    const [type, id] = filter.split("://", 2);
+    const [type, id] = filter.split('://', 2);
 
-    if (type === "project") {
+    if (type === 'project') {
       if (projectName !== null) {
         // More than one project selected
         return null;
       }
       projectName = id;
-    } else if (type === "ns") {
+    } else if (type === 'ns') {
       namespaces.push(id);
     } else {
       // Something other than project or namespace
@@ -2089,9 +2079,9 @@ export function project(getters) {
 
   // We have one project and a set of namespaces
   // Check that all of the namespaces belong to the project
-  const project = getters["management/byId"](
+  const project = getters['management/byId'](
     MANAGEMENT.PROJECT,
-    `${clusterId}/${projectName}`
+    `${ clusterId }/${ projectName }`
   );
 
   // No additional namespaces means just the project is selected
@@ -2147,11 +2137,12 @@ function loadExtension(rootState, kind, key, fallback) {
   const ext = rootState.$plugin.getDynamic(kind, key);
 
   if (ext) {
-    if (typeof ext === "function") {
+    if (typeof ext === 'function') {
       return defineAsyncComponent(ext);
     }
 
     return () => defineAsyncComponent(ext);
   }
+
   return fallback(key);
 }

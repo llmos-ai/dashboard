@@ -20,8 +20,8 @@ import { getVendor, getProduct } from '@shell/config/private-label';
 import { SETTING } from '@shell/config/settings';
 
 export default {
-  name: 'Login',
-  layout: 'unauthenticated',
+  name:       'Login',
+  layout:     'unauthenticated',
   components: {
     AsyncButton,
     CopyCode,
@@ -36,19 +36,19 @@ export default {
     const username = $cookies.get(USERNAME, { parseJSON: false }) || '';
 
     return {
-      product: getProduct(),
+      product:            getProduct(),
       username,
-      password: '',
-      remember: !!username,
-      timedOut: this.$route.query[TIMED_OUT] === _FLAGGED,
-      loggedOut: this.$route.query[LOGGED_OUT] === _FLAGGED,
-      err: this.$route.query.err,
-      customLoginError: {},
-      hasLocal: true,
-      showLocal: true,
+      password:           '',
+      remember:           !!username,
+      timedOut:           this.$route.query[TIMED_OUT] === _FLAGGED,
+      loggedOut:          this.$route.query[LOGGED_OUT] === _FLAGGED,
+      err:                this.$route.query.err,
+      customLoginError:   {},
+      hasLocal:           true,
+      showLocal:          true,
       showLocaleSelector: true,
-      firstLogin: false,
-      vendor: '',
+      firstLogin:         false,
+      vendor:             '',
     };
   },
 
@@ -69,9 +69,7 @@ export default {
         return this.t('login.error');
       }
 
-      return this.err?.length
-        ? this.t('login.specificError', { msg: this.err })
-        : '';
+      return this.err?.length ? this.t('login.specificError', { msg: this.err }) : '';
     },
 
     errorToDisplay() {
@@ -80,7 +78,7 @@ export default {
         this.customLoginError?.message &&
         this.errorMessage
       ) {
-        return `${this.customLoginError.message} \n ${this.errorMessage}`;
+        return `${ this.customLoginError.message } \n ${ this.errorMessage }`;
       }
 
       if (this.errorMessage) {
@@ -98,11 +96,12 @@ export default {
   async fetch() {
     const publicUIInfo = await this.$store.dispatch('auth/getPublicUIInfo');
     const firstLogin = publicUIInfo[SETTING.FIRST_LOGIN] === 'true';
+
     this.vendor = getVendor(publicUIInfo[SETTING.PL]);
 
     const { value } = await this.$store.dispatch('management/find', {
       type: MANAGEMENT.SETTING,
-      id: SETTING.BANNERS,
+      id:   SETTING.BANNERS,
     });
 
     this.customLoginError = JSON.parse(value).loginError;
@@ -120,7 +119,7 @@ export default {
 
   methods: {
     displayName(provider) {
-      return this.t(`model.authConfig.provider.${provider}`);
+      return this.t(`model.authConfig.provider.${ provider }`);
     },
 
     toggleLocal() {
@@ -158,16 +157,16 @@ export default {
       try {
         await this.$store.dispatch('auth/login', {
           provider: 'local',
-          body: {
-            username: this.username,
-            password: this.password,
+          body:     {
+            username:     this.username,
+            password:     this.password,
             responseType: 'cookie',
           },
         });
 
         const users = await this.$store.dispatch('management/findAll', {
           type: MANAGEMENT.USER,
-          opt: { url: `/v1/${MANAGEMENT.USER}?me=true` },
+          opt:  { url: `/v1/${ MANAGEMENT.USER }?me=true` },
         });
 
         if (!!users?.[0]) {
@@ -176,11 +175,11 @@ export default {
 
         if (this.remember) {
           this.$cookies.set(USERNAME, this.username, {
-            encode: (x) => x,
-            maxAge: 86400 * 365,
-            path: '/',
+            encode:   (x) => x,
+            maxAge:   86400 * 365,
+            path:     '/',
             sameSite: true,
-            secure: true,
+            secure:   true,
           });
         } else {
           this.$cookies.remove(USERNAME);
@@ -215,11 +214,21 @@ export default {
           data-testid="login__messages"
           :class="{ 'login-messages--hasContent': hasLoginMessage }"
         >
-          <Banner v-if="errorToDisplay" :label="errorToDisplay" color="error" />
-          <h4 v-else-if="loggedOut" class="text-success text-center">
+          <Banner
+            v-if="errorToDisplay"
+            :label="errorToDisplay"
+            color="error"
+          />
+          <h4
+            v-else-if="loggedOut"
+            class="text-success text-center"
+          >
             {{ t('login.loggedOut') }}
           </h4>
-          <h4 v-else-if="timedOut" class="text-error text-center">
+          <h4
+            v-else-if="timedOut"
+            class="text-error text-center"
+          >
             {{ t('login.loginAgain') }}
           </h4>
         </div>
@@ -230,16 +239,25 @@ export default {
           :class="{ 'mt-30': !hasLoginMessage }"
           data-testid="first-login-message"
         >
-          <t k="setup.defaultPassword.intro" :raw="true" />
+          <t
+            k="setup.defaultPassword.intro"
+            :raw="true"
+          />
 
           <div>
-            <t k="setup.defaultPassword.scriptPrefix" :raw="true" />
+            <t
+              k="setup.defaultPassword.scriptPrefix"
+              :raw="true"
+            />
           </div>
           <CopyCode class="copy-code">
             {{ kubectlCmd }}
           </CopyCode>
           <div>
-            <t k="setup.defaultPassword.dockerSuffix" :raw="true" />
+            <t
+              k="setup.defaultPassword.dockerSuffix"
+              :raw="true"
+            />
           </div>
         </div>
         <template v-if="hasLocal">
@@ -276,9 +294,9 @@ export default {
               <div class="col span-12 text-center">
                 <AsyncButton
                   id="submit"
+                  ref="loginLocalButton"
                   data-testid="login-submit"
                   type="primary"
-                  ref="loginLocalButton"
                   size="large"
                   :action-label="t('login.loginWithLocal')"
                   :waiting-label="t('login.loggingIn')"
@@ -286,7 +304,10 @@ export default {
                   :error-label="t('asyncButton.default.error')"
                   @click="loginLocal"
                 />
-                <div v-if="!firstLogin" class="mt-20">
+                <div
+                  v-if="!firstLogin"
+                  class="mt-20"
+                >
                   <Checkbox
                     v-model:value="remember"
                     :label="t('login.remember.label')"
@@ -296,7 +317,10 @@ export default {
               </div>
             </div>
           </form>
-          <div v-if="hasLocal && !showLocal" class="mt-20 text-center">
+          <div
+            v-if="hasLocal && !showLocal"
+            class="mt-20 text-center"
+          >
             <a
               id="login-useLocal"
               data-testid="login-useLocal"
@@ -307,7 +331,10 @@ export default {
             </a>
           </div>
         </template>
-        <div v-if="showLocaleSelector" class="locale-elector text-center">
+        <div
+          v-if="showLocaleSelector"
+          class="locale-elector text-center"
+        >
           <LocaleSelector mode="login" />
         </div>
       </div>

@@ -335,13 +335,9 @@ export function init(store) {
     group:      'advanced',
     name:       LLMOS.TOOL,
     namespaced: true,
-    // route:      {
-    //   name:   `c-cluster-llmos-tools`,
-    //   // params: { resource: LLMOS.TOOL }
-    // },
-    route:      { name: 'c-cluster-llmos-tools' },
-    exact:  false,
-    weight: 101,
+    route:      { name: `c-cluster-llmos-tools` },
+    exact:      false,
+    weight:     101,
   });
 
   basicType(
