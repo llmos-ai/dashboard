@@ -35,23 +35,24 @@ export default {
     const key = JSON.stringify(headers) + method + opt.url;
     let waiting;
 
-    if (method === 'get') {
-      waiting = state.deferredRequests[key];
+    // if (method === 'get') {
+    //   waiting = state.deferredRequests[key];
+    //   console.log('🚀 ~ request ~ waiting:', waiting);
 
-      if (waiting) {
-        const later = deferred();
+    //   if (waiting) {
+    //     const later = deferred();
 
-        waiting.push(later);
+    //     waiting.push(later);
 
-        // console.log('Deferred request for', key, waiting.length);
+    //     // console.log('Deferred request for', key, waiting.length);
 
-        return later.promise;
-      } else {
-        // Set it to something so that future requests know to defer.
-        waiting = [];
-        state.deferredRequests[key] = waiting;
-      }
-    }
+    //     return later.promise;
+    //   } else {
+    //     // Set it to something so that future requests know to defer.
+    //     waiting = [];
+    //     state.deferredRequests[key] = waiting;
+    //   }
+    // }
 
     if (
       opt.stream &&

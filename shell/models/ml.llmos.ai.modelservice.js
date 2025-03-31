@@ -15,7 +15,7 @@ export default class ModelService extends MlWorkload {
       },
       spec: {
         replicas:        1,
-        modelRegistry:   'huggingface',
+        modelRegistry:   '',
         model:           '',
         servedModelName: '',
         serviceType:     'ClusterIP',
