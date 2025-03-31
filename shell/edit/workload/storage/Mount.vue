@@ -114,15 +114,14 @@ export default {
         />
       </div>
       <div class="remove">
-        <button
+        <a-button
           v-if="mode !== 'view'"
           id="remove-mount"
-          type="button"
-          class="btn btn-sm role-link"
+          type="link"
           @click="remove(volumeMount)"
         >
           {{ t('generic.remove') }}
-        </button>
+        </a-button>
       </div>
     </div>
     <div class="row">

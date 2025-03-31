@@ -112,14 +112,12 @@ export default {
           <template v-else-if="addon.spec.enabled">
             <a-button
               v-clean-html="t('managedAddon.tools.action.disable')"
-              type="primary"
               size="small"
               @click="disable(addon)"
             />
             <router-link :to="addon.editUrl">
               <a-button
                 v-clean-html="t('managedAddon.tools.action.edit')"
-                type="primary"
                 size="small"
               />
             </router-link>

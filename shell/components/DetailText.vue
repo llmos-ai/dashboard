@@ -184,7 +184,6 @@ export default {
     <CopyToClipboard
       v-if="copy && !isBinary"
       :text="value"
-      class="role-tertiary"
       action-color=""
     />
   </div>

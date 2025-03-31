@@ -802,7 +802,7 @@ export default {
                         !isView &&
                         isValueFieldEmpty(row[valueName])
                     "
-                    class="btn btn-sm role-secondary file-selector"
+                    class="file-selector"
                     :label="t('generic.upload')"
                     :include-file-name="true"
                     :aria-label="t('generic.ariaLabel.value', { index: i })"

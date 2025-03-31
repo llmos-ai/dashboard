@@ -600,9 +600,9 @@ export default {
           </template>
         </Select>
         <div class="log-action log-action-group ml-5">
-          <button
-            class="btn role-primary wm-btn"
+          <a-button
             role="button"
+            type="primary"
             :aria-label="t('wm.containerLogs.follow')"
             :aria-disabled="isFollowing"
             :disabled="isFollowing"
@@ -613,10 +613,9 @@ export default {
               k="wm.containerLogs.follow"
             />
             <i class="wm-btn-small icon icon-chevron-end" />
-          </button>
-          <button
-            class="btn role-primary wm-btn"
-            role="button"
+          </a-button>
+          <a-button
+            type="primary"
             :aria-label="t('wm.containerLogs.clear')"
             @click="clear"
           >
@@ -625,7 +624,7 @@ export default {
               k="wm.containerLogs.clear"
             />
             <i class="wm-btn-small icon icon-close" />
-          </button>
+          </a-button>
           <AsyncButton
             mode="download"
             role="button"
@@ -666,9 +665,9 @@ export default {
               :container="false"
               @focus.capture="openContainerMenu"
             >
-              <button
-                class="btn role-primary btn-cog"
+              <a-button
                 role="button"
+                type="primary"
                 :aria-label="t('wm.containerLogs.options')"
               >
                 <i
@@ -679,7 +678,7 @@ export default {
                   class="icon icon-chevron-up"
                   :alt="t('wm.containerLogs.expand')"
                 />
-              </button>
+              </a-button>
 
               <template #popper>
                 <div class="filter-popup">

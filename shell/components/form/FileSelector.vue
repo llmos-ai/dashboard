@@ -154,7 +154,7 @@ export default {
   <a-button
     v-if="!isView"
     :disabled="disabled"
-    class="file-selector btn"
+    class="file-selector"
     @click="selectFile"
   >
     <span>{{ label }}</span>

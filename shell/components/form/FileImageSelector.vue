@@ -60,7 +60,6 @@ export default {
   <FileSelector
     v-if="!value && !isView"
     :value="value"
-    class="btn role-primary"
     :mode="mode"
     :read-as-data-url="true"
     :byte-limit="byteLimit"

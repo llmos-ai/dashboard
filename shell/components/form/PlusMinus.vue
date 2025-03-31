@@ -49,27 +49,26 @@ export default {
       v-if="label"
       class="label"
     >{{ label }} </span>
-    <button
+    <a-button
       v-clean-tooltip="minusTooltip"
       :disabled="disabled || !canMinus"
       type="button"
-      class="btn btn-sm role-secondary"
+      size="small"
       @click="$emit('minus')"
     >
       <i class="icon icon-sm icon-minus" />
-    </button>
+    </a-button>
     <div class="value">
       {{ value }}
     </div>
-    <button
+    <a-button
       v-clean-tooltip="plusTooltip"
       :disabled="disabled || !canPlus"
-      type="button"
-      class="btn btn-sm role-secondary"
+      size="small"
       @click="$emit('plus')"
     >
       <i class="icon icon-sm icon-plus" />
-    </button>
+    </a-button>
   </div>
 </template>
 

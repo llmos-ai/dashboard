@@ -48,14 +48,13 @@ export default {
 
 <template>
   <div>
-    <button
+    <a-button
       v-if="mode!=='view'"
-      type="button"
-      class="role-link btn btn-lg remove-vol"
+      type="link"
       @click="$emit('remove')"
     >
       <i class="icon icon-x" />
-    </button>
+    </a-button>
     <div>
       <h3>{{ t('workload.storage.subtypes.csi') }}</h3>
       <div class="row mb-10">

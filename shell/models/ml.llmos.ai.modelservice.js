@@ -14,6 +14,9 @@ export default class ModelService extends MlWorkload {
         annotations: {},
       },
       spec: {
+        tags:            [],
+        libraryName:     '',
+        pipelineTag:     '',
         replicas:        1,
         modelRegistry:   '',
         model:           '',

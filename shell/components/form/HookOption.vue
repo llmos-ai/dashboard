@@ -203,28 +203,28 @@ export default {
           />
         </template>
         <div class="remove">
-          <button
+          <a-button
             v-if="!isView"
-            type="button"
-            class="btn role-link ml0"
+            type="link"
+            class="ml0"
             :disabled="mode==='view'"
             @click.stop="removeHeader(index)"
           >
             <t k="generic.remove" />
-          </button>
+          </a-button>
         </div>
       </div>
 
       <div>
-        <button
+        <a-button
           v-if="!isView"
-          type="button"
-          class="btn role-link mb-20"
+          type="link"
+          class="mb-20"
           :disabled="mode === 'view'"
           @click.stop="addHeader"
         >
           Add Header
-        </button>
+        </a-button>
       </div>
     </template>
   </div>

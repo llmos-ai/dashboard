@@ -27,7 +27,6 @@ import AdvancedFiltering from './advanced-filtering';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { getParent } from '@shell/utils/dom';
 import { FORMATTERS } from '@shell/components/SortableTable/sortable-config';
-import ButtonMultiAction from '@shell/components/ButtonMultiAction.vue';
 import ActionMenu from '@shell/components/ActionMenuShell.vue';
 
 // Uncomment for table performance debugging
@@ -63,7 +62,6 @@ export default {
     AsyncButton,
     ActionDropdown,
     LabeledSelect,
-    ButtonMultiAction,
     ActionMenu,
   },
   mixins: [
@@ -1145,7 +1143,7 @@ export default {
                   />
                   <span v-clean-html="act.label" />
                 </a-button>
-
+                <!-- TODO: update live col width -->
                 <ActionDropdown
                   :class="bulkActionsDropdownClass"
                   class="bulk-actions-dropdown"
@@ -1248,14 +1246,14 @@ export default {
             ref="advanced-filter-group"
             class="advanced-filter-group"
           >
-            <button
-              class="btn role-primary"
+            <a-button
+              type="primary"
               @click="
                 advancedFilteringVisibility = !advancedFilteringVisibility
               "
             >
               {{ t('sortableTable.addFilter') }}
-            </button>
+            </a-button>
             <div
               v-show="advancedFilteringVisibility"
               class="advanced-filter-container"
@@ -1284,19 +1282,18 @@ export default {
                 />
               </div>
               <div class="bottom-block">
-                <button
-                  class="btn role-secondary"
+                <a-button
                   :disabled="!advancedFilteringValues.length"
                   @click="clearAllAdvancedFilters"
                 >
                   {{ t('sortableTable.resetFilters') }}
-                </button>
-                <button
-                  class="btn role-primary"
+                </a-button>
+                <a-button
+                  type="primary"
                   @click="addAdvancedFilter"
                 >
                   {{ t('sortableTable.add') }}
-                </button>
+                </a-button>
               </div>
             </div>
           </div>

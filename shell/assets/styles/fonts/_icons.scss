@@ -40,6 +40,10 @@ $icon-inverse:          #fff !default;
   display: inline-block;
 }
 
+[class^="icon-"], [class*=" icon-"] {
+  line-height: inherit;
+}
+
 // Sizes
 .icon-fw {
   width: math.div(18em, 14);

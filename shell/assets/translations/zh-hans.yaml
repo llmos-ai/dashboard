@@ -5810,6 +5810,16 @@ unit:
       one { 天 }
       other { 天 }
     }
+  month: |-
+    {count, plural,
+      one { 个月 }
+      other { 个月 }
+    }
+  year: |-
+    {count, plural,
+      one { 年 }
+      other { 年 }
+    }
 workloadPorts:
   addPort: 添加端口或 Service
   remove: 移除
@@ -6381,3 +6391,16 @@ chat:
     top_p: 通过核心采样控制多样性：0.5 表示考虑所有基于概率权重选项的一半。
     seed: 如果指定，我们的系统将尽最大努力进行确定性采样，以便使用相同 seed 和参数的重复请求应返回相同的结果。
     stop: 停止序列是一个预定义或用户指定的文本字符串，当这些序列出现时，它会提示 AI 停止生成后续的 token。
+
+modelService:
+  model: 模型名称
+  searchPlaceholder: '从 { source } 搜索模型'
+  modelTooltip: Name or path of the huggingface model
+  modelPlaceholder: e.g., facebook/opt-125m
+  modelName: Served Model Name
+  modelNamePlaceholder: The model name to use in the API
+  image: Image
+  volumes: Volumes
+  huggingFaceToken: Hugging Face Hub Token
+  hf:
+    endpoint: Hugging Face Mirror Endpoint

@@ -242,13 +242,12 @@ export default {
           v-if="showRemove"
           class="remove"
         >
-          <button
-            type="button"
-            class="btn role-link"
+          <a-button
+            type="link"
             @click="remove(idx)"
           >
             <t k="generic.remove" />
-          </button>
+          </a-button>
         </div>
         <Error
           :value="{...row, idx}"
@@ -260,13 +259,11 @@ export default {
       v-if="showAdd"
       class="footer"
     >
-      <button
-        type="button"
-        class="btn role-tertiary add"
+      <a-button
         @click="add()"
       >
         <t k="generic.add" />
-      </button>
+      </a-button>
     </div>
   </div>
 </template>

@@ -225,13 +225,12 @@ export default {
             v-if="showRemove"
             class="remove"
           >
-            <button
-              type="button"
-              class="btn role-link"
+            <a-button
+              type="link"
               @click="remove(idx)"
             >
               Remove
-            </button>
+            </a-button>
           </td>
         </tr>
       </tbody>
@@ -240,13 +239,11 @@ export default {
       v-if="showAdd"
       class="footer"
     >
-      <button
-        type="button"
-        class="btn role-tertiary add"
+      <a-button
         @click="add()"
       >
         Add Port
-      </button>
+      </a-button>
     </div>
   </div>
 </template>

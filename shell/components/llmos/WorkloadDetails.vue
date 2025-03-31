@@ -241,6 +241,10 @@ export default {
     canScale() {
       return !!SCALABLE_TYPES.includes(this.value.type) && this.value.canUpdate;
     },
+
+    tags() {
+      return this.value.spec?.tags || [];
+    }
   },
   methods: {
     async scale(isUp) {
@@ -298,6 +302,20 @@ export default {
 <template>
   <Loading v-if="$fetchState.pending" />
   <div v-else>
+    <div class="tags mb-10">
+      <a-space
+        :size="[4, 4]"
+        wrap
+      >
+        <a-tag
+          v-for="tag in tags"
+          :key="tag"
+          color="default"
+        >
+          {{ tag }}
+        </a-tag>
+      </a-space>
+    </div>
     <div
       v-if="canScale"
       class="right-align flex"

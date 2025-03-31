@@ -90,21 +90,20 @@ export default {
       <div class="dialog-buttons mt-20">
         <slot name="buttons" />
         <div v-if="!$slots.buttons">
-          <button
-            class="btn role-secondary"
+          <a-button
             @click="closeDialog(false)"
           >
             {{ t('generic.cancel') }}
-          </button>
-          <button
+          </a-button>
+          <a-button
             v-if="!mode"
-            class="btn role-primary ml-10"
             @click="closeDialog(true)"
           >
             {{ t('generic.ok') }}
-          </button>
+          </a-button>
           <AsyncButton
             v-else
+            type="primary"
             :mode="mode"
             class="ml-10"
             @click="ok"

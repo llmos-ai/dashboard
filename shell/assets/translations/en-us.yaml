@@ -1791,6 +1791,12 @@ graphOptions:
   refresh: Refresh
   range: Range
 
+codeMirror:
+  escapeText: Press Shift+Escape to blur from editor
+  keymap:
+    tooltip: Key mapping preference.
+    indicatorToolip: "Key mapping: {name}"
+
 growl:
   clearAll: Clear All Notifications
   disconnectError:
@@ -6112,6 +6118,16 @@ unit:
       one { day }
       other { days }
     }
+  month: |-
+    {count, plural,
+      one { month }
+      other { month }
+    }
+  year: |-
+    {count, plural,
+      one { year }
+      other { year }
+    }
 workloadPorts:
   addPort: Add Port or Service
   remove: Remove
@@ -6546,6 +6562,7 @@ ray:
 
 modelService:
   model: Model Name
+  searchPlaceholder: 'Search Models from { source }'
   modelTooltip: Name or path of the huggingface model
   modelPlaceholder: e.g., facebook/opt-125m
   modelName: Served Model Name

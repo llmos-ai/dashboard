@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import MarkedView from '@shell/components/MarkedView.vue';
+import MarkedView from '@shell/components/MarkedView';
 import EditInput from '@shell/components/AI/EditInput.vue';
 
 const props = defineProps({

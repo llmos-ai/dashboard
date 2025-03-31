@@ -91,15 +91,13 @@ const actionAriaLabel = (opt) => {
 <template>
   <a-radio-group
     :value="value"
-    :button-style="buttonStyle"
+    button-style="solid"
   >
     <a-radio-button
       v-for="(opt, idx) in optionObjects"
       :key="idx"
       v-clean-tooltip="opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip"
       :value="opt.value"
-      :type="opt.active"
-      :size="size"
       :aria-label="actionAriaLabel(opt)"
       @click="change(opt.value)"
     >

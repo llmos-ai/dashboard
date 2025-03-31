@@ -141,15 +141,13 @@ export default {
         :loading="loading"
         @update:value="changeSelected"
       />
-      <button
+      <a-button
         v-if="!isView"
-        type="button"
-        class="btn role-secondary"
         data-testid="clear-search"
         @click="clearSearch($event)"
       >
         {{ t("generic.clear") }}
-      </button>
+      </a-button>
     </div>
     <template v-if="serviceNameNew">
       <div class="row span-6">

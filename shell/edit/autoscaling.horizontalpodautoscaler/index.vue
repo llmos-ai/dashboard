@@ -260,14 +260,13 @@ export default {
             :initial-empty-row="true"
           >
             <template #remove-button="removeProps">
-              <button
+              <a-button
                 v-if="value.spec.metrics.length > 1"
-                type="button"
-                class="btn role-link close btn-sm"
+                type="link"
                 @click="removeProps.remove"
               >
                 <i class="icon icon-x" />
-              </button>
+              </a-button>
               <span v-else />
             </template>
             <template #default="props">

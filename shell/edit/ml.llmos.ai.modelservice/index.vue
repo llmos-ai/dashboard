@@ -7,9 +7,10 @@ import { mergeEnvs } from '@shell/utils/merge';
 import { SETTING } from '@shell/config/settings';
 import { allHash } from '@shell/utils/promise';
 import RemoteModelList from '@shell/edit/ml.llmos.ai.modelservice/RemoteModelList.vue';
+import { _CREATE } from '@shell/config/query-params';
 
 export default {
-  name:       'ModelService',
+  name:       'EditModelService',
   mixins:     [CreateEditView, FormValidation, LLMOSWorkload],
   components: { RemoteModelList },
   props:      {
@@ -29,22 +30,29 @@ export default {
           return { metadata: { name: text } };
         }
       },
-      type: Function
+      type: Function,
     },
   },
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
     const hash = await allHash({
-      modelServiceDefaultImage: this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.MODEL_SERVICE_DEFAULT_IMAGE),
-      settings:                 this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }),
+      modelServiceDefaultImage: this.$store.getters[`${ inStore }/byId`](
+        MANAGEMENT.SETTING,
+        SETTING.MODEL_SERVICE_DEFAULT_IMAGE
+      ),
+      settings: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }),
     });
 
-    const huggingFaceProxy = hash.settings?.find((item) => item.id === SETTING.HUGGINGfACE_ENDPOINT);
+    const huggingFaceProxy = hash.settings?.find(
+      (item) => item.id === SETTING.HUGGINGfACE_ENDPOINT
+    );
 
     const container = this.value.spec?.template?.spec?.containers[0];
 
-    const hfToken = container.env.find((env) => env.name === 'HUGGING_FACE_HUB_TOKEN');
+    const hfToken = container.env.find(
+      (env) => env.name === 'HUGGING_FACE_HUB_TOKEN'
+    );
 
     if (!hfToken) {
       this.hfToken = {
@@ -60,8 +68,12 @@ export default {
     }
 
     if (!this.container.image) {
-      const systemImageRegistry = hash.settings?.find((item) => item.id === SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY);
-      const msDefaultImage = hash.modelServiceDefaultImage.value || hash.modelServiceDefaultImage.default;
+      const systemImageRegistry = hash.settings?.find(
+        (item) => item.id === SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY
+      );
+      const msDefaultImage =
+        hash.modelServiceDefaultImage.value ||
+        hash.modelServiceDefaultImage.default;
       const registry = systemImageRegistry?.value || 'ghcr.io';
 
       const image = this.processImageString(msDefaultImage, registry);
@@ -77,10 +89,13 @@ export default {
       'VLLM_USE_MODELSCOPE',
     ];
 
+    const items = [{ title: 'Choose Model' }, { title: 'Set Config' }];
+
     return {
-      open:            true,
-      searchModelName: '',
-      hfToken:         {
+      current: 0,
+      items,
+      open:    false,
+      hfToken: {
         name:      'HUGGING_FACE_HUB_TOKEN',
         valueFrom: { secretKeyRef: { name: '', key: '' } },
       },
@@ -90,13 +105,46 @@ export default {
       sourceOptions: [
         { label: 'HuggingFace', value: 'huggingface' },
         { label: 'ModelScope', value: 'modelscope' },
-        { label: 'Local', value: 'local' }
-      ]
+        { label: 'Local', value: 'local' },
+      ],
     };
   },
 
   created() {
     this.registerBeforeHook(this.willSave, 'willSave');
+  },
+
+  computed: {
+    showRemoteList() {
+      return (
+        this.spec.modelRegistry === 'huggingface' ||
+        this.spec.modelRegistry === 'modelscope'
+      );
+    },
+    disableNext() {
+      return !this.spec.modelRegistry;
+    },
+
+    validationPassed() {
+      return (
+        !!this.spec.modelRegistry &&
+        !!this.value.metadata.name &&
+        !!this.spec.model
+      );
+    },
+
+    // page show logic
+    disableModelInput() {
+      if (
+        this.spec.modelRegistry &&
+        this.spec.modelRegistry !== 'local' &&
+        this.mode === _CREATE
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
   },
 
   methods: {
@@ -108,22 +156,24 @@ export default {
         this.errors.push(this.t('validation.required', { key: 'Image' }, true));
       }
 
-      if (this.container.resources.requests.cpu === 0 || this.container.resources.requests.memory === 0) {
-        this.errors.push(this.t('validation.required', { key: 'CPU or Memory' }, true));
+      if (
+        this.container.resources.requests.cpu === 0 ||
+        this.container.resources.requests.memory === 0
+      ) {
+        this.errors.push(
+          this.t('validation.required', { key: 'CPU or Memory' }, true)
+        );
       }
 
       if (this.spec.model === '') {
-        this.errors.push(this.t('validation.required', { key: 'Model Name' }, true));
+        this.errors.push(
+          this.t('validation.required', { key: 'Model Name' }, true)
+        );
       }
 
       if (this.errors.length > 0) {
         return Promise.reject(this.errors);
       }
-    },
-
-    chooseRemoteModel(model) {
-      console.log('----model', model);
-      this.open = true;
     },
 
     update() {
@@ -138,7 +188,8 @@ export default {
 
     processImageString(imageString, customRegistry) {
       // Check if the image contains a registry
-      const regex = /^([a-zA-Z0-9._-]+\/)?([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+):([a-zA-Z0-9._-]+)$/;
+      const regex =
+        /^([a-zA-Z0-9._-]+\/)?([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+):([a-zA-Z0-9._-]+)$/;
 
       const match = imageString.match(regex);
 
@@ -154,7 +205,20 @@ export default {
         }
       }
       throw new Error('Invalid image string format.');
-    }
+    },
+    next() {
+      this.current++;
+    },
+    prev() {
+      this.current--;
+    },
+
+    updateModelInfo(item) {
+      this.spec.tags = item.tags || [];
+      this.spec.pipelineTag = item.pipelineTag || '';
+      this.spec.libraryName = item.libraryName || '';
+      this.spec.model = item.id;
+    },
   },
 };
 </script>
@@ -166,6 +230,8 @@ export default {
     :mode="mode"
     :errors="errors"
     :apply-hooks="applyHooks"
+    class="flex flex-col h-full"
+    :validation-passed="validationPassed"
     @finish="save"
   >
     <NameNsDescription
@@ -174,200 +240,244 @@ export default {
       :mode="mode"
     />
 
-    <ResourceTabs
-      :value="value"
-      class="mt-15"
-      :need-conditions="false"
-      :need-related="false"
-      :side-tabs="true"
+    <a-steps
+      :current="0"
+      :items="items"
+      class="mb-10"
+    />
+
+    <LabeledSelect
+      v-if="current === 0"
+      v-model:value="spec.modelRegistry"
+      label="Source"
+      :options="sourceOptions"
       :mode="mode"
-    >
-      <Tab
-        name="general"
-        label="General"
-        class="bordered-table"
-        :weight="tabWeightMap.general"
-      >
-        <!-- TODO: gutter ? -->
-        <a-row
-          :gutter="[16]"
-          class="mb-[16px]"
-        >
-          <a-col :span="12">
-            <LabeledSelect
-              v-model:value="spec.modelRegistry"
-              label="Source"
-              :options="sourceOptions"
-              :mode="mode"
-              required
-              @update:value="chooseRemoteModel"
-            />
-          </a-col>
+      required
+      class="mb-10"
+    />
 
-          <a-col :span="12">
-            <LabeledInput
-              v-model:value="spec.model"
-              :required="true"
-              :localized-label="true"
-              :mode="mode"
-              :label="t('modelService.model')"
-              :tooltip="t('modelService.modelTooltip')"
-              :placeholder="t('modelService.modelPlaceholder')"
-            />
-          </a-col>
-        </a-row>
+    <div class="grow-1 h-[0] flex flex-col">
+      <div class="grow-1">
+        <RemoteModelList
+          v-if="current === 0 && showRemoteList"
+          :key="spec.modelRegistry"
+          class="h-full overflow-hidden"
+          :source="spec.modelRegistry"
+          @update:item="updateModelInfo"
+        />
 
-        <a-row
-          :gutter="[16, 24]"
-          class="mb-[16px]"
-        >
-          <a-col :span="12">
-            <LabeledInput
-              v-model:value="spec.servedModelName"
-              :localized-label="true"
-              :mode="mode"
-              :label="t('modelService.modelName')"
-              :tooltip="t('modelService.modelNamePlaceholder')"
-            />
-          </a-col>
-          <a-col :span="12">
-            <ShellInput
-              v-model:value="container.args"
-              :mode="mode"
-              :label="t('workload.container.command.args')"
-              :placeholder="t('generic.placeholder', {text: '--dtype=half --cpu-offload-gb=10'}, true)"
-              @update:value="update"
-            />
-          </a-col>
-        </a-row>
-
-        <h4>{{ t('modelService.huggingFaceToken') }}</h4>
-        <a-row
-          :gutter="[16]"
-          class="mb-[16px]"
-        >
-          <a-col :span="12">
-            <ValueFromResource
-              v-model:value="hfToken"
-              :value="hfToken"
-              default-type="secretKeyRef"
-              :all-secrets="namespacedSecrets"
-              :mode="mode"
-              :loading="isLoadingSecondaryResources"
-              @update:value="update"
-            />
-          </a-col>
-
-          <a-col :span="12">
-            <LabeledInput
-              v-model:value="hfEndpoint.value"
-              :localized-label="true"
-              :mode="mode"
-              class="mb-20"
-              :label="t('modelService.hf.endpoint')"
-            />
-          </a-col>
-        </a-row>
-
-        <div class="row">
-          <div class="col span-12">
-            <h3>{{ t('workload.container.titles.env') }}</h3>
-            <EnvVars
-              :mode="mode"
-              :config-maps="namespacedConfigMaps"
-              :secrets="namespacedSecrets"
-              :value="container"
-              :excludes="excludeEnvs"
-              :loading="isLoadingSecondaryResources"
-            />
-          </div>
-        </div>
-
-        <AdvancedSection
-          class="col span-12 advanced"
+        <ResourceTabs
+          v-if="current == 1"
+          :value="value"
+          class="mt-15"
+          :need-conditions="false"
+          :need-related="false"
+          :side-tabs="true"
           :mode="mode"
         >
-          <div class="row">
-            <div class="col span-6">
-              <LabeledInput
-                v-model:value="container.image"
-                :required="true"
-                :mode="mode"
-                :label="t('modelService.image')"
-              />
+          <Tab
+            name="general"
+            label="General"
+            class="bordered-table"
+            :weight="tabWeightMap.general"
+          >
+            <a-row
+              :gutter="[16]"
+              class="mb-[16px]"
+            >
+              <a-col :span="12">
+                <LabeledSelect
+                  v-model:value="spec.modelRegistry"
+                  label="Source"
+                  :options="sourceOptions"
+                  :mode="mode"
+                  required
+                  :disabled="disableModelInput"
+                />
+              </a-col>
+
+              <a-col :span="12">
+                <LabeledInput
+                  v-model:value="spec.model"
+                  :required="true"
+                  :localized-label="true"
+                  :mode="mode"
+                  :disabled="disableModelInput"
+                  :label="t('modelService.model')"
+                  :tooltip="t('modelService.modelTooltip')"
+                  :placeholder="t('modelService.modelPlaceholder')"
+                />
+              </a-col>
+            </a-row>
+
+            <a-row
+              :gutter="[16, 24]"
+              class="mb-[16px]"
+            >
+              <a-col :span="12">
+                <LabeledInput
+                  v-model:value="spec.servedModelName"
+                  :localized-label="true"
+                  :mode="mode"
+                  :label="t('modelService.modelName')"
+                  :tooltip="t('modelService.modelNamePlaceholder')"
+                />
+              </a-col>
+              <a-col :span="12">
+                <ShellInput
+                  v-model:value="container.args"
+                  :mode="mode"
+                  :label="t('workload.container.command.args')"
+                  :placeholder="
+                    t(
+                      'generic.placeholder',
+                      { text: '--dtype=half --cpu-offload-gb=10' },
+                      true
+                    )
+                  "
+                  @update:value="update"
+                />
+              </a-col>
+            </a-row>
+
+            <h4>{{ t("modelService.huggingFaceToken") }}</h4>
+            <a-row
+              :gutter="[16]"
+              class="mb-[16px]"
+            >
+              <a-col :span="12">
+                <ValueFromResource
+                  v-model:value="hfToken"
+                  :value="hfToken"
+                  default-type="secretKeyRef"
+                  :all-secrets="namespacedSecrets"
+                  :mode="mode"
+                  :loading="isLoadingSecondaryResources"
+                  @update:value="update"
+                />
+              </a-col>
+
+              <a-col :span="12">
+                <LabeledInput
+                  v-model:value="hfEndpoint.value"
+                  :localized-label="true"
+                  :mode="mode"
+                  class="mb-20"
+                  :label="t('modelService.hf.endpoint')"
+                />
+              </a-col>
+            </a-row>
+
+            <div class="row">
+              <div class="col span-12">
+                <h3>{{ t("workload.container.titles.env") }}</h3>
+                <EnvVars
+                  :mode="mode"
+                  :config-maps="namespacedConfigMaps"
+                  :secrets="namespacedSecrets"
+                  :value="container"
+                  :excludes="excludeEnvs"
+                  :loading="isLoadingSecondaryResources"
+                />
+              </div>
             </div>
 
-            <div class="col span-6">
-              <LabeledSelect
-                v-model:value="spec.serviceType"
-                :mode="mode"
-                :options="svcOptions"
-                :label="t('workload.networking.networkMode.label')"
-                :placeholder="t('workload.networking.networkMode.placeholder')"
-                @update:value="update"
-              />
-            </div>
-          </div>
-        </AdvancedSection>
-      </Tab>
+            <AdvancedSection
+              class="col span-12 advanced"
+              :mode="mode"
+            >
+              <div class="row">
+                <div class="col span-6">
+                  <LabeledInput
+                    v-model:value="container.image"
+                    :required="true"
+                    :mode="mode"
+                    :label="t('modelService.image')"
+                  />
+                </div>
 
-      <Tab
-        :label="t('workload.container.titles.resources')"
-        name="resources"
-        :weight="tabWeightMap['resources']"
-      >
-        <!-- Resources and Limitations -->
-        <ContainerResourceLimit
-          v-model:value="flatResources"
-          :mode="mode"
-          :runtime-classes="runtimeClasses"
-          :pod-spec="podTemplateSpec"
-          :handle-gpu-limit="true"
-          :handle-v-gpu="true"
-          :show-tip="false"
-        />
-      </Tab>
+                <div class="col span-6">
+                  <LabeledSelect
+                    v-model:value="spec.serviceType"
+                    :mode="mode"
+                    :options="svcOptions"
+                    :label="t('workload.networking.networkMode.label')"
+                    :placeholder="
+                      t('workload.networking.networkMode.placeholder')
+                    "
+                    @update:value="update"
+                  />
+                </div>
+              </div>
+            </AdvancedSection>
+          </Tab>
 
-      <Tab
-        :label="t('generic.volume.title')"
-        name="volumes"
-        :weight="tabWeightMap['volumes']"
-      >
-        <Volume
-          v-model:value="spec"
-          :namespace="value.metadata?.namespace"
-          :register-before-hook="registerBeforeHook"
-          :mode="mode"
-          :save-pvc-hook-name="savePvcHookName"
-          :loading="isLoadingSecondaryResources"
-          :namespaced-pvcs="pvcs"
-          @removePvcForm="clearPvcFormState"
-        />
-      </Tab>
+          <Tab
+            :label="t('workload.container.titles.resources')"
+            name="resources"
+            :weight="tabWeightMap['resources']"
+          >
+            <!-- Resources and Limitations -->
+            <ContainerResourceLimit
+              v-model:value="flatResources"
+              :mode="mode"
+              :runtime-classes="runtimeClasses"
+              :pod-spec="podTemplateSpec"
+              :handle-gpu-limit="true"
+              :handle-v-gpu="true"
+              :show-tip="false"
+            />
+          </Tab>
 
-      <Tab
-        :label="t('workload.container.titles.nodeScheduling')"
-        name="nodeScheduling"
-        :weight="tabWeightMap['nodeScheduling']"
-      >
-        <NodeScheduling
-          :mode="mode"
-          :value="podTemplateSpec"
-          :nodes="allNodes"
-          :loading="isLoadingSecondaryResources"
-        />
-      </Tab>
-    </ResourceTabs>
+          <Tab
+            :label="t('generic.volume.title')"
+            name="volumes"
+            :weight="tabWeightMap['volumes']"
+          >
+            <Volume
+              v-model:value="spec"
+              :namespace="value.metadata?.namespace"
+              :register-before-hook="registerBeforeHook"
+              :mode="mode"
+              :save-pvc-hook-name="savePvcHookName"
+              :loading="isLoadingSecondaryResources"
+              :namespaced-pvcs="pvcs"
+              @removePvcForm="clearPvcFormState"
+            />
+          </Tab>
 
-    <a-modal
-      v-model:open="open"
-      :maskClosable="false"
-      :keyboard="false"
-      title="HuggingFace"
-      width="w-full"
-      @ok="handleOk"
-    >
-      <RemoteModelList :search="searchModelName" />
-    </a-modal>
+          <Tab
+            :label="t('workload.container.titles.nodeScheduling')"
+            name="nodeScheduling"
+            :weight="tabWeightMap['nodeScheduling']"
+          >
+            <NodeScheduling
+              :mode="mode"
+              :value="podTemplateSpec"
+              :nodes="allNodes"
+              :loading="isLoadingSecondaryResources"
+            />
+          </Tab>
+        </ResourceTabs>
+      </div>
+
+      <div class="self-end">
+        <a-button
+          v-if="current === 0"
+          type="primary"
+          :disabled="disableNext"
+          @click="next"
+        >
+          Next
+        </a-button>
+
+        <a-button
+          v-if="current === 1"
+          @click="prev"
+        >
+          Previous
+        </a-button>
+      </div>
+    </div>
   </CruResource>
 </template>

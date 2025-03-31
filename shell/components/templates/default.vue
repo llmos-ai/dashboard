@@ -9,7 +9,6 @@ import PromptModal from '@shell/components/PromptModal';
 import Header from '@shell/components/nav/Header';
 import Brand from '@shell/mixins/brand';
 import FixedBanner from '@shell/components/FixedBanner';
-import AwsComplianceBanner from '@shell/components/AwsComplianceBanner';
 import DraggableZone from '@shell/components/DraggableZone';
 import { MANAGEMENT } from '@shell/config/types';
 import { markSeenReleaseNotes } from '@shell/utils/version';
@@ -30,7 +29,6 @@ export default {
     GrowlManager,
     WindowManager,
     FixedBanner,
-    AwsComplianceBanner,
     DraggableZone,
     SideNav,
   },

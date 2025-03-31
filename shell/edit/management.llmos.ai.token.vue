@@ -253,44 +253,24 @@ export default {
 
     <div class="buttons mt-20">
       <div class="right">
-        <button
-          type="button"
+        <a-button
+          type="primary"
           data-testid="token_done_create_button"
-          class="btn role-primary"
           @click="doneCreate"
         >
           <t k="generic.done" />
-        </button>
+        </a-button>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-  .scope-select {
-    min-width: 33%;
-    width: unset;
-  }
   .expiry {
     display: flex;
     > * {
       flex: 0 0 200px;
       margin-right: 10px;
-    }
-  }
-
-  .buttons {
-    display: grid;
-    grid-template-areas:  "left right";
-    grid-template-columns: "min-content auto";
-
-    .right {
-      grid-area: right;
-      text-align: right;
-
-      .btn, button {
-        margin: 0 0 0 $column-gutter;
-      }
     }
   }
 </style>

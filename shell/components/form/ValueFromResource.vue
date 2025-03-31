@@ -414,24 +414,22 @@ export default {
     </template>
     <div class="remove">
       <div v-if="!hasDefaultType">
-        <button
+        <a-button
           v-if="!isView"
-          type="button"
-          class="btn role-link"
+          type="link"
           @click.stop="$emit('remove')"
         >
           {{ t('generic.remove') }}
-        </button>
+        </a-button>
       </div>
       <div v-else>
-        <button
+        <a-button
           v-if="!isView"
-          type="button"
-          class="btn role-link"
+          type="link"
           @click="reset"
         >
           {{ t('generic.reset') }}
-        </button>
+        </a-button>
       </div>
     </div>
   </div>

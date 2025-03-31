@@ -423,13 +423,11 @@ export default {
             name="cancel"
             :cancel="cancel"
           >
-            <button
-              type="button"
-              class="btn role-secondary"
+            <a-button
               @click="cancel"
             >
               <t k="generic.cancel" />
-            </button>
+            </a-button>
           </slot>
           <div class="controls-steps">
             <slot
@@ -437,14 +435,12 @@ export default {
               name="back"
               :back="back"
             >
-              <button
+              <a-button
                 :disabled="!canPrevious || (!editFirstStep && activeStepIndex===1)"
-                type="button"
-                class="btn role-secondary"
                 @click="back()"
               >
                 <t k="wizard.previous" />
-              </button>
+              </a-button>
             </slot>
             <slot
               v-if="activeStepIndex === visibleSteps.length-1"
@@ -462,14 +458,13 @@ export default {
               name="next"
               :next="next"
             >
-              <button
+              <a-button
                 :disabled="!canNext"
-                type="button"
                 :class="nextButtonStyle"
                 @click="next()"
               >
                 <t :k="nextButtonLabel" />
-              </button>
+              </a-button>
             </slot>
           </div>
         </div>

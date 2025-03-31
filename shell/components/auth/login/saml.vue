@@ -27,13 +27,11 @@ export default {
 
 <template>
   <div class="text-center">
-    <button
+    <a-button
       ref="btn"
-      class="btn bg-primary"
-      style="font-size: 18px;"
       @click="login"
     >
       {{ t('login.loginWithProvider', {provider: displayName}) }}
-    </button>
+    </a-button>
   </div>
 </template>

@@ -59,20 +59,19 @@ export default {
         </div>
       </template>
       <template #actions>
-        <button
-          class="btn role-secondary"
+        <a-button
           @click="close"
         >
           {{ t('generic.cancel') }}
-        </button>
+        </a-button>
         <div class="spacer" />
-        <button
-          class="btn role-primary bg-error ml-10"
+        <a-button
+          type="primary"
           :data-testid="componentTestid + '-confirm-button'"
           @click="disable"
         >
           {{ t('generic.disable') }}
-        </button>
+        </a-button>
       </template>
     </a-card>
   </app-modal>

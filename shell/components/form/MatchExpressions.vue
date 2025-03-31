@@ -240,14 +240,14 @@ export default {
 
 <template>
   <div>
-    <button
+    <a-button
       v-if="showRemove && !isView"
-      type="button"
-      class="btn role-link remove-expression"
+      type="link"
+      class="remove-expression"
       @click="$emit('remove')"
     >
       <i class="icon icon-x" />
-    </button>
+    </a-button>
 
     <div
       v-if="rules.length"
@@ -357,10 +357,9 @@ export default {
         v-if="showRemoveButton"
         class="remove-container"
       >
-        <button
+        <a-button
           v-if="!isView"
-          type="button"
-          class="btn role-link"
+          type="link"
           :style="{padding:'0px'}"
 
           :disabled="mode==='view'"
@@ -368,21 +367,19 @@ export default {
           @click="removeRule(row)"
         >
           <t k="generic.remove" />
-        </button>
+        </a-button>
       </div>
     </div>
     <div
       v-if="!isView && showAddButton"
       class="mt-20"
     >
-      <button
-        type="button"
-        class="btn role-tertiary add"
+      <a-button
         :data-testid="`input-match-expression-add-rule`"
         @click="addRule"
       >
         <t k="workload.scheduling.affinity.matchExpressions.addRule" />
-      </button>
+      </a-button>
     </div>
   </div>
 </template>

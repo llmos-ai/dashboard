@@ -421,7 +421,7 @@ export default {
         :required="nameRequired"
         :rules="rules.namespace"
       />
-      <button
+      <a-button
         aria="Cancel create"
         @click="cancelCreateNamespace"
       >
@@ -429,7 +429,7 @@ export default {
           v-clean-tooltip="t('generic.cancel')"
           class="icon icon-close align-value"
         />
-      </button>
+      </a-button>
     </div>
     <div
       v-if="namespaced && !nameNsHidden && !createNamespace"

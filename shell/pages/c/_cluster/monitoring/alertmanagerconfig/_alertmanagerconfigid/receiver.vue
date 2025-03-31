@@ -301,16 +301,16 @@ export default {
             @update:value="handleButtonGroupClick"
           />
 
-          <button
+          <a-button
             v-if="mode === view"
             ref="actions"
             aria-haspopup="true"
-            type="button"
-            class="btn role-multi-action actions"
+            type="primary"
+            class="actions"
             @click="handleReceiverActionMenuClick"
           >
             <i class="icon icon-actions" />
-          </button>
+          </a-button>
         </div>
       </div>
     </header>

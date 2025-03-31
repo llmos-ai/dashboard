@@ -66,13 +66,11 @@ export default {
       class="bottom"
     >
       <div class="buttons">
-        <button
-          type="button"
-          class="btn role-secondary mr-10"
+        <a-button
           @click="close"
         >
           {{ t('generic.cancel') }}
-        </button>
+        </a-button>
         <AsyncButton
           mode="continue"
           @click="apply"
