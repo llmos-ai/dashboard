@@ -6,11 +6,13 @@ import { MANAGEMENT } from '@shell/config/types';
 import { mergeEnvs } from '@shell/utils/merge';
 import { SETTING } from '@shell/config/settings';
 import { allHash } from '@shell/utils/promise';
+import RemoteModelList from '@shell/edit/ml.llmos.ai.modelservice/RemoteModelList.vue';
 
 export default {
-  name:   'ModelService',
-  mixins: [CreateEditView, FormValidation, LLMOSWorkload],
-  props:  {
+  name:       'ModelService',
+  mixins:     [CreateEditView, FormValidation, LLMOSWorkload],
+  components: { RemoteModelList },
+  props:      {
     value: {
       type:     Object,
       required: true,
@@ -53,7 +55,7 @@ export default {
 
     const hfEndpoint = container.env.find((env) => env.name === 'HF_ENDPOINT');
 
-    if (!hfEndpoint) {
+    if (!hfEndpoint && huggingFaceProxy) {
       this.hfEndpoint = { name: 'HF_ENDPOINT', value: huggingFaceProxy.value };
     }
 
@@ -76,7 +78,9 @@ export default {
     ];
 
     return {
-      hfToken: {
+      open:            true,
+      searchModelName: '',
+      hfToken:         {
         name:      'HUGGING_FACE_HUB_TOKEN',
         valueFrom: { secretKeyRef: { name: '', key: '' } },
       },
@@ -115,6 +119,11 @@ export default {
       if (this.errors.length > 0) {
         return Promise.reject(this.errors);
       }
+    },
+
+    chooseRemoteModel(model) {
+      console.log('----model', model);
+      this.open = true;
     },
 
     update() {
@@ -191,6 +200,7 @@ export default {
               :options="sourceOptions"
               :mode="mode"
               required
+              @update:value="chooseRemoteModel"
             />
           </a-col>
 
@@ -348,5 +358,16 @@ export default {
         />
       </Tab>
     </ResourceTabs>
+
+    <a-modal
+      v-model:open="open"
+      :maskClosable="false"
+      :keyboard="false"
+      title="HuggingFace"
+      width="w-full"
+      @ok="handleOk"
+    >
+      <RemoteModelList :search="searchModelName" />
+    </a-modal>
   </CruResource>
 </template>

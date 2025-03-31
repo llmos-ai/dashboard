@@ -99,15 +99,14 @@ export default {
 
     this.vendor = getVendor(publicUIInfo[SETTING.PL]);
 
+    this.publicUIInfo = publicUIInfo;
+    this.firstLogin = firstLogin;
     const { value } = await this.$store.dispatch('management/find', {
       type: MANAGEMENT.SETTING,
       id:   SETTING.BANNERS,
     });
 
     this.customLoginError = JSON.parse(value).loginError;
-
-    this.publicUIInfo = publicUIInfo;
-    this.firstLogin = firstLogin;
   },
 
   mounted() {

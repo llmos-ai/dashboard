@@ -87,6 +87,7 @@ const getProxyConfig = (proxyConfig) => ({
   '/api':            proxyWsOpts(api), // Management k8s API
   '/apis':           proxyWsOpts(api), // Management k8s API
   '/v1':             proxyWsOpts(api), // Management Steve API
+  '/proxy':          proxyWsOpts(api),
   '/v3':             proxyWsOpts(api), // Rancher API
   '/v3-public':      proxyOpts(api), // Rancher Unauthed API
   '/api-ui':         proxyOpts(api), // Browser API UI
