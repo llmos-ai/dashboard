@@ -190,12 +190,12 @@ export default {
               {{ banner.text }}
             </p>
           </div>
-          <button
-            class="btn role-primary"
+          <a-button
+            type="primary"
             @click="hideDialog()"
           >
             {{ banner.button }}
-          </button>
+          </a-button>
         </div>
       </div>
     </div>

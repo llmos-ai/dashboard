@@ -88,20 +88,18 @@ export default {
         v-if="canAdjust"
         class="text-center pb-5"
       >
-        <button
-          type="button"
-          class="btn btn-sm bg-primary scale-btn"
+        <a-button
+          type="primary"
           @click="scaleDown"
         >
           <i class="icon icon-minus" />
-        </button>
-        <button
-          type="button"
-          class="btn btn-sm bg-primary scale-btn"
+        </a-button>
+        <a-button
+          type="primary"
           @click="scaleUp"
         >
           <i class="icon icon-plus" />
-        </button>
+        </a-button>
       </div>
       <table
         v-if="row.complexScale"

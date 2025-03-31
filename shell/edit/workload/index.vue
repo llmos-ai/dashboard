@@ -179,14 +179,13 @@ export default {
                 #tab-header-right
                 class="tab-content-controls"
               >
-                <button
+                <a-button
                   v-if="allContainers.length > 1 && !isView"
-                  type="button"
-                  class="btn-sm role-link"
+                  type="link"
                   @click="removeContainer(tab)"
                 >
                   {{ t('workload.container.removeContainer') }}
-                </button>
+                </a-button>
               </template>
               <div>
                 <div
@@ -575,14 +574,13 @@ export default {
         </Tab>
         <template #tab-row-extras>
           <li class="tablist-controls">
-            <button
+            <a-button
               v-if="!isView"
-              type="button"
-              class="btn-sm role-link"
+              type="link"
               @click="addContainerBtn"
             >
               <i class="icon icon-plus pr-5" /> {{ t('workload.container.addContainer') }}
-            </button>
+            </a-button>
           </li>
         </template>
       </Tabbed>

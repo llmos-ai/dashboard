@@ -21,11 +21,6 @@ export default function useFetch(url, params = {}, options = {}, defaultData = [
 
       const response = await store.dispatch('cluster/request', fullOptions);
 
-      console.log('🚀 ~ fetchData ~ store:', store);
-      // const response = await store.dispatch('request', fullOptions);
-
-      console.log('🚀 ~ fetchData ~ result:', response);
-
       data.value = response;
     } catch (err) {
       error.value = err;
@@ -36,7 +31,7 @@ export default function useFetch(url, params = {}, options = {}, defaultData = [
 
   onMounted(fetchData);
 
-  watch(() => toValue(url), () => {
+  watch([() => toValue(url), () => toValue(params.url)], () => {
     loading.value = true;
     fetchData();
   });

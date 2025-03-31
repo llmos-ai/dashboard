@@ -571,15 +571,14 @@ export default {
       <slot name="right">
         <div class="actions-container align-start">
           <div class="actions">
-            <button
+            <a-button
               v-if="detailsAction && currentView === DETAIL_VIEW && isView"
-              type="button"
-              class="btn role-primary actions mr-10"
+              type="primary"
               :disabled="!detailsAction.enabled"
               @click="invokeDetailsAction"
             >
               {{ detailsAction.label }}
-            </button>
+            </a-button>
             <ButtonGroup
               v-if="showSensitiveToggle"
               :value="!!hideSensitiveData"
@@ -596,17 +595,18 @@ export default {
               class="mr-10"
             />
 
-            <button
-              v-if="isView"
-              ref="actions"
-              data-testid="masthead-action-menu"
-              aria-haspopup="true"
-              type="button"
-              class="btn role-multi-action actions"
-              @click="showActions"
-            >
-              <i class="icon icon-actions" />
-            </button>
+            <div ref="actions">
+              <!-- TODO: use dropdown -->
+              <a-button
+                v-if="isView"
+                data-testid="masthead-action-menu"
+                aria-haspopup="true"
+                class="actions"
+                @click="showActions"
+              >
+                <i class="icon icon-actions" />
+              </a-button>
+            </div>
           </div>
         </div>
       </slot>

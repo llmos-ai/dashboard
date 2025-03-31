@@ -47,7 +47,7 @@ export default defineComponent({
       type: String as PropType<
         'button' | 'submit' | 'reset' | undefined | 'primary' | 'link' | 'text'
       >,
-      default: 'button',
+      default: '',
     },
     tabIndex: {
       type: Number,

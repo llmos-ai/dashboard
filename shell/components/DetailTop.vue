@@ -239,9 +239,10 @@ export default {
         <span class="label">
           {{ t('resourceDetail.detailTop.labels') }}:
         </span>
-        <Tag
+        <a-Tag
           v-for="(prop, key) in labels"
           :key="key"
+          color="default"
         >
           <i
             v-if="internalIcons[key]"
@@ -256,7 +257,7 @@ export default {
             <span v-if="showAllLabels">: {{ key }}</span>
           </span>
           <span v-else>{{ prop ? `${key} : ${prop}` : key }}</span>
-        </Tag>
+        </a-Tag>
         <a
           v-if="showFilteredSystemLabels"
           href="#"

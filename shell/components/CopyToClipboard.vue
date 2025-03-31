@@ -38,6 +38,7 @@ export default {
     success-label="Copied!"
     error-label="Error Copying"
     v-bind="$attrs"
+    type="dashed"
     :delay="2000"
     @click="clicked"
   />

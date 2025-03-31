@@ -67,13 +67,12 @@ const save = () => {
 
     <div v-else>
       <div class="flex items-end">
-        <button
-          type="button"
-          class="btn btn-sm role-link"
+        <a-button
+          type="link"
           @click="handleCancel"
         >
           <i class="icon icon-close" />
-        </button>
+        </a-button>
 
         <a-textarea
           v-model:value="inputValue"

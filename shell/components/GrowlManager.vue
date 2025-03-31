@@ -117,13 +117,12 @@ export default {
       v-if="stack.length > 1"
       class="text-right mr-10 mt-10"
     >
-      <button
-        type="button"
-        class="btn btn-sm role-primary"
+      <a-button
+        type="primary"
         @click="closeAll()"
       >
         {{ t('growl.clearAll') }}
-      </button>
+      </a-button>
     </div>
   </div>
 </template>

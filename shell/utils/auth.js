@@ -13,6 +13,7 @@ import { allHash } from '@shell/utils/promise';
 import { getProductFromRoute, getResourceFromRoute } from '@shell/utils/router';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
 import { findBy } from '@shell/utils/array';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 export function openAuthPopup(url, provider) {
   const popup = new Popup(
@@ -236,7 +237,7 @@ export function setProduct(store, to) {
   }
 
   if (!product) {
-    product = EXPLORER;
+    product = LLMOS;
   }
 
   const oldProduct = store.getters['productId'];

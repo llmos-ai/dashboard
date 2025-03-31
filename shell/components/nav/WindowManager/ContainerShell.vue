@@ -473,9 +473,9 @@ export default {
         </template>
       </Select>
       <div class="pull-left ml-5">
-        <button
-          class="btn btn-sm role-primary"
+        <a-button
           role="button"
+          type="primary"
           :aria-label="t('wm.containerShell.clear')"
           @click="clear"
         >
@@ -483,7 +483,7 @@ export default {
             data-testid="shell-clear-button-label"
             k="wm.containerShell.clear"
           />
-        </button>
+        </a-button>
       </div>
       <div class="status pull-left">
         <t

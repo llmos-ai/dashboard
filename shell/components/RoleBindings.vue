@@ -404,23 +404,22 @@ export default {
         />
       </div>
       <div class="remove">
-        <button
-          v-t="'generic.remove'"
+        <a-button
           :disabled="isView"
-          type="button"
-          class="btn role-link"
+          type="link"
           @click="remove(row)"
-        />
+        >
+          {{ t('generic.remove') }}
+        </a-button>
       </div>
     </div>
     <div>
-      <button
-        v-t="'rbac.roleBinding.add'"
+      <a-button
         :disabled="isView"
-        type="button"
-        class="btn role-tertiary add"
         @click="add()"
-      />
+      >
+        {{ t('rbac.roleBinding.add') }}
+      </a-button>
     </div>
   </div>
 </template>

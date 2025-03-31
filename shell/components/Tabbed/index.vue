@@ -308,24 +308,24 @@ export default {
         v-if="sideTabs && showTabsAddRemove"
         class="tab-list-footer"
       >
-        <li>
-          <button
-            type="button"
-            class="btn bg-transparent"
+        <li class="flex justify-between">
+          <a-button
+            type="text"
+            class="grow-1"
             data-testid="tab-list-add"
             @click="tabAddClicked"
           >
             <i class="icon icon-plus" />
-          </button>
-          <button
-            type="button"
-            class="btn bg-transparent"
+          </a-button>
+          <a-button
+            type="text"
+            class="grow-1"
             :disabled="!sortedTabs.length"
             data-testid="tab-list-remove"
             @click="tabRemoveClicked"
           >
             <i class="icon icon-minus" />
-          </button>
+          </a-button>
         </li>
       </ul>
       <slot name="tab-row-extras" />

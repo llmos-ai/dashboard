@@ -303,14 +303,13 @@ export default {
         v-if="!row._showHost && row._serviceType !== 'LoadBalancer' && row._serviceType !== 'NodePort'"
         class="add-host"
       >
-        <button
+        <a-button
           :disabled="mode==='view'"
-          type="button"
-          class="btn btn-sm role-tertiary"
+          size="small"
           @click="row._showHost = true"
         >
           {{ t('workloadPorts.addHost') }}
-        </button>
+        </a-button>
       </div>
 
       <div v-if="row._serviceType === 'LoadBalancer' || row._serviceType === 'NodePort'">
@@ -329,26 +328,23 @@ export default {
         v-if="showRemove"
         class="remove"
       >
-        <button
-          type="button"
-          class="btn role-link"
+        <a-button
+          type="link"
           @click="remove(idx)"
         >
           {{ t('workloadPorts.remove') }}
-        </button>
+        </a-button>
       </div>
     </div>
     <div
       v-if="showAdd"
       class="footer"
     >
-      <button
-        type="button"
-        class="btn role-tertiary add"
+      <a-button
         @click="add()"
       >
         {{ t('workloadPorts.addPort') }}
-      </button>
+      </a-button>
     </div>
   </div>
 </template>

@@ -81,15 +81,14 @@ export default {
       </InfoBox>
     </template>
     <template v-slot:remove-button="scope">
-      <button
+      <a-button
         v-if="canRemoveRow(scope.row, scope.i)"
-        type="button"
-        class="btn role-link close btn-sm"
+        type="link"
         :data-testid="`remove-item-${scope.i}`"
         @click="scope.remove"
       >
         <i class="icon icon-x" />
-      </button>
+      </a-button>
       <span v-else />
     </template>
     <!-- Pass down templates provided by the caller -->

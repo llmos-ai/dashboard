@@ -209,3 +209,16 @@ export function roundToDecimal(num, decimalPlaces) {
 
   return num;
 }
+
+// 给数字添加合适的单位
+export function addUnit(num) {
+  if (num >= 1000000) {
+    return `${ (num / 1000000).toFixed(2) }m`;
+  } else if (num >= 10000) {
+    return `${ (num / 10000).toFixed(2) }w`;
+  } else if (num >= 1000) {
+    return `${ (num / 1000).toFixed(2) }k`;
+  }
+
+  return num.toString();
+}

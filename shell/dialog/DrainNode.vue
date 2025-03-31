@@ -224,12 +224,11 @@ export default {
       slot="actions"
       class="buttons"
     >
-      <button
-        class="btn role-secondary mr-10"
+      <a-button
         @click="close"
       >
         {{ t('generic.cancel') }}
-      </button>
+      </a-button>
 
       <AsyncButton
         mode="drain"

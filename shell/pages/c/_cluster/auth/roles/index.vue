@@ -6,7 +6,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import Loading from '@shell/components/Loading';
 import { SUBTYPE_MAPPING, CREATE_VERBS } from '@shell/models/management.llmos.ai.globalrole';
 import { NAME } from '@shell/config/product/auth';
-
+import ButtonLink from '@shell/components/ButtonLink';
 const GLOBAL = SUBTYPE_MAPPING.GLOBAL.key;
 const NAMESPACE = SUBTYPE_MAPPING.NAMESPACE.key;
 
@@ -30,6 +30,7 @@ export default {
   name: 'Roles',
 
   components: {
+    ButtonLink,
     Tab,
     Tabbed,
     ResourceTable,
@@ -155,13 +156,12 @@ export default {
       </div>
       <div class="actions-container">
         <div class="actions">
-          <router-link
+          <button-link
             v-if="canCreate"
             :to="createLocation"
-            class="btn role-primary"
           >
             {{ createLabel }}
-          </router-link>
+          </button-link>
         </div>
       </div>
     </header>

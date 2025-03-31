@@ -257,27 +257,24 @@ export default {
         />
       </div>
       <div class="col remove">
-        <button
+        <a-button
           v-if="!isView"
-          type="button"
-          class="btn role-link"
+          type="link"
           :disabled="mode==='view'"
           :data-testid="`toleration-remove-index${ index }`"
           @click="remove(rule)"
         >
           <t k="generic.remove" />
-        </button>
+        </a-button>
       </div>
     </div>
-    <button
+    <a-button
       v-if="!isView"
-      type="button"
-      class="btn role-tertiary"
       data-testid="add-toleration-btn"
       @click="addToleration"
     >
       <t k="workload.scheduling.tolerations.addToleration" />
-    </button>
+    </a-button>
   </div>
 </template>
 

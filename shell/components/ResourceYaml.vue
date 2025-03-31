@@ -382,7 +382,6 @@ export default {
           #left
         >
           <FileSelector
-            class="btn role-secondary"
             :label="t('generic.readFromFile')"
             @selected="onFileSelected"
           />
