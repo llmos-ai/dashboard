@@ -4,12 +4,12 @@ import CruResource from '@shell/components/CruResource';
 import FormValidation from '@shell/mixins/form-validation';
 
 export default {
-  name: 'EditManagedAddon',
+  name:       'EditManagedAddon',
   components: { CruResource },
-  mixins: [CreateEditView, FormValidation],
-  props: {
+  mixins:     [CreateEditView, FormValidation],
+  props:      {
     value: {
-      type: Object,
+      type:     Object,
       required: true,
     },
   },
@@ -19,7 +19,7 @@ export default {
       const name = this.value.metadata.name;
 
       try {
-        return require(`./${name}/index.vue`).default;
+        return require(`./${ name }/index.vue`).default;
       } catch {
         return require(`./generic.vue`).default;
       }
@@ -42,7 +42,7 @@ export default {
       let promptMsg;
       const name = this.value.metadata.name;
       const exists = this.$store.getters['i18n/exists'];
-      const key = `managedAddon.disablePrompt.${name}`;
+      const key = `managedAddon.disablePrompt.${ name }`;
       const defaultKey = 'managedAddon.disablePrompt.generic';
 
       if (exists(key)) {
@@ -53,12 +53,12 @@ export default {
 
       return new Promise((resolve, reject) => {
         this.$store.dispatch('cluster/promptModal', {
-          component: 'GenericPrompt',
+          component:      'GenericPrompt',
           componentProps: {
             applyMode: 'disable',
-            title: this.t('promptRemove.title', {}, true),
-            body: promptMsg,
-            confirm: (buttonDone) => {
+            title:     this.t('promptRemove.title', {}, true),
+            body:      promptMsg,
+            confirm:   (buttonDone) => {
               if (buttonDone) {
                 resolve(true);
               }

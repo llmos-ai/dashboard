@@ -1,21 +1,21 @@
 <script>
-import BrandImage from "@shell/components/BrandImage";
-import ClusterIconMenu from "@shell/components/ClusterIconMenu";
-import IconOrSvg from "../IconOrSvg";
-import { BLANK_CLUSTER } from "@shell/store";
-import { mapGetters } from "vuex";
-import { MANAGEMENT } from "@shell/config/types";
+import BrandImage from '@shell/components/BrandImage';
+import ClusterIconMenu from '@shell/components/ClusterIconMenu';
+import IconOrSvg from '../IconOrSvg';
+import { BLANK_CLUSTER } from '@shell/store';
+import { mapGetters } from 'vuex';
+import { MANAGEMENT } from '@shell/config/types';
 import {
   MENU_MAX_CLUSTERS,
   VIEW_CONTAINER_DASHBOARD,
-} from "@shell/store/prefs";
-import { sortBy } from "@shell/utils/sort";
-import { ucFirst } from "@shell/utils/string";
-import { KEY } from "@shell/utils/platform";
-import { getVersionInfo } from "@shell/utils/version";
-import { SETTING } from "@shell/config/settings";
-import { getProductFromRoute } from "@shell/utils/router";
-import { NAME as EXPLORER } from "@shell/config/product/explorer";
+} from '@shell/store/prefs';
+import { sortBy } from '@shell/utils/sort';
+import { ucFirst } from '@shell/utils/string';
+import { KEY } from '@shell/utils/platform';
+import { getVersionInfo } from '@shell/utils/version';
+import { SETTING } from '@shell/config/settings';
+import { getProductFromRoute } from '@shell/utils/router';
+import { NAME as EXPLORER } from '@shell/config/product/explorer';
 
 export default {
   components: {
@@ -28,61 +28,63 @@ export default {
     const { displayVersion, fullVersion } = getVersionInfo(this.$store);
 
     return {
-      shown: false,
+      shown:                  false,
       displayVersion,
       fullVersion,
-      clusterFilter: "",
-      maxClustersToShow: MENU_MAX_CLUSTERS,
-      emptyCluster: BLANK_CLUSTER,
-      showPinClusters: false,
-      searchActive: false,
+      clusterFilter:          '',
+      maxClustersToShow:      MENU_MAX_CLUSTERS,
+      emptyCluster:           BLANK_CLUSTER,
+      showPinClusters:        false,
+      searchActive:           false,
       viewContainerDashboard: false,
     };
   },
 
   async fetch() {
-    this.viewContainerDashboard = this.$store.getters["prefs/get"](
+    this.viewContainerDashboard = this.$store.getters['prefs/get'](
       VIEW_CONTAINER_DASHBOARD
     );
   },
 
   computed: {
-    ...mapGetters(["clusterId"]),
+    ...mapGetters(['clusterId']),
     ...mapGetters([
-      "clusterReady",
-      "isMgmt",
-      "currentCluster",
-      "currentProduct",
+      'clusterReady',
+      'isMgmt',
+      'currentCluster',
+      'currentProduct',
     ]),
 
     value: {
       get() {
-        return this.$store.getters["productId"];
+        return this.$store.getters['productId'];
       },
     },
 
     sideMenuStyle() {
       return {
         marginBottom: this.globalBannerSettings?.footerFont,
-        marginTop: this.globalBannerSettings?.headerFont,
+        marginTop:    this.globalBannerSettings?.headerFont,
       };
     },
 
     globalBannerSettings() {
-      const settings = this.$store.getters["management/all"](
+      const settings = this.$store.getters['management/all'](
         MANAGEMENT.SETTING
       );
       const bannerSettings = settings?.find((s) => s.id === SETTING.BANNERS);
 
       if (bannerSettings) {
         const parsed = JSON.parse(bannerSettings.value);
-        const { showFooter, showHeader, bannerFooter, bannerHeader } = parsed;
+        const {
+          showFooter, showHeader, bannerFooter, bannerHeader
+        } = parsed;
 
         return {
           headerFont:
-            showHeader === "true" ? this.pxToEm(bannerHeader.fontSize) : "0px",
+            showHeader === 'true' ? this.pxToEm(bannerHeader.fontSize) : '0px',
           footerFont:
-            showFooter === "true" ? this.pxToEm(bannerFooter.fontSize) : "0px",
+            showFooter === 'true' ? this.pxToEm(bannerFooter.fontSize) : '0px',
         };
       }
 
@@ -94,42 +96,39 @@ export default {
     },
 
     clusters() {
-      const kubeClusters = this.$store.getters["management/all"](
+      const kubeClusters = this.$store.getters['management/all'](
         MANAGEMENT.CLUSTER
       );
 
       return (
         kubeClusters?.map((x) => {
           return {
-            id: x.id,
-            label: x.nameDisplay,
-            ready: x.isReady,
-            osLogo: x.providerOsLogo,
+            id:              x.id,
+            label:           x.nameDisplay,
+            ready:           x.isReady,
+            osLogo:          x.providerOsLogo,
             providerNavLogo: x.providerMenuLogo,
-            llmNavLogo: x.llmNavLogo,
-            badge: x.badge,
-            isLocal: x.isLocal,
-            pinned: x.pinned,
-            pin: () => x.pin(),
-            unpin: () => x.unpin(),
-            clusterRoute: {
-              name: "c-cluster-explorer",
+            llmNavLogo:      x.llmNavLogo,
+            badge:           x.badge,
+            isLocal:         x.isLocal,
+            pinned:          x.pinned,
+            pin:             () => x.pin(),
+            unpin:           () => x.unpin(),
+            clusterRoute:    {
+              name:   'c-cluster-explorer',
               params: { cluster: x.id },
             },
-            llmosRoute: { name: "c-cluster-llmos", params: { cluster: x.id } },
+            llmosRoute: { name: 'c-cluster-llmos', params: { cluster: x.id } },
           };
         }) || []
       );
     },
 
     clustersFiltered() {
-      const search = (this.clusterFilter || "").toLowerCase();
-      const out = search
-        ? this.clusters.filter((item) =>
-            item.label?.toLowerCase().includes(search)
-          )
-        : this.clusters;
-      const sorted = sortBy(out, ["ready:desc", "label"]);
+      const search = (this.clusterFilter || '').toLowerCase();
+      const out = search ? this.clusters.filter((item) => item.label?.toLowerCase().includes(search)
+      ) : this.clusters;
+      const sorted = sortBy(out, ['ready:desc', 'label']);
 
       if (search) {
         this.showPinClusters = false;
@@ -153,7 +152,7 @@ export default {
 
     pinFiltered() {
       const out = this.clusters.filter((item) => item.pinned);
-      const sorted = sortBy(out, ["ready:desc", "label"]);
+      const sorted = sortBy(out, ['ready:desc', 'label']);
 
       return sorted;
     },
@@ -162,30 +161,28 @@ export default {
       const pinCount = this.clusters.filter((item) => item.pinned).length;
       const height = pinCount > 2 ? pinCount * 43 : 90;
 
-      return `min-height: ${height}px`;
+      return `min-height: ${ height }px`;
     },
 
     clusterFilterCount() {
-      return this.clusterFilter
-        ? this.clustersFiltered.length
-        : this.clusters.length;
+      return this.clusterFilter ? this.clustersFiltered.length : this.clusters.length;
     },
 
     configurationApps() {
       const options = this.options;
 
-      return options.filter((opt) => opt.category === "configuration");
+      return options.filter((opt) => opt.category === 'configuration');
     },
 
     options() {
-      const cluster = this.clusterId || this.$store.getters["defaultClusterId"];
+      const cluster = this.clusterId || this.$store.getters['defaultClusterId'];
 
       // TODO plugin routes
-      const entries = this.$store.getters["type-map/activeProducts"]?.map(
+      const entries = this.$store.getters['type-map/activeProducts']?.map(
         (p) => {
           // Try product-specific index first
           const to = p.to || {
-            name: `c-cluster-${p.name}`,
+            name:   `c-cluster-${ p.name }`,
             params: { cluster },
           };
 
@@ -194,37 +191,37 @@ export default {
             .filter((route) => route.name === to.name);
 
           if (!matched.length) {
-            to.name = "c-cluster-product";
+            to.name = 'c-cluster-product';
             to.params.product = p.name;
           }
 
           return {
-            label: this.$store.getters["i18n/withFallback"](
-              `product."${p.name}"`,
+            label: this.$store.getters['i18n/withFallback'](
+              `product."${ p.name }"`,
               null,
               ucFirst(p.name)
             ),
-            icon: `icon-${p.icon || "copy"}`,
-            svg: p.svg,
-            value: p.name,
-            removable: p.removable !== false,
-            inStore: p.inStore || "cluster",
-            weight: p.weight || 1,
-            category: p.category || "none",
+            icon:              `icon-${ p.icon || 'copy' }`,
+            svg:               p.svg,
+            value:             p.name,
+            removable:         p.removable !== false,
+            inStore:           p.inStore || 'cluster',
+            weight:            p.weight || 1,
+            category:          p.category || 'none',
             to,
             isMultiClusterApp: p.isMultiClusterApp,
           };
         }
       );
 
-      return sortBy(entries, ["weight"]);
+      return sortBy(entries, ['weight']);
     },
 
     canEditSettings() {
       return (
-        this.$store.getters["management/schemaFor"](MANAGEMENT.SETTING)
+        this.$store.getters['management/schemaFor'](MANAGEMENT.SETTING)
           ?.resourceMethods || []
-      ).includes("PUT");
+      ).includes('PUT');
     },
 
     appBar() {
@@ -234,14 +231,14 @@ export default {
       // since we want to check last pinFiltered and clustersFiltered
       const appBar = {
         configurationApps: this.configurationApps,
-        pinFiltered: this.pinFiltered,
-        clustersFiltered: this.clustersFiltered,
+        pinFiltered:       this.pinFiltered,
+        clustersFiltered:  this.clustersFiltered,
       };
 
       Object.keys(appBar).forEach((menuSection) => {
         const menuSectionItems = appBar[menuSection];
         const isClusterCheck =
-          menuSection === "pinFiltered" || menuSection === "clustersFiltered";
+          menuSection === 'pinFiltered' || menuSection === 'clustersFiltered';
 
         // need to reset active state on other menu items
         menuSectionItems.forEach((item) => {
@@ -265,16 +262,16 @@ export default {
     },
 
     isCurrRouteClusterExplorer() {
-      if (this.$route.name?.startsWith("c-cluster-explorer")) {
+      if (this.$route.name?.startsWith('c-cluster-explorer')) {
         return true;
       }
       const product = this.$route.params?.product;
 
-      return this.$route?.name?.startsWith("c-cluster") && product === EXPLORER;
+      return this.$route?.name?.startsWith('c-cluster') && product === EXPLORER;
     },
 
     isCurrRouteClusterLLMOS() {
-      return this.$route?.name?.startsWith("c-cluster");
+      return this.$route?.name?.startsWith('c-cluster');
     },
 
     productFromRoute() {
@@ -289,11 +286,11 @@ export default {
   },
 
   mounted() {
-    document.addEventListener("keyup", this.handler);
+    document.addEventListener('keyup', this.handler);
   },
 
-  beforeDestroy() {
-    document.removeEventListener("keyup", this.handler);
+  beforeUnmount() {
+    document.removeEventListener('keyup', this.handler);
   },
 
   methods: {
@@ -320,7 +317,7 @@ export default {
       const lineHeightInPx = 2 * parseInt(elementFontSize);
       const lineHeightInEm = lineHeightInPx / defaultFontSize;
 
-      return `${lineHeightInEm}em`;
+      return `${ lineHeightInEm }em`;
     },
 
     handler(e) {
@@ -332,7 +329,7 @@ export default {
     hide() {
       this.shown = false;
       if (this.clustersFiltered === 0) {
-        this.clusterFilter = "";
+        this.clusterFilter = '';
       }
     },
 
@@ -347,12 +344,12 @@ export default {
 
       if (!this.shown) {
         return {
-          content: this.shown ? null : item,
-          placement: "right",
+          content:       this.shown ? null : item,
+          placement:     'right',
           popperOptions: {
             modifiers: {
               preventOverflow: { enabled: false },
-              hide: { enabled: false },
+              hide:            { enabled: false },
             },
           },
         };
@@ -366,7 +363,11 @@ export default {
 <template>
   <div>
     <!-- Overlay -->
-    <div v-if="shown" class="side-menu-glass" @click="hide()" />
+    <div
+      v-if="shown"
+      class="side-menu-glass"
+      @click="hide()"
+    />
     <transition name="fade">
       <!-- Side menu -->
       <div
@@ -378,7 +379,11 @@ export default {
       >
         <!-- Logo and name -->
         <div class="title">
-          <div data-testid="top-level-menu" class="menu" @click="toggle()">
+          <div
+            data-testid="top-level-menu"
+            class="menu"
+            @click="toggle()"
+          >
             <svg
               class="menu-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -386,7 +391,10 @@ export default {
               viewBox="0 0 24 24"
               width="24"
             >
-              <path d="M0 0h24v24H0z" fill="none" />
+              <path
+                d="M0 0h24v24H0z"
+                fill="none"
+              />
               <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
             </svg>
           </div>
@@ -411,7 +419,10 @@ export default {
                 viewBox="0 0 24 24"
                 width="24"
               >
-                <path d="M0 0h24v24H0z" fill="none" />
+                <path
+                  d="M0 0h24v24H0z"
+                  fill="none"
+                />
                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
               </svg>
               <div class="home-text">
@@ -420,11 +431,17 @@ export default {
             </router-link>
 
             <!-- Search bar -->
-            <div v-if="showClusterSearch" class="clusters-search">
+            <div
+              v-if="showClusterSearch"
+              class="clusters-search"
+            >
               <div class="clusters-search-count">
                 <span>{{ clusterFilterCount }}</span>
                 {{ t("nav.search.clusters") }}
-                <i v-if="clusterFilter" class="icon icon-filter_alt" />
+                <i
+                  v-if="clusterFilter"
+                  class="icon icon-filter_alt"
+                />
               </div>
 
               <div class="search">
@@ -432,7 +449,7 @@ export default {
                   ref="clusterFilter"
                   v-model="clusterFilter"
                   :placeholder="t('nav.search.placeholder')"
-                />
+                >
                 <i
                   v-if="clusterFilter"
                   class="icon icon-close"
@@ -496,7 +513,10 @@ export default {
                         {{ t("product.clusterManagement") }}
                       </div>
                     </router-link>
-                    <span v-else class="option cluster selector disabled">
+                    <span
+                      v-else
+                      class="option cluster selector disabled"
+                    >
                       <ClusterIconMenu
                         v-clean-tooltip="getTooltipConfig(c.label)"
                         :cluster="c"
@@ -512,7 +532,7 @@ export default {
               <div
                 v-if="
                   (clustersFiltered.length === 0 || pinFiltered.length === 0) &&
-                  searchActive
+                    searchActive
                 "
                 data-testid="top-level-menu-no-results"
                 class="none-matching"
@@ -546,11 +566,14 @@ export default {
             </router-link>
           </template>
 
-          <div v-if="canEditSettings" class="category">
+          <div
+            v-if="canEditSettings"
+            class="category"
+          >
             <!-- App menu -->
             <template v-if="configurationApps.length">
               <div class="category-title">
-                <hr />
+                <hr>
                 <span>
                   {{ t("nav.categories.configuration") }}
                 </span>
@@ -580,8 +603,14 @@ export default {
 
         <!-- Footer -->
         <div class="footer">
-          <div class="version" @click="hide()">
-            <router-link role="link" :to="{ name: 'about' }">
+          <div
+            class="version"
+            @click="hide()"
+          >
+            <router-link
+              role="link"
+              :to="{ name: 'about' }"
+            >
               {{ t("about.title") }}
             </router-link>
           </div>

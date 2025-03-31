@@ -73,21 +73,19 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const hash = await allHash({
-      defaultConfig: this.$store.dispatch(`${inStore}/request`, {
-        url: 'v1-public/ui',
-      }),
-      addonConfigs: this.$store.dispatch(`${inStore}/find`, {
+      defaultConfig: this.$store.dispatch(`${ inStore }/request`, { url: 'v1-public/ui' }),
+      addonConfigs:  this.$store.dispatch(`${ inStore }/find`, {
         type: MANAGEMENT.SETTING,
-        id: SETTING.MANAGED_ADDON_CONFIGS,
+        id:   SETTING.MANAGED_ADDON_CONFIGS,
       }),
-      systemImageRegistry: this.$store.dispatch(`${inStore}/find`, {
+      systemImageRegistry: this.$store.dispatch(`${ inStore }/find`, {
         type: MANAGEMENT.SETTING,
-        id: SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY,
+        id:   SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY,
       }),
     });
 
     if (!this.spec.rayVersion) {
-      const rayDefaultVersion = await this.$store.getters[`${inStore}/byId`](
+      const rayDefaultVersion = await this.$store.getters[`${ inStore }/byId`](
         MANAGEMENT.SETTING,
         SETTING.RAY_CLUSTER_DEFAULT_VERSION
       );
@@ -129,9 +127,9 @@ export default {
     const monitoringConfig = this.initMonitoringConfig(headGroupContainer);
 
     return {
-      defaultConfig: {},
-      runtimeClasses: [],
-      savePvcHookName: 'savePvcHook',
+      defaultConfig:       {},
+      runtimeClasses:      [],
+      savePvcHookName:     'savePvcHook',
       spec,
       autoScaleOptions,
       headGroupSpec,
@@ -141,12 +139,12 @@ export default {
       defaultWorkerPodTemplateSpec,
       monitoringConfig,
       RAY_DEFAULT_MONITORING_CONFIG,
-      addonConfigs: null,
+      addonConfigs:        null,
       systemImageRegistry: '',
 
       secondaryResourceData: this.secondaryResourceDataConfig(),
-      namespacedConfigMaps: [],
-      namespacedSecrets: [],
+      namespacedConfigMaps:  [],
+      namespacedSecrets:     [],
     };
   },
 
@@ -209,7 +207,7 @@ export default {
       set(neu) {
         this.value.metadata.annotations[
           ANNOTATIONS.RAY_CLUSTER_FT_ENABLED
-        ] = `${neu}`;
+        ] = `${ neu }`;
       },
     },
 
@@ -227,18 +225,18 @@ export default {
 
     monitoringAddonLink() {
       const query = {
-        [MODE]: _EDIT,
+        [MODE]:    _EDIT,
         [ENABLED]: 'true',
       };
 
       return {
-        name: 'c-cluster-product-resource-namespace-id',
+        name:   'c-cluster-product-resource-namespace-id',
         params: {
-          product: LLMOS,
-          cluster: 'local',
-          resource: MANAGEMENT.MANAGED_ADDON,
+          product:   LLMOS,
+          cluster:   'local',
+          resource:  MANAGEMENT.MANAGED_ADDON,
           namespace: 'llmos-monitoring-system',
-          id: 'llmos-monitoring',
+          id:        'llmos-monitoring',
         },
         query,
       };
@@ -254,7 +252,7 @@ export default {
       set(neu) {
         this.value.metadata.annotations[
           ANNOTATIONS.MONITORING_ENABLED
-        ] = `${neu}`;
+        ] = `${ neu }`;
         if (neu && isEmpty(this.monitoringConfig)) {
           this.monitoringConfig = this.initMonitoringConfig();
         }
@@ -284,7 +282,7 @@ export default {
         const serverURL = window.location.origin;
         const url = new URL(serverURL);
 
-        monitoringConfig.RAY_GRAFANA_IFRAME_HOST = `${url.origin}${MONITORING_GRAFANA_PATH}`;
+        monitoringConfig.RAY_GRAFANA_IFRAME_HOST = `${ url.origin }${ MONITORING_GRAFANA_PATH }`;
       }
 
       return monitoringConfig;
@@ -293,14 +291,14 @@ export default {
     secondaryResourceDataConfig() {
       return {
         namespace: this.value?.metadata?.namespace || null,
-        data: {
-          [CONFIG_MAP]: { applyTo: [{ var: 'namespacedConfigMaps' }] },
+        data:      {
+          [CONFIG_MAP]:      { applyTo: [{ var: 'namespacedConfigMaps' }] },
           [SERVICE_ACCOUNT]: { applyTo: [{ var: 'namespacedServiceNames' }] },
-          [RUNTIME_CLASS]: { applyTo: [{ var: 'runtimeClasses' }] },
-          [PVC]: {
+          [RUNTIME_CLASS]:   { applyTo: [{ var: 'runtimeClasses' }] },
+          [PVC]:             {
             applyTo: [
               {
-                var: 'pvcs',
+                var:         'pvcs',
                 parsingFunc: (data) => {
                   return data.filter((pvc) => {
                     return pvc.namespace !== this.value?.metadata?.namespace;
@@ -313,11 +311,10 @@ export default {
             applyTo: [
               { var: 'namespacedSecrets' },
               {
-                var: 'imagePullNamespacedSecrets',
+                var:         'imagePullNamespacedSecrets',
                 parsingFunc: (data) => {
                   return data.filter(
-                    (secret) =>
-                      secret._type === SECRET_TYPES.DOCKER ||
+                    (secret) => secret._type === SECRET_TYPES.DOCKER ||
                       secret._type === SECRET_TYPES.DOCKER_JSON
                   );
                 },
@@ -328,7 +325,7 @@ export default {
             applyTo: [
               { var: 'allNodeObjects' },
               {
-                var: 'allNodes',
+                var:         'allNodes',
                 parsingFunc: (data) => {
                   return data
                     .filter((node) => {
@@ -416,11 +413,11 @@ export default {
 
       // set rayVersion
       if (this.spec.rayVersion) {
-        this.headGroupContainer.image = `${this.systemImageRegistry}/llmos-ai/mirrored-rayproject-ray:${this.spec.rayVersion}`;
+        this.headGroupContainer.image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }`;
         if (hasGPUResources(this.defaultWorkerPodTemplateSpec.containers)) {
-          this.defaultWorkerPodTemplateSpec.containers[0].image = `${this.systemImageRegistry}/llmos-ai/mirrored-rayproject-ray:${this.spec.rayVersion}-gpu`;
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }-gpu`;
         } else {
-          this.defaultWorkerPodTemplateSpec.containers[0].image = `${this.systemImageRegistry}/llmos-ai/mirrored-rayproject-ray:${this.spec.rayVersion}`;
+          this.defaultWorkerPodTemplateSpec.containers[0].image = `${ this.systemImageRegistry }/llmos-ai/mirrored-rayproject-ray:${ this.spec.rayVersion }`;
         }
         this.defaultWorkerPodTemplateSpec.schedulerName = VolcanoScheduler;
       }
@@ -468,7 +465,11 @@ export default {
     :apply-hooks="applyHooks"
     @finish="save"
   >
-    <NameNsDescription :value="value" :namespaced="true" :mode="mode" />
+    <NameNsDescription
+      :value="value"
+      :namespaced="true"
+      :mode="mode"
+    />
 
     <ResourceTabs
       v-model="value"
@@ -496,7 +497,10 @@ export default {
             />
           </div>
         </div>
-        <div v-if="value.spec.enableInTreeAutoscaling" class="row mb-20">
+        <div
+          v-if="value.spec.enableInTreeAutoscaling"
+          class="row mb-20"
+        >
           <div class="col span-6">
             <LabeledSelect
               v-if="autoScaleOptions"
@@ -532,14 +536,20 @@ export default {
               @input="update"
             />
             <span class="text-tips">
-              <a href="https://llmos.1block.ai/docs/monitoring" target="_blank">
+              <a
+                href="https://llmos.1block.ai/docs/monitoring"
+                target="_blank"
+              >
                 View more
               </a>
             </span>
           </div>
         </div>
         <div v-if="enableMonitoring">
-          <div v-if="!monitoringEnabled" class="row mb-20">
+          <div
+            v-if="!monitoringEnabled"
+            class="row mb-20"
+          >
             <div class="text-banner">
               <span class="warning">
                 LLMOS monitoring is not installed, click
@@ -570,7 +580,10 @@ export default {
           </div>
         </div>
 
-        <div v-if="enableMonitoring" class="row mb-20">
+        <div
+          v-if="enableMonitoring"
+          class="row mb-20"
+        >
           <div class="col span-6">
             <LabeledInput
               v-model="monitoringConfig.RAY_PROMETHEUS_HOST"
@@ -582,7 +595,10 @@ export default {
           </div>
         </div>
 
-        <AdvancedSection class="col span-12 advanced" :mode="mode">
+        <AdvancedSection
+          class="col span-12 advanced"
+          :mode="mode"
+        >
           <h3 class="mb-10">
             {{ t('generic.tabs.advanced') }}
           </h3>
@@ -642,7 +658,10 @@ export default {
           />
         </div>
 
-        <AdvancedSection class="col span-12 advanced" :mode="mode">
+        <AdvancedSection
+          class="col span-12 advanced"
+          :mode="mode"
+        >
           <div class="row mb-20">
             <div class="col span-6">
               <Checkbox

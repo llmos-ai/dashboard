@@ -27,7 +27,7 @@ export default {
     };
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.intervalHandle) {
       clearInterval(this.intervalHandle);
     }

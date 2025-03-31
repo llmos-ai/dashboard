@@ -8,45 +8,45 @@ export default {
   emits: ['dd-button-action', 'click-action'],
 
   mixins: [VueSelectOverrides],
-  props: {
+  props:  {
     buttonLabel: {
       default: '',
-      type: String,
+      type:    String,
     },
     closeOnSelect: {
       default: true,
-      type: Boolean,
+      type:    Boolean,
     },
     disabled: {
       default: false,
-      type: Boolean,
+      type:    Boolean,
     },
     // array of option objects containing at least a label and link, but also icon and action are available
     dropdownOptions: {
       // required: true,
       default: () => [],
-      type: Array,
+      type:    Array,
     },
     optionKey: {
       default: null,
-      type: String,
+      type:    String,
     },
     optionLabel: {
       default: 'label',
-      type: String,
+      type:    String,
     },
     // sm, null(med), lg - no xs...its so small
     size: {
       default: null,
-      type: String,
+      type:    String,
     },
     value: {
       default: null,
-      type: String,
+      type:    String,
     },
     placement: {
       default: 'bottom-start',
-      type: String,
+      type:    String,
     },
     selectable: {
       default: (opt) => {
@@ -80,7 +80,7 @@ export default {
       const dropWidth = dropdownList.clientWidth;
 
       if (dropWidth < componentWidth) {
-        dropdownList.style.width = `${componentWidth}px`;
+        dropdownList.style.width = `${ componentWidth }px`;
       } else {
         dropdownList.style.width = 'min-content';
       }
@@ -99,13 +99,13 @@ export default {
         placement: this.placement || 'bottom-start',
         modifiers: [
           {
-            name: 'offset',
+            name:    'offset',
             options: { offset: [-2, 2] },
           },
           {
-            name: 'toggleClass',
+            name:    'toggleClass',
             enabled: true,
-            phase: 'write',
+            phase:   'write',
             fn({ state }) {
               component.$el.setAttribute('x-placement', state.placement);
             },
@@ -215,11 +215,18 @@ export default {
       </a-button>
     </template>
     <!-- Pass down templates provided by the caller -->
-    <template v-for="(_, slot) of $slots" #[slot]="scope" :key="slot">
+    <template
+      v-for="(_, slot) of $slots"
+      #[slot]="scope"
+      :key="slot"
+    >
       <template
         v-if="slot !== 'selected-option' && typeof $slots[slot] === 'function'"
       >
-        <slot :name="slot" v-bind="scope" />
+        <slot
+          :name="slot"
+          v-bind="scope"
+        />
       </template>
     </template>
   </v-select>

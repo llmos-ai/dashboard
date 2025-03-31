@@ -86,7 +86,6 @@ export default {
     :rows="rows"
     key-field="_key"
     :namespaced="false"
-    
   >
     <template #col:uuid="{row}">
       <td>

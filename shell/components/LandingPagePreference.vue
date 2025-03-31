@@ -65,7 +65,6 @@ export default {
       return options;
     },
 
-
     routeDropdownOptions() {
       // Drop-down shows list of clusters that can ber set as login landing page
       const out = [];

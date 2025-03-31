@@ -35,11 +35,30 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
     const hash = await allHash({
       modelServiceDefaultImage: this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.MODEL_SERVICE_DEFAULT_IMAGE),
-      settings:      this.$store.dispatch(`${ inStore }/find`, { type: MANAGEMENT.SETTING }),
+      settings:                 this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }),
     });
 
+    const huggingFaceProxy = hash.settings?.find((item) => item.id === SETTING.HUGGINGfACE_ENDPOINT);
+
+    const container = this.value.spec?.template?.spec?.containers[0];
+
+    const hfToken = container.env.find((env) => env.name === 'HUGGING_FACE_HUB_TOKEN');
+
+    if (!hfToken) {
+      this.hfToken = {
+        name:      'HUGGING_FACE_HUB_TOKEN',
+        valueFrom: { secretKeyRef: { name: '', key: '' } },
+      };
+    }
+
+    const hfEndpoint = container.env.find((env) => env.name === 'HF_ENDPOINT');
+
+    if (!hfEndpoint) {
+      this.hfEndpoint = { name: 'HF_ENDPOINT', value: huggingFaceProxy.value };
+    }
+
     if (!this.container.image) {
-      const systemImageRegistry = hash.settings?.find(item => item.id === SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY);
+      const systemImageRegistry = hash.settings?.find((item) => item.id === SETTING.GLOBAL_SYSTEM_IMAGE_REGISTRY);
       const msDefaultImage = hash.modelServiceDefaultImage.value || hash.modelServiceDefaultImage.default;
       const registry = systemImageRegistry?.value || 'ghcr.io';
 
@@ -56,25 +75,12 @@ export default {
       'VLLM_USE_MODELSCOPE',
     ];
 
-    const container = this.value.spec?.template?.spec?.containers[0];
-    let hfToken = container.env.find((env) => env.name === 'HUGGING_FACE_HUB_TOKEN');
-
-    if (!hfToken) {
-      hfToken = {
+    return {
+      hfToken: {
         name:      'HUGGING_FACE_HUB_TOKEN',
         valueFrom: { secretKeyRef: { name: '', key: '' } },
-      };
-    }
-
-    let hfEndpoint = container.env.find((env) => env.name === 'HF_ENDPOINT');
-
-    if (!hfEndpoint) {
-      hfEndpoint = { name: 'HF_ENDPOINT', value: '' };
-    }
-
-    return {
-      hfToken,
-      hfEndpoint,
+      },
+      hfEndpoint:    { name: 'HF_ENDPOINT', value: '' },
       excludeEnvs,
       events:        [],
       sourceOptions: [
@@ -172,9 +178,12 @@ export default {
         label="General"
         class="bordered-table"
         :weight="tabWeightMap.general"
-      > 
+      >
         <!-- TODO: gutter ? -->
-        <a-row :gutter="[16]" class="mb-[16px]">
+        <a-row
+          :gutter="[16]"
+          class="mb-[16px]"
+        >
           <a-col :span="12">
             <LabeledSelect
               v-model:value="spec.modelRegistry"
@@ -198,7 +207,10 @@ export default {
           </a-col>
         </a-row>
 
-        <a-row :gutter="[16, 24]" class="mb-[16px]">
+        <a-row
+          :gutter="[16, 24]"
+          class="mb-[16px]"
+        >
           <a-col :span="12">
             <LabeledInput
               v-model:value="spec.servedModelName"
@@ -220,8 +232,11 @@ export default {
         </a-row>
 
         <h4>{{ t('modelService.huggingFaceToken') }}</h4>
-        <div class="row">
-          <div class="col span-6">
+        <a-row
+          :gutter="[16]"
+          class="mb-[16px]"
+        >
+          <a-col :span="12">
             <ValueFromResource
               v-model:value="hfToken"
               :value="hfToken"
@@ -231,9 +246,9 @@ export default {
               :loading="isLoadingSecondaryResources"
               @update:value="update"
             />
-          </div>
+          </a-col>
 
-          <div class="col span-6">
+          <a-col :span="12">
             <LabeledInput
               v-model:value="hfEndpoint.value"
               :localized-label="true"
@@ -241,8 +256,8 @@ export default {
               class="mb-20"
               :label="t('modelService.hf.endpoint')"
             />
-          </div>
-        </div>
+          </a-col>
+        </a-row>
 
         <div class="row">
           <div class="col span-12">
@@ -254,7 +269,6 @@ export default {
               :value="container"
               :excludes="excludeEnvs"
               :loading="isLoadingSecondaryResources"
-              class="mb-20"
             />
           </div>
         </div>
@@ -269,7 +283,6 @@ export default {
                 v-model:value="container.image"
                 :required="true"
                 :mode="mode"
-                class="mb-20"
                 :label="t('modelService.image')"
               />
             </div>

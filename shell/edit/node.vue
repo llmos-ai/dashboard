@@ -34,7 +34,7 @@ export default {
 
   props: {
     value: {
-      type: Object,
+      type:     Object,
       required: true,
     },
   },
@@ -46,7 +46,11 @@ export default {
     <div v-if="isCreate">
       <NodeImportCommand :value="value" />
       <slot name="actions">
-        <a-button class="pull-right" type="primary" @click="done">
+        <a-button
+          class="pull-right"
+          type="primary"
+          @click="done"
+        >
           {{ t('generic.done') }}
         </a-button>
       </slot>
@@ -63,10 +67,24 @@ export default {
       @finish="save"
       @cancel="done"
     >
-      <NameNsDescription :value="value" :namespaced="false" :mode="mode" />
-      <ResourceTabs :value="value" :mode="mode">
-        <Tab name="taints" :label="t('node.detail.tab.taints')" :weight="0">
-          <Taints v-model:value="value.spec.taints" :mode="mode" />
+      <NameNsDescription
+        :value="value"
+        :namespaced="false"
+        :mode="mode"
+      />
+      <ResourceTabs
+        :value="value"
+        :mode="mode"
+      >
+        <Tab
+          name="taints"
+          :label="t('node.detail.tab.taints')"
+          :weight="0"
+        >
+          <Taints
+            v-model:value="value.spec.taints"
+            :mode="mode"
+          />
         </Tab>
         <Tab
           name="labels-and-annotations"

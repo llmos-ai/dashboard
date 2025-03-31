@@ -1,11 +1,11 @@
 <script>
-import Tab from "@shell/components/Tabbed/Tab";
-import Tabbed from "@shell/components/Tabbed";
-import { MANAGEMENT } from "@shell/config/types";
-import ResourceTable from "@shell/components/ResourceTable";
-import Loading from "@shell/components/Loading";
+import Tab from '@shell/components/Tabbed/Tab';
+import Tabbed from '@shell/components/Tabbed';
+import { MANAGEMENT } from '@shell/config/types';
+import ResourceTable from '@shell/components/ResourceTable';
+import Loading from '@shell/components/Loading';
 import { SUBTYPE_MAPPING, CREATE_VERBS } from '@shell/models/management.llmos.ai.globalrole';
-import { NAME } from "@shell/config/product/auth";
+import { NAME } from '@shell/config/product/auth';
 
 const GLOBAL = SUBTYPE_MAPPING.GLOBAL.key;
 const NAMESPACE = SUBTYPE_MAPPING.NAMESPACE.key;
@@ -27,7 +27,7 @@ const createRoleTemplate = {
 };
 
 export default {
-  name: "Roles",
+  name: 'Roles',
 
   components: {
     Tab,
@@ -44,16 +44,8 @@ export default {
       MANAGEMENT.ROLE_TEMPLATE
     );
 
-    this["globalRoles"] = globalRoleSchema
-      ? await this.$store.dispatch(`management/findAll`, {
-          type: MANAGEMENT.GLOBAL_ROLE,
-        })
-      : [];
-    this["roleTemplates"] = roleTemplatesSchema
-      ? await this.$store.dispatch(`management/findAll`, {
-          type: MANAGEMENT.ROLE_TEMPLATE,
-        })
-      : [];
+    this['globalRoles'] = globalRoleSchema ? await this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.GLOBAL_ROLE }) : [];
+    this['roleTemplates'] = roleTemplatesSchema ? await this.$store.dispatch(`management/findAll`, { type: MANAGEMENT.ROLE_TEMPLATE }) : [];
   },
 
   data() {
@@ -65,9 +57,9 @@ export default {
     );
 
     const roleTemplateHeaders =
-      this.$store.getters["type-map/headersFor"](roleTemplatesSchema);
+      this.$store.getters['type-map/headersFor'](roleTemplatesSchema);
     const defaultHeaderIndex = roleTemplateHeaders.findIndex(
-      (header) => header.name === "default"
+      (header) => header.name === 'default'
     );
 
     return {
@@ -100,7 +92,7 @@ export default {
       GLOBAL,
       NAMESPACE,
 
-      globalRoles: null,
+      globalRoles:   null,
       roleTemplates: null,
     };
   },
@@ -129,7 +121,7 @@ export default {
     },
 
     createLabel() {
-      return this.t(`rbac.roletemplate.subtypes.${this.type}.createButton`);
+      return this.t(`rbac.roletemplate.subtypes.${ this.type }.createButton`);
     },
 
     createLocation() {

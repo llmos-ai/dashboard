@@ -31,18 +31,18 @@ export default {
     return {
       showGlobalRoles,
       form: {
-        username: this.value.spec?.username,
+        username:    this.value.spec?.username,
         description: this.value.spec?.description,
         displayName: this.value.spec?.displayName,
         active,
-        password: {
-          password: '',
+        password:    {
+          password:          '',
           userChangeOnLogin: false,
         },
       },
       validation: {
-        password: false,
-        roles: !showGlobalRoles,
+        password:     false,
+        roles:        !showGlobalRoles,
         rolesChanged: false,
       },
       roles: [],
@@ -132,22 +132,20 @@ export default {
 
     async createUser() {
       // Ensure username is unique (this does not happen in the backend)
-      const users = await this.$store.dispatch('management/findAll', {
-        type: MANAGEMENT.USER,
-      });
+      const users = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.USER });
 
       if (users.find((u) => u.spec.username === this.form.username)) {
         throw new Error(this.t('user.edit.credentials.username.exists'));
       }
 
       const user = await this.$store.dispatch('management/create', {
-        type: MANAGEMENT.USER,
+        type:     MANAGEMENT.USER,
         metadata: { generateName: 'user-' },
-        spec: {
-          username: this.form.username,
-          password: this.form.password.password,
+        spec:     {
+          username:    this.form.username,
+          password:    this.form.password.password,
           displayName: this.form.displayName,
-          active: this.form.active,
+          active:      this.form.active,
           description: this.form.description,
         },
       });
@@ -162,7 +160,7 @@ export default {
 
       const user = await this.$store.dispatch('management/find', {
         type: MANAGEMENT.USER,
-        id: this.value.id,
+        id:   this.value.id,
       });
 
       // Save change of password
@@ -178,8 +176,8 @@ export default {
 
       return await this.$store.dispatch('management/find', {
         type: MANAGEMENT.USER,
-        id: this.value.id,
-        opt: { force: true },
+        id:   this.value.id,
+        opt:  { force: true },
       });
     },
 
@@ -259,7 +257,10 @@ export default {
         @valid="validation.password = $event"
       />
 
-      <div v-if="showGlobalRoles" class="global-permissions">
+      <div
+        v-if="showGlobalRoles"
+        class="global-permissions"
+      >
         <GlobalRoleBindings
           ref="grb"
           :user-id="value.id || liveValue.id"

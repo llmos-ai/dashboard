@@ -1,26 +1,26 @@
 export function camelToTitle(str) {
-  return dasherize(str || "")
-    .split("-")
+  return dasherize(str || '')
+    .split('-')
     .map((str) => {
       return ucFirst(str);
     })
-    .join(" ");
+    .join(' ');
 }
 
 export function ucFirst(str) {
-  str = str || "";
+  str = str || '';
 
   return str.substr(0, 1).toUpperCase() + str.substr(1);
 }
 
 export function lcFirst(str) {
-  str = str || "";
+  str = str || '';
 
   return str.substr(0, 1).toLowerCase() + str.substr(1);
 }
 
-export function strPad(str, toLength, padChars = " ", right = false) {
-  str = `${str}`;
+export function strPad(str, toLength, padChars = ' ', right = false) {
+  str = `${ str }`;
 
   if (str.length >= toLength) {
     return str;
@@ -38,23 +38,23 @@ export function strPad(str, toLength, padChars = " ", right = false) {
 
 // Turn thing1 into thing00000001 so that the numbers sort numerically
 export function sortableNumericSuffix(str) {
-  str = str || "";
+  str = str || '';
   const match = str.match(/^(.*[^0-9])([0-9]+)$/);
 
   if (match) {
-    return match[1] + strPad(match[2], 8, "0");
+    return match[1] + strPad(match[2], 8, '0');
   }
 
   return str;
 }
 
 const entityMap = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-  "/": "&#x2F;",
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;',
 };
 
 export function escapeHtml(html) {
@@ -69,15 +69,15 @@ export function escapeHtml(html) {
  * @returns string
  */
 export function decodeHtml(text) {
-  const div = document.createElement("div");
+  const div = document.createElement('div');
 
   div.innerHTML = text;
 
-  return div.textContent || div.innerText || "";
+  return div.textContent || div.innerText || '';
 }
 
 export function escapeRegex(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 export function random32(count) {
@@ -106,18 +106,18 @@ export function random32(count) {
   }
 }
 
-const alpha = "abcdefghijklmnopqrstuvwxyz";
-const num = "0123456789";
-const sym = "!@#$%^&*()_+-=[]{};:,./<>?|";
+const alpha = 'abcdefghijklmnopqrstuvwxyz';
+const num = '0123456789';
+const sym = '!@#$%^&*()_+-=[]{};:,./<>?|';
 
 export const CHARSET = {
-  NUMERIC: num,
-  NO_VOWELS: "bcdfghjklmnpqrstvwxz2456789",
-  ALPHA: alpha + alpha.toUpperCase(),
-  ALPHA_NUM: alpha + alpha.toUpperCase() + num,
+  NUMERIC:     num,
+  NO_VOWELS:   'bcdfghjklmnpqrstvwxz2456789',
+  ALPHA:       alpha + alpha.toUpperCase(),
+  ALPHA_NUM:   alpha + alpha.toUpperCase() + num,
   ALPHA_LOWER: alpha,
   ALPHA_UPPER: alpha.toUpperCase(),
-  HEX: `${num}ABCDEF`,
+  HEX:         `${ num }ABCDEF`,
   PASSWORD:
     alpha + alpha.toUpperCase() + num + alpha + alpha.toUpperCase() + num + sym,
   // ^-- includes alpha / ALPHA / num twice to reduce the occurrence of symbols
@@ -132,59 +132,54 @@ export function randomStr(length = 16, chars = CHARSET.ALPHA_NUM) {
     .map((val) => {
       return chars[val % chars.length];
     })
-    .join("");
+    .join('');
 }
 
 export function formatPercent(value, maxPrecision = 2) {
   if (value < 1 && maxPrecision >= 2) {
-    return `${Math.round(value * 100) / 100}%`;
+    return `${ Math.round(value * 100) / 100 }%`;
   } else if (value < 10 && maxPrecision >= 1) {
-    return `${Math.round(value * 10) / 10}%`;
+    return `${ Math.round(value * 10) / 10 }%`;
   } else {
-    return `${Math.round(value)}%`;
+    return `${ Math.round(value) }%`;
   }
 }
 
 export function pluralize(str) {
   if (str.match(/.*[^aeiou]y$/i)) {
-    return `${str.substr(0, str.length - 1)}ies`;
-  } else if (str.endsWith("ics")) {
+    return `${ str.substr(0, str.length - 1) }ies`;
+  } else if (str.endsWith('ics')) {
     return str;
-  } else if (str.endsWith("s")) {
-    return `${str}es`;
+  } else if (str.endsWith('s')) {
+    return `${ str }es`;
   } else {
-    return `${str}s`;
+    return `${ str }s`;
   }
 }
 
-export function resourceNames(names, t, options = {}) {
+export function resourceNames(names, plusMore, t, endString) {
   const MAX_NAMES_COUNT = 5;
-
-  let { plusMore, endString } = options;
 
   // plusMore default value
   if (!plusMore) {
-    plusMore = t("promptRemove.andOthers", {
-      count:
-        names.length > MAX_NAMES_COUNT ? names.length - MAX_NAMES_COUNT : 0,
-    });
+    plusMore = t('promptRemove.andOthers', { count: names.length > MAX_NAMES_COUNT ? names.length - MAX_NAMES_COUNT : 0 });
   }
 
   // endString default value
   if (!endString) {
-    endString = endString === false ? " " : ".";
+    endString = endString === false ? ' ' : '.';
   }
 
   return names.reduce((res, name, i) => {
     if (i < MAX_NAMES_COUNT) {
-      res += `<b>${escapeHtml(name)}</b>`;
+      res += `<b>${ escapeHtml( name ) }</b>`;
 
       if (i === names.length - 1) {
         res += endString;
       } else if (i === names.length - 2) {
-        res += names.length <= 5 ? t("generic.and") : "";
+        res += names.length <= 5 ? t('generic.and') : '';
       } else {
-        res += i < MAX_NAMES_COUNT - 1 ? t("generic.comma") : "";
+        res += i < MAX_NAMES_COUNT - 1 ? t('generic.comma') : '';
       }
     }
 
@@ -193,11 +188,11 @@ export function resourceNames(names, t, options = {}) {
     }
 
     return res;
-  }, "");
+  }, '');
 }
 
-export function indent(lines, count = 2, token = " ", afterRegex = null) {
-  if (typeof lines === "string") {
+export function indent(lines, count = 2, token = ' ', afterRegex = null) {
+  if (typeof lines === 'string') {
     lines = lines.split(/\n/);
   } else {
     lines = lines || [];
@@ -206,7 +201,7 @@ export function indent(lines, count = 2, token = " ", afterRegex = null) {
   const padStr = new Array(count + 1).join(token);
 
   const out = lines.map((line) => {
-    let prefix = "";
+    let prefix = '';
     let suffix = line;
 
     if (afterRegex) {
@@ -218,10 +213,10 @@ export function indent(lines, count = 2, token = " ", afterRegex = null) {
       }
     }
 
-    return `${prefix}${padStr}${suffix}`;
+    return `${ prefix }${ padStr }${ suffix }`;
   });
 
-  const str = out.join("\n");
+  const str = out.join('\n');
 
   return str;
 }
@@ -229,17 +224,17 @@ export function indent(lines, count = 2, token = " ", afterRegex = null) {
 const decamelizeRegex = /([a-z\d])([A-Z])/g;
 
 export function decamelize(str) {
-  return str.replace(decamelizeRegex, "$1_$2").toLowerCase();
+  return str.replace(decamelizeRegex, '$1_$2').toLowerCase();
 }
 
 const dasherizeRegex = /[ _]/g;
 
 export function dasherize(str) {
-  return decamelize(str).replace(dasherizeRegex, "-");
+  return decamelize(str).replace(dasherizeRegex, '-');
 }
 
 export function asciiLike(str) {
-  str = str || "";
+  str = str || '';
 
   if (str.match(/[^\r\n\t\x20-\x7F]/)) {
     return false;
@@ -249,21 +244,21 @@ export function asciiLike(str) {
 }
 
 export function coerceStringTypeToScalarType(val, type) {
-  if (type === "float") {
+  if (type === 'float') {
     // Coerce strings to floats
     val = parseFloat(val) || null; // NaN becomes null
-  } else if (type === "int") {
+  } else if (type === 'int') {
     // Coerce strings to ints
     val = parseInt(val, 10);
 
     if (isNaN(val)) {
       val = null;
     }
-  } else if (type === "boolean") {
+  } else if (type === 'boolean') {
     // Coerce strings to boolean
-    if (val.toLowerCase() === "true") {
+    if (val.toLowerCase() === 'true') {
       val = true;
-    } else if (val.toLowerCase() === "false") {
+    } else if (val.toLowerCase() === 'false') {
       val = false;
     }
   }
@@ -273,7 +268,7 @@ export function coerceStringTypeToScalarType(val, type) {
 
 export function matchesSomeRegex(stringRaw, regexes = []) {
   return regexes.some((regexRaw) => {
-    const string = stringRaw || "";
+    const string = stringRaw || '';
     const regex = ensureRegex(regexRaw);
 
     return string.match(regex);
@@ -281,11 +276,11 @@ export function matchesSomeRegex(stringRaw, regexes = []) {
 }
 
 export function ensureRegex(strOrRegex, exact = true) {
-  if (typeof strOrRegex === "string") {
+  if (typeof strOrRegex === 'string') {
     if (exact) {
-      return new RegExp(`^${escapeRegex(strOrRegex)}$`, "i");
+      return new RegExp(`^${ escapeRegex(strOrRegex) }$`, 'i');
     } else {
-      return new RegExp(`${escapeRegex(strOrRegex)}`, "i");
+      return new RegExp(`${ escapeRegex(strOrRegex) }`, 'i');
     }
   }
 
@@ -293,7 +288,7 @@ export function ensureRegex(strOrRegex, exact = true) {
 }
 
 export function nlToBr(value) {
-  return escapeHtml(value || "").replace(/(\r\n|\r|\n)/g, "<br/>\n");
+  return escapeHtml(value || '').replace(/(\r\n|\r|\n)/g, '<br/>\n');
 }
 
 const quotedMatch = /[^."']+|"([^"]*)"|'([^']*)'/g;
@@ -301,25 +296,25 @@ const quotedMatch = /[^."']+|"([^"]*)"|'([^']*)'/g;
 export function splitObjectPath(path) {
   if (path.includes('"') || path.includes("'")) {
     // Path with quoted section
-    return path.match(quotedMatch).map((x) => x.replace(/['"]/g, ""));
+    return path.match(quotedMatch).map((x) => x.replace(/['"]/g, ''));
   }
 
   // Regular path
-  return path.split(".");
+  return path.split('.');
 }
 
 export function joinObjectPath(ary) {
-  let out = "";
+  let out = '';
 
   for (const p of ary) {
-    if (p.includes(".")) {
-      out += `."${p}"`;
+    if (p.includes('.')) {
+      out += `."${ p }"`;
     } else {
-      out += `.${p}`;
+      out += `.${ p }`;
     }
   }
 
-  if (out.startsWith(".")) {
+  if (out.startsWith('.')) {
     out = out.substr(1);
   }
 
@@ -327,10 +322,10 @@ export function joinObjectPath(ary) {
 }
 
 export function shortenedImage(image) {
-  return (image || "")
-    .replace(/^(index\.)?docker.io\/(library\/)?/, "")
-    .replace(/:latest$/, "")
-    .replace(/^(.*@sha256:)([0-9a-f]{8})[0-9a-f]+$/i, "$1$2…");
+  return (image || '')
+    .replace(/^(index\.)?docker.io\/(library\/)?/, '')
+    .replace(/:latest$/, '')
+    .replace(/^(.*@sha256:)([0-9a-f]{8})[0-9a-f]+$/i, '$1$2…');
 }
 
 export function isIpv4(ip) {
@@ -341,19 +336,18 @@ export function isIpv4(ip) {
 }
 
 export function sanitizeKey(k) {
-  return (k || "").replace(/[^a-z0-9./_-]/gi, "");
+  return (k || '').replace(/[^a-z0-9./_-]/gi, '');
 }
 
 export function sanitizeValue(v) {
-  return (v || "").replace(/[^a-z0-9._-]/gi, "");
+  return (v || '').replace(/[^a-z0-9._-]/gi, '');
 }
 
 export function sanitizeIP(v) {
-  return (v || "").replace(/[^a-z0-9.:_-]/gi, "");
+  return (v || '').replace(/[^a-z0-9.:_-]/gi, '');
 }
 
 export function generateRandomAlphaString(length) {
-  return Array.from({ length }, () =>
-    String.fromCharCode((97 + Math.random() * 26) | 0)
-  ).join("");
+  return Array.from({ length }, () => String.fromCharCode((97 + Math.random() * 26) | 0)
+  ).join('');
 }

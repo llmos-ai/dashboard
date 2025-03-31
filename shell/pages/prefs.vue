@@ -28,7 +28,7 @@ import LocaleSelector from '@shell/components/LocaleSelector';
 import { isDevBuild } from '@shell/utils/version';
 
 export default {
-  layout: 'plain',
+  layout:     'plain',
   components: {
     BackLink,
     ButtonGroup,
@@ -45,15 +45,15 @@ export default {
     };
   },
   computed: {
-    keymap: mapPref(KEYMAP),
-    viewInApi: mapPref(VIEW_IN_API),
-    allNamespaces: mapPref(ALL_NAMESPACES),
-    themeShortcut: mapPref(THEME_SHORTCUT),
-    dateFormat: mapPref(DATE_FORMAT),
-    timeFormat: mapPref(TIME_FORMAT),
-    perPage: mapPref(ROWS_PER_PAGE),
-    hideDesc: mapPref(HIDE_DESC),
-    pluginDeveloper: mapPref(PLUGIN_DEVELOPER),
+    keymap:                 mapPref(KEYMAP),
+    viewInApi:              mapPref(VIEW_IN_API),
+    allNamespaces:          mapPref(ALL_NAMESPACES),
+    themeShortcut:          mapPref(THEME_SHORTCUT),
+    dateFormat:             mapPref(DATE_FORMAT),
+    timeFormat:             mapPref(TIME_FORMAT),
+    perPage:                mapPref(ROWS_PER_PAGE),
+    hideDesc:               mapPref(HIDE_DESC),
+    pluginDeveloper:        mapPref(PLUGIN_DEVELOPER),
     viewContainerDashboard: mapPref(VIEW_CONTAINER_DASHBOARD),
 
     theme: {
@@ -68,7 +68,7 @@ export default {
     themeOptions() {
       return this.$store.getters['prefs/options'](THEME).map((value) => {
         return {
-          labelKey: `prefs.theme.${value}`,
+          labelKey: `prefs.theme.${ value }`,
           value,
         };
       });
@@ -77,7 +77,7 @@ export default {
     keymapOptions() {
       return this.$store.getters['prefs/options'](KEYMAP).map((value) => {
         return {
-          labelKey: `prefs.keymap.${value}`,
+          labelKey: `prefs.keymap.${ value }`,
           value,
         };
       });
@@ -99,7 +99,7 @@ export default {
 
       return this.$store.getters['prefs/options'](DATE_FORMAT).map(
         (value, index) => {
-          const updateValue = `${now.format(value)} (${value})`;
+          const updateValue = `${ now.format(value) } (${ value })`;
 
           if (index > 1 && isDuplicate) {
             return {
@@ -187,7 +187,10 @@ export default {
 <template>
   <div>
     <BackLink :link="backLink" />
-    <h1 v-t="'prefs.title'" class="mb-20" />
+    <h1
+      v-t="'prefs.title'"
+      class="mb-20"
+    />
     <!-- Language -->
     <div class="mt-10 mb-10">
       <h4 v-t="'prefs.language'" />
@@ -199,7 +202,7 @@ export default {
     </div>
     <!-- Theme -->
     <div class="mt-10 mb-10">
-      <hr />
+      <hr>
       <h4 v-t="'prefs.theme.label'" />
       <ButtonGroup
         v-model:value="theme"
@@ -207,18 +210,22 @@ export default {
         :options="themeOptions"
       />
       <div class="mt-10">
-        <t k="prefs.theme.autoDetail" :pm="pm" :am="am" />
+        <t
+          k="prefs.theme.autoDetail"
+          :pm="pm"
+          :am="am"
+        />
       </div>
     </div>
     <!-- Login landing page -->
     <div class="mt-10 mb-10">
-      <hr />
+      <hr>
       <h4 v-t="'prefs.landing.label'" />
       <LandingPagePreference data-testid="prefs__landingPagePreference" />
     </div>
     <!-- Display Settings -->
     <div class="mt-10 mb-10">
-      <hr />
+      <hr>
       <h4 v-t="'prefs.displaySettings.title'" />
       <p class="set-landing-leadin">
         {{ t('prefs.displaySettings.detail', {}, (raw = true)) }}
@@ -259,7 +266,7 @@ export default {
     </div>
     <!-- Advanced Features -->
     <div class="col adv-features mt-10 mb-10">
-      <hr />
+      <hr>
       <h4 v-t="'prefs.advFeatures.title'" />
       <Checkbox
         v-model:value="viewInApi"
@@ -267,21 +274,21 @@ export default {
         :label="t('prefs.advFeatures.viewInApi', {}, true)"
         class="mt-10"
       />
-      <br />
+      <br>
       <Checkbox
         v-model:value="allNamespaces"
         data-testid="prefs__allNamespaces"
         :label="t('prefs.advFeatures.allNamespaces', {}, true)"
         class="mt-20"
       />
-      <br />
+      <br>
       <Checkbox
         v-model:value="themeShortcut"
         data-testid="prefs__themeShortcut"
         :label="t('prefs.advFeatures.themeShortcut', {}, true)"
         class="mt-20"
       />
-      <br />
+      <br>
       <Checkbox
         v-model:value="hideDescriptions"
         data-testid="prefs__hideDescriptions"
@@ -289,7 +296,7 @@ export default {
         class="mt-20"
       />
       <template v-if="admin && isDevBuild">
-        <br />
+        <br>
         <Checkbox
           v-model:value="viewContainerDashboard"
           :label="t('prefs.advFeatures.viewContainerDashboard', {}, true)"
@@ -299,7 +306,7 @@ export default {
     </div>
     <!-- YAML editor key mapping -->
     <div class="col mt-10 mb-10">
-      <hr />
+      <hr>
       <h4 v-t="'prefs.keymap.label'" />
       <ButtonGroup
         v-model:value="keymap"

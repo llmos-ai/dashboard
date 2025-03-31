@@ -24,10 +24,9 @@ export default {
 
   fetch() {
     if ( this.$store.getters['management/schemaFor'](MANAGEMENT.CLUSTER) ) {
-       this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER });
+      this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER });
     }
   },
-
 
   data() {
     const fullVersion = getVersionInfo(this.$store).fullVersion;
@@ -68,7 +67,7 @@ export default {
   },
 
   // Forget the types when we leave the page
-  beforeDestroy() {},
+  beforeUnmount() {},
 
   methods: {
     /**

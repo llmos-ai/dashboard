@@ -1,52 +1,52 @@
 <script>
-import Type from "@shell/components/nav/Type";
+import Type from '@shell/components/nav/Type';
 
 export default {
-  name: "Group",
+  name: 'Group',
 
   components: { Type },
 
-  emits: ["expand", "close"],
+  emits: ['expand', 'close'],
 
   props: {
     depth: {
-      type: Number,
+      type:    Number,
       default: 0,
     },
 
     idPrefix: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     group: {
-      type: Object,
+      type:     Object,
       required: true,
     },
 
     childrenKey: {
-      type: String,
-      default: "children",
+      type:    String,
+      default: 'children',
     },
 
     canCollapse: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     showHeader: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     fixedOpen: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
 
   data() {
-    const id = (this.idPrefix || "") + this.group.name;
+    const id = (this.idPrefix || '') + this.group.name;
 
     return { id, expanded: false };
   },
@@ -83,7 +83,7 @@ export default {
         if (overviewRoute && grp.overview) {
           const route = this.$router.resolve(overviewRoute || {});
 
-          return this.$route.fullPath.split("#")[0] === route?.fullPath;
+          return this.$route.fullPath.split('#')[0] === route?.fullPath;
         }
       }
 
@@ -103,7 +103,7 @@ export default {
   methods: {
     expandGroup() {
       this.isExpanded = true;
-      this.$emit("expand", this.group);
+      this.$emit('expand', this.group);
     },
 
     groupSelected() {
@@ -112,10 +112,10 @@ export default {
         return;
       } else {
         // Remove all active class if click on group header and not active route
-        const headerEl = document.querySelectorAll(".header");
+        const headerEl = document.querySelectorAll('.header');
 
         headerEl.forEach((el) => {
-          el.classList.remove("active");
+          el.classList.remove('active');
         });
       }
       this.expandGroup();
@@ -149,15 +149,15 @@ export default {
     },
 
     close() {
-      this.$emit("close");
+      this.$emit('close');
     },
 
     // User clicked on the expander icon, so toggle the expansion so the user can see inside the group
     peek($event) {
       // Add active class to the current header if click on chevron icon
-      $event.target.parentElement.classList.remove("active");
+      $event.target.parentElement.classList.remove('active');
       if (this.hasActiveRoute() && this.isExpanded) {
-        $event.target.parentElement.classList.add("active");
+        $event.target.parentElement.classList.add('active');
       }
       this.isExpanded = !this.isExpanded;
       $event.stopPropagation();
@@ -167,25 +167,22 @@ export default {
       if (!items) {
         items = this.group;
       }
-
       for (const item of items.children) {
         if (item.children && this.hasActiveRoute(item)) {
           return true;
         } else if (item.route) {
-          const navLevels = ["cluster", "product", "resource"];
+          const navLevels = ['cluster', 'product', 'resource'];
           const matchesNavLevel =
             navLevels.filter(
-              (param) =>
-                !this.$route.params[param] ||
+              (param) => !this.$route.params[param] ||
                 this.$route.params[param] !== item.route.params[param]
             ).length === 0;
-          const withoutHash = this.$route.hash
-            ? this.$route.fullPath.slice(
-                0,
-                this.$route.fullPath.indexOf(this.$route.hash)
-              )
-            : this.$route.fullPath;
-          const withoutQuery = withoutHash.split("?")[0];
+          const withoutHash = this.$route.hash ? this.$route.fullPath.slice(
+            0,
+            this.$route.fullPath.indexOf(this.$route.hash)
+          ) : this.$route.fullPath;
+          const withoutQuery = withoutHash.split('?')[0];
+
           if (
             matchesNavLevel ||
             this.$router.resolve(item.route).fullPath === withoutQuery
@@ -256,7 +253,10 @@ export default {
             <span v-clean-html="group.labelDisplay || group.label" />
           </div>
         </router-link>
-        <div class="text-sm menu-item" v-else>
+        <div
+          v-else
+          class="text-sm menu-item"
+        >
           <span v-clean-html="group.labelDisplay || group.label" />
         </div>
       </slot>
@@ -275,15 +275,28 @@ export default {
         @keyup.space="peek($event, true)"
       />
     </div>
-    <ul v-if="isExpanded" class="list-unstyled body" v-bind="$attrs">
-      <template v-for="(child, idx) in group[childrenKey]" :key="idx">
-        <li v-if="child.divider" :key="idx">
-          <hr />
+    <ul
+      v-if="isExpanded"
+      class="list-unstyled body"
+      v-bind="$attrs"
+    >
+      <template
+        v-for="(child, idx) in group[childrenKey]"
+        :key="idx"
+      >
+        <li
+          v-if="child.divider"
+          :key="idx"
+        >
+          <hr>
         </li>
         <!-- <div v-else-if="child[childrenKey] && hideGroup(child[childrenKey])" :key="child.name">
           HIDDEN
         </div> -->
-        <li v-else-if="child[childrenKey]" :key="child.name">
+        <li
+          v-else-if="child[childrenKey]"
+          :key="child.name"
+        >
           <Group
             ref="groups"
             :key="id + '_' + child.name + '_children'"

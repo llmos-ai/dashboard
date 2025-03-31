@@ -92,7 +92,7 @@ export default {
     };
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     // Remove the data and stop watching resources that were fetched in this page
     // Events in particular can lead to change messages having to be processed when we are no longer interested in events
     this.$store.dispatch('cluster/forgetType', EVENT);
@@ -243,7 +243,6 @@ export default {
         return agg;
       }, initialAggregation);
     },
-
 
     cpuUsed() {
       const total = parseSi(this.currentCluster?.status?.capacity?.cpu);
@@ -443,7 +442,9 @@ export default {
 
     <div v-if="componentServices">
       <div
-         v-for="(status, i) in componentServices" :key="i" class="k8s-component-status"
+        v-for="(status, i) in componentServices"
+        :key="i"
+        class="k8s-component-status"
         :class="{'k8s-component-status-healthy': status.healthy, 'k8s-component-status-unhealthy': !status.healthy}"
       >
         <i

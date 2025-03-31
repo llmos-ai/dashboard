@@ -9,35 +9,35 @@ export default {
   emits: ['cancel-confirmed', 'finish'],
 
   components: { AsyncButton, ResourceCancelModal },
-  props: {
+  props:      {
     mode: {
-      type: String,
+      type:    String,
       default: 'create',
     },
 
     isForm: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     // Override the set of labels shown on the button from the default save/create.
     finishButtonMode: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     confirmCancelRequired: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     confirmBackRequired: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     showCancel: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
@@ -46,7 +46,7 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'form-footer',
     },
   },

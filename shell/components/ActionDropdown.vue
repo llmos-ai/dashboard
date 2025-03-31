@@ -4,17 +4,17 @@ export default {
 
   props: {
     size: {
-      type: String,
+      type:    String,
       default: '', // possible values are xs, sm, lg. empty is default .btn
     },
     // whether this is a button and dropdown (default) or dropdown that looks like a button/dropdown
     dualAction: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     disableButton: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -25,19 +25,19 @@ export default {
       let out;
 
       switch (size) {
-        case '':
-          out = 'btn';
-          break;
-        case 'xs':
-          out = 'btn btn-xs';
-          break;
-        case 'sm':
-          out = 'btn btn-sm';
-          break;
-        case 'lg':
-          out = 'btn btn-lg';
-          break;
-        default:
+      case '':
+        out = 'btn';
+        break;
+      case 'xs':
+        out = 'btn btn-xs';
+        break;
+      case 'sm':
+        out = 'btn btn-sm';
+        break;
+      case 'lg':
+        out = 'btn btn-lg';
+        break;
+      default:
       }
 
       return out;
@@ -72,7 +72,10 @@ export default {
         :disabled="disableButton"
         :flip="false"
       >
-        <slot name="button-content" :buttonSize="buttonSize">
+        <slot
+          name="button-content"
+          :buttonSize="buttonSize"
+        >
           <a-button
             ref="popoverButton"
             class="icon-container no-left-border-radius"

@@ -1,12 +1,12 @@
 <script>
-import Loading from "@shell/components/Loading";
-import Tabbed from "@shell/components/Tabbed";
-import Tab from "@shell/components/Tabbed/Tab";
-import TypeDescription from "@shell/components/TypeDescription";
+import Loading from '@shell/components/Loading';
+import Tabbed from '@shell/components/Tabbed';
+import Tab from '@shell/components/Tabbed/Tab';
+import TypeDescription from '@shell/components/TypeDescription';
 
-import ResourceTable from "@shell/components/ResourceTable";
-import { MONITORING } from "@shell/config/types";
-import { allHash } from "@shell/utils/promise";
+import ResourceTable from '@shell/components/ResourceTable';
+import { MONITORING } from '@shell/config/types';
+import { allHash } from '@shell/utils/promise';
 export default {
   components: {
     Loading,
@@ -17,20 +17,16 @@ export default {
   },
 
   async fetch() {
-    this.serviceMonitorSchema = this.$store.getters["cluster/schemaFor"](
+    this.serviceMonitorSchema = this.$store.getters['cluster/schemaFor'](
       MONITORING.SERVICE_MONITOR
     );
-    this.podMonitorSchema = this.$store.getters["cluster/schemaFor"](
+    this.podMonitorSchema = this.$store.getters['cluster/schemaFor'](
       MONITORING.POD_MONITOR
     );
 
     const hash = await allHash({
-      serviceMonitors: this.$store.dispatch("cluster/findAll", {
-        type: MONITORING.SERVICE_MONITOR,
-      }),
-      podMonitors: this.$store.dispatch("cluster/findAll", {
-        type: MONITORING.POD_MONITOR,
-      }),
+      serviceMonitors: this.$store.dispatch('cluster/findAll', { type: MONITORING.SERVICE_MONITOR }),
+      podMonitors:     this.$store.dispatch('cluster/findAll', { type: MONITORING.POD_MONITOR }),
     });
 
     this.serviceMonitors = hash.serviceMonitors;
@@ -42,9 +38,9 @@ export default {
 
     return {
       serviceMonitorSchema: null,
-      podMonitorSchema: null,
-      serviceMonitors: [],
-      podMonitors: [],
+      podMonitorSchema:     null,
+      serviceMonitors:      [],
+      podMonitors:          [],
       initTab,
     };
   },
@@ -55,9 +51,9 @@ export default {
         this.$refs?.tabs?.activeTabName || this.routeSchema.id;
 
       return {
-        name: "c-cluster-monitoring-monitor-create",
+        name:   'c-cluster-monitoring-monitor-create',
         params: { cluster: this.$route.params.cluster },
-        query: { resource: activeResource },
+        query:  { resource: activeResource },
       };
     },
   },
@@ -68,7 +64,9 @@ export default {
   <Loading v-if="$fetchState.pending" />
   <div v-else>
     <div class="row header mb-20">
-      <h1 class="flex flex-1">{{ t("monitoring.monitors") }}</h1>
+      <h1 class="flex flex-1">
+        {{ t("monitoring.monitors") }}
+      </h1>
       <div>
         <a-button
           type="primary"
@@ -79,14 +77,20 @@ export default {
         </a-button>
       </div>
     </div>
-    <Tabbed ref="tabs" :default-tab="initTab">
+    <Tabbed
+      ref="tabs"
+      :default-tab="initTab"
+    >
       <Tab
         :name="serviceMonitorSchema.id"
         :label="$store.getters['type-map/labelFor'](serviceMonitorSchema, 2)"
         :weight="2"
       >
         <TypeDescription :resource="serviceMonitorSchema.id" />
-        <ResourceTable :schema="serviceMonitorSchema" :rows="serviceMonitors" />
+        <ResourceTable
+          :schema="serviceMonitorSchema"
+          :rows="serviceMonitors"
+        />
       </Tab>
       <Tab
         :name="podMonitorSchema.id"
@@ -94,7 +98,10 @@ export default {
         :weight="1"
       >
         <TypeDescription :resource="podMonitorSchema.id" />
-        <ResourceTable :schema="podMonitorSchema" :rows="podMonitors" />
+        <ResourceTable
+          :schema="podMonitorSchema"
+          :rows="podMonitors"
+        />
       </Tab>
     </Tabbed>
   </div>

@@ -30,7 +30,7 @@ export default {
 
   data() {
     return {
-      services: [],
+      services:     [],
       dashboardUrl: '',
     };
   },

@@ -13,7 +13,7 @@ export default {
   data() {
     return {
       isMac,
-      value: '',
+      value:  '',
       groups: null,
     };
   },
@@ -54,7 +54,7 @@ export default {
       // Suplement the output with count info. Usualy the `Type` component would handle this individualy... but scales real bad so give it
       // some help
       const counts =
-        this.$store.getters[`${product.inStore}/all`](COUNT)?.[0]?.counts || {};
+        this.$store.getters[`${ product.inStore }/all`](COUNT)?.[0]?.counts || {};
 
       out.forEach((o) => {
         o.children?.forEach((t) => {
@@ -95,7 +95,11 @@ export default {
       @keyup.esc="$emit('closeSearch')"
     />
     <div class="results">
-      <div v-for="g in groups" :key="g.name" class="package">
+      <div
+        v-for="g in groups"
+        :key="g.name"
+        class="package"
+      >
         <Group
           v-if="!g.hidden"
           :key="g.name"

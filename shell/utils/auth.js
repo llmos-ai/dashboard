@@ -1,5 +1,5 @@
-import { Popup, popupWindowOptions } from "@shell/utils/window";
-import { parse as parseUrl, addParam } from "@shell/utils/url";
+import { Popup, popupWindowOptions } from '@shell/utils/window';
+import { parse as parseUrl, addParam } from '@shell/utils/url';
 import {
   BACK_TO,
   SPA,
@@ -7,12 +7,12 @@ import {
   _FLAGGED,
   TIMED_OUT,
   LOGGED_OUT,
-} from "@shell/config/query-params";
-import { MANAGEMENT } from "@shell/config/types";
-import { allHash } from "@shell/utils/promise";
-import { getProductFromRoute, getResourceFromRoute } from "@shell/utils/router";
-import { NAME as EXPLORER } from "@shell/config/product/explorer";
-import { findBy } from "@shell/utils/array";
+} from '@shell/config/query-params';
+import { MANAGEMENT } from '@shell/config/types';
+import { allHash } from '@shell/utils/promise';
+import { getProductFromRoute, getResourceFromRoute } from '@shell/utils/router';
+import { NAME as EXPLORER } from '@shell/config/product/explorer';
+import { findBy } from '@shell/utils/array';
 
 export function openAuthPopup(url, provider) {
   const popup = new Popup(
@@ -32,11 +32,11 @@ export function openAuthPopup(url, provider) {
       };
     },
     () => {
-      popup.reject(new Error("Access was not authorized"));
+      popup.reject(new Error('Access was not authorized'));
     }
   );
 
-  popup.open(url, "auth-test", popupWindowOptions());
+  popup.open(url, 'auth-test', popupWindowOptions());
 
   return popup.promise;
 }
@@ -47,12 +47,12 @@ export function returnTo(opt, vm) {
   if (vm.$router.options && vm.$router.options.base) {
     const routerBase = vm.$router.options.base;
 
-    if (routerBase !== "/") {
-      route = `${routerBase.replace(/\/+$/, "")}/${route.replace(/^\/+/, "")}`;
+    if (routerBase !== '/') {
+      route = `${ routerBase.replace(/\/+$/, '') }/${ route.replace(/^\/+/, '') }`;
     }
   }
 
-  let returnToUrl = `${window.location.origin}${route}`;
+  let returnToUrl = `${ window.location.origin }${ route }`;
 
   const parsed = parseUrl(window.location.href);
 
@@ -65,7 +65,7 @@ export function returnTo(opt, vm) {
   }
 
   if (opt.config) {
-    returnToUrl = addParam(returnToUrl, "config", opt.config);
+    returnToUrl = addParam(returnToUrl, 'config', opt.config);
   }
 
   // if (opt.isSlo) {
@@ -79,11 +79,9 @@ export function returnTo(opt, vm) {
 /**
  * Determines common auth provider info as those that are available (non-local) and the location of the enabled provider
  */
-export const authProvidersInfo = async (store) => {
+export const authProvidersInfo = async(store) => {
   try {
-    const rows = await store.dispatch(`management/findAll`, {
-      type: MANAGEMENT.AUTH_CONFIG,
-    });
+    const rows = await store.dispatch(`management/findAll`, { type: MANAGEMENT.AUTH_CONFIG });
 
     return parseAuthProvidersInfo(rows);
   } catch (error) {
@@ -95,19 +93,17 @@ export const authProvidersInfo = async (store) => {
  * Parses auth provider's info to return if there's an auth provider enabled
  */
 export function parseAuthProvidersInfo(rows) {
-  const nonLocal = rows.filter((x) => x.name !== "local");
+  const nonLocal = rows.filter((x) => x.name !== 'local');
   const enabled = nonLocal.filter((x) => x.enabled === true);
 
-  const supportedNonLocal = nonLocal.filter((x) => x.id !== "oidc");
+  const supportedNonLocal = nonLocal.filter((x) => x.id !== 'oidc');
 
   const enabledLocation =
-    enabled.length === 1
-      ? {
-          name: "c-cluster-auth-config-id",
-          params: { id: enabled[0].id },
-          query: { mode: _EDIT },
-        }
-      : null;
+    enabled.length === 1 ? {
+      name:   'c-cluster-auth-config-id',
+      params: { id: enabled[0].id },
+      query:  { mode: _EDIT },
+    } : null;
 
   return {
     nonLocal: supportedNonLocal,
@@ -120,20 +116,18 @@ export const checkSchemasForFindAllHash = (types, store) => {
   const hash = {};
 
   for (const [key, value] of Object.entries(types)) {
-    const schema = store.getters[`${value.inStoreType}/schemaFor`](value.type);
+    const schema = store.getters[`${ value.inStoreType }/schemaFor`](value.type);
 
     // It could be that user has permissions for GET but not list
     // e.g. Standard user with GitRepo permissions try to fetch list of fleetworkspaces
     // user has ability to GET but not fleet workspaces
     // so optionally define a function that require it to pass before /findAll
-    const validSchema = value.schemaValidator
-      ? value.schemaValidator(schema)
-      : !!schema;
+    const validSchema = value.schemaValidator ? value.schemaValidator(schema) : !!schema;
 
     if (validSchema) {
-      const res = store.dispatch(`${value.inStoreType}/findAll`, {
+      const res = store.dispatch(`${ value.inStoreType }/findAll`, {
         type: value.type,
-        opt: value.opt,
+        opt:  value.opt,
       });
 
       if (!value.skipWait) {
@@ -149,7 +143,7 @@ export const checkPermissions = (types, getters) => {
   const hash = {};
 
   for (const [key, value] of Object.entries(types)) {
-    const schema = getters["management/schemaFor"](value.type);
+    const schema = getters['management/schemaFor'](value.type);
 
     if (!schema) {
       hash[key] = false;
@@ -191,9 +185,9 @@ export const checkPermissions = (types, getters) => {
 
 export const canViewResource = (store, resource) => {
   // Note - don't use the current products store... because products can override stores for resources with `typeStoreMap`
-  const inStore = store.getters["currentStore"](resource);
+  const inStore = store.getters['currentStore'](resource);
   // There's a chance we're in an extension's product who's store could be anything, so confirm schemaFor exists
-  const schemaFor = store.getters[`${inStore}/schemaFor`];
+  const schemaFor = store.getters[`${ inStore }/schemaFor`];
 
   // In order to check a resource is valid we need these
   if (!inStore || !schemaFor) {
@@ -202,7 +196,7 @@ export const canViewResource = (store, resource) => {
 
   // Resource is valid if a schema exists for it (standard resource, spoofed resource) or it's a virtual resource
   const validResource =
-    schemaFor(resource) || store.getters["type-map/isVirtual"](resource);
+    schemaFor(resource) || store.getters['type-map/isVirtual'](resource);
 
   return !!validResource;
 };
@@ -226,38 +220,38 @@ export function setProduct(store, to) {
     (product &&
       (!to.matched.length ||
         (to.matched.length &&
-          to.matched[0].path === "/c/:cluster/:product"))) ||
+          to.matched[0].path === '/c/:cluster/:product'))) ||
     // if the product grabbed from the route is not registered, then we don't have it!
-    (product && !store.getters["type-map/isProductRegistered"](product))
+    (product && !store.getters['type-map/isProductRegistered'](product))
   ) {
     const error = new Error(
-      store.getters["i18n/t"](
-        "nav.failWhale.productNotFound",
+      store.getters['i18n/t'](
+        'nav.failWhale.productNotFound',
         { productNotFound: product },
         true
       )
     );
 
-    return store.dispatch("loadingError", error);
+    return store.dispatch('loadingError', error);
   }
 
   if (!product) {
     product = EXPLORER;
   }
 
-  const oldProduct = store.getters["productId"];
-  const oldStore = store.getters["currentProduct"]?.inStore;
+  const oldProduct = store.getters['productId'];
+  const oldStore = store.getters['currentProduct']?.inStore;
 
   if (product !== oldProduct) {
-    store.commit("setProduct", product);
+    store.commit('setProduct', product);
   }
 
-  const neuStore = store.getters["currentProduct"]?.inStore;
+  const neuStore = store.getters['currentProduct']?.inStore;
 
   if (neuStore !== oldStore) {
     // If the product store changes, clear the catalog.
     // There might be management catalog items in it vs cluster.
-    store.commit("catalog/reset");
+    store.commit('catalog/reset');
   }
 }
 
@@ -271,7 +265,7 @@ export function setProduct(store, to) {
  * - there's a resource associated with route (meta or param)
  */
 export function validateResource(store, to) {
-  const product = store.getters["currentProduct"];
+  const product = store.getters['currentProduct'];
   const resource = getResourceFromRoute(to);
 
   // In order to check a resource is valid we need these
@@ -286,14 +280,14 @@ export function validateResource(store, to) {
   // Unknown resource, redirect to fail whale
 
   const error = new Error(
-    store.getters["i18n/t"](
-      "nav.failWhale.resourceNotFound",
+    store.getters['i18n/t'](
+      'nav.failWhale.resourceNotFound',
       { resource },
       true
     )
   );
 
-  store.dispatch("loadingError", error);
+  store.dispatch('loadingError', error);
 
   throw error;
 }
@@ -304,11 +298,9 @@ export function validateResource(store, to) {
 export async function findMe(store) {
   // TODO: Move this to `auth`
   // First thing we do in loadManagement is fetch principals anyway.... so don't ?me=true here
-  const principals = await store.dispatch("management/findAll", {
+  const principals = await store.dispatch('management/findAll', {
     type: MANAGEMENT.USER,
-    opt: {
-      redirectUnauthorized: false,
-    },
+    opt:  { redirectUnauthorized: false },
   });
   const me = principals[0];
 
@@ -318,19 +310,19 @@ export async function findMe(store) {
 /**
  * Attempt to login with default credentials. Note: I think that this may actually be outdated since we don't use these default credentials anymore on setup.
  */
-export async function tryInitialSetup(store, password = "admin") {
+export async function tryInitialSetup(store, password = 'admin') {
   try {
-    const res = await store.dispatch("auth/login", {
-      provider: "local",
-      body: {
-        username: "admin",
+    const res = await store.dispatch('auth/login', {
+      provider: 'local',
+      body:     {
+        username: 'admin',
         password,
       },
     });
 
     return res._status === 200;
   } catch (e) {
-    console.error("Error trying initial setup", e); // eslint-disable-line no-console
+    console.error('Error trying initial setup', e); // eslint-disable-line no-console
 
     return false;
   }
@@ -340,24 +332,24 @@ export async function tryInitialSetup(store, password = "admin") {
  * Record in our state management that we're indeed logged in
  */
 export function isLoggedIn(store, me) {
-  store.commit("auth/hasAuth", true);
-  store.commit("auth/loggedInAs", me.id);
+  store.commit('auth/hasAuth', true);
+  store.commit('auth/loggedInAs', me.id);
 }
 
 /**
  * Record in our state management that we're not logged in and then redirect to the login page
  */
 export function notLoggedIn(store, redirect, route) {
-  store.commit("auth/hasAuth", true);
+  store.commit('auth/hasAuth', true);
 
-  if (!route.name.includes("auth")) {
-    store.commit("prefs/setAuthRedirect", route);
+  if (!route.name.includes('auth')) {
+    store.commit('prefs/setAuthRedirect', route);
   }
 
-  if (route.name === "index") {
-    return redirect("/auth/login");
+  if (route.name === 'index') {
+    return redirect('/auth/login');
   } else {
-    return redirect(`/auth/login?${TIMED_OUT}`);
+    return redirect(`/auth/login?${ TIMED_OUT }`);
   }
 }
 
@@ -365,5 +357,5 @@ export function notLoggedIn(store, redirect, route) {
  * Record in our state management that we don't have any auth providers
  */
 export function noAuth(store) {
-  store.commit("auth/hasAuth", false);
+  store.commit('auth/hasAuth', false);
 }

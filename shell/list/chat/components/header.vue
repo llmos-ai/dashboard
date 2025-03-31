@@ -1,21 +1,21 @@
 <script setup>
-import { useStore } from "vuex";
-import { useI18n } from "@shell/composables/useI18n";
-import ButtonGroup from "@/shell/components/ButtonGroup.vue";
+import { useStore } from 'vuex';
+import { useI18n } from '@shell/composables/useI18n';
+import ButtonGroup from '@/shell/components/ButtonGroup.vue';
 
 const store = useStore();
 const { t } = useI18n(store);
 
-const chatType = defineModel("type");
+const chatType = defineModel('type');
 
 const options = [
   {
-    label: t("chat.type.chat"),
-    value: "chat",
+    label: t('chat.type.chat'),
+    value: 'chat',
   },
   {
-    label: t("chat.type.compare"),
-    value: "compare",
+    label: t('chat.type.compare'),
+    value: 'compare',
   },
 ];
 </script>

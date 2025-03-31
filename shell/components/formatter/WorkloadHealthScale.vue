@@ -1,8 +1,8 @@
 <script>
-import ProgressBarMulti from "@shell/components/ProgressBarMulti";
-import PlusMinus from "@shell/components/form/PlusMinus";
-import { POD, SCALABLE_WORKLOAD_TYPES } from "@shell/config/types";
-import { ucFirst } from "@shell/utils/string";
+import ProgressBarMulti from '@shell/components/ProgressBarMulti';
+import PlusMinus from '@shell/components/form/PlusMinus';
+import { POD, SCALABLE_WORKLOAD_TYPES } from '@shell/config/types';
+import { ucFirst } from '@shell/utils/string';
 
 const SCALABLE_TYPES = Object.values(SCALABLE_WORKLOAD_TYPES);
 const INVALID_TYPES = [POD];
@@ -12,35 +12,35 @@ export default {
 
   props: {
     row: {
-      type: Object,
+      type:     Object,
       required: true,
     },
     col: {
-      type: Object,
+      type:     Object,
       required: true,
     },
     rowKey: {
-      type: String,
+      type:     String,
       required: true,
     },
   },
 
-  beforeDestroy() {
-    document.removeEventListener("click", this.onClickOutside);
+  beforeUnmount() {
+    document.removeEventListener('click', this.onClickOutside);
   },
 
   data() {
     return {
       disabled: false,
       expanded: false,
-      loading: true,
-      cParts: [],
+      loading:  true,
+      cParts:   [],
     };
   },
 
   computed: {
     id() {
-      return `${this.rowKey}-workload-health-scale`.replaceAll("-", "");
+      return `${ this.rowKey }-workload-health-scale`.replaceAll('-', '');
     },
 
     canScale() {
@@ -66,7 +66,7 @@ export default {
         this.row.jobGauges || this.row.podGauges || []
       )
         .map(([name, value]) => ({
-          color: `bg-${value.color}`,
+          color: `bg-${ value.color }`,
           value: value.count || 0,
           label: ucFirst(name),
         }))
@@ -80,7 +80,7 @@ export default {
     },
 
     onClickOutside(event) {
-      const { [`root-${this.id}`]: component } = this.$refs;
+      const { [`root-${ this.id }`]: component } = this.$refs;
 
       if (!component || component.contains(event.target)) {
         return;
@@ -97,7 +97,7 @@ export default {
       await this.scale(true);
     },
     async scale(isUp) {
-      this["disabled"] = true;
+      this['disabled'] = true;
       try {
         if (isUp) {
           await this.row.scaleUp();
@@ -106,10 +106,10 @@ export default {
         }
       } catch (err) {
         this.$store.dispatch(
-          "growl/fromError",
+          'growl/fromError',
           {
-            title: this.t("workload.list.errorCannotScale", {
-              direction: isUp ? "up" : "down",
+            title: this.t('workload.list.errorCannotScale', {
+              direction:    isUp ? 'up' : 'down',
               workloadName: this.row.name,
             }),
             err,
@@ -117,7 +117,7 @@ export default {
           { root: true }
         );
       }
-      this["disabled"] = false;
+      this['disabled'] = false;
     },
 
     insideBounds(bounding, bounds) {
@@ -133,9 +133,9 @@ export default {
   watch: {
     expanded(neu) {
       if (neu) {
-        document.addEventListener("click", this.onClickOutside);
+        document.addEventListener('click', this.onClickOutside);
       } else {
-        document.removeEventListener("click", this.onClickOutside);
+        document.removeEventListener('click', this.onClickOutside);
       }
 
       // If the drop down content appears outside of the window then move it to be above the trigger
@@ -148,7 +148,7 @@ export default {
         const dropdown = document.getElementById(this.id);
 
         if (!neu) {
-          dropdown.classList.remove("expanded-checked");
+          dropdown.classList.remove('expanded-checked');
 
           return;
         }
@@ -156,20 +156,20 @@ export default {
         // Ensure drop down will be inside of the window, otherwise show above the trigger
         const bounding = dropdown.getBoundingClientRect();
         const insideWindow = this.insideBounds(bounding, {
-          top: 0,
-          left: 0,
-          right: window.innerWidth || document.documentElement.clientWidth,
+          top:    0,
+          left:   0,
+          right:  window.innerWidth || document.documentElement.clientWidth,
           bottom: window.innerHeight || document.documentElement.clientHeight,
         });
 
         if (insideWindow) {
-          dropdown.classList.remove("out-of-view");
+          dropdown.classList.remove('out-of-view');
         } else {
-          dropdown.classList.add("out-of-view");
+          dropdown.classList.add('out-of-view');
         }
 
         // This will trigger the actual display of the drop down (after we've calculated if it goes below or above trigger)
-        dropdown.classList.add("expanded-checked");
+        dropdown.classList.add('expanded-checked');
       });
     },
   },
@@ -178,10 +178,18 @@ export default {
 
 <template>
   <div v-if="!canShow" />
-  <div v-else-if="loading" class="hs-popover__loader">
+  <div
+    v-else-if="loading"
+    class="hs-popover__loader"
+  >
     <i class="icon icon-spinner" />
   </div>
-  <div v-else :id="`root-${id}`" :ref="`root-${id}`" class="hs-popover">
+  <div
+    v-else
+    :id="`root-${id}`"
+    :ref="`root-${id}`"
+    class="hs-popover"
+  >
     <div
       id="trigger"
       class="hs-popover__trigger"
@@ -202,13 +210,24 @@ export default {
         }"
       />
     </div>
-    <div :id="id" class="hs-popover__content" :class="{ expanded, [id]: true }">
+    <div
+      :id="id"
+      class="hs-popover__content"
+      :class="{ expanded, [id]: true }"
+    >
       <div>
-        <div v-for="(obj, i) in parts" :key="i" class="counts">
+        <div
+          v-for="(obj, i) in parts"
+          :key="i"
+          class="counts"
+        >
           <span class="counts-label">{{ obj.label }}</span>
           <span>{{ obj.value }}</span>
         </div>
-        <div v-if="canScale" class="text-center scale">
+        <div
+          v-if="canScale"
+          class="text-center scale"
+        >
           <span>{{ t("tableHeaders.scale") }} </span>
           <PlusMinus
             :value="row.spec.replicas"

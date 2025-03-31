@@ -29,7 +29,7 @@ export default {
   data() {
     return {
       // Assume home pages have routes where the name is the key to use for string lookup
-      name: this.$route.name,
+      name:             this.$route.name,
       noLocaleShortcut: process.env.dev || false,
     };
   },
@@ -61,7 +61,10 @@ export default {
       <Header :simple="true" />
       <main class="main-layout">
         <IndentedPanel class="pt-20">
-          <router-view :key="$route.path" class="outlet" />
+          <router-view
+            :key="$route.path"
+            class="outlet"
+          />
         </IndentedPanel>
         <ActionMenu />
         <PromptRemove />

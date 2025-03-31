@@ -16,39 +16,37 @@ export default {
   },
   props: {
     mode: {
-      type: String,
+      type:    String,
       default: _VIEW,
     },
     realMode: {
-      type: String,
+      type:    String,
       default: _VIEW,
     },
     assignOnly: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     type: {
-      type: String,
+      type:    String,
       default: 'group',
       validator(val) {
         return val === 'group' || val === 'user';
       },
     },
     userId: {
-      type: String,
+      type:    String,
       default: '',
     },
   },
   async fetch() {
     try {
-      this.allRoles = await this.$store.dispatch('management/findAll', {
-        type: MANAGEMENT.GLOBAL_ROLE,
-      });
+      this.allRoles = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.GLOBAL_ROLE });
       if (!this.sortedRoles) {
         this.sortedRoles = {
-          global: [],
+          global:  [],
           builtin: [],
-          custom: [],
+          custom:  [],
         };
 
         this.allRoles.forEach((role) => {
@@ -59,8 +57,7 @@ export default {
           }
         });
 
-        const sort = (a, b) =>
-          a.spec.displayName.localeCompare(b.spec.displayName);
+        const sort = (a, b) => a.spec.displayName.localeCompare(b.spec.displayName);
 
         this.sortedRoles.builtin = this.sortedRoles.builtin.sort(sort);
         this.sortedRoles.custom = this.sortedRoles.custom.sort(sort);
@@ -78,13 +75,13 @@ export default {
   },
   data() {
     return {
-      globalPermissions: ['admin', 'user'],
-      roleTemplateBindings: null,
-      sortedRoles: null,
-      selectedRoles: [],
+      globalPermissions:     ['admin', 'user'],
+      roleTemplateBindings:  null,
+      sortedRoles:           null,
+      selectedRoles:         [],
       startingSelectedRoles: [],
-      assignOnlyRoles: {},
-      roleChanges: {},
+      assignOnlyRoles:       {},
+      roleChanges:           {},
     };
   },
   computed: {
@@ -117,7 +114,7 @@ export default {
       }
     },
     getUnique(...ids) {
-      return `${this.userId}-${ids.join('-')}`;
+      return `${ this.userId }-${ ids.join('-') }`;
     },
 
     selectDefaults() {
@@ -156,7 +153,7 @@ export default {
             if (!!boundRole) {
               this.selectedRoles.push(mappedRole.id);
               this.startingSelectedRoles.push({
-                roleId: mappedRole.id,
+                roleId:    mappedRole.id,
                 bindingId: boundRole.id,
               });
               // Checkboxes should be disabled, besides normal 'mode' ways, if we're only assigning and not removing existing roles
@@ -177,17 +174,15 @@ export default {
 
     checkboxChanged() {
       const addRoles = this.selectedRoles.filter(
-        (selected) =>
-          !this.startingSelectedRoles.find(
-            (startingRole) => startingRole.roleId === selected
-          )
+        (selected) => !this.startingSelectedRoles.find(
+          (startingRole) => startingRole.roleId === selected
+        )
       );
       const removeBindings = this.startingSelectedRoles
         .filter(
-          (startingRole) =>
-            !this.selectedRoles.find(
-              (selected) => selected === startingRole.roleId
-            )
+          (startingRole) => !this.selectedRoles.find(
+            (selected) => selected === startingRole.roleId
+          )
         )
         .map((startingRole) => startingRole.bindingId);
 
@@ -208,59 +203,55 @@ export default {
 
     async saveAddedRoles(userId) {
       const requestOptions = {
-        type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
+        type:     MANAGEMENT.ROLE_TEMPLATE_BINDING,
         metadata: {
           generateName: `rtb-`,
-          labels: { 'auth.management.llmos.ai/user-id': userId || this.userId },
+          labels:       { 'auth.management.llmos.ai/user-id': userId || this.userId },
         },
         roleTemplateRef: {
           apiGroup: MANAGEMENT_GROUP,
-          kind: 'GlobalRole',
-          name: '', // a placeholder of the role name
+          kind:     'GlobalRole',
+          name:     '', // a placeholder of the role name
         },
         subjects: [
           {
             apiGroup: RBAC_GROUP,
-            kind: 'User',
-            name: userId || this.userId,
+            kind:     'User',
+            name:     userId || this.userId,
           },
         ],
       };
 
       const newBindings = await Promise.all(
-        this.roleChanges.addRoles.map((role) =>
-          this.$store.dispatch(`management/create`, {
-            ...requestOptions,
-            roleTemplateRef: {
-              ...requestOptions.roleTemplateRef,
-              name: role, // Pass roleName dynamically here
-            },
-          })
+        this.roleChanges.addRoles.map((role) => this.$store.dispatch(`management/create`, {
+          ...requestOptions,
+          roleTemplateRef: {
+            ...requestOptions.roleTemplateRef,
+            name: role, // Pass roleName dynamically here
+          },
+        })
         )
       );
 
       // Save all changes (and ensure user isn't logged out if they don't have permissions to make a change)
       await Promise.all(
-        newBindings.map((newBinding) =>
-          newBinding.save({ redirectUnauthorized: false })
+        newBindings.map((newBinding) => newBinding.save({ redirectUnauthorized: false })
         )
       );
     },
 
     async saveRemovedRoles() {
       const existingBindings = await Promise.all(
-        this.roleChanges.removeBindings.map((bindingId) =>
-          this.$store.dispatch('management/find', {
-            type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
-            id: bindingId,
-          })
+        this.roleChanges.removeBindings.map((bindingId) => this.$store.dispatch('management/find', {
+          type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
+          id:   bindingId,
+        })
         )
       );
 
       // Save all changes (and ensure user isn't logged out if they don't have permissions to make a change)
       await Promise.all(
-        existingBindings.map((existingBinding) =>
-          existingBinding.remove({ redirectUnauthorized: false })
+        existingBindings.map((existingBinding) => existingBinding.remove({ redirectUnauthorized: false })
         )
       );
     },
@@ -276,7 +267,7 @@ export default {
         'management/findAll',
         {
           type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
-          opt: { force: true },
+          opt:  { force: true },
         },
         { force: true }
       );
@@ -351,7 +342,10 @@ export default {
         :key="roleType"
         class="role-group mb-10"
       >
-        <a-card v-if="Object.keys(sortedRole).length" :show-actions="false">
+        <a-card
+          v-if="Object.keys(sortedRole).length"
+          :show-actions="false"
+        >
           <template v-slot:title>
             <div class="type-title">
               <span>{{ t(`rbac.globalRoles.types.${roleType}.label`) }}</span>

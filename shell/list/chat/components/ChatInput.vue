@@ -8,7 +8,7 @@ import {
 
 const props = defineProps({
   loading: {
-    type: Boolean,
+    type:    Boolean,
     default: false,
   },
 });
@@ -37,6 +37,7 @@ const customRequest = (options) => {
 
     // base64 数据
     const base64Data = reader.result;
+
     console.log('🚀 ~ file.base64Data:', base64Data);
 
     // 将 base64 数据存入 file 对象
@@ -62,6 +63,7 @@ const customRequest = (options) => {
 const handleRemove = (file) => {
   const index = fileList.value.indexOf(file);
   const newFileList = fileList.value.slice();
+
   newFileList.splice(index, 1);
   fileList.value = newFileList;
 };
@@ -78,8 +80,8 @@ const submit = () => {
     <div class="flex p-1">
       <a-image
         v-for="file in fileList"
-        :src="file.thumbUrl"
         :key="file.uid"
+        :src="file.thumbUrl"
         :height="100"
       />
     </div>
@@ -91,20 +93,27 @@ const submit = () => {
       @keyup.alt.enter.exact="submit"
     />
     <div class="flex items-center justify-between">
-      <div class="left"></div>
+      <div class="left" />
       <div class="right flex items-center mb-5 mr-5">
         <a-upload
           :multiple="true"
           :default-file-list="fileList"
           list-type="picture"
-          @remove="handleRemove"
           :show-upload-list="false"
           :customRequest="customRequest"
+          @remove="handleRemove"
         >
           <PictureOutlined class="text-xl cursor-pointer" />
         </a-upload>
-        <a-divider type="vertical" class="mt-5" style="height: 15px" />
-        <PauseCircleOutlined v-if="loading" class="text-2xl font-semibold" />
+        <a-divider
+          type="vertical"
+          class="mt-5"
+          style="height: 15px"
+        />
+        <PauseCircleOutlined
+          v-if="loading"
+          class="text-2xl font-semibold"
+        />
         <a-button
           v-else
           type="primary"

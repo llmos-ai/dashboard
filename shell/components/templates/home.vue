@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       // Assume home pages have routes where the name is the key to use for string lookup
-      name: this.$route.name,
+      name:             this.$route.name,
       noLocaleShortcut: process.env.dev || false,
     };
   },
@@ -55,9 +55,15 @@ export default {
       class="dashboard-content"
       :class="{ 'dashboard-padding-left': showTopLevelMenu }"
     >
-      <Header v-if="managementReady" :simple="true" />
+      <Header
+        v-if="managementReady"
+        :simple="true"
+      />
       <main class="main-layout">
-        <router-view :key="$route.path" class="outlet" />
+        <router-view
+          :key="$route.path"
+          class="outlet"
+        />
       </main>
     </div>
     <FixedBanner :footer="true" />

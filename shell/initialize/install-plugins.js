@@ -1,38 +1,38 @@
-import PortalVue from "portal-vue";
-import Vue3Resize from "vue3-resize";
-import FloatingVue from "floating-vue";
-import vSelect from "vue-select";
-import "vue3-resize/dist/vue3-resize.css";
+import PortalVue from 'portal-vue';
+import Vue3Resize from 'vue3-resize';
+import FloatingVue from 'floating-vue';
+import vSelect from 'vue-select';
+import 'vue3-resize/dist/vue3-resize.css';
 
 // import '@shell/plugins/extend-router';
-import "@shell/plugins/formatters";
-import "@shell/plugins/js-yaml";
+import '@shell/plugins/formatters';
+import '@shell/plugins/js-yaml';
 
-import i18n from "@shell/plugins/i18n";
-import globalFormatters from "@shell/plugins/global-formatters";
+import i18n from '@shell/plugins/i18n';
+import globalFormatters from '@shell/plugins/global-formatters';
 
-import axios from "@shell/utils/axios";
-import cookieUniversal from "@shell/utils/cookie-universal";
-import config from "@shell/utils/config";
-import axiosShell from "@shell/plugins/axios";
-import codeMirror from "@shell/plugins/codemirror-loader";
-import { InstallCodeMirror } from "codemirror-editor-vue3";
-import * as intNumber from "@shell/directives/int-number";
-import nuxtClientInit from "@shell/plugins/nuxt-client-init";
+import axios from '@shell/utils/axios';
+import cookieUniversal from '@shell/utils/cookie-universal';
+import config from '@shell/utils/config';
+import axiosShell from '@shell/plugins/axios';
+import codeMirror from '@shell/plugins/codemirror-loader';
+import { InstallCodeMirror } from 'codemirror-editor-vue3';
+import * as intNumber from '@shell/directives/int-number';
+import nuxtClientInit from '@shell/plugins/nuxt-client-init';
 // import plugin from '@shell/plugins/plugin';
-import plugins from "@shell/core/plugins.js";
-import pluginsLoader from "@shell/core/plugins-loader.js";
-import replaceAll from "@shell/plugins/replaceall";
-import steveCreateWorker from "@shell/plugins/steve-create-worker";
-import emberCookie from "@shell/plugins/ember-cookie";
-import ShortKey from "@shell/plugins/shortkey";
+import plugins from '@shell/core/plugins.js';
+import pluginsLoader from '@shell/core/plugins-loader.js';
+import replaceAll from '@shell/plugins/replaceall';
+import steveCreateWorker from '@shell/plugins/steve-create-worker';
+import emberCookie from '@shell/plugins/ember-cookie';
+import ShortKey from '@shell/plugins/shortkey';
 
-import "floating-vue/dist/style.css";
-import { floatingVueOptions } from "@shell/plugins/floating-vue";
+import 'floating-vue/dist/style.css';
+import { floatingVueOptions } from '@shell/plugins/floating-vue';
 
 // add ant-design-vue
-import Antd from "ant-design-vue";
-import "ant-design-vue/dist/reset.css";
+import Antd from 'ant-design-vue';
+import 'ant-design-vue/dist/reset.css';
 
 export async function installPlugins(vueApp) {
   vueApp.use(globalFormatters);
@@ -41,8 +41,8 @@ export async function installPlugins(vueApp) {
   vueApp.use(FloatingVue, floatingVueOptions);
   vueApp.use(Antd);
   vueApp.use(ShortKey, {
-    prevent: ["input", "textarea", "select"],
-    preventContainer: ["#modal-container-element"],
+    prevent:          ['input', 'textarea', 'select'],
+    preventContainer: ['#modal-container-element'],
   });
   vueApp.use(InstallCodeMirror);
 }
@@ -63,10 +63,9 @@ export async function installInjectedPlugins(app, vueApp) {
     emberCookie,
   ];
 
-  const installations = pluginDefinitions.map(async (pluginDefinition) => {
-    if (typeof pluginDefinition === "function") {
-      await pluginDefinition(app.context, (key, value) =>
-        inject(key, value, app.context, vueApp)
+  const installations = pluginDefinitions.map(async(pluginDefinition) => {
+    if (typeof pluginDefinition === 'function') {
+      await pluginDefinition(app.context, (key, value) => inject(key, value, app.context, vueApp)
       );
     }
   });
@@ -75,7 +74,7 @@ export async function installInjectedPlugins(app, vueApp) {
 
   // We had i18n/init happening asynchronously within the i18n installation method. We need this to happen synchronously otherwise we end up with race conditions where some pages won't load when translated.
   // If there's any performance reasons this can be done concurrently with all of the installation promises above but I felt it was organizationally better to keep both i18n items together.
-  await app.store.dispatch("i18n/init");
+  await app.store.dispatch('i18n/init');
 
   // Order matters here. This is coming after the other plugins specifically so $cookies can be installed. i18n/init relies on prefs/get which relies on $cookies.
   vueApp.use(i18n, { store: app.store });
@@ -100,15 +99,15 @@ export async function installInjectedPlugins(app, vueApp) {
  */
 function inject(key, value, context, vueApp) {
   if (!key) {
-    throw new Error("inject(key, value) has no key provided");
+    throw new Error('inject(key, value) has no key provided');
   }
   if (value === undefined) {
-    throw new Error(`inject('${key}', value) has no value provided`);
+    throw new Error(`inject('${ key }', value) has no value provided`);
   }
 
   const { app, store } = context;
 
-  key = `$${key}`;
+  key = `$${ key }`;
   // Add into app
   app[key] = value;
   // Add into context
@@ -120,7 +119,7 @@ function inject(key, value, context, vueApp) {
   store[key] = app[key];
 
   // Check if plugin not already installed
-  const installKey = `__plugin_${key}_installed__`;
+  const installKey = `__plugin_${ key }_installed__`;
 
   window.installedPlugins = window.installedPlugins || {};
 

@@ -2,6 +2,8 @@
 import { LabeledInput } from '@components/Form/LabeledInput';
 
 export default {
+  emits: ['update:value'],
+
   components: { LabeledInput },
 
   props: {
@@ -19,6 +21,10 @@ export default {
       causes $emit 'input' of ["-c", "sleep 600"]
   */
   data() {
+    return { userValue: '' };
+  },
+
+  created() {
     let userValue = '';
 
     if ( this.value ) {
@@ -34,7 +40,7 @@ export default {
       }, '').trim();
     }
 
-    return { userValue };
+    this.userValue = userValue;
   },
 
   methods: {
@@ -44,7 +50,7 @@ export default {
       if ( userValue ) {
         out = userValue.match(/('[^']+')|("[^"]+")|\S+/g).map((string) => string.replace(/^'|'$|^"|"$/g, ''));
       }
-      this.$emit('input', out);
+      this.$emit('update:value', out);
     },
   }
 };
@@ -84,6 +90,6 @@ export function unparse(xs) {
   <LabeledInput
     v-model:value="userValue"
     v-bind="$attrs"
-    @input="update($event)"
+    @update:value="update($event)"
   />
 </template>

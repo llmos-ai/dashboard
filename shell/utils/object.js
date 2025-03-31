@@ -128,7 +128,7 @@ export function deleteProperty(obj, path) {
 }
 
 export function getter(path) {
-  return function (obj) {
+  return function(obj) {
     return get(obj, path);
   };
 }
@@ -197,12 +197,12 @@ export function definedKeys(obj) {
     const val = obj[key];
 
     if (Array.isArray(val)) {
-      return `"${key}"`;
+      return `"${ key }"`;
     } else if (isObject(val)) {
       // no need for quotes around the subkey since the recursive call will fill that in via one of the other two statements in the if block
-      return (definedKeys(val) || []).map((subkey) => `"${key}".${subkey}`);
+      return (definedKeys(val) || []).map((subkey) => `"${ key }".${ subkey }`);
     } else {
-      return `"${key}"`;
+      return `"${ key }"`;
     }
   });
 
@@ -290,8 +290,8 @@ export function changeset(from, to, parentPath = []) {
       out = { ...out, ...changeset(from[k], to[k], [...parentPath, k]) };
     } else if (!isEqual(from[k], to[k])) {
       out[path] = {
-        op: 'change',
-        from: from[k],
+        op:    'change',
+        from:  from[k],
         value: to[k],
       };
     }
@@ -329,25 +329,25 @@ export function changesetConflicts(a, b) {
     seen[k] = true;
 
     if (ok && bb) {
-      switch (`${aa.op}-${bb.op}`) {
-        case 'add-add':
-        case 'add-change':
-        case 'change-add':
-        case 'change-change':
-          ok = isEqual(aa.value, bb.value);
-          break;
+      switch (`${ aa.op }-${ bb.op }`) {
+      case 'add-add':
+      case 'add-change':
+      case 'change-add':
+      case 'change-change':
+        ok = isEqual(aa.value, bb.value);
+        break;
 
-        case 'add-remove':
-        case 'change-remove':
-        case 'remove-add':
-        case 'remove-change':
-          ok = false;
-          break;
+      case 'add-remove':
+      case 'change-remove':
+      case 'remove-add':
+      case 'remove-change':
+        ok = false;
+        break;
 
-        case 'remove-remove':
-        default:
-          ok = true;
-          break;
+      case 'remove-remove':
+      default:
+        ok = true;
+        break;
       }
     }
 
@@ -405,7 +405,7 @@ export function applyChangeset(obj, changeset) {
     } else if (entry.op === 'remove') {
       remove(obj, path);
     } else {
-      throw new Error(`Unknown operation:${entry.op}`);
+      throw new Error(`Unknown operation:${ entry.op }`);
     }
   }
 
@@ -431,8 +431,7 @@ export function pickBy(obj = {}, predicate = (value, key) => false) {
  * @param {*} callback
  * @returns
  */
-export const toDictionary = (array, callback) =>
-  Object.assign({}, ...array.map((item) => ({ [item]: callback(item) })));
+export const toDictionary = (array, callback) => Object.assign({}, ...array.map((item) => ({ [item]: callback(item) })));
 
 export function dropKeys(obj, keys) {
   if (!obj) {

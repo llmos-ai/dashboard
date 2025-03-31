@@ -27,52 +27,52 @@ export default {
 
   props: {
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     value: {
-      type: Object,
+      type:     Object,
       required: true,
     },
 
     initialYamlForDiff: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     yaml: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     doneRoute: {
-      type: [String, Object],
+      type:    [String, Object],
       default: null,
     },
 
     offerPreview: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     parentParams: {
-      type: Object,
+      type:    Object,
       default: null,
     },
 
     doneOverride: {
-      type: [Function, Object],
+      type:    [Function, Object],
       default: null,
     },
 
     showFooter: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     applyHooks: {
-      type: Function,
+      type:    Function,
       default: null,
     },
   },
@@ -82,11 +82,11 @@ export default {
     this.$router.applyQuery({ [PREVIEW]: _UNFLAG });
 
     return {
-      initialYaml: this.initialYamlForDiff || this.yaml,
-      currentYaml: this.yaml,
-      showPreview: false,
-      errors: null,
-      cm: null,
+      initialYaml:  this.initialYamlForDiff || this.yaml,
+      currentYaml:  this.yaml,
+      showPreview:  false,
+      errors:       null,
+      cm:           null,
       initialReady: true,
     };
   },
@@ -95,7 +95,7 @@ export default {
     schema() {
       const inStore = this.$store.getters['currentStore'](this.value.type);
 
-      return this.$store.getters[`${inStore}/schemaFor`](this.value.type);
+      return this.$store.getters[`${ inStore }/schemaFor`](this.value.type);
     },
 
     isCreate() {
@@ -320,9 +320,7 @@ export default {
 
     done() {
       if (this.doneOverride) {
-        return typeof this.doneOverride === 'function'
-          ? this.doneOverride()
-          : this.$router.replace(this.doneOverride);
+        return typeof this.doneOverride === 'function' ? this.doneOverride() : this.$router.replace(this.doneOverride);
       }
       if (!this.doneRoute) {
         return;
@@ -333,7 +331,7 @@ export default {
         return;
       }
       this.$router.replace({
-        name: this.doneRoute,
+        name:   this.doneRoute,
         params: { resource: this.value.type },
       });
     },
@@ -379,15 +377,24 @@ export default {
         @save="save"
         @done="done"
       >
-        <template v-if="!isView" #left>
+        <template
+          v-if="!isView"
+          #left
+        >
           <FileSelector
             class="btn role-secondary"
             :label="t('generic.readFromFile')"
             @selected="onFileSelected"
           />
         </template>
-        <template v-if="!isView" #middle>
-          <a-button v-if="showPreview" @click="unpreview">
+        <template
+          v-if="!isView"
+          #middle
+        >
+          <a-button
+            v-if="showPreview"
+            @click="unpreview"
+          >
             <t k="resourceYaml.buttons.continue" />
           </a-button>
           <a-button

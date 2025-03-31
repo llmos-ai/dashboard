@@ -12,89 +12,88 @@ export default {
   emits: ['add', 'remove', 'update:value'],
 
   components: { TextAreaAutoGrow, LabeledInput },
-  props: {
+  props:      {
     value: {
-      type: Array,
+      type:    Array,
       default: null,
     },
     mode: {
-      type: String,
+      type:    String,
       default: _EDIT,
     },
     initialEmptyRow: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     title: {
-      type: String,
+      type:    String,
       default: '',
     },
     protip: {
-      type: [String, Boolean],
+      type:    [String, Boolean],
       default: DEFAULT_PROTIP,
     },
     showHeader: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     valueLabel: {
-      type: String,
+      type:    String,
       default: 'Value',
     },
     valuePlaceholder: {
-      type: String,
+      type:    String,
       default: 'e.g. bar',
     },
     valueMultiline: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     addIcon: {
-      type: String,
+      type:    String,
       default: '',
     },
     addLabel: {
-      type: String,
+      type:    String,
       default: '',
     },
     addAllowed: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     addDisabled: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     removeLabel: {
-      type: String,
+      type:    String,
       default: '',
     },
     removeAllowed: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     defaultAddValue: {
-      type: [String, Number, Object, Array],
+      type:    [String, Number, Object, Array],
       default: '',
     },
     loading: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     disabled: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     required: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     rules: {
-      default: () => [],
-      type: Array,
+      default:   () => [],
+      type:      Array,
       // we only want functions in the rules array
-      validator: (rules) =>
-        rules.every((rule) => ['function'].includes(typeof rule)),
+      validator: (rules) => rules.every((rule) => ['function'].includes(typeof rule)),
     },
   },
   data() {
@@ -237,11 +236,17 @@ export default {
 
 <template>
   <div>
-    <div v-if="title" class="clearfix">
+    <div
+      v-if="title"
+      class="clearfix"
+    >
       <slot name="title">
         <h3>
           {{ title }}
-          <span v-if="required" class="required">*</span>
+          <span
+            v-if="required"
+            class="required"
+          >*</span>
           <i
             v-if="showProtip"
             v-clean-tooltip="protip"
@@ -317,7 +322,10 @@ export default {
             </slot>
           </div>
         </slot>
-        <div v-if="showRemove" class="remove">
+        <div
+          v-if="showRemove"
+          class="remove"
+        >
           <slot
             name="remove-button"
             :remove="() => remove(row, idx)"
@@ -338,11 +346,23 @@ export default {
     </template>
     <div v-else>
       <slot name="empty">
-        <div v-if="mode === 'view'" class="text-muted">&mdash;</div>
+        <div
+          v-if="mode === 'view'"
+          class="text-muted"
+        >
+          &mdash;
+        </div>
       </slot>
     </div>
-    <div v-if="showAdd && !isView" class="footer mt-20">
-      <slot v-if="showAdd" name="add" :add="add">
+    <div
+      v-if="showAdd && !isView"
+      class="footer mt-20"
+    >
+      <slot
+        v-if="showAdd"
+        name="add"
+        :add="add"
+      >
         <a-button
           class="add"
           :disabled="loading || disableAdd"

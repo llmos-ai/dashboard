@@ -1,23 +1,23 @@
 <script>
-import { _VIEW } from "@shell/config/query-params";
-import { Checkbox } from "@components/Form/Checkbox";
+import { _VIEW } from '@shell/config/query-params';
+import { Checkbox } from '@components/Form/Checkbox';
 
 export default {
-  name: "DefaultLinksEditor",
+  name: 'DefaultLinksEditor',
 
-  emits: ["update:value"],
+  emits: ['update:value'],
 
   components: { Checkbox },
 
   props: {
     // Array of objects with key, label, value and enabled properties
     value: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
 
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
   },
@@ -32,8 +32,8 @@ export default {
     showhide(row, i, e) {
       const value = this.value[i];
 
-      value["enabled"] = !!value.enabled;
-      this.$emit("update:value", this.value);
+      value['enabled'] = !!value.enabled;
+      this.$emit('update:value', this.value);
     },
   },
 };
@@ -56,12 +56,21 @@ export default {
       </label>
       <label class="text-label" />
 
-      <template v-for="(row, i) in value" :key="i">
-        <div class="kv-item key" :class="{ 'link-hidden': !row.enabled }">
+      <template
+        v-for="(row, i) in value"
+        :key="i"
+      >
+        <div
+          class="kv-item key"
+          :class="{ 'link-hidden': !row.enabled }"
+        >
           <span>{{ row.label }}</span>
         </div>
 
-        <div class="kv-item value" :class="{ 'link-hidden': !row.enabled }">
+        <div
+          class="kv-item value"
+          :class="{ 'link-hidden': !row.enabled }"
+        >
           <span>{{ row.value }}</span>
         </div>
 

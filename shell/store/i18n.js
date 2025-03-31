@@ -13,7 +13,7 @@ const intlCache = {};
 
 let lastLoaded = 0;
 
-export const state = function () {
+export const state = function() {
   // const translationContext = require.context('@shell/assets/translations', true, /.*/);
   // const available = translationContext.keys().map(path => path.replace(/^.*\/([^\/]+)\.[^.]+$/, '$1'));
   // Using require.context() forces them to all be in the same webpack chunk name... just hardcode the list for now so zh-hans
@@ -21,9 +21,9 @@ export const state = function () {
   const available = [DEFAULT_LOCALE, 'zh-hans'];
 
   const out = {
-    default: DEFAULT_LOCALE,
-    selected: null,
-    previous: null,
+    default:      DEFAULT_LOCALE,
+    selected:     null,
+    previous:     null,
     available,
     translations: { [DEFAULT_LOCALE]: en },
   };
@@ -33,10 +33,10 @@ export const state = function () {
 
 export const getters = {
   selectedLocaleLabel(state) {
-    const key = `locale.${state.selected}`;
+    const key = `locale.${ state.selected }`;
 
     if (state.selected === NONE) {
-      return `%${key}%`;
+      return `%${ key }%`;
     } else {
       return get(state.translations[state.default], key);
     }
@@ -46,10 +46,10 @@ export const getters = {
     const out = {};
 
     for (const locale of state.available) {
-      const key = `locale.${locale}`;
+      const key = `locale.${ locale }`;
 
       if (state.selected === NONE) {
-        out[locale] = `%${key}%`;
+        out[locale] = `%${ key }%`;
       } else {
         out[locale] = get(state.translations[state.default], key);
       }
@@ -64,11 +64,11 @@ export const getters = {
 
   t: (state) => (key, args, language) => {
     if (state.selected === NONE && !language) {
-      return `%${key}%`;
+      return `%${ key }%`;
     }
 
     const locale = language || state.selected;
-    const cacheKey = `${locale}/${key}`;
+    const cacheKey = `${ locale }/${ key }`;
     let formatter = intlCache[cacheKey];
 
     if (!formatter) {
@@ -102,8 +102,8 @@ export const getters = {
     } else if (formatter && formatter.format) {
       // Inject things like appName so they're always available in any translation
       const moreArgs = {
-        vendor: getVendor(),
-        appName: getProduct(),
+        vendor:   getVendor(),
+        appName:  getProduct(),
         docsBase: DOCS_BASE,
         ...args,
       };
@@ -116,7 +116,7 @@ export const getters = {
 
   exists: (state) => (key, language) => {
     const locale = language || state.selected;
-    const cacheKey = `${locale}/${key}`;
+    const cacheKey = `${ locale }/${ key }`;
 
     if (intlCache[cacheKey]) {
       return true;
@@ -144,8 +144,7 @@ export const getters = {
   },
 
   multiWithFallback:
-    (state, getters) =>
-    (items, key = 'key') => {
+    (state, getters) => (items, key = 'key') => {
       return items.map((item) => {
         item[key] = getters.withFallback(item[key], null, item[key]);
 
@@ -154,8 +153,7 @@ export const getters = {
     },
 
   withFallback:
-    (state, getters) =>
-    (key, args, fallback, fallbackIsKey = false) => {
+    (state, getters) => (key, args, fallback, fallbackIsKey = false) => {
       // Support withFallback(key,fallback) when no args
       if (!fallback && typeof args === 'string') {
         fallback = args;
@@ -223,7 +221,9 @@ export const mutations = {
 };
 
 export const actions = {
-  init({ state, commit, dispatch, rootGetters }) {
+  init({
+    state, commit, dispatch, rootGetters
+  }) {
     let selected = rootGetters['prefs/get']('locale');
 
     // We might be using a locale that is loaded by a plugin that is no longer loaded
@@ -271,8 +271,11 @@ export const actions = {
     commit('removeLocale', locale);
   },
 
-  async switchTo({ state, rootState, commit, dispatch, getters }, locale) {
+  async switchTo({
+    state, rootState, commit, dispatch, getters
+  }, locale) {
     const currentLocale = getters['current']();
+
     if (locale === NONE) {
       commit('setSelected', locale);
 
@@ -342,7 +345,7 @@ export const actions = {
       dispatch(
         'prefs/set',
         {
-          key: 'locale',
+          key:   'locale',
           value: state.selected,
         },
         { root: true }

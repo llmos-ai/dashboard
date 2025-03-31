@@ -12,13 +12,13 @@ export default {
   },
   data() {
     return {
-      valid: false,
-      password: '',
+      valid:     false,
+      password:  '',
       showModal: false,
     };
   },
   computed: { ...mapGetters({ t: 'i18n/t' }) },
-  methods: {
+  methods:  {
     show(show) {
       if (show) {
         this.showModal = true;
@@ -52,7 +52,10 @@ export default {
   >
     <a-card :title="t('changePassword.title')">
       <form @submit.prevent>
-        <ChangePassword ref="changePassword" @valid="valid = $event" />
+        <ChangePassword
+          ref="changePassword"
+          @valid="valid = $event"
+        />
       </form>
 
       <template #actions>

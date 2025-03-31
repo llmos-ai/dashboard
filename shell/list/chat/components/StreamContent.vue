@@ -1,6 +1,9 @@
 <template>
   <div class="mt-10">
-    <EditInput v-if="message.role === 'user'" :value="message.content" />
+    <EditInput
+      v-if="message.role === 'user'"
+      :value="message.content"
+    />
     <template v-else>
       <a-card v-if="showCard">
         <MarkedView
@@ -20,20 +23,20 @@
 </template>
 
 <script setup>
-import MarkedView from "@shell/components/MarkedView.vue";
-import EditInput from "@shell/components/AI/EditInput.vue";
+import MarkedView from '@shell/components/MarkedView.vue';
+import EditInput from '@shell/components/AI/EditInput.vue';
 
 const props = defineProps({
   message: {
-    type: Object,
+    type:     Object,
     required: true,
-    default: () => ({
-      role: "",
-      content: "",
+    default:  () => ({
+      role:    '',
+      content: '',
     }),
   },
   showCard: {
-    type: Boolean,
+    type:    Boolean,
     default: true,
   },
 });

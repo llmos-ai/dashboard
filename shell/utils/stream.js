@@ -73,7 +73,7 @@ export async function fetchLLMStream({
       onBefore();
     }
     const response = await fetch(url, {
-      method: 'POST',
+      method:  'POST',
       headers: {
         'Content-Type': 'application/json',
         ...headers,
@@ -91,10 +91,11 @@ export async function fetchLLMStream({
 
       const jsonContent = JSON.parse(content);
       const message = jsonContent?.error?.message;
+
       if (message) {
         throw new Error(message);
       } else {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error(`HTTP error! Status: ${ response.status }`);
       }
     }
 
@@ -103,6 +104,7 @@ export async function fetchLLMStream({
 
     while (!done) {
       const { value, done: readerDone } = await reader.read();
+
       done = readerDone;
 
       if (value) {
@@ -117,6 +119,7 @@ export async function fetchLLMStream({
             if (typeof onDone === 'function') {
               onDone();
             }
+
             return;
           }
 
@@ -132,6 +135,7 @@ export async function fetchLLMStream({
               // reasoning_content  (think)
               const reasoningContent =
                 parsed.choices?.[0]?.delta?.reasoning_content || '';
+
               if (reasoningContent && typeof onData === 'function') {
                 onData(reasoningContent, true);
               }

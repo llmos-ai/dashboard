@@ -12,9 +12,7 @@ import { dasherize, ucFirst } from '@shell/utils/string';
 import { get, clone } from '@shell/utils/object';
 import { removeObject } from '@shell/utils/array';
 import { Checkbox } from '@components/Form/Checkbox';
-import AsyncButton, {
-  ASYNC_BUTTON_STATES,
-} from '@shell/components/AsyncButton';
+import AsyncButton, { ASYNC_BUTTON_STATES } from '@shell/components/AsyncButton';
 import ActionDropdown from '@shell/components/ActionDropdown';
 import throttle from 'lodash/throttle';
 import debounce from 'lodash/debounce';
@@ -90,24 +88,24 @@ export default {
       //    search: string|array[string] Field name(s) to search in, default: [name]
       //    width:  number
       // }
-      type: Array,
+      type:     Array,
       required: true,
     },
 
     rows: {
       // The array of objects to show
-      type: Array,
+      type:     Array,
       required: true,
     },
 
     keyField: {
       // Field that is unique for each row.
-      type: String,
+      type:    String,
       default: '_key',
     },
 
     loading: {
-      type: Boolean,
+      type:     Boolean,
       required: false,
     },
 
@@ -117,98 +115,98 @@ export default {
      * Alt Loading - False: Hide the table rows when `loading`. Intended when all resources are provided up front.
      */
     altLoading: {
-      type: Boolean,
+      type:     Boolean,
       required: false,
     },
 
     groupBy: {
       // Field to group rows by, row[groupBy] must be something that can be a map key
-      type: String,
+      type:    String,
       default: null,
     },
     groupRef: {
       // Object to provide as the reference for rendering the grouping row
-      type: String,
+      type:    String,
       default: null,
     },
     groupSort: {
       // Field to order groups by, defaults to groupBy
-      type: Array,
+      type:    Array,
       default: null,
     },
 
     defaultSortBy: {
       // Default field to sort by if none is specified
       // uses name on headers
-      type: String,
+      type:    String,
       default: null,
     },
 
     tableActions: {
       // Show bulk table actions
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     rowActions: {
       // Show action dropdown on the end of each row
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     mangleActionResources: {
-      type: Function,
+      type:    Function,
       default: null,
     },
 
     rowActionsWidth: {
       // How wide the action dropdown column should be
-      type: Number,
+      type:    Number,
       default: 40,
     },
 
     search: {
       // Show search input to filter rows
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     extraSearchFields: {
       // Additional fields that aren't defined in the headers to search in on each row
-      type: Array,
+      type:    Array,
       default: null,
     },
 
     subRows: {
       // If there are sub-rows, your main row must have <tr class="main-row"> to identify it
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     subRowsDescription: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     subExpandable: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     subExpandColumn: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     subSearch: {
       // A field containing an array of sub-items to also search in for each row
-      type: String,
+      type:    String,
       default: null,
     },
 
     subFields: {
       // Search this list of fields within the items in "subSearch" of each row
-      type: Array,
+      type:    Array,
       default: null,
     },
 
@@ -216,7 +214,7 @@ export default {
      * Show the divider between the thead and tbody.
      */
     topDivider: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
@@ -224,16 +222,16 @@ export default {
      * Show the dividers between rows
      */
     bodyDividers: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     overflowX: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     overflowY: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
@@ -241,7 +239,7 @@ export default {
      * If pagination of the data is enabled or not
      */
     paging: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
@@ -249,7 +247,7 @@ export default {
      * What translation key to use for displaying the '1 - 10 of 100 Things' pagination info
      */
     pagingLabel: {
-      type: String,
+      type:    String,
       default: 'sortableTable.paging.generic',
     },
 
@@ -257,7 +255,7 @@ export default {
      * Additional params to pass to the pagingLabel translation
      */
     pagingParams: {
-      type: Object,
+      type:    Object,
       default: null,
     },
 
@@ -267,7 +265,7 @@ export default {
      * looking for a reference.
      */
     rowsPerPage: {
-      type: Number,
+      type:    Number,
       default: null, // Default comes from the user preference
     },
 
@@ -275,7 +273,7 @@ export default {
      * Allows you to override the default translation text of no rows view
      */
     noRowsKey: {
-      type: String,
+      type:    String,
       default: 'sortableTable.noRows',
     },
 
@@ -283,7 +281,7 @@ export default {
      * Allows you to hide the no rows messaging.
      */
     showNoRows: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
@@ -291,7 +289,7 @@ export default {
      * Allows you to override the default translation text of no search data view
      */
     noDataKey: {
-      type: String,
+      type:    String,
       default: 'sortableTable.noData', // i18n-uses sortableTable.noData
     },
 
@@ -299,7 +297,7 @@ export default {
      * Allows you to override showing the THEAD section.
      */
     showHeaders: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
@@ -310,7 +308,7 @@ export default {
      * This does not have to update given internal facets like sort order or direction
      */
     sortGenerationFn: {
-      type: Function,
+      type:    Function,
       default: null,
     },
 
@@ -318,7 +316,7 @@ export default {
      * Can be used in place of sortGenerationFn
      */
     sortGeneration: {
-      type: String,
+      type:    String,
       default: null,
     },
 
@@ -326,7 +324,7 @@ export default {
      * The list will always be sorted by these regardless of what the user has selected
      */
     mandatorySort: {
-      type: Array,
+      type:    Array,
       default: null,
     },
 
@@ -336,7 +334,7 @@ export default {
      * block within an AlertmanagerConfig resource.
      */
     getCustomDetailLink: {
-      type: Function,
+      type:    Function,
       default: null,
     },
 
@@ -345,21 +343,21 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'sortable-table',
     },
     /**
      * Allows for the usage of a query param to work for simple filtering (q)
      */
     useQueryParamsForSimpleFiltering: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     /**
      * Manaul force the update of live and delayed cells. Change this number to kick off the update
      */
     forceUpdateLiveAndDelayed: {
-      type: Number,
+      type:    Number,
       default: 0,
     },
 
@@ -367,7 +365,7 @@ export default {
      * True if pagination is executed outside of the component
      */
     externalPaginationEnabled: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
@@ -375,12 +373,12 @@ export default {
      * If `externalPaginationEnabled` is true this will be used as the current page
      */
     externalPaginationResult: {
-      type: Object,
+      type:    Object,
       default: null,
     },
 
     manualRefreshButtonSize: {
-      type: String,
+      type:    String,
       default: '',
     },
   },
@@ -402,15 +400,13 @@ export default {
     const isLoading = this.loading || false;
 
     return {
-      refreshButtonPhase: isLoading
-        ? ASYNC_BUTTON_STATES.WAITING
-        : ASYNC_BUTTON_STATES.ACTION,
-      expanded: {},
+      refreshButtonPhase:         isLoading ? ASYNC_BUTTON_STATES.WAITING : ASYNC_BUTTON_STATES.ACTION,
+      expanded:                   {},
       searchQuery,
       eventualSearchQuery,
-      subMatches: null,
-      actionOfInterest: null,
-      loadingDelay: false,
+      subMatches:                 null,
+      actionOfInterest:           null,
+      loadingDelay:               false,
       debouncedPaginationChanged: null,
       /**
        * The is the bool the DOM uses to show loading state. it's proxied from `loading` to avoid blipping the indicator (see usages)
@@ -447,14 +443,14 @@ export default {
   },
 
   watch: {
-    eventualSearchQuery: debounce(function (q) {
+    eventualSearchQuery: debounce(function(q) {
       this.searchQuery = q;
 
       if (!this.hasAdvancedFiltering && this.useQueryParamsForSimpleFiltering) {
         const route = {
-          name: this.$route.name,
+          name:   this.$route.name,
           params: { ...this.$route.params },
-          query: { ...this.$route.query, q },
+          query:  { ...this.$route.query, q },
         };
 
         if (!q && this.$route.query?.q) {
@@ -509,9 +505,7 @@ export default {
     manualRefreshLoadingFinished: {
       handler(neu, old) {
         // this is merely to update the manual refresh button status
-        this.refreshButtonPhase = !neu
-          ? ASYNC_BUTTON_STATES.WAITING
-          : ASYNC_BUTTON_STATES.ACTION;
+        this.refreshButtonPhase = !neu ? ASYNC_BUTTON_STATES.WAITING : ASYNC_BUTTON_STATES.ACTION;
         if (neu && neu !== old) {
           this.$nextTick(() => this.updateLiveAndDelayed());
         }
@@ -522,9 +516,7 @@ export default {
     loading: {
       handler(neu, old) {
         // Always ensure the Refresh button phase aligns with loading state (to ensure external phase changes which can then reset the internal phase changed by click)
-        this.refreshButtonPhase = neu
-          ? ASYNC_BUTTON_STATES.WAITING
-          : ASYNC_BUTTON_STATES.ACTION;
+        this.refreshButtonPhase = neu ? ASYNC_BUTTON_STATES.WAITING : ASYNC_BUTTON_STATES.ACTION;
 
         if (this.altLoading) {
           // Delay setting the actual loading indicator. This should avoid flashing up the indicator if the API responds quickly
@@ -570,12 +562,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters({
-      isTooManyItemsToAutoUpdate: 'resource-fetch/isTooManyItemsToAutoUpdate',
-    }),
-    ...mapGetters({
-      isManualRefreshLoading: 'resource-fetch/manualRefreshIsLoading',
-    }),
+    ...mapGetters({ isTooManyItemsToAutoUpdate: 'resource-fetch/isTooManyItemsToAutoUpdate' }),
+    ...mapGetters({ isManualRefreshLoading: 'resource-fetch/manualRefreshIsLoading' }),
     namespaces() {
       return this.$store.getters['activeNamespaceCache'];
     },
@@ -644,8 +632,7 @@ export default {
       const out = this.headers
         .slice()
         .filter(
-          (c) =>
-            !c.maxPageSize || (c.maxPageSize && c.maxPageSize >= this.perPage)
+          (c) => !c.maxPageSize || (c.maxPageSize && c.maxPageSize >= this.perPage)
         );
 
       if (this.groupBy) {
@@ -684,12 +671,12 @@ export default {
     // For data-title properties on <td>s
     dt() {
       const out = {
-        check: `Select: `,
+        check:   `Select: `,
         actions: `Actions: `,
       };
 
       this.columns.forEach((col) => {
-        out[col.name] = `${col.label || col.name}:`;
+        out[col.name] = `${ col.label || col.name }:`;
       });
 
       return out;
@@ -697,11 +684,11 @@ export default {
 
     classObject() {
       return {
-        'top-divider': this.topDivider,
+        'top-divider':   this.topDivider,
         'body-dividers': this.bodyDividers,
-        'overflow-y': this.overflowY,
-        'overflow-x': this.overflowX,
-        'alt-loading': this.altLoading && this.isLoading,
+        'overflow-y':    this.overflowY,
+        'overflow-x':    this.overflowX,
+        'alt-loading':   this.altLoading && this.isLoading,
       };
     },
 
@@ -741,8 +728,8 @@ export default {
       this.groupedRows.forEach((grp) => {
         const group = {
           grp,
-          key: grp.key,
-          ref: grp.ref,
+          key:  grp.key,
+          ref:  grp.ref,
           rows: [],
         };
 
@@ -751,18 +738,16 @@ export default {
         grp.rows.forEach((row) => {
           const rowData = {
             row,
-            key: this.get(row, this.keyField),
-            showSubRow: this.showSubRow(row, this.keyField),
+            key:                        this.get(row, this.keyField),
+            showSubRow:                 this.showSubRow(row, this.keyField),
             canRunBulkActionOfInterest: this.canRunBulkActionOfInterest(row),
-            columns: [],
+            columns:                    [],
           };
 
           group.rows.push(rowData);
 
           this.columns.forEach((c) => {
-            const value = c.delayLoading
-              ? undefined
-              : this.valueFor(row, c, c.isLabel);
+            const value = c.delayLoading ? undefined : this.valueFor(row, c, c.isLabel);
             let component;
             let formatted = value;
             let needRef = false;
@@ -790,14 +775,14 @@ export default {
             }
 
             rowData.columns.push({
-              col: c,
+              col:       c,
               value,
               formatted,
               component,
               needRef,
-              delayed: c.delayLoading,
-              live: c.formatter?.startsWith('Live') || c.liveUpdates,
-              label: this.labelFor(c),
+              delayed:   c.delayLoading,
+              live:      c.formatter?.startsWith('Live') || c.liveUpdates,
+              label:     this.labelFor(c),
               dasherize: columnFormmatterIDs[c.formatter] || '',
             });
           });
@@ -1049,7 +1034,7 @@ export default {
       }
     },
 
-    focusNext: throttle(function (event, more = false) {
+    focusNext: throttle(function(event, more = false) {
       const elem = this.focusAdjacent(true);
       const row = getParent(elem, 'tr');
 
@@ -1060,7 +1045,7 @@ export default {
       this.keySelectRow(row, more);
     }, 50),
 
-    focusPrevious: throttle(function (event, more = false) {
+    focusPrevious: throttle(function(event, more = false) {
       const elem = this.focusAdjacent(false);
       const row = getParent(elem, 'tr');
 
@@ -1093,7 +1078,7 @@ export default {
       // will open on whichever target element is clicked.
       this.$emit('clickedActionButton', {
         event,
-        targetElement: this.$refs[`actionButton${i}`][0],
+        targetElement: this.$refs[`actionButton${ i }`][0],
       });
     },
 
@@ -1103,13 +1088,13 @@ export default {
       }
 
       this.$emit('pagination-changed', {
-        page: this.page,
+        page:    this.page,
         perPage: this.perPage,
-        filter: {
+        filter:  {
           searchFields: this.searchFields,
-          searchQuery: this.searchQuery,
+          searchQuery:  this.searchQuery,
         },
-        sort: this.sortFields,
+        sort:       this.sortFields,
         descending: this.descending,
       });
     },
@@ -1118,7 +1103,10 @@ export default {
 </script>
 
 <template>
-  <div ref="container" :data-testid="componentTestid + '-list-container'">
+  <div
+    ref="container"
+    :data-testid="componentTestid + '-list-container'"
+  >
     <div
       :class="{ titled: $slots.title && $slots.title.length }"
       class="sortable-table-header"
@@ -1151,7 +1139,10 @@ export default {
                   @mouseover="setBulkActionOfInterest(act)"
                   @mouseleave="setBulkActionOfInterest(null)"
                 >
-                  <i v-if="act.icon" :class="act.icon" />
+                  <i
+                    v-if="act.icon"
+                    :class="act.icon"
+                  />
                   <span v-clean-html="act.label" />
                 </a-button>
 
@@ -1189,7 +1180,10 @@ export default {
                         @mouseover="setBulkActionOfInterest(act)"
                         @mouseleave="setBulkActionOfInterest(null)"
                       >
-                        <i v-if="act.icon" :class="act.icon" />
+                        <i
+                          v-if="act.icon"
+                          :class="act.icon"
+                        />
                         <span v-clean-html="act.label" />
                       </li>
                     </ul>
@@ -1216,21 +1210,28 @@ export default {
         <div
           v-if="
             search ||
-            hasAdvancedFiltering ||
-            isTooManyItemsToAutoUpdate ||
-            $slots['header-right']
+              hasAdvancedFiltering ||
+              isTooManyItemsToAutoUpdate ||
+              $slots['header-right']
           "
           class="search"
           data-testid="search-box-filter-row"
         >
-          <ul v-if="hasAdvancedFiltering" class="advanced-filters-applied">
-            <li v-for="(filter, i) in advancedFilteringValues" :key="i">
+          <ul
+            v-if="hasAdvancedFiltering"
+            class="advanced-filters-applied"
+          >
+            <li
+              v-for="(filter, i) in advancedFilteringValues"
+              :key="i"
+            >
               <span class="label">{{
                 `"${filter.value}" ${t('sortableTable.in')} ${filter.label}`
               }}</span>
-              <span class="cross" @click="clearAdvancedFilter(i)"
-                >&#10005;</span
-              >
+              <span
+                class="cross"
+                @click="clearAdvancedFilter(i)"
+              >&#10005;</span>
               <div class="bg" />
             </li>
           </ul>
@@ -1265,7 +1266,7 @@ export default {
                 type="search"
                 class="advanced-search-box"
                 :placeholder="t('sortableTable.filterFor')"
-              />
+              >
               <div class="middle-block">
                 <span>{{ t('sortableTable.in') }}</span>
                 <LabeledSelect
@@ -1290,7 +1291,10 @@ export default {
                 >
                   {{ t('sortableTable.resetFilters') }}
                 </button>
-                <button class="btn role-primary" @click="addAdvancedFilter">
+                <button
+                  class="btn role-primary"
+                  @click="addAdvancedFilter"
+                >
                   {{ t('sortableTable.add') }}
                 </button>
               </div>
@@ -1350,7 +1354,10 @@ export default {
             <td :colspan="fullColspan">
               <div class="data-loading">
                 <i class="icon-spin icon icon-spinner" />
-                <t k="generic.loading" :raw="true" />
+                <t
+                  k="generic.loading"
+                  :raw="true"
+                />
               </div>
             </td>
           </tr>
@@ -1360,7 +1367,10 @@ export default {
         <slot name="no-rows">
           <tr class="no-rows">
             <td :colspan="fullColspan">
-              <t v-if="showNoRows" :k="noRowsKey" />
+              <t
+                v-if="showNoRows"
+                :k="noRowsKey"
+              />
             </td>
           </tr>
         </slot>
@@ -1368,7 +1378,10 @@ export default {
       <tbody v-else-if="noResults">
         <slot name="no-results">
           <tr class="no-results">
-            <td :colspan="fullColspan" class="text-center">
+            <td
+              :colspan="fullColspan"
+              class="text-center"
+            >
               <t :k="noDataKey" />
             </td>
           </tr>
@@ -1389,16 +1402,28 @@ export default {
         >
           <tr class="group-row">
             <td :colspan="fullColspan">
-              <slot name="group-by" :group="groupedRows.grp">
-                <div v-trim-whitespace class="group-tab">
+              <slot
+                name="group-by"
+                :group="groupedRows.grp"
+              >
+                <div
+                  v-trim-whitespace
+                  class="group-tab"
+                >
                   {{ groupedRows.ref }}
                 </div>
               </slot>
             </td>
           </tr>
         </slot>
-        <template v-for="(row, i) in groupedRows.rows" :key="i">
-          <slot name="main-row" :row="row.row">
+        <template
+          v-for="(row, i) in groupedRows.rows"
+          :key="i"
+        >
+          <slot
+            name="main-row"
+            :row="row.row"
+          >
             <slot
               :name="'main-row:' + (row.row.mainRowKey || i)"
               :full-colspan="fullColspan"
@@ -1415,7 +1440,11 @@ export default {
                   actionOfInterest && !row.canRunBulkActionOfInterest
                 "
               >
-                <td v-if="tableActions" class="row-check" align="middle">
+                <td
+                  v-if="tableActions"
+                  class="row-check"
+                  align="middle"
+                >
                   {{ row.mainRowKey }}
                   <Checkbox
                     class="selection-checkbox"
@@ -1429,7 +1458,11 @@ export default {
                     "
                   />
                 </td>
-                <td v-if="subExpandColumn" class="row-expand" align="middle">
+                <td
+                  v-if="subExpandColumn"
+                  class="row-expand"
+                  align="middle"
+                >
                   <i
                     data-title="Toggle Expand"
                     :class="{
@@ -1440,7 +1473,10 @@ export default {
                     @click.stop="toggleExpand(row.row)"
                   />
                 </td>
-                <template v-for="(col, j) in row.columns" :key="j">
+                <template
+                  v-for="(col, j) in row.columns"
+                  :key="j"
+                >
                   <slot
                     :name="'col:' + col.col.name"
                     :row="row.row"
@@ -1452,7 +1488,7 @@ export default {
                     <td
                       v-show="
                         !hasAdvancedFiltering ||
-                        (hasAdvancedFiltering && col.col.isColVisible)
+                          (hasAdvancedFiltering && col.col.isColVisible)
                       "
                       :key="col.col.name"
                       :data-title="col.col.label"
@@ -1511,7 +1547,11 @@ export default {
                   </slot>
                 </template>
                 <td v-if="rowActions">
-                  <slot name="row-actions" :row="row.row" :index="i">
+                  <slot
+                    name="row-actions"
+                    :row="row.row"
+                    :index="i"
+                  >
                     <ActionMenu
                       :resource="row.row"
                       :data-testid="
@@ -1548,7 +1588,11 @@ export default {
               @mouseenter="onRowMouseEnter"
               @mouseleave="onRowMouseLeave"
             >
-              <td v-if="tableActions" class="row-check" align="middle" />
+              <td
+                v-if="tableActions"
+                class="row-check"
+                align="middle"
+              />
               <td
                 :colspan="fullColspan - (tableActions ? 1 : 0)"
                 :class="{ 'text-error': row.row.stateObj.error }"
@@ -1560,13 +1604,16 @@ export default {
         </template>
       </tbody>
     </table>
-    <div v-if="showPaging" class="paging">
+    <div
+      v-if="showPaging"
+      class="paging"
+    >
       <a-button
         size="small"
         data-testid="pagination-first"
         :disabled="page == 1 || loading"
-        @click="goToPage('first')"
         class="!inline-flex content-center"
+        @click="goToPage('first')"
       >
         <i class="icon icon-chevron-beginning" />
       </a-button>
@@ -1574,8 +1621,8 @@ export default {
         size="small"
         data-testid="pagination-prev"
         :disabled="page == 1 || loading"
-        @click="goToPage('prev')"
         class="!inline-flex content-center"
+        @click="goToPage('prev')"
       >
         <i class="icon icon-chevron-left" />
       </a-button>
@@ -1608,7 +1655,11 @@ export default {
       @shortkey="focusSearch()"
     />
     <template v-if="tableActions">
-      <a-button v-shortkey="['j']" class="hide" @shortkey="focusNext($event)" />
+      <a-button
+        v-shortkey="['j']"
+        class="hide"
+        @shortkey="focusNext($event)"
+      />
       <a-button
         v-shortkey="['k']"
         class="hide"

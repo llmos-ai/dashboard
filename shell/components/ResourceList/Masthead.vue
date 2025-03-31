@@ -23,53 +23,53 @@ export default {
   },
   props: {
     resource: {
-      type: String,
+      type:     String,
       required: true,
     },
     favoriteResource: {
-      type: String,
+      type:    String,
       default: null,
     },
     schema: {
-      type: Object,
+      type:    Object,
       default: null,
     },
     typeDisplay: {
-      type: String,
+      type:    String,
       default: null,
     },
     isCreatable: {
-      type: Boolean,
+      type:    Boolean,
       default: null,
     },
     isYamlCreatable: {
-      type: Boolean,
+      type:    Boolean,
       default: null,
     },
     createLocation: {
-      type: Object,
+      type:    Object,
       default: null,
     },
     yamlCreateLocation: {
-      type: Object,
+      type:    Object,
       default: null,
     },
     createButtonLabel: {
-      type: String,
+      type:    String,
       default: null,
     },
     loadResources: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
 
     loadIndeterminate: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     showIncrementalLoadingIndicator: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
@@ -78,7 +78,7 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'masthead',
     },
   },
@@ -86,14 +86,14 @@ export default {
   data() {
     const params = { ...this.$route.params };
 
-    const formRoute = { name: `${this.$route.name}-create`, params };
+    const formRoute = { name: `${ this.$route.name }-create`, params };
 
     const hasEditComponent = this.$store.getters['type-map/hasCustomEdit'](
       this.resource
     );
 
     const yamlRoute = {
-      name: `${this.$route.name}-create`,
+      name:  `${ this.$route.name }-create`,
       params,
       query: { [AS]: _YAML },
     };
@@ -150,8 +150,7 @@ export default {
       // blocked-post means you can post through norman, but not through steve.
       if (
         this.schema &&
-        !this.schema?.collectionMethods.find((x) =>
-          ['blocked-post', 'post'].includes(x.toLowerCase())
+        !this.schema?.collectionMethods.find((x) => ['blocked-post', 'post'].includes(x.toLowerCase())
         )
       ) {
         return false;
@@ -184,7 +183,10 @@ export default {
     <div class="title">
       <h1 class="m-0">
         <TabTitle>{{ _typeDisplay }}</TabTitle>
-        <Favorite v-if="isExplorer" :resource="favoriteResource || resource" />
+        <Favorite
+          v-if="isExplorer"
+          :resource="favoriteResource || resource"
+        />
       </h1>
       <ResourceLoadingIndicator
         v-if="showIncrementalLoadingIndicator"

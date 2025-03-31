@@ -18,7 +18,7 @@ import {
 import { clone } from '@shell/utils/object';
 
 export default {
-  name: 'AlertmanagerConfigReceiverCreateEdit',
+  name:       'AlertmanagerConfigReceiverCreateEdit',
   components: {
     ActionMenu,
     ButtonGroup,
@@ -33,11 +33,11 @@ export default {
 
     const alertmanagerConfigId = this.$route.params.alertmanagerconfigid;
     const originalAlertmanagerConfigResource = await this.$store.dispatch(
-      `${inStore}/find`,
+      `${ inStore }/find`,
       { type: MONITORING.ALERTMANAGER_CONFIG, id: alertmanagerConfigId }
     );
     const alertmanagerConfigResource = await this.$store.dispatch(
-      `${inStore}/clone`,
+      `${ inStore }/clone`,
       { resource: originalAlertmanagerConfigResource }
     );
     const mode = this.$route.query.mode;
@@ -65,28 +65,28 @@ export default {
 
   data() {
     return {
-      actionMenuTargetElement: null,
-      actionMenuTargetEvent: null,
-      alertmanagerConfigId: '',
-      alertmanagerConfigResource: null,
+      actionMenuTargetElement:       null,
+      actionMenuTargetEvent:         null,
+      alertmanagerConfigId:          '',
+      alertmanagerConfigResource:    null,
       alertmanagerConfigDetailRoute: null,
-      config: _CONFIG,
-      create: _CREATE,
-      detail: _DETAIL,
-      edit: _EDIT,
-      receiverActionMenuIsOpen: false,
-      receiverName: '',
-      receiverValue: {},
-      showPreview: false,
-      view: _VIEW,
-      viewOptions: [
+      config:                        _CONFIG,
+      create:                        _CREATE,
+      detail:                        _DETAIL,
+      edit:                          _EDIT,
+      receiverActionMenuIsOpen:      false,
+      receiverName:                  '',
+      receiverValue:                 {},
+      showPreview:                   false,
+      view:                          _VIEW,
+      viewOptions:                   [
         {
           labelKey: 'resourceDetail.masthead.config',
-          value: 'config',
+          value:    'config',
         },
         {
           labelKey: 'resourceDetail.masthead.yaml',
-          value: _YAML,
+          value:    _YAML,
         },
       ],
       yaml: _YAML,
@@ -124,7 +124,7 @@ export default {
       const resource = this.alertmanagerConfigResource;
 
       const inStore = this.$store.getters['currentStore'](resource);
-      const schemas = this.$store.getters[`${inStore}/all`](SCHEMA);
+      const schemas = this.$store.getters[`${ inStore }/all`](SCHEMA);
       const clonedResource = clone(resource);
 
       const out = createYaml(
@@ -153,30 +153,30 @@ export default {
     },
     heading() {
       switch (this.$route.query.mode) {
-        case this.create:
-          return this.t(
-            'monitoring.alertmanagerConfig.receiverFormNames.create'
-          );
-        case this.edit:
-          if (
-            this.currentView === this.yaml ||
+      case this.create:
+        return this.t(
+          'monitoring.alertmanagerConfig.receiverFormNames.create'
+        );
+      case this.edit:
+        if (
+          this.currentView === this.yaml ||
             this.$route.query.as === this.yaml
-          ) {
-            // When you edit as YAML, you edit the whole AlertmanagerConfig
-            // at once, so the header is just "Edit AlertmanagerConfig"
-            return this.t(
-              'monitoring.alertmanagerConfig.receiverFormNames.editYaml'
-            );
-          }
-
-          // When you edit as a form, you edit only the receiver,
-          // so the form header is "Edit Receiver in AlertmanagerConfig"
-          return this.t('monitoring.alertmanagerConfig.receiverFormNames.edit');
-
-        default:
+        ) {
+          // When you edit as YAML, you edit the whole AlertmanagerConfig
+          // at once, so the header is just "Edit AlertmanagerConfig"
           return this.t(
-            'monitoring.alertmanagerConfig.receiverFormNames.detail'
+            'monitoring.alertmanagerConfig.receiverFormNames.editYaml'
           );
+        }
+
+        // When you edit as a form, you edit only the receiver,
+        // so the form header is "Edit Receiver in AlertmanagerConfig"
+        return this.t('monitoring.alertmanagerConfig.receiverFormNames.edit');
+
+      default:
+        return this.t(
+          'monitoring.alertmanagerConfig.receiverFormNames.detail'
+        );
       }
     },
   },
@@ -207,9 +207,7 @@ export default {
 
         this.redirectToAlertmanagerConfigDetail();
       } catch (e) {
-        const msg = e?.message
-          ? e.message
-          : this.t('monitoring.alertmanagerConfig.error');
+        const msg = e?.message ? e.message : this.t('monitoring.alertmanagerConfig.error');
 
         this.$refs.config.setError(msg);
         buttonDone(false);
@@ -332,7 +330,7 @@ export default {
     <ReceiverConfig
       v-if="
         (currentView === config || currentView === detail) &&
-        alertmanagerConfigResource
+          alertmanagerConfigResource
       "
       ref="config"
       :value="receiverValue"

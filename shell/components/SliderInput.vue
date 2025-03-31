@@ -1,36 +1,36 @@
 <script setup>
-import { QuestionCircleOutlined } from "@ant-design/icons-vue";
+import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 
 const model = defineModel();
 
 const props = defineProps({
   min: {
-    type: Number,
+    type:    Number,
     default: 0,
   },
   max: {
-    type: Number,
+    type:    Number,
     default: 2,
   },
   interval: {
-    type: Number,
+    type:    Number,
     default: 0.1,
   },
   label: {
-    type: String,
-    default: "",
+    type:    String,
+    default: '',
   },
   description: {
-    type: String,
-    default: "",
+    type:    String,
+    default: '',
   },
 });
 
-const emit = defineEmits(["change"]);
+const emit = defineEmits(['change']);
 
 const updateValue = (value) => {
   model.value = value;
-  emit("change");
+  emit('change');
 };
 </script>
 
@@ -39,7 +39,10 @@ const updateValue = (value) => {
     <div class="col span-8 flex items-center">
       <span class="label mr-1">{{ label }}</span>
 
-      <a-tooltip placement="topLeft" v-if="description">
+      <a-tooltip
+        v-if="description"
+        placement="topLeft"
+      >
         <template #title>
           <span>{{ description }}</span>
         </template>

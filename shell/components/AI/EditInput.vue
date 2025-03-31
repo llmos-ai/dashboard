@@ -1,19 +1,19 @@
 <script setup>
-import { ref, watch } from "vue";
-import { EditOutlined, ArrowUpOutlined } from "@ant-design/icons-vue";
+import { ref, watch } from 'vue';
+import { EditOutlined, ArrowUpOutlined } from '@ant-design/icons-vue';
 
 const props = defineProps({
   value: {
-    type: String,
-    default: "",
+    type:    String,
+    default: '',
   },
   isEdit: {
-    type: Boolean,
+    type:    Boolean,
     default: false,
   },
 });
 
-const emit = defineEmits(["update:value"]);
+const emit = defineEmits(['update:value']);
 
 const inputValue = ref(props.value);
 const editing = ref(props.isEdit);
@@ -35,14 +35,17 @@ const handleCancel = () => {
 };
 
 const save = () => {
-  emit("update:value", inputValue.value);
+  emit('update:value', inputValue.value);
   editing.value = false;
 };
 </script>
 
 <template>
   <div>
-    <div v-if="!editing" class="relative">
+    <div
+      v-if="!editing"
+      class="relative"
+    >
       <div class="flex flex-col items-end group w-auto">
         <span class="px-[16px] py-[9px] rounded-xl bg-[#a22d2d0a] w-auto">
           {{ inputValue }}
@@ -72,7 +75,10 @@ const save = () => {
           <i class="icon icon-close" />
         </button>
 
-        <a-textarea v-model:value="inputValue" auto-size />
+        <a-textarea
+          v-model:value="inputValue"
+          auto-size
+        />
 
         <a-button
           shape="circle"

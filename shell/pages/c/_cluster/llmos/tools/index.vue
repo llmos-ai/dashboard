@@ -20,11 +20,7 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const hash = await allHash({
-      addons: this.$store.dispatch(`${inStore}/findAll`, {
-        type: MANAGEMENT.MANAGED_ADDON,
-      }),
-    });
+    const hash = await allHash({ addons: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.MANAGED_ADDON }) });
 
     this.addons = hash.addons;
   },
@@ -73,8 +69,15 @@ export default {
         :data-testid="`cluster-tools-app-${addon.id}`"
       >
         <div class="logo">
-          <i v-if="addon.iconName" class="icon" :class="addon.iconName" />
-          <LazyImage v-else :src="addon.logo" />
+          <i
+            v-if="addon.iconName"
+            class="icon"
+            :class="addon.iconName"
+          />
+          <LazyImage
+            v-else
+            :src="addon.logo"
+          />
         </div>
         <div class="name-version">
           <div>
@@ -92,7 +95,10 @@ export default {
           </div>
         </div>
         <div class="description">
-          <div v-clean-html="addon.description" class="description-content" />
+          <div
+            v-clean-html="addon.description"
+            class="description-content"
+          />
         </div>
         <div class="action">
           <template v-if="addon.blocked">
@@ -101,8 +107,7 @@ export default {
               disabled="true"
               type="primary"
               size="small"
-            >
-            </a-button>
+            />
           </template>
           <template v-else-if="addon.spec.enabled">
             <a-button

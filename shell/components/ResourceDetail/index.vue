@@ -66,22 +66,22 @@ export default {
 
   props: {
     storeOverride: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     resourceOverride: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     parentRouteOverride: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     flexContent: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
@@ -90,11 +90,11 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'resource-details',
     },
     errorsMap: {
-      type: Object,
+      type:    Object,
       default: null,
     },
   },
@@ -115,9 +115,7 @@ export default {
     // There are 6 "real" modes that can be put into the query string
     // These are mapped down to the 3 regular page "mode"s that create-edit-view components
     // know about:  view, edit, create (stage, import and clone become "create")
-    const mode = [_CLONE, _IMPORT, _STAGE].includes(realMode)
-      ? _CREATE
-      : realMode;
+    const mode = [_CLONE, _IMPORT, _STAGE].includes(realMode) ? _CREATE : realMode;
 
     const getGraphConfig = store.getters['type-map/hasGraph'](resourceType);
     const hasGraph = !!getGraphConfig;
@@ -130,7 +128,7 @@ export default {
       id
     );
 
-    const schemas = store.getters[`${inStore}/all`](SCHEMA);
+    const schemas = store.getters[`${ inStore }/all`](SCHEMA);
 
     // As determines what component will be rendered
     const requested = route.query[AS];
@@ -155,16 +153,14 @@ export default {
 
     const options = store.getters[`type-map/optionsFor`](resourceType);
 
-    this.showMasthead = [_CREATE, _EDIT].includes(mode)
-      ? options.resourceEditMasthead
-      : true;
+    this.showMasthead = [_CREATE, _EDIT].includes(mode) ? options.resourceEditMasthead : true;
     const canViewYaml = options.canYaml;
 
     if (options.resource) {
       resourceType = options.resource;
     }
 
-    const schema = store.getters[`${inStore}/schemaFor`](resourceType);
+    const schema = store.getters[`${ inStore }/schemaFor`](resourceType);
     let model, initialModel, liveModel, yaml;
 
     if (realMode === _CREATE || realMode === _IMPORT) {
@@ -178,11 +174,9 @@ export default {
         data.metadata = { namespace };
       }
 
-      liveModel = await store.dispatch(`${inStore}/create`, data);
-      initialModel = await store.dispatch(`${inStore}/clone`, {
-        resource: liveModel,
-      });
-      model = await store.dispatch(`${inStore}/clone`, { resource: liveModel });
+      liveModel = await store.dispatch(`${ inStore }/create`, data);
+      initialModel = await store.dispatch(`${ inStore }/clone`, { resource: liveModel });
+      model = await store.dispatch(`${ inStore }/clone`, { resource: liveModel });
 
       if (model.forceYaml === true) {
         as = _YAML;
@@ -201,14 +195,14 @@ export default {
       let fqid = id;
 
       if (schema.attributes?.namespaced && namespace) {
-        fqid = `${namespace}/${fqid}`;
+        fqid = `${ namespace }/${ fqid }`;
       }
 
       try {
-        liveModel = await store.dispatch(`${inStore}/find`, {
+        liveModel = await store.dispatch(`${ inStore }/find`, {
           type: resourceType,
-          id: fqid,
-          opt: { watch: true },
+          id:   fqid,
+          opt:  { watch: true },
         });
       } catch (e) {
         if (e.status === 404 || e.status === 403) {
@@ -231,13 +225,9 @@ export default {
         if (realMode === _VIEW) {
           model = liveModel;
         } else {
-          model = await store.dispatch(`${inStore}/clone`, {
-            resource: liveModel,
-          });
+          model = await store.dispatch(`${ inStore }/clone`, { resource: liveModel });
         }
-        initialModel = await store.dispatch(`${inStore}/clone`, {
-          resource: liveModel,
-        });
+        initialModel = await store.dispatch(`${ inStore }/clone`, { resource: liveModel });
 
         if (as === _YAML) {
           yaml = await getYaml(this.$store, liveModel);
@@ -265,7 +255,7 @@ export default {
 
     // Ensure common properties exists
     try {
-      model = await store.dispatch(`${inStore}/cleanForDetail`, model);
+      model = await store.dispatch(`${ inStore }/cleanForDetail`, model);
     } catch (e) {
       this.errors.push(e);
     }
@@ -296,26 +286,26 @@ export default {
   },
   data() {
     return {
-      chartData: null,
+      chartData:       null,
       resourceSubtype: null,
 
       // Set by fetch
-      hasGraph: null,
+      hasGraph:        null,
       hasCustomDetail: null,
-      hasCustomEdit: null,
-      resourceType: null,
-      asYaml: null,
-      yaml: null,
-      liveModel: null,
-      initialModel: null,
-      mode: null,
-      as: null,
-      value: null,
-      model: null,
-      notFound: null,
-      canViewChart: true,
-      canViewYaml: null,
-      errors: [],
+      hasCustomEdit:   null,
+      resourceType:    null,
+      asYaml:          null,
+      yaml:            null,
+      liveModel:       null,
+      initialModel:    null,
+      mode:            null,
+      as:              null,
+      value:           null,
+      model:           null,
+      notFound:        null,
+      canViewChart:    true,
+      canViewYaml:     null,
+      errors:          [],
     };
   },
 
@@ -352,10 +342,10 @@ export default {
 
     showComponent() {
       switch (this.as) {
-        case _DETAIL:
-          return this.detailComponent;
-        case _CONFIG:
-          return this.editComponent;
+      case _DETAIL:
+        return this.detailComponent;
+      case _CONFIG:
+        return this.editComponent;
       }
 
       return null;
@@ -364,15 +354,13 @@ export default {
       return this.errors?.length && Array.isArray(this.errors);
     },
     mappedErrors() {
-      return !this.errors
-        ? {}
-        : this.errorsMap ||
+      return !this.errors ? {} : this.errorsMap ||
             this.errors.reduce(
               (acc, error) => ({
                 ...acc,
                 [error]: {
                   message: error?.data?.message || error,
-                  icon: null,
+                  icon:    null,
                 },
               }),
               {}
@@ -471,9 +459,16 @@ export default {
       :parent-route-override="parentRouteOverride"
       :store-override="storeOverride"
     >
-      <DetailTop v-if="isView && isDetail" :value="liveModel" />
+      <DetailTop
+        v-if="isView && isDetail"
+        :value="liveModel"
+      />
     </Masthead>
-    <div v-if="hasErrors" id="cru-errors" class="cru__errors">
+    <div
+      v-if="hasErrors"
+      id="cru-errors"
+      class="cru__errors"
+    >
       <Banner
         v-for="(err, i) in errors"
         :key="i"

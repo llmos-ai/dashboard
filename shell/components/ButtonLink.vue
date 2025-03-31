@@ -1,24 +1,32 @@
 <script setup>
 import { RouteLocationRaw } from 'vue-router';
-const props = defineProps({
+defineProps({
   to: {
-    type: RouteLocationRaw,
+    type:     RouteLocationRaw,
     required: true,
   },
   linkLabel: {
-    type: String,
+    type:    String,
     default: '',
   },
   type: {
-    type: String,
+    type:    String,
     default: 'primary',
   },
+  size: {
+    type:    String,
+    default: 'large'
+  }
 });
 </script>
 
 <template>
   <router-link :to="to">
-    <a-button :type="type" :size="size" v-bind="$attrs">
+    <a-button
+      :type="type"
+      :size="size"
+      v-bind="$attrs"
+    >
       <slot>
         {{ linkLabel }}
       </slot>

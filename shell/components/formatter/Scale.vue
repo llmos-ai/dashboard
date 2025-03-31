@@ -1,17 +1,17 @@
 <script>
-import ProgressBarMulti from "@shell/components/ProgressBarMulti";
+import ProgressBarMulti from '@shell/components/ProgressBarMulti';
 
 export default {
   components: { ProgressBarMulti },
 
   props: {
     row: {
-      type: Object,
+      type:     Object,
       required: true,
     },
 
     col: {
-      type: Object,
+      type:    Object,
       default: null,
     },
   },
@@ -57,11 +57,23 @@ export default {
     offset="1"
   >
     <span>
-      <ProgressBarMulti v-if="row.complexScale" :values="row.scaleParts" />
-      <p v-if="row.scales && row.scales.global" class="scale">Global</p>
-      <span v-else class="scale">
+      <ProgressBarMulti
+        v-if="row.complexScale"
+        :values="row.scaleParts"
+      />
+      <p
+        v-if="row.scales && row.scales.global"
+        class="scale"
+      >Global</p>
+      <span
+        v-else
+        class="scale"
+      >
         {{ row.scales.current }}
-        <div v-if="row.scales.auto" class="text-small text-muted">
+        <div
+          v-if="row.scales.auto"
+          class="text-small text-muted"
+        >
           ({{ row.scales.desired }})
         </div>
         <span v-else-if="row.showDesiredScale">
@@ -72,7 +84,10 @@ export default {
     </span>
 
     <template #popper>
-      <div v-if="canAdjust" class="text-center pb-5">
+      <div
+        v-if="canAdjust"
+        class="text-center pb-5"
+      >
         <button
           type="button"
           class="btn btn-sm bg-primary scale-btn"
@@ -88,9 +103,15 @@ export default {
           <i class="icon icon-plus" />
         </button>
       </div>
-      <table v-if="row.complexScale" class="fixed">
+      <table
+        v-if="row.complexScale"
+        class="fixed"
+      >
         <tbody>
-          <tr v-for="(obj, i) in row.scaleParts" :key="i">
+          <tr
+            v-for="(obj, i) in row.scaleParts"
+            :key="i"
+          >
             <td :class="{ 'text-left': true, [obj.textColor]: true }">
               {{ obj.label }}
             </td>

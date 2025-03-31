@@ -83,7 +83,7 @@ export default {
     this.$refs.frame.onload = this.inject;
     this.poll();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.interval) {
       clearInterval(this.interval);
     }

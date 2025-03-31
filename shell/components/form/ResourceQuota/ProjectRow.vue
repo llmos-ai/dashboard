@@ -1,26 +1,26 @@
 <script>
-import Select from "@shell/components/form/Select";
-import UnitInput from "@shell/components/form/UnitInput";
-import { ROW_COMPUTED } from "./shared";
+import Select from '@shell/components/form/Select';
+import UnitInput from '@shell/components/form/UnitInput';
+import { ROW_COMPUTED } from './shared';
 
 export default {
   components: { Select, UnitInput },
 
   props: {
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
     types: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
     type: {
-      type: String,
-      default: "",
+      type:    String,
+      default: '',
     },
     value: {
-      type: Object,
+      type:    Object,
       default: () => {
         return {};
       },
@@ -46,19 +46,19 @@ export default {
   methods: {
     updateType(type) {
       if (
-        typeof this.value.spec.resourceQuota?.limit[this.type] !== "undefined"
+        typeof this.value.spec.resourceQuota?.limit[this.type] !== 'undefined'
       ) {
         delete this.value.spec.resourceQuota.limit[this.type];
       }
       if (
         typeof this.value.spec.namespaceDefaultResourceQuota?.limit[
           this.type
-        ] !== "undefined"
+        ] !== 'undefined'
       ) {
         delete this.value.spec.namespaceDefaultResourceQuota.limit[this.type];
       }
 
-      this.$emit("type-change", type);
+      this.$emit('type-change', type);
     },
 
     updateQuotaLimit(prop, type, val) {
@@ -72,7 +72,10 @@ export default {
 };
 </script>
 <template>
-  <div v-if="typeOption" class="row">
+  <div
+    v-if="typeOption"
+    class="row"
+  >
     <Select
       class="mr-10"
       :mode="mode"

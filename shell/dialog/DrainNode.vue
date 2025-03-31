@@ -17,12 +17,12 @@ export default {
 
   props: {
     kubeNodes: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
 
     normanNodeId: {
-      type: String,
+      type:    String,
       default: '',
     },
   },
@@ -61,13 +61,13 @@ export default {
       ],
 
       gracePeriod: false,
-      timeout: false,
+      timeout:     false,
 
       body: {
         deleteLocalData: false,
-        force: false,
-        gracePeriod: null,
-        timeout: null,
+        force:           false,
+        gracePeriod:     null,
+        timeout:         null,
       },
 
       EDIT: _EDIT,
@@ -121,8 +121,7 @@ export default {
 
       try {
         await Promise.all(
-          this.kubeNodes.map((node) =>
-            node.norman?.doAction('drain', parsedBody)
+          this.kubeNodes.map((node) => node.norman?.doAction('drain', parsedBody)
           )
         );
         this.close();
@@ -136,8 +135,14 @@ export default {
 </script>
 
 <template>
-  <a-card class="prompt-rotate" :show-highlight-border="false">
-    <h4 slot="title" class="text-default-text">
+  <a-card
+    class="prompt-rotate"
+    :show-highlight-border="false"
+  >
+    <h4
+      slot="title"
+      class="text-default-text"
+    >
       <template v-if="kubeNodes.length > 1">
         {{ t('drainNode.titleMultiple', { count: kubeNodes.length }) }}
       </template>
@@ -208,14 +213,28 @@ export default {
         :placeholder="t('drainNode.timeout.placeholder')"
       />
     </div>
-    <Banner v-for="(err, i) in errors" :key="i" color="error" :label="err" />
+    <Banner
+      v-for="(err, i) in errors"
+      :key="i"
+      color="error"
+      :label="err"
+    />
 
-    <div slot="actions" class="buttons">
-      <button class="btn role-secondary mr-10" @click="close">
+    <div
+      slot="actions"
+      class="buttons"
+    >
+      <button
+        class="btn role-secondary mr-10"
+        @click="close"
+      >
         {{ t('generic.cancel') }}
       </button>
 
-      <AsyncButton mode="drain" @click="apply" />
+      <AsyncButton
+        mode="drain"
+        @click="apply"
+      />
     </div>
   </a-card>
 </template>

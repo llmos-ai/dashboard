@@ -18,25 +18,25 @@ export default {
 
   props: {
     value: {
-      type: Array,
+      type:    Array,
       default: () => [],
     },
 
     mode: {
-      type: String,
+      type:    String,
       default: 'create',
     },
   },
 
   data(props) {
     const defaultAlert = {
-      alert: '',
-      expr: '',
-      for: '0s',
+      alert:  '',
+      expr:   '',
+      for:    '0s',
       labels: {
-        severity: 'none',
-        namespace: 'default',
-        cluster_id: this.$store.getters['clusterId'],
+        severity:     'none',
+        namespace:    'default',
+        cluster_id:   this.$store.getters['clusterId'],
         cluster_name: this.$store.getters['currentCluster'].spec.displayName,
       },
     };
@@ -92,24 +92,24 @@ export default {
       const { value } = this;
 
       switch (ruleType) {
-        case 'record':
-          value.push({
-            record: '',
-            expr: '',
-            labels: {
-              severity: 'none',
-              namespace: 'default',
-              cluster_id: this.$store.getters['clusterId'],
-              cluster_name:
+      case 'record':
+        value.push({
+          record: '',
+          expr:   '',
+          labels: {
+            severity:     'none',
+            namespace:    'default',
+            cluster_id:   this.$store.getters['clusterId'],
+            cluster_name:
                 this.$store.getters['currentCluster'].spec.displayName,
-            },
-          });
-          break;
-        case 'alert':
-          value.push(clone(this.defaultAlert));
-          break;
-        default:
-          break;
+          },
+        });
+        break;
+      case 'alert':
+        value.push(clone(this.defaultAlert));
+        break;
+      default:
+        break;
       }
     },
     removeRule(ruleIndex) {
@@ -134,30 +134,31 @@ export default {
       </h3>
       <ArrayListGrouped :value="recordingRules">
         <template #default="props">
-          <RecordingRule class="rule" :value="props.row.value" :mode="mode" />
+          <RecordingRule
+            class="rule"
+            :value="props.row.value"
+            :mode="mode"
+          />
         </template>
         <template #add>
-          <button
+          <a-button
             v-if="!isView"
             :disabled="disableAddRecord"
-            type="button"
-            class="btn role-tertiary"
             data-testid="v2-monitoring-add-record"
             @click="addRule('record')"
           >
             <t k="prometheusRule.recordingRules.addLabel" />
-          </button>
+          </a-button>
           <span v-else />
         </template>
         <template v-slot:remove-button="props">
-          <button
+          <a-button
             v-if="!isView"
-            type="button"
-            class="btn role-link close btn-sm"
+            type="link"
             @click="removeRule(props.i)"
           >
             <i class="icon icon-x" />
-          </button>
+          </a-button>
           <span v-else />
         </template>
       </ArrayListGrouped>
@@ -182,30 +183,31 @@ export default {
       </div>
       <ArrayListGrouped :value="alertingRules">
         <template #default="props">
-          <AlertingRule class="rule" :value="props.row.value" :mode="mode" />
+          <AlertingRule
+            class="rule"
+            :value="props.row.value"
+            :mode="mode"
+          />
         </template>
         <template #add>
-          <button
+          <a-button
             v-if="!isView"
             :disabled="disableAddAlert"
-            type="button"
-            class="btn role-tertiary"
             data-testid="v2-monitoring-add-alert"
             @click="addRule('alert')"
           >
             <t k="prometheusRule.alertingRules.addLabel" />
-          </button>
+          </a-button>
           <span v-else />
         </template>
         <template v-slot:remove-button="props">
-          <button
+          <a-button
             v-if="!isView"
-            type="button"
-            class="btn role-link close btn-sm"
+            type="link"
             @click="removeRule(props.i)"
           >
             <i class="icon icon-x" />
-          </button>
+          </a-button>
           <span v-else />
         </template>
       </ArrayListGrouped>

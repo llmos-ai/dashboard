@@ -37,18 +37,18 @@ import { getApplicableExtensionEnhancements } from '@shell/core/plugin-helpers';
 export const DNS_LIKE_TYPES = ['dnsLabel', 'dnsLabelRestricted', 'hostname'];
 
 const REMAP_STATE = {
-  disabled: 'inactive',
-  notapplied: 'Not Applied',
-  notready: 'Not Ready',
-  waitapplied: 'Wait Applied',
-  outofsync: 'Out of Sync',
-  'in-progress': 'In Progress',
-  gitupdating: 'Git Updating',
-  errapplied: 'Err Applied',
-  waitcheckin: 'Wait Check-In',
-  off: 'Disabled',
+  disabled:                 'inactive',
+  notapplied:               'Not Applied',
+  notready:                 'Not Ready',
+  waitapplied:              'Wait Applied',
+  outofsync:                'Out of Sync',
+  'in-progress':            'In Progress',
+  gitupdating:              'Git Updating',
+  errapplied:               'Err Applied',
+  waitcheckin:              'Wait Check-In',
+  off:                      'Disabled',
   waitingforinfrastructure: 'Waiting for Infra',
-  waitingfornoderef: 'Waiting for Node Ref',
+  waitingfornoderef:        'Waiting for Node Ref',
 };
 
 const DEFAULT_COLOR = 'warning';
@@ -58,98 +58,98 @@ const DEFAULT_WAIT_INTERVAL = 1000;
 const DEFAULT_WAIT_TMIMEOUT = 30000;
 
 export const STATES_ENUM = {
-  IN_USE: 'in-use',
-  IN_PROGRESS: 'in-progress',
+  IN_USE:           'in-use',
+  IN_PROGRESS:      'in-progress',
   PENDING_ROLLBACK: 'pending-rollback',
-  PENDING_UPGRADE: 'pending-upgrade',
-  ABORTED: 'aborted',
-  ACTIVATING: 'activating',
-  ACTIVE: 'active',
-  AVAILABLE: 'available',
-  BACKED_UP: 'backedup',
-  BOUND: 'bound',
-  BUILDING: 'building',
-  COMPLETED: 'completed',
-  CORDONED: 'cordoned',
-  COUNT: 'count',
-  CREATED: 'created',
-  CREATING: 'creating',
-  DEACTIVATING: 'deactivating',
-  DEGRADED: 'degraded',
-  DENIED: 'denied',
-  DEPLOYED: 'deployed',
-  DEPLOYING: 'deploying',
-  DISABLED: 'disabled',
-  DISCONNECTED: 'disconnected',
-  DRAINED: 'drained',
-  DRAINING: 'draining',
-  ENABLED: 'enabled',
-  ERR_APPLIED: 'errapplied',
-  ERROR: 'error',
-  ERRORING: 'erroring',
-  ERRORS: 'errors',
-  EXPIRED: 'expired',
-  EXPIRING: 'expiring',
-  FAIL: 'fail',
-  FAILED: 'failed',
-  HEALTHY: 'healthy',
-  INACTIVE: 'inactive',
-  INFO: 'info',
-  INITIALIZING: 'initializing',
-  INPROGRESS: 'inprogress',
-  LOCKED: 'locked',
-  MIGRATING: 'migrating',
-  MISSING: 'missing',
-  MODIFIED: 'modified',
-  NOT_APPLICABLE: 'notApplicable',
-  NOT_APLLIED: 'notapplied',
-  NOT_READY: 'notready',
-  OFF: 'off',
-  ORPHANED: 'orphaned',
-  OTHER: 'other',
-  OUT_OF_SYNC: 'outofsync',
-  ON_GOING: 'on-going',
-  PASS: 'pass',
-  PASSED: 'passed',
-  PAUSED: 'paused',
-  PENDING: 'pending',
-  PROVISIONING: 'provisioning',
-  PROVISIONED: 'provisioned',
-  PURGED: 'purged',
-  PURGING: 'purging',
-  READY: 'ready',
-  RECONNECTING: 'reconnecting',
-  REGISTERING: 'registering',
-  REINITIALIZING: 'reinitializing',
-  RELEASED: 'released',
-  REMOVED: 'removed',
-  REMOVING: 'removing',
-  REQUESTED: 'requested',
-  RESTARTING: 'restarting',
-  RESTORING: 'restoring',
-  RESIZING: 'resizing',
-  RUNNING: 'running',
-  SKIP: 'skip',
-  SKIPPED: 'skipped',
-  STARTING: 'starting',
-  STOPPED: 'stopped',
-  STOPPING: 'stopping',
-  SUCCEEDED: 'succeeded',
-  SUCCESS: 'success',
-  SUCCESSFUL: 'successful',
-  SUPERSEDED: 'superseded',
-  SUSPENDED: 'suspended',
-  UNAVAILABLE: 'unavailable',
-  UNHEALTHY: 'unhealthy',
-  UNINSTALLED: 'uninstalled',
-  UNINSTALLING: 'uninstalling',
-  UNKNOWN: 'unknown',
-  UNTRIGGERED: 'untriggered',
-  UPDATING: 'updating',
-  WAIT_APPLIED: 'waitapplied',
-  WAIT_CHECKIN: 'waitcheckin',
-  WAITING: 'waiting',
-  WARNING: 'warning',
+  PENDING_UPGRADE:  'pending-upgrade',
+  ABORTED:          'aborted',
+  ACTIVATING:       'activating',
+  ACTIVE:           'active',
+  AVAILABLE:        'available',
+  BACKED_UP:        'backedup',
+  BOUND:            'bound',
+  BUILDING:         'building',
+  COMPLETED:        'completed',
+  CORDONED:         'cordoned',
+  COUNT:            'count',
+  CREATED:          'created',
+  CREATING:         'creating',
+  DEACTIVATING:     'deactivating',
+  DEGRADED:         'degraded',
+  DENIED:           'denied',
+  DEPLOYED:         'deployed',
+  DEPLOYING:        'deploying',
+  DISABLED:         'disabled',
+  DISCONNECTED:     'disconnected',
+  DRAINED:          'drained',
+  DRAINING:         'draining',
+  ENABLED:          'enabled',
+  ERR_APPLIED:      'errapplied',
+  ERROR:            'error',
+  ERRORING:         'erroring',
+  ERRORS:           'errors',
+  EXPIRED:          'expired',
+  EXPIRING:         'expiring',
+  FAIL:             'fail',
+  FAILED:           'failed',
+  HEALTHY:          'healthy',
+  INACTIVE:         'inactive',
+  INFO:             'info',
+  INITIALIZING:     'initializing',
+  INPROGRESS:       'inprogress',
+  LOCKED:           'locked',
+  MIGRATING:        'migrating',
+  MISSING:          'missing',
+  MODIFIED:         'modified',
+  NOT_APPLICABLE:   'notApplicable',
+  NOT_APLLIED:      'notapplied',
+  NOT_READY:        'notready',
+  OFF:              'off',
+  ORPHANED:         'orphaned',
+  OTHER:            'other',
+  OUT_OF_SYNC:      'outofsync',
+  ON_GOING:         'on-going',
+  PASS:             'pass',
+  PASSED:           'passed',
+  PAUSED:           'paused',
+  PENDING:          'pending',
+  PROVISIONING:     'provisioning',
+  PROVISIONED:      'provisioned',
+  PURGED:           'purged',
+  PURGING:          'purging',
+  READY:            'ready',
+  RECONNECTING:     'reconnecting',
+  REGISTERING:      'registering',
+  REINITIALIZING:   'reinitializing',
+  RELEASED:         'released',
+  REMOVED:          'removed',
+  REMOVING:         'removing',
+  REQUESTED:        'requested',
+  RESTARTING:       'restarting',
+  RESTORING:        'restoring',
+  RESIZING:         'resizing',
+  RUNNING:          'running',
+  SKIP:             'skip',
+  SKIPPED:          'skipped',
+  STARTING:         'starting',
+  STOPPED:          'stopped',
+  STOPPING:         'stopping',
+  SUCCEEDED:        'succeeded',
+  SUCCESS:          'success',
+  SUCCESSFUL:       'successful',
+  SUPERSEDED:       'superseded',
+  SUSPENDED:        'suspended',
+  UNAVAILABLE:      'unavailable',
+  UNHEALTHY:        'unhealthy',
+  UNINSTALLED:      'uninstalled',
+  UNINSTALLING:     'uninstalling',
+  UNKNOWN:          'unknown',
+  UNTRIGGERED:      'untriggered',
+  UPDATING:         'updating',
+  WAIT_APPLIED:     'waitapplied',
+  WAIT_CHECKIN:     'waitcheckin',
+  WAITING:          'waiting',
+  WARNING:          'warning',
 };
 
 export function mapStateToEnum(statusString) {
@@ -161,561 +161,561 @@ export function mapStateToEnum(statusString) {
 
 export const STATES = {
   [STATES_ENUM.IN_USE]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'In Use',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'In Use',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.IN_PROGRESS]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'In Progress',
+    color:        'info',
+    icon:         'tag',
+    label:        'In Progress',
     compoundIcon: 'info',
   },
   [STATES_ENUM.PENDING_ROLLBACK]: {
-    color: 'info',
-    icon: 'dot-half',
-    label: 'Pending Rollback',
+    color:        'info',
+    icon:         'dot-half',
+    label:        'Pending Rollback',
     compoundIcon: 'info',
   },
   [STATES_ENUM.PENDING_UPGRADE]: {
-    color: 'info',
-    icon: 'dot-half',
-    label: 'Pending Update',
+    color:        'info',
+    icon:         'dot-half',
+    label:        'Pending Update',
     compoundIcon: 'info',
   },
   [STATES_ENUM.ABORTED]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Aborted',
+    color:        'warning',
+    icon:         'error',
+    label:        'Aborted',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.ACTIVATING]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Activating',
+    color:        'info',
+    icon:         'tag',
+    label:        'Activating',
     compoundIcon: 'info',
   },
   [STATES_ENUM.ACTIVE]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Active',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Active',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.AVAILABLE]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Available',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Available',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.BACKED_UP]: {
-    color: 'success',
-    icon: 'backup',
-    label: 'Backed Up',
+    color:        'success',
+    icon:         'backup',
+    label:        'Backed Up',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.BOUND]: {
-    color: 'success',
-    icon: 'dot',
-    label: 'Bound',
+    color:        'success',
+    icon:         'dot',
+    label:        'Bound',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.BUILDING]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Building',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Building',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.COMPLETED]: {
-    color: 'success',
-    icon: 'dot',
-    label: 'Completed',
+    color:        'success',
+    icon:         'dot',
+    label:        'Completed',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.CORDONED]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Cordoned',
+    color:        'info',
+    icon:         'tag',
+    label:        'Cordoned',
     compoundIcon: 'info',
   },
   [STATES_ENUM.COUNT]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Count',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Count',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.CREATED]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Created',
+    color:        'info',
+    icon:         'tag',
+    label:        'Created',
     compoundIcon: 'info',
   },
   [STATES_ENUM.CREATING]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Creating',
+    color:        'info',
+    icon:         'tag',
+    label:        'Creating',
     compoundIcon: 'info',
   },
   [STATES_ENUM.DEACTIVATING]: {
-    color: 'info',
-    icon: 'adjust',
-    label: 'Deactivating',
+    color:        'info',
+    icon:         'adjust',
+    label:        'Deactivating',
     compoundIcon: 'info',
   },
   [STATES_ENUM.DEGRADED]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Degraded',
+    color:        'warning',
+    icon:         'error',
+    label:        'Degraded',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.DENIED]: {
-    color: 'error',
-    icon: 'adjust',
-    label: 'Denied',
+    color:        'error',
+    icon:         'adjust',
+    label:        'Denied',
     compoundIcon: 'error',
   },
   [STATES_ENUM.DEPLOYED]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Deployed',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Deployed',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.DISABLED]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Disabled',
+    color:        'warning',
+    icon:         'error',
+    label:        'Disabled',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.DISCONNECTED]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Disconnected',
+    color:        'warning',
+    icon:         'error',
+    label:        'Disconnected',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.DRAINED]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Drained',
+    color:        'info',
+    icon:         'tag',
+    label:        'Drained',
     compoundIcon: 'info',
   },
   [STATES_ENUM.DRAINING]: {
-    color: 'warning',
-    icon: 'tag',
-    label: 'Draining',
+    color:        'warning',
+    icon:         'tag',
+    label:        'Draining',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.ENABLED]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Enabled',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Enabled',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.ERR_APPLIED]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Error Applied',
+    color:        'error',
+    icon:         'error',
+    label:        'Error Applied',
     compoundIcon: 'error',
   },
   [STATES_ENUM.ERROR]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Error',
+    color:        'error',
+    icon:         'error',
+    label:        'Error',
     compoundIcon: 'error',
   },
   [STATES_ENUM.ERRORING]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Erroring',
+    color:        'error',
+    icon:         'error',
+    label:        'Erroring',
     compoundIcon: 'error',
   },
   [STATES_ENUM.ERRORS]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Errors',
+    color:        'error',
+    icon:         'error',
+    label:        'Errors',
     compoundIcon: 'error',
   },
   [STATES_ENUM.EXPIRED]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Expired',
+    color:        'error',
+    icon:         'error',
+    label:        'Expired',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.EXPIRING]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Expiring',
+    color:        'warning',
+    icon:         'error',
+    label:        'Expiring',
     compoundIcon: 'error',
   },
   [STATES_ENUM.FAIL]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Fail',
+    color:        'error',
+    icon:         'error',
+    label:        'Fail',
     compoundIcon: 'error',
   },
   [STATES_ENUM.FAILED]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Failed',
+    color:        'error',
+    icon:         'error',
+    label:        'Failed',
     compoundIcon: 'error',
   },
   [STATES_ENUM.HEALTHY]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Healthy',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Healthy',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.INACTIVE]: {
-    color: 'error',
-    icon: 'dot',
-    label: 'Inactive',
+    color:        'error',
+    icon:         'dot',
+    label:        'Inactive',
     compoundIcon: 'error',
   },
   [STATES_ENUM.INITIALIZING]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Initializing',
+    color:        'warning',
+    icon:         'error',
+    label:        'Initializing',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.INPROGRESS]: {
-    color: 'info',
-    icon: 'spinner',
-    label: 'In Progress',
+    color:        'info',
+    icon:         'spinner',
+    label:        'In Progress',
     compoundIcon: 'info',
   },
   [STATES_ENUM.INFO]: {
-    color: 'info',
-    icon: 'info',
-    label: 'Info',
+    color:        'info',
+    icon:         'info',
+    label:        'Info',
     compoundIcon: 'info',
   },
   [STATES_ENUM.LOCKED]: {
-    color: 'warning',
-    icon: 'adjust',
-    label: 'Locked',
+    color:        'warning',
+    icon:         'adjust',
+    label:        'Locked',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.MIGRATING]: {
-    color: 'info',
-    icon: 'info',
-    label: 'Migrated',
+    color:        'info',
+    icon:         'info',
+    label:        'Migrated',
     compoundIcon: 'info',
   },
   [STATES_ENUM.MISSING]: {
-    color: 'warning',
-    icon: 'adjust',
-    label: 'Missing',
+    color:        'warning',
+    icon:         'adjust',
+    label:        'Missing',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.MODIFIED]: {
-    color: 'warning',
-    icon: 'edit',
-    label: 'Modified',
+    color:        'warning',
+    icon:         'edit',
+    label:        'Modified',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.NOT_APPLICABLE]: {
-    color: 'warning',
-    icon: 'tag',
-    label: 'Not Applicable',
+    color:        'warning',
+    icon:         'tag',
+    label:        'Not Applicable',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.NOT_APLLIED]: {
-    color: 'warning',
-    icon: 'tag',
-    label: 'Not Applied',
+    color:        'warning',
+    icon:         'tag',
+    label:        'Not Applied',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.NOT_READY]: {
-    color: 'warning',
-    icon: 'tag',
-    label: 'Not Ready',
+    color:        'warning',
+    icon:         'tag',
+    label:        'Not Ready',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.OFF]: {
     color: 'darker',
-    icon: 'error',
+    icon:  'error',
     label: 'Off',
   },
   [STATES_ENUM.ON_GOING]: {
-    color: 'info',
-    icon: 'info',
-    label: 'Info',
+    color:        'info',
+    icon:         'info',
+    label:        'Info',
     compoundIcon: 'info',
   },
   [STATES_ENUM.ORPHANED]: {
-    color: 'warning',
-    icon: 'tag',
-    label: 'Orphaned',
+    color:        'warning',
+    icon:         'tag',
+    label:        'Orphaned',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.OTHER]: {
-    color: 'info',
-    icon: 'info',
-    label: 'Other',
+    color:        'info',
+    icon:         'info',
+    label:        'Other',
     compoundIcon: 'info',
   },
   [STATES_ENUM.OUT_OF_SYNC]: {
-    color: 'warning',
-    icon: 'tag',
-    label: 'Out Of Sync',
+    color:        'warning',
+    icon:         'tag',
+    label:        'Out Of Sync',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.PASS]: {
-    color: 'success',
-    icon: 'dot-dotfill',
-    label: 'Pass',
+    color:        'success',
+    icon:         'dot-dotfill',
+    label:        'Pass',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.PASSED]: {
-    color: 'success',
-    icon: 'dot-dotfill',
-    label: 'Passed',
+    color:        'success',
+    icon:         'dot-dotfill',
+    label:        'Passed',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.PAUSED]: {
-    color: 'info',
-    icon: 'info',
-    label: 'Paused',
+    color:        'info',
+    icon:         'info',
+    label:        'Paused',
     compoundIcon: 'info',
   },
   [STATES_ENUM.PENDING]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Pending',
+    color:        'info',
+    icon:         'tag',
+    label:        'Pending',
     compoundIcon: 'info',
   },
   [STATES_ENUM.PROVISIONING]: {
-    color: 'info',
-    icon: 'dot',
-    label: 'Provisioning',
+    color:        'info',
+    icon:         'dot',
+    label:        'Provisioning',
     compoundIcon: 'info',
   },
   [STATES_ENUM.PROVISIONED]: {
-    color: 'success',
-    icon: 'dot',
-    label: 'Provisioned',
+    color:        'success',
+    icon:         'dot',
+    label:        'Provisioned',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.PURGED]: {
-    color: 'error',
-    icon: 'purged',
-    label: 'Purged',
+    color:        'error',
+    icon:         'purged',
+    label:        'Purged',
     compoundIcon: 'error',
   },
   [STATES_ENUM.PURGING]: {
-    color: 'info',
-    icon: 'purged',
-    label: 'Purging',
+    color:        'info',
+    icon:         'purged',
+    label:        'Purging',
     compoundIcon: 'info',
   },
   [STATES_ENUM.READY]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Ready',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Ready',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.RECONNECTING]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Reconnecting',
+    color:        'error',
+    icon:         'error',
+    label:        'Reconnecting',
     compoundIcon: 'error',
   },
   [STATES_ENUM.REGISTERING]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Registering',
+    color:        'info',
+    icon:         'tag',
+    label:        'Registering',
     compoundIcon: 'info',
   },
   [STATES_ENUM.REINITIALIZING]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Reinitializing',
+    color:        'warning',
+    icon:         'error',
+    label:        'Reinitializing',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.RELEASED]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Released',
+    color:        'warning',
+    icon:         'error',
+    label:        'Released',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.REMOVED]: {
-    color: 'error',
-    icon: 'trash',
-    label: 'Removed',
+    color:        'error',
+    icon:         'trash',
+    label:        'Removed',
     compoundIcon: 'error',
   },
   [STATES_ENUM.REMOVING]: {
-    color: 'info',
-    icon: 'trash',
-    label: 'Removing',
+    color:        'info',
+    icon:         'trash',
+    label:        'Removing',
     compoundIcon: 'info',
   },
   [STATES_ENUM.REQUESTED]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Requested',
+    color:        'info',
+    icon:         'tag',
+    label:        'Requested',
     compoundIcon: 'info',
   },
   [STATES_ENUM.RESTARTING]: {
-    color: 'info',
-    icon: 'adjust',
-    label: 'Restarting',
+    color:        'info',
+    icon:         'adjust',
+    label:        'Restarting',
     compoundIcon: 'info',
   },
   [STATES_ENUM.RESTORING]: {
-    color: 'info',
-    icon: 'medicalcross',
-    label: 'Restoring',
+    color:        'info',
+    icon:         'medicalcross',
+    label:        'Restoring',
     compoundIcon: 'info',
   },
   [STATES_ENUM.RESIZING]: {
-    color: 'warning',
-    icon: 'dot',
-    label: 'Resizing',
+    color:        'warning',
+    icon:         'dot',
+    label:        'Resizing',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.RUNNING]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Running',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Running',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.SKIP]: {
-    color: 'info',
-    icon: 'dot-open',
-    label: 'Skip',
+    color:        'info',
+    icon:         'dot-open',
+    label:        'Skip',
     compoundIcon: 'info',
   },
   [STATES_ENUM.SKIPPED]: {
-    color: 'info',
-    icon: 'dot-open',
-    label: 'Skipped',
+    color:        'info',
+    icon:         'dot-open',
+    label:        'Skipped',
     compoundIcon: 'info',
   },
   [STATES_ENUM.STARTING]: {
-    color: 'info',
-    icon: 'adjust',
-    label: 'Starting',
+    color:        'info',
+    icon:         'adjust',
+    label:        'Starting',
     compoundIcon: 'info',
   },
   [STATES_ENUM.STOPPED]: {
-    color: 'error',
-    icon: 'dot',
-    label: 'Stopped',
+    color:        'error',
+    icon:         'dot',
+    label:        'Stopped',
     compoundIcon: 'error',
   },
   [STATES_ENUM.STOPPING]: {
-    color: 'info',
-    icon: 'adjust',
-    label: 'Stopping',
+    color:        'info',
+    icon:         'adjust',
+    label:        'Stopping',
     compoundIcon: 'info',
   },
   [STATES_ENUM.SUCCEEDED]: {
-    color: 'success',
-    icon: 'dot-dotfill',
-    label: 'Succeeded',
+    color:        'success',
+    icon:         'dot-dotfill',
+    label:        'Succeeded',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.SUCCESS]: {
-    color: 'success',
-    icon: 'dot-open',
-    label: 'Success',
+    color:        'success',
+    icon:         'dot-open',
+    label:        'Success',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.SUCCESSFUL]: {
     color: 'success',
-    icon: 'dot-open',
+    icon:  'dot-open',
     label: 'Successful',
   },
   [STATES_ENUM.SUPERSEDED]: {
-    color: 'info',
-    icon: 'dot-open',
-    label: 'Superseded',
+    color:        'info',
+    icon:         'dot-open',
+    label:        'Superseded',
     compoundIcon: 'info',
   },
   [STATES_ENUM.SUSPENDED]: {
-    color: 'info',
-    icon: 'pause',
-    label: 'Suspended',
+    color:        'info',
+    icon:         'pause',
+    label:        'Suspended',
     compoundIcon: 'info',
   },
   [STATES_ENUM.UNAVAILABLE]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Unavailable',
+    color:        'error',
+    icon:         'error',
+    label:        'Unavailable',
     compoundIcon: 'error',
   },
   [STATES_ENUM.UNHEALTHY]: {
-    color: 'error',
-    icon: 'error',
-    label: 'Unhealthy',
+    color:        'error',
+    icon:         'error',
+    label:        'Unhealthy',
     compoundIcon: 'error',
   },
   [STATES_ENUM.UNINSTALLED]: {
-    color: 'info',
-    icon: 'trash',
-    label: 'Uninstalled',
+    color:        'info',
+    icon:         'trash',
+    label:        'Uninstalled',
     compoundIcon: 'info',
   },
   [STATES_ENUM.UNINSTALLING]: {
-    color: 'info',
-    icon: 'trash',
-    label: 'Uninstalling',
+    color:        'info',
+    icon:         'trash',
+    label:        'Uninstalling',
     compoundIcon: 'info',
   },
   [STATES_ENUM.UNKNOWN]: {
-    color: 'warning',
-    icon: 'x',
-    label: 'Unknown',
+    color:        'warning',
+    icon:         'x',
+    label:        'Unknown',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.UNTRIGGERED]: {
-    color: 'success',
-    icon: 'tag',
-    label: 'Untriggered',
+    color:        'success',
+    icon:         'tag',
+    label:        'Untriggered',
     compoundIcon: 'checkmark',
   },
   [STATES_ENUM.UPDATING]: {
-    color: 'warning',
-    icon: 'tag',
-    label: 'Updating',
+    color:        'warning',
+    icon:         'tag',
+    label:        'Updating',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.WAIT_APPLIED]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Wait Applied',
+    color:        'info',
+    icon:         'tag',
+    label:        'Wait Applied',
     compoundIcon: 'info',
   },
   [STATES_ENUM.WAIT_CHECKIN]: {
-    color: 'warning',
-    icon: 'tag',
-    label: 'Wait Checkin',
+    color:        'warning',
+    icon:         'tag',
+    label:        'Wait Checkin',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.WAITING]: {
-    color: 'info',
-    icon: 'tag',
-    label: 'Waiting',
+    color:        'info',
+    icon:         'tag',
+    label:        'Waiting',
     compoundIcon: 'info',
   },
   [STATES_ENUM.WARNING]: {
-    color: 'warning',
-    icon: 'error',
-    label: 'Warning',
+    color:        'warning',
+    icon:         'error',
+    label:        'Warning',
     compoundIcon: 'warning',
   },
   [STATES_ENUM.DEPLOYING]: {
-    color: 'info',
-    icon: 'info',
-    label: 'Deploying',
+    color:        'info',
+    icon:         'info',
+    label:        'Deploying',
     compoundIcon: 'info',
   },
 };
 
 export function getStatesByType(type = 'info') {
   const out = {
-    info: [],
-    error: [],
+    info:    [],
+    error:   [],
     success: [],
     warning: [],
     unknown: [],
@@ -735,21 +735,19 @@ export function getStatesByType(type = 'info') {
 }
 
 const SORT_ORDER = {
-  error: 1,
-  warning: 2,
-  info: 3,
-  success: 4,
-  ready: 5,
+  error:    1,
+  warning:  2,
+  info:     3,
+  success:  4,
+  ready:    5,
   notready: 6,
-  other: 7,
+  other:    7,
 };
 
 export function getStateLabel(state) {
   const lowercaseState = state.toLowerCase();
 
-  return STATES[lowercaseState]
-    ? STATES[lowercaseState].label
-    : STATES[STATES_ENUM.UNKNOWN].label;
+  return STATES[lowercaseState] ? STATES[lowercaseState].label : STATES[STATES_ENUM.UNKNOWN].label;
 }
 
 export function colorForState(state, isError, isTransitioning) {
@@ -772,7 +770,7 @@ export function colorForState(state, isError, isTransitioning) {
     color = DEFAULT_COLOR;
   }
 
-  return `text-${color}`;
+  return `text-${ color }`;
 }
 
 export function stateDisplay(state) {
@@ -806,8 +804,7 @@ export function primaryDisplayStatusFromCount(status) {
       return status[key] > 0 && statusOrder.includes(key.toLowerCase());
     })
     .sort(
-      (a, b) =>
-        statusOrder.indexOf(a.toLowerCase()) -
+      (a, b) => statusOrder.indexOf(a.toLowerCase()) -
         statusOrder.indexOf(b.toLowerCase())
     );
 
@@ -817,7 +814,7 @@ export function primaryDisplayStatusFromCount(status) {
 export function stateSort(color, display) {
   color = color.replace(/^(text|bg)-/, '');
 
-  return `${SORT_ORDER[color] || SORT_ORDER['other']} ${display}`;
+  return `${ SORT_ORDER[color] || SORT_ORDER['other'] } ${ display }`;
 }
 
 export function isConditionReadyAndWaiting(condition) {
@@ -846,24 +843,24 @@ export default class Resource {
     }
 
     Object.defineProperty(this, '$ctx', {
-      value: markRaw(ctx),
+      value:      markRaw(ctx),
       enumerable: false,
     });
 
     if (rehydrateNamespace) {
       Object.defineProperty(this, '__rehydrate', {
-        value: rehydrateNamespace,
-        enumerable: true,
+        value:        rehydrateNamespace,
+        enumerable:   true,
         configurable: true,
       });
     }
 
     if (setClone) {
       Object.defineProperty(this, '__clone', {
-        value: true,
-        enumerable: true,
+        value:        true,
+        enumerable:   true,
         configurable: true,
-        writable: true,
+        writable:     true,
       });
     }
   }
@@ -924,15 +921,15 @@ export default class Resource {
       }
 
       if (m.namespace) {
-        return `${this.type}/${m.namespace}/${m.name}`;
+        return `${ this.type }/${ m.namespace }/${ m.name }`;
       }
     }
 
     if (this.id) {
-      return `${this.type}/${this.id}`;
+      return `${ this.type }/${ this.id }`;
     }
 
-    return `${this.type}/${Math.random()}`;
+    return `${ this.type }/${ Math.random() }`;
   }
 
   get schema() {
@@ -940,7 +937,7 @@ export default class Resource {
   }
 
   toString() {
-    return `[${this.type}: ${this.id}]`;
+    return `[${ this.type }: ${ this.id }]`;
   }
 
   get typeDisplay() {
@@ -972,7 +969,7 @@ export default class Resource {
     const name = this.nameDisplay;
 
     if (namespace) {
-      return `${namespace}:${name}`;
+      return `${ namespace }:${ name }`;
     }
 
     return name;
@@ -987,9 +984,7 @@ export default class Resource {
     let out;
 
     if (name) {
-      out = this.t('resourceTable.groupLabel.namespace', {
-        name: escapeHtml(name),
-      });
+      out = this.t('resourceTable.groupLabel.namespace', { name: escapeHtml(name) });
     } else {
       out = this.t('resourceTable.groupLabel.notInANamespace');
     }
@@ -1059,7 +1054,7 @@ export default class Resource {
       icon = DEFAULT_ICON;
     }
 
-    return `icon icon-${icon}`;
+    return `icon icon-${ icon }`;
   }
 
   get stateSort() {
@@ -1095,7 +1090,7 @@ export default class Resource {
       () => {
         return (this.state || '').toLowerCase() === state.toLowerCase();
       },
-      `state=${state}`,
+      `state=${ state }`,
       timeout,
       interval
     );
@@ -1117,7 +1112,7 @@ export default class Resource {
       () => {
         return this.hasAction(name);
       },
-      `action=${name}`,
+      `action=${ name }`,
       undefined,
       undefined
     );
@@ -1128,7 +1123,7 @@ export default class Resource {
       () => {
         return this.hasLink(name);
       },
-      `link=${name}`,
+      `link=${ name }`,
       undefined,
       undefined
     );
@@ -1153,7 +1148,7 @@ export default class Resource {
       return true;
     }
 
-    return (entry.status || '').toLowerCase() === `${withStatus}`.toLowerCase();
+    return (entry.status || '').toLowerCase() === `${ withStatus }`.toLowerCase();
   }
 
   waitForCondition(
@@ -1166,7 +1161,7 @@ export default class Resource {
       () => {
         return this.isCondition(name, withStatus);
       },
-      `condition ${name}=${withStatus}`,
+      `condition ${ name }=${ withStatus }`,
       timeoutMs,
       intervalMs
     );
@@ -1228,21 +1223,21 @@ export default class Resource {
     const all = [
       { divider: true },
       {
-        action: this.canUpdate ? 'goToEdit' : 'goToViewConfig',
-        label: this.t(this.canUpdate ? 'action.edit' : 'action.view'),
-        icon: 'icon icon-edit',
+        action:  this.canUpdate ? 'goToEdit' : 'goToViewConfig',
+        label:   this.t(this.canUpdate ? 'action.edit' : 'action.view'),
+        icon:    'icon icon-edit',
         enabled: this.canCustomEdit,
       },
       {
-        action: this.canEditYaml ? 'goToEditYaml' : 'goToViewYaml',
-        label: this.t(this.canEditYaml ? 'action.editYaml' : 'action.viewYaml'),
-        icon: 'icon icon-file',
+        action:  this.canEditYaml ? 'goToEditYaml' : 'goToViewYaml',
+        label:   this.t(this.canEditYaml ? 'action.editYaml' : 'action.viewYaml'),
+        icon:    'icon icon-file',
         enabled: this.canYaml,
       },
       {
-        action: this.canCustomEdit ? 'goToClone' : 'cloneYaml',
-        label: this.t('action.clone'),
-        icon: 'icon icon-copy',
+        action:  this.canCustomEdit ? 'goToClone' : 'cloneYaml',
+        label:   this.t('action.clone'),
+        icon:    'icon icon-copy',
         enabled:
           this.canClone &&
           this.canCreate &&
@@ -1250,29 +1245,29 @@ export default class Resource {
       },
       { divider: true },
       {
-        action: 'download',
-        label: this.t('action.download'),
-        icon: 'icon icon-download',
-        bulkable: true,
+        action:     'download',
+        label:      this.t('action.download'),
+        icon:       'icon icon-download',
+        bulkable:   true,
         bulkAction: 'downloadBulk',
-        enabled: this.canYaml,
-        weight: -9,
+        enabled:    this.canYaml,
+        weight:     -9,
       },
       {
-        action: 'viewInApi',
-        label: this.t('action.viewInApi'),
-        icon: 'icon icon-external-link',
+        action:  'viewInApi',
+        label:   this.t('action.viewInApi'),
+        icon:    'icon icon-external-link',
         enabled: this.canViewInApi,
       },
       {
-        action: 'promptRemove',
-        altAction: 'remove',
-        label: this.t('action.remove'),
-        icon: 'icon icon-trash',
-        bulkable: true,
-        enabled: this.canDelete,
+        action:     'promptRemove',
+        altAction:  'remove',
+        label:      this.t('action.remove'),
+        icon:       'icon icon-trash',
+        bulkable:   true,
+        enabled:    this.canDelete,
         bulkAction: 'promptRemove',
-        weight: -10, // Delete always goes last
+        weight:     -10, // Delete always goes last
       },
     ];
 
@@ -1288,26 +1283,24 @@ export default class Resource {
         const typeofEnabled = typeof enabledFn;
 
         switch (typeofEnabled) {
-          case 'undefined':
-            newActionInstance.enabled = true;
-            break;
-          case 'function':
-            Object.defineProperty(newActionInstance, 'enabled', {
-              get: () => enabledFn(this),
-            });
-            break;
-          case 'boolean':
-            // no op, just use it directly
-            break;
-          default:
-            // unsupported value
-            console.warn(
-              `Unsupported 'enabled' property type for action: ${
-                action.label || action.labelKey
-              }`
-            ); // eslint-disable-line no-console
-            delete newActionInstance.enabled;
-            break;
+        case 'undefined':
+          newActionInstance.enabled = true;
+          break;
+        case 'function':
+          Object.defineProperty(newActionInstance, 'enabled', { get: () => enabledFn(this) });
+          break;
+        case 'boolean':
+          // no op, just use it directly
+          break;
+        default:
+          // unsupported value
+          console.warn(
+            `Unsupported 'enabled' property type for action: ${
+              action.label || action.labelKey
+            }`
+          ); // eslint-disable-line no-console
+          delete newActionInstance.enabled;
+          break;
         }
 
         all.push(newActionInstance);
@@ -1371,9 +1364,7 @@ export default class Resource {
   }
 
   get canEditYaml() {
-    return this.schema?.resourceMethods?.find((x) => x === 'blocked-PUT')
-      ? false
-      : this.canUpdate;
+    return this.schema?.resourceMethods?.find((x) => x === 'blocked-PUT') ? false : this.canUpdate;
   }
 
   // ------------------------------------------------------------------
@@ -1396,7 +1387,7 @@ export default class Resource {
     }
 
     if (!opt.url) {
-      throw new Error(`Unknown link ${linkName} on ${this.type} ${this.id}`);
+      throw new Error(`Unknown link ${ linkName } on ${ this.type } ${ this.id }`);
     }
 
     return this.$dispatch('request', { opt, type: this.type });
@@ -1455,9 +1446,7 @@ export default class Resource {
     opt.headers = opt.headers || {};
 
     if (!opt.headers['content-type']) {
-      const contentType = merge
-        ? 'application/strategic-merge-patch+json'
-        : 'application/json-patch+json';
+      const contentType = merge ? 'application/strategic-merge-patch+json' : 'application/json-patch+json';
 
       opt.headers['content-type'] = contentType;
     }
@@ -1468,20 +1457,20 @@ export default class Resource {
     return !alertOnError
       ? dispatch
       : dispatch.catch((e) => {
-          const title = this.t('resource.errors.update', { name: this.name });
+        const title = this.t('resource.errors.update', { name: this.name });
 
-          console.error(title, e); // eslint-disable-line no-console
+        console.error(title, e); // eslint-disable-line no-console
 
-          this.$dispatch(
-            'growl/error',
-            {
-              title,
-              message: e?.message,
-              timeout: 5000,
-            },
-            { root: true }
-          );
-        });
+        this.$dispatch(
+          'growl/error',
+          {
+            title,
+            message: e?.message,
+            timeout: 5000,
+          },
+          { root: true }
+        );
+      });
   }
 
   save() {
@@ -1514,7 +1503,7 @@ export default class Resource {
     }
 
     if (this.metadata?.resourceVersion) {
-      this.metadata.resourceVersion = `${this.metadata.resourceVersion}`;
+      this.metadata.resourceVersion = `${ this.metadata.resourceVersion }`;
     }
 
     if (!opt.url) {
@@ -1528,7 +1517,7 @@ export default class Resource {
           this.metadata &&
           this.metadata.namespace
         ) {
-          url += `/${this.metadata.namespace}`;
+          url += `/${ this.metadata.namespace }`;
         }
 
         opt.url = url;
@@ -1578,7 +1567,7 @@ export default class Resource {
     if (opt?.replace && opt.method === 'put') {
       const argParam = opt.url.includes('?') ? '&' : '?';
 
-      opt.url = `${opt.url}${argParam}_replace=true`;
+      opt.url = `${ opt.url }${ argParam }_replace=true`;
       delete opt.replace;
     }
 
@@ -1591,7 +1580,7 @@ export default class Resource {
       // Steve sometimes returns Table responses instead of the resource you just saved.. ignore
       if (res && res.kind !== 'Table') {
         await this.$dispatch('load', {
-          data: res,
+          data:     res,
           existing: forNew ? this : undefined,
         });
       }
@@ -1600,8 +1589,8 @@ export default class Resource {
         // If there's a conflict, try to load the new version
         await this.$dispatch('find', {
           type: this.type,
-          id: this.id,
-          opt: { force: true },
+          id:   this.id,
+          opt:  { force: true },
         });
       }
 
@@ -1643,10 +1632,10 @@ export default class Resource {
 
   get listLocation() {
     return {
-      name: `c-cluster-product-resource`,
+      name:   `c-cluster-product-resource`,
       params: {
-        product: this.$rootGetters['productId'],
-        cluster: this.$rootGetters['clusterId'],
+        product:  this.$rootGetters['productId'],
+        cluster:  this.$rootGetters['clusterId'],
         resource: this.type,
       },
     };
@@ -1662,9 +1651,9 @@ export default class Resource {
         schema?.attributes?.namespaced ? '-namespace' : ''
       }-id`,
       params: {
-        product: this.$rootGetters['productId'],
-        cluster: this.$rootGetters['clusterId'],
-        resource: this.type,
+        product:   this.$rootGetters['productId'],
+        cluster:   this.$rootGetters['clusterId'],
+        resource:  this.type,
         namespace: this.metadata?.namespace,
         id,
       },
@@ -1691,7 +1680,7 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _CLONE,
-      [AS]: _UNFLAG,
+      [AS]:   _UNFLAG,
       ...moreQuery,
     };
 
@@ -1704,7 +1693,7 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _EDIT,
-      [AS]: _UNFLAG,
+      [AS]:   _UNFLAG,
       ...moreQuery,
     };
 
@@ -1717,7 +1706,7 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _VIEW,
-      [AS]: _CONFIG,
+      [AS]:   _CONFIG,
       ...moreQuery,
     };
 
@@ -1730,7 +1719,7 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _EDIT,
-      [AS]: _YAML,
+      [AS]:   _YAML,
     };
 
     this.currentRouter().push(location);
@@ -1742,7 +1731,7 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _VIEW,
-      [AS]: _YAML,
+      [AS]:   _YAML,
     };
 
     this.currentRouter().push(location);
@@ -1754,7 +1743,7 @@ export default class Resource {
     location.query = {
       ...location.query,
       [MODE]: _CLONE,
-      [AS]: _YAML,
+      [AS]:   _YAML,
       ...moreQuery,
     };
 
@@ -1762,12 +1751,10 @@ export default class Resource {
   }
 
   async download() {
-    const value = await this.followLink('view', {
-      headers: { accept: 'application/yaml' },
-    });
+    const value = await this.followLink('view', { headers: { accept: 'application/yaml' } });
     const data = await this.cleanForDownload(value.data);
 
-    downloadFile(`${this.nameDisplay}.yaml`, data, 'application/yaml');
+    downloadFile(`${ this.nameDisplay }.yaml`, data, 'application/yaml');
   }
 
   async downloadBulk(items) {
@@ -1775,11 +1762,11 @@ export default class Resource {
     const names = [];
 
     for (const item of items) {
-      let name = `${item.nameDisplay}.yaml`;
+      let name = `${ item.nameDisplay }.yaml`;
       let i = 2;
 
       while (names.includes(name)) {
-        name = `${item.nameDisplay}_${i++}.yaml`;
+        name = `${ item.nameDisplay }_${ i++ }.yaml`;
       }
 
       names.push(name);
@@ -1788,11 +1775,11 @@ export default class Resource {
     await eachLimit(items, 10, (item, idx) => {
       return item
         .followLink('view', { headers: { accept: 'application/yaml' } })
-        .then(async (data) => {
+        .then(async(data) => {
           const yaml = data.data || data;
           const cleanedYaml = await this.cleanForDownload(yaml);
 
-          files[`resources/${names[idx]}`] = cleanedYaml;
+          files[`resources/${ names[idx] }`] = cleanedYaml;
         });
     });
 
@@ -1821,9 +1808,7 @@ export default class Resource {
 
   get urlFromAttrs() {
     const schema = this.$getters['schemaFor'](this.type);
-    const {
-      metadata: { namespace = 'default' },
-    } = this;
+    const { metadata: { namespace = 'default' } } = this;
     let url = schema.links.collection;
 
     const attributes = schema?.attributes;
@@ -1833,10 +1818,10 @@ export default class Resource {
     }
     const { group, resource } = attributes;
 
-    url = `${url.slice(
+    url = `${ url.slice(
       0,
       url.indexOf('/v1')
-    )}/apis/${group}/namespaces/${namespace}/${resource}`;
+    ) }/apis/${ group }/namespaces/${ namespace }/${ resource }`;
 
     return url;
   }
@@ -1925,25 +1910,25 @@ export default class Resource {
     const isCreate = !this.id;
     const headers = {
       'content-type': 'application/yaml',
-      accept: 'application/json',
+      accept:         'application/json',
     };
 
     if (isCreate) {
       res = await this.schema.followLink('collection', {
         method: 'POST',
         headers,
-        data: yaml,
+        data:   yaml,
       });
     } else {
       res = await this.followLink('update', {
         method: 'PUT',
         headers,
-        data: yaml,
+        data:   yaml,
       });
     }
 
     await this.$dispatch(`load`, {
-      data: res,
+      data:     res,
       existing: isCreate ? this : undefined,
     });
 
@@ -1962,22 +1947,16 @@ export default class Resource {
     const customValidationRulesets = this?.customValidationRules
       .filter((rule) => !!rule.validators || !!rule.required)
       .map((rule) => {
-        const formRules = formRulesGenerator(this.t, {
-          displayKey: rule?.translationKey
-            ? this.t(rule.translationKey)
-            : 'Value',
-        });
+        const formRules = formRulesGenerator(this.t, { displayKey: rule?.translationKey ? this.t(rule.translationKey) : 'Value' });
 
         return {
-          path: rule.path,
+          path:  rule.path,
           rules: [
             ...(rule.validators || []),
             ...(rule.required ? ['required'] : []),
             ...(['dnsLabel', 'dnsLabelRestricted', 'hostname'].includes(
               rule.type
-            )
-              ? [rule.type]
-              : []),
+            ) ? [rule.type] : []),
           ]
             .map((rule) => {
               if (rule.includes(':')) {
@@ -2175,14 +2154,12 @@ export default class Resource {
 
     if (this.owners?.length > 0) {
       details.push({
-        label: this.t('resourceDetail.detailTop.ownerReferences', {
-          count: this.owners.length,
-        }),
+        label:     this.t('resourceDetail.detailTop.ownerReferences', { count: this.owners.length }),
         formatter: 'ListLinkDetail',
-        content: this.owners.map((owner) => ({
-          key: owner.id,
-          row: owner,
-          col: {},
+        content:   this.owners.map((owner) => ({
+          key:   owner.id,
+          row:   owner,
+          col:   {},
           value: owner.metadata.name,
         })),
       });
@@ -2190,10 +2167,10 @@ export default class Resource {
 
     if (get(this, 'metadata.deletionTimestamp')) {
       details.push({
-        label: this.t('resourceDetail.detailTop.deleted'),
-        formatter: 'LiveDate',
+        label:         this.t('resourceDetail.detailTop.deleted'),
+        formatter:     'LiveDate',
         formatterOpts: { addSuffix: true },
-        content: get(this, 'metadata.deletionTimestamp'),
+        content:       get(this, 'metadata.deletionTimestamp'),
       });
     }
 
@@ -2230,20 +2207,20 @@ export default class Resource {
         continue;
       }
 
-      if (!r[`${direction}Type`]) {
+      if (!r[`${ direction }Type`]) {
         continue;
       }
 
       if (r.selector) {
         addObjects(out.selectors, {
-          type: r.toType,
+          type:      r.toType,
           namespace: r.toNamespace,
-          selector: r.selector,
+          selector:  r.selector,
         });
       } else {
-        const type = r[`${direction}Type`];
-        let namespace = r[`${direction}Namespace`];
-        let name = r[`${direction}Id`];
+        const type = r[`${ direction }Type`];
+        let namespace = r[`${ direction }Namespace`];
+        let name = r[`${ direction }Id`];
 
         if (!namespace && name.includes('/')) {
           const idx = name.indexOf('/');
@@ -2252,7 +2229,7 @@ export default class Resource {
           name = name.substr(idx + 1);
         }
 
-        const id = (namespace ? `${namespace}/` : '') + name;
+        const id = (namespace ? `${ namespace }/` : '') + name;
 
         addObject(out.ids, {
           type,

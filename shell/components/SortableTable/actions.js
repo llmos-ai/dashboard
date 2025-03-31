@@ -6,9 +6,9 @@ const displayType = 'inline-block';
 export default {
   data() {
     return {
-      bulkActionsClass: 'bulk',
-      bulkActionClass: 'bulk-action',
-      bulkActionsDropdownClass: 'bulk-actions-dropdown',
+      bulkActionsClass:            'bulk',
+      bulkActionClass:             'bulk-action',
+      bulkActionsDropdownClass:    'bulk-actions-dropdown',
       bulkActionAvailabilityClass: 'action-availability',
 
       hiddenActions: [],
@@ -52,9 +52,7 @@ export default {
         return null;
       }
 
-      return this.t('sortableTable.actionAvailability.selected', {
-        actionable: this.selectedRows.length,
-      });
+      return this.t('sortableTable.actionAvailability.selected', { actionable: this.selectedRows.length });
     },
 
     // Shows a tooltip if the bulk action that the user is hovering over can not be applied to all selected rows
@@ -73,7 +71,7 @@ export default {
 
       return this.t('sortableTable.actionAvailability.some', {
         actionable: runnableTotal,
-        total: this.selectedRows.length,
+        total:      this.selectedRows.length,
       });
     },
   },
@@ -93,10 +91,10 @@ export default {
       }
 
       const actionsContainer = this.$refs.container.querySelector(
-        `.${this.bulkActionsClass}`
+        `.${ this.bulkActionsClass }`
       );
       const actionsDropdown = this.$refs.container.querySelector(
-        `.${this.bulkActionsDropdownClass}`
+        `.${ this.bulkActionsDropdownClass }`
       );
 
       if (!actionsContainer || !actionsDropdown) {
@@ -105,13 +103,13 @@ export default {
 
       const actionsContainerWidth = actionsContainer.offsetWidth;
       const actionsHTMLCollection = this.$refs.container.querySelectorAll(
-        `.${this.bulkActionClass}`
+        `.${ this.bulkActionClass }`
       );
       const actions = Array.from(actionsHTMLCollection || []);
 
       // Determine if the 'x selected' label should show and it's size
       const selectedRowsText = this.$refs.container.querySelector(
-        `.${this.bulkActionAvailabilityClass}`
+        `.${ this.bulkActionAvailabilityClass }`
       );
       let selectedRowsTextWidth = 0;
 

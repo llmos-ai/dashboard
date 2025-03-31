@@ -32,7 +32,7 @@ export default {
 
   props: {
     defaultNamespace: {
-      type: String,
+      type:    String,
       default: 'default',
     },
   },
@@ -40,17 +40,17 @@ export default {
   async fetch() {
     this.allNamespaces = await this.$store.dispatch('cluster/findAll', {
       type: NAMESPACE,
-      opt: { url: 'namespaces' },
+      opt:  { url: 'namespaces' },
     });
   },
 
   data() {
     return {
-      currentYaml: '',
+      currentYaml:   '',
       allNamespaces: [],
-      errors: null,
-      rows: null,
-      done: false,
+      errors:        null,
+      rows:          null,
+      done:          false,
     };
   },
 
@@ -92,7 +92,7 @@ export default {
         this.errors = [];
 
         const res = await this.currentCluster.doAction('apply', {
-          yaml: this.currentYaml,
+          yaml:             this.currentYaml,
           defaultNamespace: this.defaultNamespace,
         });
 
@@ -122,7 +122,11 @@ export default {
 
 <template>
   <Loading v-if="$fetchState.pending" />
-  <a-card v-else data-testid="import-yaml" :trigger-focus-trap="true">
+  <a-card
+    v-else
+    data-testid="import-yaml"
+    :trigger-focus-trap="true"
+  >
     <template #title>
       <!-- TODO: enhancement -->
       <div>
@@ -180,9 +184,18 @@ export default {
       class="yaml-editor"
       @onReady="onReadyYamlEditor"
     />
-    <Banner v-for="(err, i) in errors" :key="i" color="error" :label="err" />
+    <Banner
+      v-for="(err, i) in errors"
+      :key="i"
+      color="error"
+      :label="err"
+    />
     <template #actions>
-      <div v-if="done" class="text-center" style="width: 100%">
+      <div
+        v-if="done"
+        class="text-center"
+        style="width: 100%"
+      >
         <a-button
           :aria-label="t('generic.close')"
           role="button"
@@ -193,7 +206,11 @@ export default {
           {{ t('generic.close') }}
         </a-button>
       </div>
-      <div v-else class="text-center" style="width: 100%">
+      <div
+        v-else
+        class="text-center"
+        style="width: 100%"
+      >
         <a-button
           :aria-label="t('generic.cancel')"
           role="button"

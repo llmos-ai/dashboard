@@ -1,14 +1,14 @@
 <script>
-import ResourceTable from "@shell/components/ResourceTable";
-import Loading from "@shell/components/Loading";
-import Masthead from "./Masthead";
-import ResourceLoadingIndicator from "./ResourceLoadingIndicator";
-import ResourceFetch from "@shell/mixins/resource-fetch";
-import IconMessage from "@shell/components/IconMessage.vue";
-import { ResourceListComponentName } from "./resource-list.config";
-import { PanelLocation, ExtensionPoint } from "@shell/core/types";
-import ExtensionPanel from "@shell/components/ExtensionPanel";
-import { sameContents } from "@shell/utils/array";
+import ResourceTable from '@shell/components/ResourceTable';
+import Loading from '@shell/components/Loading';
+import Masthead from './Masthead';
+import ResourceLoadingIndicator from './ResourceLoadingIndicator';
+import ResourceFetch from '@shell/mixins/resource-fetch';
+import IconMessage from '@shell/components/IconMessage.vue';
+import { ResourceListComponentName } from './resource-list.config';
+import { PanelLocation, ExtensionPoint } from '@shell/core/types';
+import ExtensionPanel from '@shell/components/ExtensionPanel';
+import { sameContents } from '@shell/utils/array';
 
 export default {
   name: ResourceListComponentName,
@@ -25,15 +25,15 @@ export default {
 
   props: {
     hasAdvancedFiltering: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     advFilterHideLabelsAsCols: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     advFilterPreventFilteringLabels: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -59,7 +59,7 @@ export default {
       // - Component contains the PaginatedResourceTable component - go forward method. PaginatedResourceTable owns fetching the resources
       if (
         component?.fetch ||
-        component?.components?.["PaginatedResourceTable"]
+        component?.components?.['PaginatedResourceTable']
       ) {
         this.componentWillFetch = true;
       }
@@ -78,9 +78,9 @@ export default {
     if (!this.componentWillFetch) {
       if (!schema) {
         store.dispatch(
-          "loadingError",
+          'loadingError',
           new Error(
-            this.t("nav.failWhale.resourceListNotFound", { resource }, true)
+            this.t('nav.failWhale.resourceListNotFound', { resource }, true)
           )
         );
 
@@ -102,10 +102,10 @@ export default {
     const params = { ...this.$route.params };
     const resource = params.resource;
 
-    const hasListComponent = getters["type-map/hasCustomList"](resource);
+    const hasListComponent = getters['type-map/hasCustomList'](resource);
 
-    const inStore = getters["currentStore"](resource);
-    const schema = getters[`${inStore}/schemaFor`](resource);
+    const inStore = getters['currentStore'](resource);
+    const schema = getters[`${ inStore }/schemaFor`](resource);
 
     const showMasthead =
       getters[`type-map/optionsFor`](resource).showListMasthead;
@@ -113,24 +113,24 @@ export default {
     return {
       schema,
       hasListComponent,
-      showMasthead: showMasthead === undefined ? true : showMasthead,
+      showMasthead:                     showMasthead === undefined ? true : showMasthead,
       resource,
-      extensionType: ExtensionPoint.PANEL,
-      extensionLocation: PanelLocation.RESOURCE_LIST,
-      loadResources: [resource], // List of resources that will be loaded, this could be many (`Workloads`)
+      extensionType:                    ExtensionPoint.PANEL,
+      extensionLocation:                PanelLocation.RESOURCE_LIST,
+      loadResources:                    [resource], // List of resources that will be loaded, this could be many (`Workloads`)
       /**
        * Will the custom component handle the fetch of resources....
        * or will this instance fetch resources
        */
-      componentWillFetch: false,
+      componentWillFetch:               false,
       // manual refresh
-      manualRefreshInit: false,
-      watch: false,
-      force: false,
+      manualRefreshInit:                false,
+      watch:                            false,
+      force:                            false,
       // Provided by fetch later
-      customTypeDisplay: null,
+      customTypeDisplay:                null,
       // incremental loading
-      loadIndeterminate: false,
+      loadIndeterminate:                false,
       // query param for simple filtering
       useQueryParamsForSimpleFiltering: true,
     };
@@ -143,14 +143,14 @@ export default {
         return [];
       }
 
-      return this.$store.getters["type-map/headersFor"](
+      return this.$store.getters['type-map/headersFor'](
         this.schema,
         this.canPaginate
       );
     },
 
     groupBy() {
-      return this.$store.getters["type-map/groupByFor"](this.schema);
+      return this.$store.getters['type-map/groupByFor'](this.schema);
     },
 
     showIncrementalLoadingIndicator() {
@@ -216,10 +216,10 @@ export default {
 
     const resource = this.$route.params.resource;
     const hasListComponent =
-      this.$store.getters["type-map/hasCustomList"](resource);
+      this.$store.getters['type-map/hasCustomList'](resource);
 
     if (hasListComponent) {
-      listComponent = this.$store.getters["type-map/importList"](resource);
+      listComponent = this.$store.getters['type-map/importList'](resource);
     }
 
     this.listComponent = listComponent;
@@ -248,7 +248,10 @@ export default {
       {{ t("resourceList.nsFilteringGeneric") }}
     </template>
   </IconMessage>
-  <div v-else class="outlet">
+  <div
+    v-else
+    class="outlet"
+  >
     <Masthead
       v-if="showMasthead"
       :type-display="customTypeDisplay"

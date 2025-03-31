@@ -1,20 +1,20 @@
 <script>
-import HookOption from "@shell/components/form/HookOption";
-import { _VIEW } from "@shell/config/query-params";
-import { isEmpty } from "@shell/utils/object";
+import HookOption from '@shell/components/form/HookOption';
+import { _VIEW } from '@shell/config/query-params';
+import { isEmpty } from '@shell/utils/object';
 
 export default {
   components: { HookOption },
 
   props: {
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     // container spec
     value: {
-      type: Object,
+      type:    Object,
       default: () => {
         return {};
       },
@@ -27,7 +27,7 @@ export default {
     return {
       postStart,
       preStop,
-      hookOptions: ["postStart", "preStop"],
+      hookOptions: ['postStart', 'preStop'],
     };
   },
 
@@ -41,15 +41,15 @@ export default {
     update() {
       const out = {
         postStart: this.postStart,
-        preStop: this.preStop,
+        preStop:   this.preStop,
       };
 
       for (const prop in out) {
         const val = out[prop];
 
         if (
-          val === "" ||
-          typeof val === "undefined" ||
+          val === '' ||
+          typeof val === 'undefined' ||
           val === null ||
           isEmpty(val)
         ) {
@@ -59,7 +59,7 @@ export default {
         }
       }
 
-      this.$emit("input", this.value);
+      this.$emit('input', this.value);
     },
   },
 };
@@ -71,14 +71,22 @@ export default {
       <h3 class="clearfix">
         {{ t("workload.container.lifecycleHook.postStart.label") }}
       </h3>
-      <HookOption v-model:value="postStart" :mode="mode" @input="update" />
+      <HookOption
+        v-model:value="postStart"
+        :mode="mode"
+        @input="update"
+      />
     </div>
 
     <div>
       <h3 class="clearfix">
         {{ t("workload.container.lifecycleHook.preStop.label") }}
       </h3>
-      <HookOption v-model:value="preStop" :mode="mode" @input="update" />
+      <HookOption
+        v-model:value="preStop"
+        :mode="mode"
+        @input="update"
+      />
     </div>
   </div>
 </template>

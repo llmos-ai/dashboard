@@ -17,49 +17,49 @@ import { fetchAlertManagerConfigSpecs } from '@shell/utils/alertmanagerconfig';
 // i18n-uses monitoringReceiver.opsgenie.*, monitoringReceiver.webhook.*, monitoringReceiver.custom.*
 export const RECEIVERS_TYPES = [
   {
-    name: 'slack',
+    name:  'slack',
     label: 'monitoringReceiver.slack.label',
     title: 'monitoringReceiver.slack.title',
-    info: 'monitoringReceiver.slack.info',
-    key: 'slackConfigs',
-    logo: require(`@shell/assets/images/vendor/slack.svg`),
+    info:  'monitoringReceiver.slack.info',
+    key:   'slackConfigs',
+    logo:  require(`@shell/assets/images/vendor/slack.svg`),
   },
   {
-    name: 'email',
+    name:  'email',
     label: 'monitoringReceiver.email.label',
     title: 'monitoringReceiver.email.title',
-    key: 'emailConfigs',
-    logo: require(`@shell/assets/images/vendor/email.svg`),
+    key:   'emailConfigs',
+    logo:  require(`@shell/assets/images/vendor/email.svg`),
   },
   {
-    name: 'pagerduty',
+    name:  'pagerduty',
     label: 'monitoringReceiver.pagerduty.label',
     title: 'monitoringReceiver.pagerduty.title',
-    info: 'monitoringReceiver.pagerduty.info',
-    key: 'pagerdutyConfigs',
-    logo: require(`@shell/assets/images/vendor/pagerduty.svg`),
+    info:  'monitoringReceiver.pagerduty.info',
+    key:   'pagerdutyConfigs',
+    logo:  require(`@shell/assets/images/vendor/pagerduty.svg`),
   },
   {
-    name: 'opsgenie',
+    name:  'opsgenie',
     label: 'monitoringReceiver.opsgenie.label',
     title: 'monitoringReceiver.opsgenie.title',
-    key: 'opsgenieConfigs',
-    logo: require(`@shell/assets/images/vendor/email.svg`),
+    key:   'opsgenieConfigs',
+    logo:  require(`@shell/assets/images/vendor/email.svg`),
   },
   {
-    name: 'webhook',
+    name:  'webhook',
     label: 'monitoringReceiver.webhook.label',
     title: 'monitoringReceiver.webhook.title',
-    key: 'webhookConfigs',
-    logo: require(`@shell/assets/images/vendor/webhook.svg`),
+    key:   'webhookConfigs',
+    logo:  require(`@shell/assets/images/vendor/webhook.svg`),
   },
   {
-    name: 'custom',
+    name:  'custom',
     label: 'monitoringReceiver.custom.label',
     title: 'monitoringReceiver.custom.title',
-    info: 'monitoringReceiver.custom.info',
-    key: 'webhookConfigs',
-    logo: require(`@shell/assets/images/vendor/custom.svg`),
+    info:  'monitoringReceiver.custom.info',
+    key:   'webhookConfigs',
+    logo:  require(`@shell/assets/images/vendor/custom.svg`),
   },
 ];
 
@@ -77,25 +77,25 @@ export default {
 
   props: {
     value: {
-      type: Object,
+      type:    Object,
       default: () => {
         return {};
       },
     },
     mode: {
-      type: String,
+      type:    String,
       default: '',
     },
     alertmanagerConfigResource: {
-      type: Object,
+      type:     Object,
       required: true,
     },
     alertmanagerConfigId: {
-      type: String,
+      type:     String,
       required: true,
     },
     saveOverride: {
-      type: Function,
+      type:     Function,
       required: true,
     },
   },
@@ -149,14 +149,14 @@ export default {
     }
 
     return {
-      create: _CREATE,
+      create:                    _CREATE,
       EDITOR_MODES,
-      fileFound: false,
-      receiverTypes: RECEIVERS_TYPES,
-      view: _VIEW,
-      yamlError: '',
-      suffixYaml: null,
-      fvFormRuleSets: [{ path: 'name', rules: ['required', 'duplicateName'] }],
+      fileFound:                 false,
+      receiverTypes:             RECEIVERS_TYPES,
+      view:                      _VIEW,
+      yamlError:                 '',
+      suffixYaml:                null,
+      fvFormRuleSets:            [{ path: 'name', rules: ['required', 'duplicateName'] }],
       fvReportedValidationPaths: ['value'],
     };
   },
@@ -201,14 +201,14 @@ export default {
         Object.assign(this.value, suffix);
         this.yamlError = '';
       } catch (ex) {
-        this.yamlError = `There was a problem parsing the Custom Config: ${ex}`;
+        this.yamlError = `There was a problem parsing the Custom Config: ${ ex }`;
       }
     },
   },
 
   methods: {
     getComponent(name) {
-      return require(`./types/${name}`).default;
+      return require(`./types/${ name }`).default;
     },
 
     navigateTo(receiverType) {
@@ -282,7 +282,11 @@ export default {
       default-tab="overview"
       @changed="tabChanged"
     >
-      <Tab :label="t('generic.overview')" :weight="99" name="overview">
+      <Tab
+        :label="t('generic.overview')"
+        :weight="99"
+        name="overview"
+      >
         <div class="box-container create-resource-container">
           <div
             v-for="(receiverType, i) in receiverTypes"
@@ -293,13 +297,16 @@ export default {
           >
             <div class="left">
               <div class="logo">
-                <img :src="receiverType.logo" />
+                <img :src="receiverType.logo">
               </div>
               <h4 class="name ml-10">
                 <t :k="receiverType.label" />
               </h4>
             </div>
-            <div v-if="receiverType.name !== 'custom'" class="right">
+            <div
+              v-if="receiverType.name !== 'custom'"
+              class="right"
+            >
               {{ getCount(receiverType) }}
             </div>
           </div>

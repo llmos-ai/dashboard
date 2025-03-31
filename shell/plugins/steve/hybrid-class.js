@@ -1,21 +1,21 @@
 import {
   ANNOTATIONS_TO_IGNORE_REGEX,
   LABELS_TO_IGNORE_REGEX,
-} from "@shell/config/labels-annotations";
-import omitBy from "lodash/omitBy";
-import pickBy from "lodash/pickBy";
+} from '@shell/config/labels-annotations';
+import omitBy from 'lodash/omitBy';
+import pickBy from 'lodash/pickBy';
 
-import { matchesSomeRegex } from "@shell/utils/string";
-import Resource from "@shell/plugins/dashboard-store/resource-class";
+import { matchesSomeRegex } from '@shell/utils/string';
+import Resource from '@shell/plugins/dashboard-store/resource-class';
 
 // these are defined elsewhere in Steve models and will cause the error  "Cannot set property <whatever> of [object Object] which has only a getter" if defined at top-level
 export function cleanHybridResources(data) {
   const potentialNormanHoldovers = [
-    "state",
-    "name",
-    "description",
-    "labels",
-    "annotations",
+    'state',
+    'name',
+    'description',
+    'labels',
+    'annotations',
   ];
 
   potentialNormanHoldovers.forEach((key) => delete data[key]);
@@ -48,7 +48,7 @@ export default class HybridModel extends Resource {
       return matchesSomeRegex(key, LABELS_TO_IGNORE_REGEX);
     });
 
-    this.metadata["labels"] = { ...wasIgnored, ...val };
+    this.metadata['labels'] = { ...wasIgnored, ...val };
   }
 
   setLabel(key, val) {
@@ -86,7 +86,7 @@ export default class HybridModel extends Resource {
       return matchesSomeRegex(key, ANNOTATIONS_TO_IGNORE_REGEX);
     });
 
-    this.metadata["annotations"] = { ...wasIgnored, ...val };
+    this.metadata['annotations'] = { ...wasIgnored, ...val };
   }
 
   setAnnotation(key, val) {
@@ -107,6 +107,6 @@ export default class HybridModel extends Resource {
   }
 
   get state() {
-    return this.stateObj?.name || "unknown";
+    return this.stateObj?.name || 'unknown';
   }
 }

@@ -113,14 +113,13 @@ export default {
           />
         </template>
         <template #add>
-          <button
+          <a-button
             v-if="!isView"
-            type="button"
-            class="btn role-tertiary add"
+            class="add"
             @click="addPVC"
           >
             {{ t('volumeClaimTemplate.add.label') }}
-          </button>
+          </a-button>
         </template>
       </ArrayListGrouped>
     </div>

@@ -116,7 +116,9 @@ export default {
           class="icon"
           :to="{ name: `c-cluster-product-resource-namespace-id-${dashboardName}`, params: { clusterName: row.name, resource: row.type, namespace: row.namespace, id: row.metadata?.name }}"
         >
-          Manage <i class="icon icon-external-link" />
+          <a-button>
+            Manage <i class="icon icon-external-link" />
+          </a-button>
         </router-link>
       </td>
     </template>

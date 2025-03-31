@@ -21,16 +21,16 @@ export const defaultTableSortGenerationFn = (schema, $store) => {
   let sortKey = resource;
 
   const inStore = $store.getters['currentStore'](resource);
-  const generation = $store.getters[`${inStore}/currentGeneration`]?.(resource);
+  const generation = $store.getters[`${ inStore }/currentGeneration`]?.(resource);
 
   if (generation) {
-    sortKey += `/${generation}`;
+    sortKey += `/${ generation }`;
   }
 
   const nsFilterKey = $store.getters['activeNamespaceCacheKey'];
 
   if (nsFilterKey) {
-    return `${sortKey}/${nsFilterKey}`;
+    return `${ sortKey }/${ nsFilterKey }`;
   }
 
   // covers case where we have no current cluster's ns cache
@@ -46,60 +46,60 @@ export default {
 
   props: {
     schema: {
-      type: Object,
+      type:    Object,
       default: null,
     },
 
     rows: {
-      type: Array,
+      type:     Array,
       required: true,
     },
 
     loading: {
-      type: Boolean,
+      type:     Boolean,
       required: false,
     },
 
     altLoading: {
-      type: Boolean,
+      type:     Boolean,
       required: false,
     },
 
     keyField: {
       // Field that is unique for each row.
-      type: String,
+      type:    String,
       default: '_key',
     },
 
     headers: {
-      type: Array,
+      type:    Array,
       default: null,
     },
 
     groupBy: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     namespaced: {
-      type: Boolean,
+      type:    Boolean,
       default: null, // Automatic from schema
     },
 
     search: {
       // Show search input to filter rows
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     tableActions: {
       // Show bulk table actions
-      type: [Boolean, null],
+      type:    [Boolean, null],
       default: null,
     },
 
     pagingLabel: {
-      type: String,
+      type:    String,
       default: 'sortableTable.paging.resource',
     },
 
@@ -107,98 +107,96 @@ export default {
      * Additional params to pass to the pagingLabel translation
      */
     pagingParams: {
-      type: Object,
+      type:    Object,
       default: null,
     },
 
     rowActions: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
 
     groupable: {
-      type: Boolean,
+      type:    Boolean,
       default: null, // Null: auto based on namespaced and type custom groupings
     },
 
     groupTooltip: {
-      type: String,
+      type:    String,
       default: 'resourceTable.groupBy.namespace',
     },
 
     overflowX: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     overflowY: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     sortGenerationFn: {
-      type: Function,
+      type:    Function,
       default: null,
     },
     getCustomDetailLink: {
-      type: Function,
+      type:    Function,
       default: null,
     },
     ignoreFilter: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     hasAdvancedFiltering: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     advFilterHideLabelsAsCols: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     advFilterPreventFilteringLabels: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     /**
      * Allows for the usage of a query param to work for simple filtering (q)
      */
     useQueryParamsForSimpleFiltering: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     /**
      * Manual force the update of live and delayed cells. Change this number to kick off the update
      */
     forceUpdateLiveAndDelayed: {
-      type: Number,
+      type:    Number,
       default: 0,
     },
 
     externalPaginationEnabled: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     externalPaginationResult: {
-      type: Object,
+      type:    Object,
       default: null,
     },
 
     rowsPerPage: {
-      type: Number,
+      type:    Number,
       default: null, // Default comes from the user preference
     },
 
     hideGroupingControls: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
 
   data() {
     // Confirm which store we're in, if schema isn't available we're probably showing a list with different types
-    const inStore = this.schema?.id
-      ? this.$store.getters['currentStore'](this.schema.id)
-      : undefined;
+    const inStore = this.schema?.id ? this.$store.getters['currentStore'](this.schema.id) : undefined;
 
     return {
       inStore,
@@ -316,8 +314,7 @@ export default {
             // we've found some labels with ' ', which isn't necessarily empty (explore action/button)
             // if we are to add cols, let's push them before these so that the UI doesn't look weird
             const lastViableColIndex = headers.findIndex(
-              (h) =>
-                (!h.label || !h.label?.trim()) &&
+              (h) => (!h.label || !h.label?.trim()) &&
                 (!h.labelKey || !h.labelKey?.trim())
             );
 
@@ -376,10 +373,8 @@ export default {
         this.ignoreFilter || // Component owner strictly states no filtering
         this.externalPaginationEnabled ||
         (isAll && !this.currentProduct?.hideSystemResources) || // Need all
-        (this.inStore
-          ? this.$store.getters[`${this.inStore}/haveNamespace`](this.schema.id)
-              ?.length
-          : false) // Store reports type has namespace filter, so rows already contain the correctly filtered resources
+        (this.inStore ? this.$store.getters[`${ this.inStore }/haveNamespace`](this.schema.id)
+          ?.length : false) // Store reports type has namespace filter, so rows already contain the correctly filtered resources
       ) {
         return this.rows || [];
       }
@@ -490,16 +485,16 @@ export default {
       const standard = [
         {
           tooltipKey: 'resourceTable.groupBy.none',
-          icon: 'icon-list-flat',
-          value: 'none',
+          icon:       'icon-list-flat',
+          value:      'none',
         },
       ];
 
       if (!this.options?.hiddenNamespaceGroupButton) {
         standard.push({
           tooltipKey: this.groupTooltip,
-          icon: 'icon-folder',
-          value: 'namespace',
+          icon:       'icon-folder',
+          value:      'namespace',
         });
       }
 
@@ -519,13 +514,13 @@ export default {
       if (!this.schema) {
         return {
           singularLabel: '',
-          pluralLabel: '',
+          pluralLabel:   '',
         };
       }
 
       return {
         singularLabel: this.$store.getters['type-map/labelFor'](this.schema),
-        pluralLabel: this.$store.getters['type-map/labelFor'](this.schema, 99),
+        pluralLabel:   this.$store.getters['type-map/labelFor'](this.schema, 99),
       };
     },
   },
@@ -556,15 +551,15 @@ export default {
       }
 
       switch (action) {
-        case 'detail':
-          selection[0].goToDetail();
-          break;
-        case 'edit':
-          selection[0].goToEdit();
-          break;
-        case 'yaml':
-          selection[0].goToViewYaml();
-          break;
+      case 'detail':
+        selection[0].goToDetail();
+        break;
+      case 'edit':
+        selection[0].goToEdit();
+        break;
+      case 'yaml':
+        selection[0].goToViewYaml();
+        break;
       }
     },
 
@@ -629,23 +624,42 @@ export default {
     @group-value-change="group = $event"
     @enter="handleEnterKeyPress"
   >
-    <template v-if="!hideGroupingControls && showGrouping" #header-middle>
+    <template
+      v-if="!hideGroupingControls && showGrouping"
+      #header-middle
+    >
       <slot name="more-header-middle" />
 
-      <ButtonGroup v-model:value="group" :options="groupOptions" />
+      <ButtonGroup
+        v-model:value="group"
+        :options="groupOptions"
+      />
     </template>
 
-    <template v-if="showGrouping" #header-right>
+    <template
+      v-if="showGrouping"
+      #header-right
+    >
       <slot name="header-right" />
     </template>
 
     <template #group-by="{ group: thisGroup }">
-      <div v-clean-html="thisGroup.ref" class="group-tab" />
+      <div
+        v-clean-html="thisGroup.ref"
+        class="group-tab"
+      />
     </template>
 
     <!-- Pass down templates provided by the caller -->
-    <template v-for="(_, slot) of $slots" :key="slot" v-slot:[slot]="scope">
-      <slot :name="slot" v-bind="scope" />
+    <template
+      v-for="(_, slot) of $slots"
+      :key="slot"
+      v-slot:[slot]="scope"
+    >
+      <slot
+        :name="slot"
+        v-bind="scope"
+      />
     </template>
 
     <template #shortkeys>

@@ -185,6 +185,7 @@ export function matchModelString(string = '', modelArray = allModelName) {
   // 尝试匹配第一部分
   if (parts[0]) {
     const firstPart = parts[0];
+
     // 精确匹配
     if (modelArray.includes(firstPart)) {
       return firstPart;
@@ -200,6 +201,7 @@ export function matchModelString(string = '', modelArray = allModelName) {
   // 如果有第二部分，尝试匹配第二部分
   if (parts[1]) {
     const secondPart = parts[1];
+
     // 精确匹配
     if (modelArray.includes(secondPart)) {
       return secondPart;

@@ -5,7 +5,7 @@ import Banner from '@components/Banner/Banner.vue';
 import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from '@shell/config/types';
 
 export default {
-  emit: ['close'],
+  emit:       ['close'],
   components: {
     ProjectMemberEditor,
     AsyncButton,
@@ -14,22 +14,22 @@ export default {
 
   props: {
     resources: {
-      type: Array,
+      type:     Array,
       required: true,
     },
 
     onAdd: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
 
     projectId: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     saveInModal: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -38,8 +38,8 @@ export default {
     return {
       member: {
         permissionGroup: 'owner',
-        custom: {},
-        principalId: '',
+        custom:          {},
+        principalId:     '',
         roleTemplateIds: [],
       },
       error: null,
@@ -63,23 +63,22 @@ export default {
     },
 
     async createBindings() {
-      const promises = this.member.roleTemplateIds.map((roleTemplateId) =>
-        this.$store.dispatch(`management/create`, {
-          type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
-          namespaceId: this.projectId,
-          roleTemplateRef: {
-            apiGroup: MANAGEMENT_GROUP,
-            kind: 'RoleTemplate',
-            name: roleTemplateId,
+      const promises = this.member.roleTemplateIds.map((roleTemplateId) => this.$store.dispatch(`management/create`, {
+        type:            MANAGEMENT.ROLE_TEMPLATE_BINDING,
+        namespaceId:     this.projectId,
+        roleTemplateRef: {
+          apiGroup: MANAGEMENT_GROUP,
+          kind:     'RoleTemplate',
+          name:     roleTemplateId,
+        },
+        subjects: [
+          {
+            apiGroup: RBAC_GROUP,
+            kind:     'User',
+            name:     this.member.principalId,
           },
-          subjects: [
-            {
-              apiGroup: RBAC_GROUP,
-              kind: 'User',
-              name: this.member.principalId,
-            },
-          ],
-        })
+        ],
+      })
       );
 
       return Promise.all(promises);
@@ -111,7 +110,10 @@ export default {
     :sticky="true"
   >
     <div class="pl-10 pr-10">
-      <Banner v-if="error" color="error">
+      <Banner
+        v-if="error"
+        color="error"
+      >
         {{ error }}
       </Banner>
       <ProjectMemberEditor
@@ -121,7 +123,10 @@ export default {
     </div>
 
     <template #actions>
-      <a-button class="mr-10" @click="close">
+      <a-button
+        class="mr-10"
+        @click="close"
+      >
         {{ t('generic.cancel') }}
       </a-button>
 
@@ -131,7 +136,11 @@ export default {
         @click="(cb) => saveBindings(cb)"
       />
 
-      <a-button v-else type="primary" @click="apply">
+      <a-button
+        v-else
+        type="primary"
+        @click="apply"
+      >
         {{ t('generic.add') }}
       </a-button>
     </template>

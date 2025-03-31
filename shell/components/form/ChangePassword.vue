@@ -18,20 +18,18 @@ export default {
   },
   props: {
     mode: {
-      type: String,
+      type:    String,
       default: null,
     },
     mustChangePassword: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
   async fetch() {
     if (this.isChange) {
       // Fetch the username for hidden input fields. The value itself is not needed if create or changing another user's password
-      const users = await this.$store.dispatch('management/findAll', {
-        type: MANAGEMENT.USER,
-      });
+      const users = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.USER });
       const user = users?.[0];
 
       this.username = user?.username;
@@ -40,15 +38,15 @@ export default {
   },
   data(ctx) {
     return {
-      username: '',
-      errorMessages: [],
+      username:                   '',
+      errorMessages:              [],
       pCanShowMismatchedPassword: false,
-      pIsRandomGenerated: false,
-      form: {
-        currentP: '',
-        newP: '',
-        genP: '',
-        confirmP: '',
+      pIsRandomGenerated:         false,
+      form:                       {
+        currentP:          '',
+        newP:              '',
+        genP:              '',
+        confirmP:          '',
         userChangeOnLogin: false,
       },
     };
@@ -180,9 +178,7 @@ export default {
       const match = this.passwordNew === this.passwordConfirm;
 
       this.errorMessages =
-        this.passwordConfirmBlurred && !match
-          ? [this.t('changePassword.errors.mismatchedPassword')]
-          : [];
+        this.passwordConfirmBlurred && !match ? [this.t('changePassword.errors.mismatchedPassword')] : [];
 
       return match;
     },
@@ -210,9 +206,7 @@ export default {
 
       if (this.isEdit) {
         // If the user generated password is required... ensure it's valid
-        return this.userGeneratedPasswordsRequired
-          ? this.baseIsUserGenPasswordValid()
-          : true;
+        return this.userGeneratedPasswordsRequired ? this.baseIsUserGenPasswordValid() : true;
       }
 
       return false;
@@ -228,7 +222,7 @@ export default {
 
       this.$emit('valid', isValid);
       this.$emit('input', {
-        password: this.password,
+        password:          this.password,
         userChangeOnLogin: this.userChangeOnLogin,
       });
     },
@@ -244,25 +238,21 @@ export default {
     async setPassword(user) {
       // Error handling is catered for by caller
       await this.$store.dispatch('management/resourceAction', {
-        type: MANAGEMENT.USER,
+        type:       MANAGEMENT.USER,
         actionName: 'setpassword',
-        resource: user,
-        body: {
-          newPassword: this.isRandomGenerated ? this.form.genP : this.form.newP,
-        },
+        resource:   user,
+        body:       { newPassword: this.isRandomGenerated ? this.form.genP : this.form.newP },
       });
     },
 
     async changePassword() {
       try {
         await this.$store.dispatch('management/collectionAction', {
-          type: MANAGEMENT.USER,
+          type:       MANAGEMENT.USER,
           actionName: 'changePassword',
-          body: {
+          body:       {
             currentPassword: this.form.currentP,
-            newPassword: this.isRandomGenerated
-              ? this.form.genP
-              : this.form.newP,
+            newPassword:     this.isRandomGenerated ? this.form.genP : this.form.newP,
           },
         });
       } catch (err) {
@@ -304,7 +294,7 @@ export default {
           :value="username"
           tabindex="-1"
           :data-lpignore="!isChange"
-        />
+        >
         <input
           id="password"
           type="password"
@@ -313,7 +303,7 @@ export default {
           :value="password"
           tabindex="-1"
           :data-lpignore="!isChange"
-        />
+        >
         <Password
           v-if="isChange"
           v-model:value="passwordCurrent"
@@ -322,7 +312,10 @@ export default {
           :required="true"
           :label="t('changePassword.currentPassword.label')"
         />
-        <div v-if="isRandomGenerated" :class="{ row: isCreateEdit }">
+        <div
+          v-if="isRandomGenerated"
+          :class="{ row: isCreateEdit }"
+        >
           <div :class="{ col: isCreateEdit, 'span-8': isCreateEdit }">
             <Password
               v-model:value="passwordGen"
@@ -333,7 +326,11 @@ export default {
             />
           </div>
         </div>
-        <div v-else class="userGen" :class="{ row: isCreateEdit }">
+        <div
+          v-else
+          class="userGen"
+          :class="{ row: isCreateEdit }"
+        >
           <div :class="{ col: isCreateEdit, 'span-4': isCreateEdit }">
             <Password
               v-model:value="passwordNew"

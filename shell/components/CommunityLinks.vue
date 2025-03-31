@@ -11,13 +11,13 @@ export default {
 
   props: {
     linkOptions: {
-      type: Object,
+      type:    Object,
       default: () => {
         return {};
       },
     },
     isSupportPage: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -89,14 +89,24 @@ export default {
 
 <template>
   <div v-if="hasOptions">
-    <SimpleBox :pref="pref" :pref-key="prefKey">
+    <SimpleBox
+      :pref="pref"
+      :pref-key="prefKey"
+    >
       <template #title>
         <h2>
           {{ t('customLinks.displayTitle') }}
         </h2>
       </template>
-      <div v-for="(link, i) in options" :key="i" class="support-link">
-        <router-link v-if="link.value.startsWith('/')" :to="link.value">
+      <div
+        v-for="(link, i) in options"
+        :key="i"
+        class="support-link"
+      >
+        <router-link
+          v-if="link.value.startsWith('/')"
+          :to="link.value"
+        >
           {{ link.label }}
         </router-link>
         <a-button

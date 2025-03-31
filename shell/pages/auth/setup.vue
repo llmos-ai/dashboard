@@ -113,7 +113,7 @@ export default {
       //   opt:  { url: `/v3/settings/${ SETTING.PL }` }
       // });
     }
-    console.log('-------cccc')
+    console.log('-------cccc');
     if (plSetting.value?.length && plSetting.value !== getVendor()) {
       setVendor(plSetting.value);
     }

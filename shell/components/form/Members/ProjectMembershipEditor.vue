@@ -1,9 +1,7 @@
 <script>
-import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from "@shell/config/types";
-import { _CREATE, _VIEW } from "@shell/config/query-params";
-import MembershipEditor, {
-  canViewMembershipEditor,
-} from "@shell/components/form/Members/MembershipEditor";
+import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from '@shell/config/types';
+import { _CREATE, _VIEW } from '@shell/config/query-params';
+import MembershipEditor, { canViewMembershipEditor } from '@shell/components/form/Members/MembershipEditor';
 
 export function canViewProjectMembershipEditor(store) {
   return canViewMembershipEditor(store, true);
@@ -14,12 +12,12 @@ export default {
 
   props: {
     parentId: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
   },
@@ -27,7 +25,7 @@ export default {
   data() {
     return {
       MANAGEMENT,
-      bindings: [],
+      bindings:          [],
       lastSavedBindings: [],
     };
   },
@@ -42,24 +40,24 @@ export default {
     },
 
     principalId() {
-      return this.$store.getters["auth/principalId"];
+      return this.$store.getters['auth/principalId'];
     },
   },
 
   methods: {
     defaultBindingHandler() {
       return this.$store.dispatch(`management/create`, {
-        type: MANAGEMENT.ROLE_TEMPLATE_BINDING,
+        type:            MANAGEMENT.ROLE_TEMPLATE_BINDING,
         roleTemplateRef: {
           apiGroup: MANAGEMENT_GROUP,
-          kind: "RoleTemplate",
-          name: "namespace-owner",
+          kind:     'RoleTemplate',
+          name:     'namespace-owner',
         },
         subjects: [
           {
             apiGroup: RBAC_GROUP,
-            kind: "User",
-            name: this.principalId,
+            kind:     'User',
+            name:     this.principalId,
           },
         ],
       });

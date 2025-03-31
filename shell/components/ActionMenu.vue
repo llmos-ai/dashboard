@@ -1,17 +1,17 @@
 <script>
-import { mapGetters } from "vuex";
-import { AUTO, CENTER, fitOnScreen } from "@shell/utils/position";
-import { isAlternate } from "@shell/utils/platform";
-import IconOrSvg from "@shell/components/IconOrSvg";
+import { mapGetters } from 'vuex';
+import { AUTO, CENTER, fitOnScreen } from '@shell/utils/position';
+import { isAlternate } from '@shell/utils/platform';
+import IconOrSvg from '@shell/components/IconOrSvg';
 
-const HIDDEN = "hide";
-const CALC = "calculate";
-const SHOW = "show";
+const HIDDEN = 'hide';
+const CALC = 'calculate';
+const SHOW = 'show';
 
 export default {
-  name: "ActionMenu",
+  name:       'ActionMenu',
   components: { IconOrSvg },
-  props: {
+  props:      {
     customActions: {
       // Custom actions can be used if you need the action
       // menu to work for something that is not a Kubernetes
@@ -23,7 +23,7 @@ export default {
       // its state controlled by either props OR by Vuex, but if it
       // gets unwieldy, it could later be split into two components,
       // one with the dependency on Vuex and one without.
-      type: Array,
+      type:    Array,
       default: () => {
         return [];
       },
@@ -37,7 +37,7 @@ export default {
       // Instead the ActionMenu component can be included once on a page,
       // and then if you click on a list item, that can change
       // the menu's target so that it can open in different locations.
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     useCustomTargetElement: {
@@ -50,17 +50,17 @@ export default {
       // was clicked.
       // This flag tells the component to look for and use the
       // custom target element.
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     customTargetElement: {
-      type: HTMLElement,
+      type:    HTMLElement,
       default: null,
     },
     customTargetEvent: {
       // The event details from the user's click can be used
       // for positioning the menu on the page.
-      type: [PointerEvent, MouseEvent],
+      type:    [PointerEvent, MouseEvent],
       default: null,
     },
 
@@ -69,8 +69,8 @@ export default {
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
-      default: "action-menu",
+      type:    String,
+      default: 'action-menu',
     },
   },
 
@@ -83,10 +83,10 @@ export default {
       // Use either these Vuex getters
       // OR the props to set the action menu state,
       // but don't use both.
-      targetElem: "action-menu/elem",
-      targetEvent: "action-menu/event",
-      shouldShow: "action-menu/showing",
-      options: "action-menu/options",
+      targetElem:  'action-menu/elem',
+      targetEvent: 'action-menu/event',
+      shouldShow:  'action-menu/showing',
+      options:     'action-menu/options',
     }),
 
     showing() {
@@ -128,7 +128,7 @@ export default {
       this.updateStyle();
     },
 
-    "$route.path"(val, old) {
+    '$route.path'(val, old) {
       this.hide();
     },
   },
@@ -138,17 +138,17 @@ export default {
       if (this.useCustomTargetElement) {
         // If the show/hide state is controlled
         // by props, emit an event to close the menu.
-        this.$emit("close");
+        this.$emit('close');
       } else {
         // If the show/hide state is controlled
         // by Vuex, mutate the store to close the menu.
-        this.$store.commit("action-menu/hide");
+        this.$store.commit('action-menu/hide');
       }
     },
 
     updateStyle() {
       if (this.phase === SHOW && !this.useCustomTargetElement) {
-        const menu = this.$el?.querySelector && this.$el.querySelector(".menu");
+        const menu = this.$el?.querySelector && this.$el.querySelector('.menu');
         const event = this.targetEvent;
         const elem = this.targetElem;
 
@@ -156,19 +156,19 @@ export default {
         // use the target element and the target event
         // to position the menu.
         this.style = fitOnScreen(menu, elem || event, {
-          overlapX: true,
-          fudgeX: elem ? -2 : 0,
-          fudgeY: elem ? 20 : 0,
+          overlapX:  true,
+          fudgeX:    elem ? -2 : 0,
+          fudgeY:    elem ? 20 : 0,
           positionX: elem ? AUTO : CENTER,
           positionY: AUTO,
         });
-        this.style.visibility = "visible";
+        this.style.visibility = 'visible';
 
         return;
       }
 
       if (this.open && this.useCustomTargetElement) {
-        const menu = this.$el?.querySelector && this.$el.querySelector(".menu");
+        const menu = this.$el?.querySelector && this.$el.querySelector('.menu');
         const elem = this.customTargetElement;
 
         // If the action menu state is controlled with
@@ -177,16 +177,16 @@ export default {
           menu,
           elem,
           {
-            overlapX: true,
-            fudgeX: elem ? 4 : 0,
-            fudgeY: elem ? 4 : 0,
+            overlapX:  true,
+            fudgeX:    elem ? 4 : 0,
+            fudgeY:    elem ? 4 : 0,
             positionX: elem ? AUTO : CENTER,
             positionY: AUTO,
           },
           true
         );
 
-        this.style.visibility = "visible";
+        this.style.visibility = 'visible';
 
         return;
       }
@@ -204,7 +204,7 @@ export default {
         const fn = action.invoke;
 
         if (fn && action.enabled) {
-          const resources = this.$store.getters["action-menu/resources"];
+          const resources = this.$store.getters['action-menu/resources'];
           const opts = {
             event,
             action,
@@ -234,7 +234,7 @@ export default {
         // by Vuex, mutate the store when an action is clicked.
         const opts = { alt: isAlternate(event) };
 
-        this.$store.dispatch("action-menu/execute", {
+        this.$store.dispatch('action-menu/execute', {
           action,
           args,
           opts,
@@ -245,9 +245,7 @@ export default {
     },
 
     hasOptions(options) {
-      return options.length !== undefined
-        ? options.length
-        : Object.keys(options).length > 0;
+      return options.length !== undefined ? options.length : Object.keys(options).length > 0;
     },
   },
 };
@@ -255,9 +253,16 @@ export default {
 
 <template>
   <div v-if="showing || open">
-    <div class="background" @click="hide" @contextmenu.prevent />
+    <div
+      class="background"
+      @click="hide"
+      @contextmenu.prevent
+    />
 
-    <a-menu class="menu" :style="style">
+    <a-menu
+      class="menu"
+      :style="style"
+    >
       <a-menu-item
         v-for="(opt, i) in menuOptions"
         :key="i"
@@ -275,7 +280,10 @@ export default {
         <span v-clean-html="opt.label" />
       </a-menu-item>
 
-      <a-menu-item v-if="!hasOptions(menuOptions)" class="no-actions">
+      <a-menu-item
+        v-if="!hasOptions(menuOptions)"
+        class="no-actions"
+      >
         <span v-t="'sortableTable.noActions'" />
       </a-menu-item>
     </a-menu>
