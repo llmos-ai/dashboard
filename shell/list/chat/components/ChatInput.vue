@@ -1,9 +1,8 @@
 <script setup>
-import { ref, defineProps, defineEmits, watch } from 'vue';
+import { ref, defineProps, defineEmits } from 'vue';
 import {
   ArrowUpOutlined,
-  PictureOutlined,
-  PauseCircleOutlined,
+  PauseOutlined,
 } from '@ant-design/icons-vue';
 
 const props = defineProps({
@@ -15,50 +14,50 @@ const props = defineProps({
 
 const model = defineModel();
 
-const emit = defineEmits(['input', 'submit']);
+const emit = defineEmits(['input', 'submit', 'update:abort']);
 
 const fileList = ref([]);
 
-const customRequest = (options) => {
-  const { file, onSuccess } = options;
+// const customRequest = (options) => {
+//   const { file, onSuccess } = options;
 
-  file.thumbUrl = URL.createObjectURL(file);
-  // 创建一个 FileReader 实例
-  const reader = new FileReader();
+//   file.thumbUrl = URL.createObjectURL(file);
+//   // 创建一个 FileReader 实例
+//   const reader = new FileReader();
 
-  // 读取文件并转换为 base64
-  reader.readAsDataURL(file);
+//   // 读取文件并转换为 base64
+//   reader.readAsDataURL(file);
 
-  // 读取完成后触发
-  reader.onload = () => {
-    // file.thumbUrl 仍然是 URL 预览
-    file.thumbUrl = URL.createObjectURL(file);
-    console.log('🚀 ~ file.thumbUrl:', file.thumbUrl);
+//   // 读取完成后触发
+//   reader.onload = () => {
+//     // file.thumbUrl 仍然是 URL 预览
+//     file.thumbUrl = URL.createObjectURL(file);
+//     console.log('🚀 ~ file.thumbUrl:', file.thumbUrl);
 
-    // base64 数据
-    const base64Data = reader.result;
+//     // base64 数据
+//     const base64Data = reader.result;
 
-    console.log('🚀 ~ file.base64Data:', base64Data);
+//     console.log('🚀 ~ file.base64Data:', base64Data);
 
-    // 将 base64 数据存入 file 对象
-    file.base64 = base64Data;
+//     // 将 base64 数据存入 file 对象
+//     file.base64 = base64Data;
 
-    // 更新 fileList
+//     // 更新 fileList
 
-    // 模拟上传成功
-    if (onSuccess) {
-      onSuccess('ok');
-    }
-  };
+//     // 模拟上传成功
+//     if (onSuccess) {
+//       onSuccess('ok');
+//     }
+//   };
 
-  // 错误处理
-  reader.onerror = (error) => {
-    console.error('文件读取失败:', error);
-  };
-  console.log('🚀 ~ customRequest ~ file:', file);
+//   // 错误处理
+//   reader.onerror = (error) => {
+//     console.error('文件读取失败:', error);
+//   };
+//   console.log('🚀 ~ customRequest ~ file:', file);
 
-  fileList.value = [...fileList.value, file];
-};
+//   fileList.value = [...fileList.value, file];
+// };
 
 const handleRemove = (file) => {
   const index = fileList.value.indexOf(file);
@@ -95,7 +94,7 @@ const submit = () => {
     <div class="flex items-center justify-between">
       <div class="left" />
       <div class="right flex items-center mb-5 mr-5">
-        <a-upload
+        <!-- <a-upload
           :multiple="true"
           :default-file-list="fileList"
           list-type="picture"
@@ -104,26 +103,43 @@ const submit = () => {
           @remove="handleRemove"
         >
           <PictureOutlined class="text-xl cursor-pointer" />
-        </a-upload>
+        </a-upload> -->
         <a-divider
           type="vertical"
           class="mt-5"
           style="height: 15px"
         />
-        <PauseCircleOutlined
-          v-if="loading"
-          class="text-2xl font-semibold"
-        />
-        <a-button
-          v-else
-          type="primary"
-          :disabled="model.length === 0"
-          shape="circle"
-          class="btn-sm"
-          @click="submit"
-        >
-          <ArrowUpOutlined class="!align-text-bottom text-xl" />
-        </a-button>
+
+        <a-tooltip v-if="loading">
+          <template #title>
+            停止生成
+          </template>
+          <a-button
+            type="primary"
+            shape="circle"
+            @click="emit('update:abort')"
+          >
+            <PauseOutlined
+              class="font-semibold"
+            />
+          </a-button>
+        </a-tooltip>
+
+        <a-tooltip v-else>
+          <template #title>
+            发送
+          </template>
+          <a-button
+            type="primary"
+            :disabled="model.length === 0"
+            shape="circle"
+            @click="submit"
+          >
+            <template #icon>
+              <ArrowUpOutlined />
+            </template>
+          </a-button>
+        </a-tooltip>
       </div>
     </div>
   </div>

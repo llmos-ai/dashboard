@@ -490,10 +490,10 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <Checkbox
-              v-model="value.spec.enableInTreeAutoscaling"
+              v-model:value="value.spec.enableInTreeAutoscaling"
               :mode="mode"
               label="Enabling Autoscaling"
-              @input="update"
+              @input:value="update"
             />
           </div>
         </div>
@@ -504,7 +504,7 @@ export default {
           <div class="col span-6">
             <LabeledSelect
               v-if="autoScaleOptions"
-              v-model="autoScaleOptions.upscalingMode"
+              v-model:value="autoScaleOptions.upscalingMode"
               label="Upscaling Mode"
               :options="upScalingModeOption"
               required
@@ -516,12 +516,12 @@ export default {
           <div class="col span-6">
             <UnitInput
               v-if="autoScaleOptions"
-              v-model="autoScaleOptions.idleTimeoutSeconds"
+              v-model:value="autoScaleOptions.idleTimeoutSeconds"
               label="Idle Timeout Seconds"
               suffix="s"
               required
               :mode="mode"
-              @input="update"
+              @input:value="update"
             />
           </div>
         </div>
@@ -530,10 +530,10 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <Checkbox
-              v-model="enableMonitoring"
+              v-model:value="enableMonitoring"
               :mode="mode"
               :label="t('ray.cluster.enableMonitoring')"
-              @input="update"
+              @input:value="update"
             />
             <span class="text-tips">
               <a
@@ -561,20 +561,20 @@ export default {
           <div class="row mb-20">
             <div class="col span-6">
               <LabeledInput
-                v-model="monitoringConfig.RAY_GRAFANA_IFRAME_HOST"
+                v-model:value="monitoringConfig.RAY_GRAFANA_IFRAME_HOST"
                 :label="t('ray.monitoring.grafana.iframe')"
                 required
                 :mode="mode"
-                @input="update"
+                @input:value="update"
               />
             </div>
             <div class="col span-6">
               <LabeledInput
-                v-model="monitoringConfig.RAY_GRAFANA_HOST"
+                v-model:value="monitoringConfig.RAY_GRAFANA_HOST"
                 :label="t('ray.monitoring.grafana.host')"
                 required
                 :mode="mode"
-                @input="update"
+                @input:value="update"
               />
             </div>
           </div>
@@ -586,11 +586,11 @@ export default {
         >
           <div class="col span-6">
             <LabeledInput
-              v-model="monitoringConfig.RAY_PROMETHEUS_HOST"
+              v-model:value="monitoringConfig.RAY_PROMETHEUS_HOST"
               :label="t('ray.monitoring.prometheus.host')"
               required
               :mode="mode"
-              @input="update"
+              @input:value="update"
             />
           </div>
         </div>
@@ -605,11 +605,11 @@ export default {
           <div class="row mb-20">
             <div class="col span-6">
               <LabeledInput
-                v-model="value.spec.rayVersion"
+                v-model:value="value.spec.rayVersion"
                 label="Cluster Ray Version"
                 required
                 :mode="mode"
-                @input="update"
+                @input:value="update"
               />
             </div>
           </div>
@@ -617,10 +617,10 @@ export default {
           <div class="row mb-20">
             <div class="col span-6">
               <Checkbox
-                v-model="enableGCSFaultTolerance"
+                v-model:value="enableGCSFaultTolerance"
                 :mode="mode"
                 :label="t('ray.cluster.enableGCS')"
-                @input="update"
+                @input:value="update"
               />
             </div>
           </div>
@@ -649,12 +649,12 @@ export default {
         <div class="mb-20">
           <!-- Resources and Limitations -->
           <ContainerResourceLimit
-            v-model="headGroupFlatResources"
+            v-model:value="headGroupFlatResources"
             :mode="mode"
             :runtime-classes="runtimeClasses"
             :pod-spec="headGroupSpec.template.spec"
             :show-tip="false"
-            @input="update"
+            @input:value="update"
           />
         </div>
 
@@ -665,10 +665,10 @@ export default {
           <div class="row mb-20">
             <div class="col span-6">
               <Checkbox
-                v-model="scheduleOnHeadNode"
+                v-model:value="scheduleOnHeadNode"
                 :mode="mode"
                 :label="t('ray.cluster.allowScheduling')"
-                @input="update"
+                @input:value="update"
               />
             </div>
           </div>
@@ -684,22 +684,22 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <UnitInput
-              v-model="workerGroupSpecs[0].replicas"
+              v-model:value="workerGroupSpecs[0].replicas"
               :hide-unit="true"
               label="Replicas"
               required
               :mode="mode"
-              @input="update"
+              @input:value="update"
             />
           </div>
           <div class="col span-6">
             <UnitInput
-              v-model="workerGroupSpecs[0].minReplicas"
+              v-model:value="workerGroupSpecs[0].minReplicas"
               label="Min Replicas"
               :hide-unit="true"
               required
               :mode="mode"
-              @input="update"
+              @input:value="update"
             />
           </div>
         </div>
@@ -707,12 +707,12 @@ export default {
         <div class="row mb-20">
           <div class="col span-6">
             <UnitInput
-              v-model="workerGroupSpecs[0].maxReplicas"
+              v-model:value="workerGroupSpecs[0].maxReplicas"
               label="Max Replicas"
               :hide-unit="true"
               required
               :mode="mode"
-              @input="update"
+              @input:value="update"
             />
           </div>
         </div>
@@ -721,13 +721,13 @@ export default {
         <div class="mb-20">
           <!-- Worker Group Resources and Limitations -->
           <ContainerResourceLimit
-            v-model="workerGroupFlatResources"
+            v-model:value="workerGroupFlatResources"
             :mode="mode"
             :runtime-classes="runtimeClasses"
             :pod-spec="workerGroupSpecs[0].template.spec"
             :handle-gpu-limit="true"
             :show-tip="false"
-            @input="update"
+            @input:value="update"
           />
         </div>
       </Tab>

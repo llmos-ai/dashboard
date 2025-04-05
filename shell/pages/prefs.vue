@@ -45,16 +45,14 @@ export default {
     };
   },
   computed: {
-    keymap:                 mapPref(KEYMAP),
-    viewInApi:              mapPref(VIEW_IN_API),
-    allNamespaces:          mapPref(ALL_NAMESPACES),
-    themeShortcut:          mapPref(THEME_SHORTCUT),
-    dateFormat:             mapPref(DATE_FORMAT),
-    timeFormat:             mapPref(TIME_FORMAT),
-    perPage:                mapPref(ROWS_PER_PAGE),
-    hideDesc:               mapPref(HIDE_DESC),
-    pluginDeveloper:        mapPref(PLUGIN_DEVELOPER),
-    viewContainerDashboard: mapPref(VIEW_CONTAINER_DASHBOARD),
+    keymap:          mapPref(KEYMAP),
+    viewInApi:       mapPref(VIEW_IN_API),
+    allNamespaces:   mapPref(ALL_NAMESPACES),
+    themeShortcut:   mapPref(THEME_SHORTCUT),
+    dateFormat:      mapPref(DATE_FORMAT),
+    timeFormat:      mapPref(TIME_FORMAT),
+    perPage:         mapPref(ROWS_PER_PAGE),
+    pluginDeveloper: mapPref(PLUGIN_DEVELOPER),
 
     theme: {
       get() {
@@ -159,26 +157,6 @@ export default {
           value: count,
         })
       );
-    },
-
-    hideDescriptions: {
-      get() {
-        return this.hideDesc.includes('ALL');
-      },
-
-      set(neu) {
-        let val;
-
-        if (neu) {
-          val = this.hideDesc.slice();
-          addObject(val, 'ALL');
-        } else {
-          // On unset, clear all remembered individual ones too
-          val = [];
-        }
-
-        this.hideDesc = val;
-      },
     },
   },
 };
@@ -288,21 +266,6 @@ export default {
         :label="t('prefs.advFeatures.themeShortcut', {}, true)"
         class="mt-20"
       />
-      <br>
-      <Checkbox
-        v-model:value="hideDescriptions"
-        data-testid="prefs__hideDescriptions"
-        :label="t('prefs.hideDesc.label')"
-        class="mt-20"
-      />
-      <template v-if="admin && isDevBuild">
-        <br>
-        <Checkbox
-          v-model:value="viewContainerDashboard"
-          :label="t('prefs.advFeatures.viewContainerDashboard', {}, true)"
-          class="mt-20"
-        />
-      </template>
     </div>
     <!-- YAML editor key mapping -->
     <div class="col mt-10 mb-10">

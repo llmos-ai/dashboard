@@ -218,7 +218,6 @@ export default {
           id="add-volume"
           :button-label="t('workload.storage.selectVolume')"
           :dropdown-options="availableVolumeOptions"
-          size="sm"
           @click-action="e=>selectVolume(e)"
         >
           <template #no-options>

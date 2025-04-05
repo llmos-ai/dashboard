@@ -184,6 +184,8 @@ export function resourceNames(names, plusMore, t, endString) {
     }
 
     if (i === MAX_NAMES_COUNT) {
+      console.log('🚀 ~ returnnames.reduce ~ plusMore:', plusMore);
+
       res += plusMore;
     }
 

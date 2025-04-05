@@ -31,6 +31,7 @@ let store = {};
   resolveStoreModules(require('../store/wm.js'), 'wm.js');
   resolveStoreModules(require('../store/customisation.js'), 'customisation.js');
   resolveStoreModules(require('../store/cru-resource.ts'), 'cru-resource.ts');
+  resolveStoreModules(require('../store/chat.js'), 'chat.js');
 
   // If the environment supports hot reloading...
 
@@ -49,6 +50,7 @@ let store = {};
         '../store/wm.js',
         '../store/customisation.js',
         '../store/cru-resource.ts',
+        '../store/chat.js',
       ],
       () => {
         // Update `root.modules` with the latest definitions.

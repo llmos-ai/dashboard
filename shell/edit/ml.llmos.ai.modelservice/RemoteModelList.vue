@@ -22,13 +22,17 @@ const props = defineProps({
     type:    String,
     default: '',
   },
+  defaultSearch: {
+    type:    String,
+    default: '',
+  }
 });
 
-const search = ref('');
+const search = ref(props.defaultSearch);
 const apiConfig = computed(() => {
   if (props.source === 'huggingface') {
     return {
-      listUrl:   `https://huggingface.co/api/models?limit=100&search=${ search.value }`,
+      listUrl:   `https://huggingface.co/api/models?limit=100&search=${ search.value }&pipeline_tag=text-generation&sort=trendingScore`,
       detailUrl: (id) => `https://huggingface.co/${ id }/resolve/main/README.md`,
       method:    'GET',
       body:      null,
@@ -53,7 +57,7 @@ const apiConfig = computed(() => {
 });
 
 // list logic
-const debouncedQuery = debouncedRef(apiConfig.value.listUrl, 500);
+debouncedRef(apiConfig.value.listUrl, 500);
 const {
   data: listData,
   isFetching: loading,
@@ -67,6 +71,7 @@ const {
 
       return { options };
     },
+    immediate: true
   }
 ).json();
 
@@ -74,6 +79,13 @@ const {
 watch([search], () => {
   execute();
 });
+
+// watch(() => props.defaultSearch, (val) => {
+//   if (val) {
+//     search.value = val;
+//   }
+// }, { immediate: true });
+
 const formatDataSource = computed(() => {
   if (props.source === 'huggingface') {
     return (
@@ -149,8 +161,12 @@ watch(debouncedReadmeUrl, () => readmeFetchExecute);
 
 watchEffect(() => {
   if (formatDataSource.value && formatDataSource.value.length > 0 && !activeItem.value.id) {
-    activeItem.value = formatDataSource.value[0];
-    emits('update:item', formatDataSource.value[0]);
+    if (!props.defaultSearch) {
+      activeItem.value = formatDataSource.value[0];
+      emits('update:item', formatDataSource.value[0]);
+    } else {
+      activeItem.value = formatDataSource.value.find((item) => item.id === props.defaultSearch);
+    }
   }
 });
 
@@ -164,13 +180,13 @@ watchEffect(() => {
       :xl="9"
       :xxl="6"
     >
-      <a-input
-        v-model:value="search"
-        :placeholder="t('modelService.searchPlaceholder', { source: source })"
-        allow-clear
-        class="mb-2"
-      />
       <div class="flex flex-col h-full">
+        <a-input
+          v-model:value="search"
+          :placeholder="t('modelService.searchPlaceholder', { source: source })"
+          allow-clear
+          class="mb-2"
+        />
         <div class="h-[0] grow-1">
           <simplebar class="h-full">
             <a-list
@@ -201,18 +217,20 @@ watchEffect(() => {
                             :value="item.createdAt"
                           />
                         </span>
-                        <span
-                          class="text-xs w-[50px] flex items-center justify-start"
-                        >
-                          <HeartOutlined class="mr-1" />{{ addUnit(item.star) }}
-                        </span>
-                        <span
-                          class="text-xs w-[50px] flex items-center justify-start"
-                        >
-                          <DownloadOutlined class="mr-1" />{{
-                            addUnit(item.downloads)
-                          }}
-                        </span>
+                        <div class="ml-auto flex">
+                          <span
+                            class="text-xs w-[50px] flex items-center justify-start"
+                          >
+                            <HeartOutlined class="mr-1" />{{ addUnit(item.star) }}
+                          </span>
+                          <span
+                            class="text-xs w-[50px] flex items-center justify-start"
+                          >
+                            <DownloadOutlined class="mr-1" />{{
+                              addUnit(item.downloads)
+                            }}
+                          </span>
+                        </div>
                       </div>
                     </template>
                   </a-list-item-meta>

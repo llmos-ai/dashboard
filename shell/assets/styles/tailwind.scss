@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+@layer base {
+  // antdv conflict
+  svg { 
+      display: inline;
+      vertical-align: baseline; 
+  }
+}

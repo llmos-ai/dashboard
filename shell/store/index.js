@@ -29,6 +29,7 @@ import {
   NAMESPACE_FILTER_NS_FULL_PREFIX,
 } from '@shell/utils/namespace-filter';
 import { allHash, allHashSettled } from '@shell/utils/promise';
+import { gcActions, gcGetters } from '@shell/utils/gc/gc-root-store';
 import { sortBy } from '@shell/utils/sort';
 import { addParam } from '@shell/utils/url';
 import semver from 'semver';
@@ -583,6 +584,7 @@ export const getters = {
     return `${ base }/latest`;
   },
 
+  ...gcGetters
 };
 
 export const mutations = {
@@ -1131,4 +1133,5 @@ export const actions = {
       }
     });
   },
+  ...gcActions
 };

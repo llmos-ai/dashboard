@@ -142,6 +142,11 @@ export default {
 
       this.value.spec.template.spec['containers'] = _containers;
     },
+
+    updateFlatResources(content) {
+      console.log('🚀 ~ updateFlatResources ~ content:', content);
+      this.flatResources = content;
+    }
   }
 };
 </script>
@@ -189,7 +194,7 @@ export default {
                 :disabled="!isCreate"
                 required
                 :mode="mode"
-                @input="update"
+                @update:value="update"
               />
             </div>
 
@@ -200,7 +205,7 @@ export default {
                 :options="notebookImages"
                 required
                 :mode="mode"
-                @input="update"
+                @update:value="update"
               />
             </div>
           </div>
@@ -234,7 +239,7 @@ export default {
                     :options="svcOptions"
                     :label="t('workload.networking.networkMode.label')"
                     :placeholder="t('workload.networking.networkMode.placeholder')"
-                    @input="update"
+                    @update:value="update"
                   />
                 </div>
               </div>
@@ -249,12 +254,13 @@ export default {
         >
           <!-- Resources and Limitations -->
           <ContainerResourceLimit
-            v-model:value="flatResources"
+            :value="flatResources"
             :mode="mode"
             :runtime-classes="runtimeClasses"
             :pod-spec="podTemplateSpec"
             :handle-gpu-limit="true"
             :show-tip="false"
+            @update:value="updateFlatResources"
           />
         </Tab>
 

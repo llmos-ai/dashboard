@@ -6375,7 +6375,11 @@ accelerator:
 
 chat:
   model: 模型
-  addModel: 添加模型
+  addModel: 添加模型对比
+  thinking: 深度思考中...
+  thinkDone: 已完成思考
+  modelSettings:
+    label: 模型设置
   type:
     chat: 对话
     compare: 多模型比较
@@ -6385,6 +6389,9 @@ chat:
     topP: Top P
     seed: Seed
     stopSequence: Stop Sequence
+    systemPrompt: 系统指导语
+    systemPromptTemplate: 系统指导语模版
+    systemPromptTemplatePlaceholder: 选择一个系统指导语模板
   parameterDesc:
     temperature: 控制随机性：降低温度会导致更少的随机完成。当温度接近零时，模型将变得确定性和重复性。
     max_tokens: 生成的最大 token 数。输入的 token 和生成的 token 的总长度受模型上下文长度的限制。
