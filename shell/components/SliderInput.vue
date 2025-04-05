@@ -37,7 +37,7 @@ const updateValue = (value) => {
 <template>
   <div class="row">
     <div class="col span-8 flex items-center">
-      <span class="label mr-1">{{ label }}</span>
+      <span class="mr-1 text-sm">{{ label }}</span>
 
       <a-tooltip
         v-if="description"

@@ -12,6 +12,7 @@ import { SETTING } from '@shell/config/settings';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
 
 export default {
+  emits:      ['update:value'],
   components: {
     LabeledSelect, UnitInput, RadioGroup, ToggleSwitch
   },
@@ -198,7 +199,7 @@ export default {
         limitsVGpuCores,
       } = this;
 
-      this.$emit('input', cleanUp({
+      this.$emit('update:value', cleanUp({
         limitsCpu,
         limitsMemory,
         requestsCpu,

@@ -337,7 +337,6 @@ export default {
       id="select-volume"
       :button-label="t('volume.add.label')"
       :dropdown-options="volumeTypeOptions"
-      size="sm"
       @click-action="e=>addVolume(e.value)"
     />
   </div>

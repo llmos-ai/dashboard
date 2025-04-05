@@ -6697,7 +6697,11 @@ accelerator:
 
 chat:
   model: Model
-  addModel: Add Model
+  addModel: Add Model Compare
+  thinking: Thinking....
+  thinkDone: Done thinking
+  modelSettings:
+    label: Model Settings
   type:
     chat: Chat
     compare: Compare
@@ -6707,6 +6711,9 @@ chat:
     topP: Top P
     seed: Seed
     stopSequence: Stop Sequence
+    systemPrompt: System Prompt
+    systemPromptTemplate: System instructions Template
+    systemPromptTemplatePlaceholder: Select a system instructions template
   parameterDesc:
     temperature: "Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive."
     max_tokens: The maximum number of tokens to generated. The total length of input tokens and generated tokens is limited by the model's context length.

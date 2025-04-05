@@ -15,6 +15,7 @@ import Socket, {
 } from '@shell/utils/socket';
 import Window from './Window';
 import dayjs from 'dayjs';
+import 'xterm/css/xterm.css';
 
 const commands = {
   linux: [
@@ -521,6 +522,7 @@ export default {
           :tabindex="xTermContainerTabIndex"
           class="shell-body"
         />
+
         <resize-observer @notify="fit" />
       </div>
     </template>

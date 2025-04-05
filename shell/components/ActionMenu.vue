@@ -263,22 +263,27 @@ export default {
       class="menu"
       :style="style"
     >
-      <a-menu-item
+      <template
         v-for="(opt, i) in menuOptions"
         :key="i"
-        :disabled="opt.disabled"
-        :data-testid="componentTestid + '-' + i + '-item'"
-        @click="execute(opt, $event)"
       >
-        <IconOrSvg
-          v-if="opt.icon || opt.svg"
-          :icon="opt.icon"
-          :src="opt.svg"
-          class="icon"
-          color="header"
-        />
-        <span v-clean-html="opt.label" />
-      </a-menu-item>
+        <a-menu-divider v-if="opt.divider" />
+        <a-menu-item
+          v-else
+          :disabled="opt.disabled"
+          :data-testid="componentTestid + '-' + i + '-item'"
+          @click="execute(opt, $event)"
+        >
+          <IconOrSvg
+            v-if="opt.icon || opt.svg"
+            :icon="opt.icon"
+            :src="opt.svg"
+            class="icon"
+            color="header"
+          />
+          <span v-clean-html="opt.label" />
+        </a-menu-item>
+      </template>
 
       <a-menu-item
         v-if="!hasOptions(menuOptions)"
@@ -304,46 +309,6 @@ export default {
   min-width: 145px;
 
   color: var(--dropdown-text);
-
-  // LI {
-  //   align-items: center;
-  //   display: flex;
-  //   padding: 8px 10px;
-  //   margin: 0;
-
-  //   &[disabled] {
-  //     cursor: not-allowed !important;
-  //     color: var(--disabled-text);
-  //   }
-
-  //   &.divider {
-  //     padding: 0;
-  //     border-bottom: 1px solid var(--dropdown-divider);
-  //   }
-
-  //   &:not(.divider):hover {
-  //     background-color: var(--dropdown-hover-bg);
-  //     color: var(--dropdown-hover-text);
-  //     cursor: pointer;
-  //   }
-
-  //   .icon {
-  //     display: unset;
-  //     width: 14px;
-  //     text-align: center;
-  //     margin-right: 8px;
-  //   }
-
-  //   &.no-actions {
-  //     color: var(--disabled-text);
-  //   }
-
-  //   &.no-actions:hover {
-  //     background-color: initial;
-  //     color: var(--disabled-text);
-  //     cursor: default;
-  //   }
-  // }
 }
 
 .background {

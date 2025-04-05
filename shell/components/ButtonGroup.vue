@@ -91,6 +91,7 @@ const actionAriaLabel = (opt) => {
 <template>
   <a-radio-group
     :value="value"
+    :size="size"
     button-style="solid"
   >
     <a-radio-button

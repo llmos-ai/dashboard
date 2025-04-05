@@ -1,39 +1,63 @@
 <script setup>
-import { defineEmits, ref, watch } from 'vue';
+import { computed, defineEmits, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import { ML_WORKLOAD_TYPES } from '@shell/config/types';
 
 import LabeledInput from '@components/Form/LabeledInput/LabeledInput.vue';
 import SliderInput from '@shell/components/SliderInput.vue';
 
 const store = useStore();
-const emits = defineEmits(['update:model', ['reset:messages']]);
-const config = defineModel('config');
+const emits = defineEmits(['update:config', 'reset:messages']);
+
 const props = defineProps({
   messages: {
     type:    Array,
-    default: [],
+    default: () => {
+      return [];
+    },
   },
+  config: {
+    type:    Object,
+    default: () => {
+      return {
+        model:       '',
+        temperature: 1,
+        max_tokens:  2048,
+        top_p:       1,
+        seed:        null,
+        stop:        null,
+      };
+    },
+  }
 });
+
+const _config = ref(props.config);
+
+watch(() => props.config, (neuValue) => {
+  _config.value = neuValue;
+}, { deep: true });
 const currentModel = ref('');
 const modelService = store.getters['cluster/all'](
   ML_WORKLOAD_TYPES.MODEL_SERVICE
 );
-const modelOptions = modelService.map((model) => {
-  return {
-    label: model.spec.model,
-    value: model.spec.model,
-    model,
-  };
+
+const modelOptions = computed(() => {
+  return modelService.map((model) => {
+    return {
+      label: model.spec.model,
+      value: model.spec.model,
+      model,
+    };
+  });
 });
 
 const update = () => {
   // TODO: enhance validation
-  if (config.value.seed) {
-    config.value.seed = Number(config.value.seed);
-  }
-  config.value.seed = config.value.seed ? Number(config.value.seed) : null;
-  config.value.stop = config.value.seed ? config.value.stop : null;
+  _config.value.seed = _config.value.seed ? Number(_config.value.seed) : null;
+  _config.value.stop = _config.value.seed ? _config.value.stop : null;
+
+  emits('update:config', _config);
 };
 
 const visible = ref(false);
@@ -46,19 +70,19 @@ const confirm = () => {
 const cancel = () => {
   visible.value = false;
   // 还原config.model值
-  config.value.model = previousModel.value;
+  _config.value.model = previousModel.value;
   preventChangeModel.value = false;
 };
 
 const changeModel = (value, option) => {
   preventChangeModel.value = true;
-  currentModel.value = option.model;
+  currentModel.value = value;
 };
 
 const previousModel = ref('');
 
 watch(
-  () => config.value.model,
+  () => _config.value.model,
   (newValue, oldValue) => {
     previousModel.value = oldValue;
     if (
@@ -69,7 +93,7 @@ watch(
     ) {
       visible.value = true;
     }
-    emits('update:model', currentModel.value);
+    emits('update:config', _config);
   }
 );
 </script>
@@ -83,11 +107,12 @@ watch(
     @confirm="confirm"
     @cancel="cancel"
   >
-    <a-select
-      v-model:value="config.model"
-      class="w-full mb-10"
+    <LabeledSelect
+      v-model:value="_config.model"
+      label="Model"
       :options="modelOptions"
-      @change="changeModel"
+      class="mb-10"
+      @update:value="changeModel"
     />
   </a-popconfirm>
   <hr class="mb-10">
@@ -98,7 +123,7 @@ watch(
   <div class="row mb-10">
     <div class="col span-12">
       <SliderInput
-        v-model="config.temperature"
+        v-model="_config.temperature"
         :min="0"
         :max="2"
         :interval="0.1"
@@ -112,7 +137,7 @@ watch(
   <div class="row mb-10">
     <div class="col span-12">
       <SliderInput
-        v-model="config.max_tokens"
+        v-model="_config.max_tokens"
         :min="0"
         :max="8192"
         :interval="1"
@@ -126,7 +151,7 @@ watch(
   <div class="row mb-10">
     <div class="col span-12">
       <SliderInput
-        v-model="config.top_p"
+        v-model="_config.top_p"
         :min="0"
         :max="1"
         :interval="0.1"
@@ -140,11 +165,11 @@ watch(
   <div class="row mb-10">
     <div class="col span-12">
       <LabeledInput
-        v-model:value="config.seed"
+        v-model:value="_config.seed"
         type="number"
         :tooltip="t('chat.parameterDesc.seed')"
         :label="t('chat.label.seed')"
-        @change="update"
+        @update:value="update"
       />
     </div>
   </div>
@@ -152,11 +177,10 @@ watch(
   <div class="row mb-10">
     <div class="col span-12">
       <LabeledInput
-        v-model:value="config.stop"
-        type="number"
+        v-model:value="_config.stop"
         :label="t('chat.label.stopSequence')"
         :tooltip="t('chat.parameterDesc.stop')"
-        @change="update"
+        @update:value="update"
       />
     </div>
   </div>

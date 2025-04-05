@@ -1,41 +1,85 @@
 <script setup>
 import { useStore } from 'vuex';
-import { ref, computed, useTemplateRef, watch } from 'vue';
+import {
+  ref, computed, useTemplateRef, watch, toValue
+} from 'vue';
 
 import { ML_WORKLOAD_TYPES } from '@shell/config/types';
 import useAutoScrollWithControl from '@shell/composables/useAutoScrollWithControl';
 
-import { ModelParamConfig } from '@shell/config/constants';
 import { matchModelString } from '@shell/utils/ai-model';
 
 import ChatFlex from '@shell/components/ChatFlex.vue';
-import Header from './components/header.vue';
-import ModelDescription from './components/ModelDescription.vue';
-import CompareModel from './components/CompareModel.vue';
+import Header from './components/Header/index.vue';
+import ModelCard from './components/ModelCard.vue';
 import ChatInput from './components/ChatInput.vue';
 import StreamContent from './components/StreamContent.vue';
 import useChat from './composables/useChat';
 
-const store = useStore();
+import SystemPrompt from '@shell/list/chat/components/SystemPrompt.vue';
+import SideConfig from '@shell/list/chat/components/SideConfig.vue';
+import cloneDeep from 'lodash/cloneDeep';
 
+const store = useStore();
 const loadFetch = async() => {
   await store.dispatch('cluster/findAll', { type: ML_WORKLOAD_TYPES.MODEL_SERVICE });
 };
 
 loadFetch();
 
-const config = ref({ ...ModelParamConfig });
+const drawerOpen = ref(true);
+const toggleDrawerOpen = (value) => {
+  drawerOpen.value = value;
+};
+
+const isChatType = computed(() => store.getters['chat/isChatType']);
+
+const singleChatMessages = computed(() => {
+  return store.getters['chat/chatMessages']();
+});
 
 const url = ref('');
 const question = ref('');
-const copyQuestion = ref('');
 
-const chatType = ref('chat');
-const isChatType = computed(() => chatType.value === 'chat');
+const modelComp = useTemplateRef('modelComp');
 
-const compareRef = useTemplateRef('compareRef');
+const { send, loading } = useChat(url, {
+  messages: singleChatMessages,
+  onUpdate: (chunk) => {
+    store.commit('chat/PUSH_CHAT_COMPLETIONS_CHUNK', { chunk });
+  },
 
-const { send, messages, loading } = useChat(url, config, copyQuestion);
+  beforeFetch: (options) => {
+    const assistantRole = cloneDeep({
+      role:      'assistant',
+      content:   '',
+      reasoning: '',
+    });
+    const userRole = cloneDeep(
+      {
+        role:    'user',
+        content: options.payload.question,
+      }
+    );
+    const isRegenerate = options?.payload?.isRegenerate;
+
+    store.commit('chat/PUSH_CHAT_COMPLETIONS_CHUNK', {
+      chunk:   isRegenerate ? assistantRole : [userRole, assistantRole],
+      type:    'single',
+      addRole: true
+    });
+    options.body = JSON.stringify({
+      ...toValue(options.body),
+      messages: singleChatMessages.value.map(({ role, content }) => ({ role, content })).slice(0, -1)
+    });
+
+    return options;
+  },
+});
+
+const filterSystemMessages = computed(() => {
+  return singleChatMessages.value.filter((item) => item.role !== 'system');
+});
 
 const scrollContainer = useTemplateRef('scrollContainer');
 const observerTarget = useTemplateRef('observerTarget');
@@ -43,22 +87,35 @@ const observerTarget = useTemplateRef('observerTarget');
 // TODO: enhancement scroll
 useAutoScrollWithControl(scrollContainer, observerTarget);
 
-const submit = (_question, fileList) => {
-  // We should copy the value of question, because ChatInput needs to be empty.
-  copyQuestion.value = question.value;
+const openSystemPrompt = ref('');
+
+const abortFetch = ref(null);
+const submit = async(_question) => {
   question.value = '';
 
   if (isChatType.value) {
-    send(_question, fileList);
+    abortFetch.value = await send({
+      question: _question,
+      config:   activeConfig.value,
+    });
   } else {
-    compareRef.value.handleSend(_question, fileList);
+    modelComp.value.map((comp) => {
+      comp.handleSend({ question: _question });
+    });
   }
 };
 
+const compareFetchLoading = computed(() => {
+  const loadings = modelComp.value?.map((comp) => comp?.loading) || [];
+
+  return loadings.every((item) => item === true) || false;
+});
+
 const model = ref('');
-const updateModel = (_model) => {
-  url.value = _model.modelApi;
-  model.value = _model;
+
+const updateModel = (resource) => {
+  url.value = resource.modelApi;
+  model.value = resource;
 };
 
 const icon = ref('');
@@ -69,82 +126,214 @@ watch(model, () => {
     modelDisplayName.value = model.value.modelName;
     icon.value = matchModelString(modelDisplayName.value);
   }
+}, { immediate: true, deep: true });
+
+// multi chat
+const chatsConfig = computed(() => store.state.chat.chatsConfig);
+const addModel = () => {
+  if (compareChatIds.value.length < 4) {
+    store.commit('chat/ADD_COMPARE_MODEL');
+  }
+};
+
+const activeUUID = computed({
+  get: () => store.state.chat.activeUUID,
+  set: (value) => store.commit('chat/SET_ACTIVE_UUID', value)
 });
+
+const updateModelMessages = (uuid, messages) => {
+  store.commit('chat/UPDATE_MODEL_MESSAGES', { uuid, messages });
+};
+
+// active config
+const activeConfig = ref({});
+
+watch(activeUUID, () => {
+  activeConfig.value = chatsConfig.value[activeUUID.value];
+}, { immediate: true });
+
+watch(isChatType, () => {
+  if (!isChatType.value) {
+    activeUUID.value = compareChatIds.value[0];
+  } else {
+    activeUUID.value = 'single';
+  }
+}, { immediate: true });
+
+// active system prompt
+const activeSystemPrompt = ref('');
+
+watch(() => ({
+  uuid:     activeUUID.value,
+  messages: store.getters['chat/chatMessages'](activeUUID.value),
+}), () => {
+  if (activeUUID.value) {
+    activeSystemPrompt.value = store.getters['chat/chatMessages'](activeUUID.value)[0].content;
+  }
+}, { immediate: true });
+
+const updateSystemPrompt = (content) => {
+  store.commit('chat/UPDATE_SYSTEM_PROMPT', { content, key: activeUUID.value });
+};
+
+const compareChatIds = computed(() => {
+  return store.getters['chat/compareChatIds'];
+});
+
+const handleAction = (uuid, action) => {
+  switch (action) {
+  case 'singleModel':
+    store.dispatch('chat/SET_SINGLE_MODEL_FROM_COMPARE');
+    break;
+  case 'remove':
+    store.dispatch('chat/REMOVE_COMPARE_MODEL', uuid);
+    break;
+  case 'clear':
+    store.commit('chat/CLEAR_CHAT_MESSAGES', uuid);
+    break;
+  default:
+    break;
+  }
+};
+
+const callbackAbortFetch = () => {
+  if (isChatType.value) {
+    abortFetch.value?.abort();
+    store.commit('chat/SET_ABORT_FROM_UI');
+  } else {
+    modelComp.value.forEach((comp) => {
+      comp.handleAbort();
+      store.commit('chat/SET_ABORT_FROM_UI', comp.uuid);
+    });
+  }
+};
+
+const regenerate = async() => {
+  const lastQuestion = await store.dispatch('chat/REGENERATE_MESSAGE');
+
+  if (lastQuestion) {
+    abortFetch.value = await send({
+      question:     lastQuestion,
+      config:       activeConfig.value,
+      isRegenerate: true
+    });
+  }
+};
 </script>
 
 <template>
-  <Header v-model:type="chatType" />
+  <Header
+    :icon="icon"
+    class="mb-10"
+    :drawer-open="drawerOpen"
+    @update:drawer="toggleDrawerOpen"
+  >
+    <template #extra>
+      <a-button
+        v-if="!isChatType"
+        type="primary"
+        size="large"
+        @click="addModel"
+      >
+        + {{ t('chat.addModel') }}
+      </a-button>
+    </template>
+  </Header>
 
-  <div class="wrapper">
-    <ModelDescription
-      v-if="isChatType"
-      v-model:config="config"
-      :name="modelDisplayName"
-      :icon="icon"
-      @update:model="updateModel"
-    />
-
-    <a-row
-      class="chat-stream mb-10"
-      justify="center"
+  <div class="flex grow-1 border-t-1 border-gray-200">
+    <div
+      class="flex grow-1 flex-col flex-wrap px-5"
     >
-      <a-col
+      <a-collapse
         v-if="isChatType"
-        :md="22"
-        :lg="20"
-        :xl="16"
-        :xxl="12"
-        class="h-full"
+        v-model:activeKey="openSystemPrompt"
+        class="w-full mt-10"
       >
-        <div class="overflow-y-scroll hide-scrollbar h-full">
-          <ChatFlex>
-            <StreamContent
-              v-for="(message, i) in messages.slice().reverse()"
-              :key="i"
-              :message="message"
-            />
-          </ChatFlex>
-        </div>
-      </a-col>
+        <a-collapse-panel
+          key="1"
+          :header="t('chat.label.systemPrompt')"
+        >
+          <SystemPrompt
+            :systemPrompt="activeSystemPrompt"
+            @update:systemPrompt="updateSystemPrompt"
+          />
+        </a-collapse-panel>
+      </a-collapse>
 
-      <a-col
-        v-else
-        :md="22"
-        :lg="22"
-        :xl="22"
-        :xxl="18"
-        class="h-full overflow-hidden"
+      <a-row
+        class="h-[300px] scroll-smooth flex grow-1 overflow-hidden my-5"
+        justify="center"
       >
-        <CompareModel
-          ref="compareRef"
-          :question="copyQuestion"
-        />
-      </a-col>
-    </a-row>
+        <a-col
+          v-if="isChatType"
+          :md="22"
+          :lg="22"
+          :xl="18"
+          :xxl="12"
+          class="h-full"
+        >
+          <div class="overflow-y-scroll hide-scrollbar h-full">
+            <ChatFlex>
+              <StreamContent
+                v-for="(message, i) in filterSystemMessages.slice().reverse()"
+                :key="i"
+                :message="message"
+                :loading="message.isStop ? false : loading"
+                @regenerate="regenerate"
+              />
+            </ChatFlex>
+          </div>
+        </a-col>
 
-    <div class="footer">
+        <a-col
+          v-else
+          :lg="22"
+          :xl="22"
+          :xxl="22"
+          class="h-full overflow-hidden"
+        >
+          <div class="h-full flex flex-row">
+            <div class="h-full flex flex-col grow-1">
+              <a-row
+                :gutter="[16, 16]"
+                class="flex-grow"
+              >
+                <a-col
+                  v-for="(uuid, idx) in compareChatIds"
+                  :key="uuid"
+                  class="flex"
+                  :span="12"
+                >
+                  <ModelCard
+                    ref="modelComp"
+                    :key="uuid"
+                    :uuid="uuid"
+                    :question="question"
+                    @update:messages="updateModelMessages"
+                    @handle:action="handleAction"
+                  >
+                    <template #title>
+                      # {{ idx + 1 }}
+                    </template>
+                  </ModelCard>
+                </a-col>
+              </a-row>
+            </div>
+          </div>
+        </a-col>
+      </a-row>
+
       <ChatInput
         v-model="question"
-        :loading="loading"
+        :loading="isChatType ?loading : compareFetchLoading"
         @submit="submit"
+        @update:abort="callbackAbortFetch"
       />
     </div>
+
+    <SideConfig
+      v-model:drawerOpen="drawerOpen"
+      :activeConfig="activeConfig"
+    />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  flex-grow: 1;
-
-  .chat-stream {
-    display: flex;
-    flex-grow: 1;
-    height: calc(300px);
-    scroll-behavior: smooth;
-    overflow: hiddle;
-  }
-}
-</style>

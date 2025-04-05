@@ -49,58 +49,77 @@ export function streamingSupported() {
   return supported;
 }
 
-/**
- * 处理大模型 API 返回数据流
- * @param {string} url - API 端点地址
- * @param {Object} body - 请求体
- * @param {Object} headers - 请求头（可选）
- * @param {Function} onData - 处理数据块的回调
- * @param {Function} onError - 处理错误的回调
- * @param {Function} onDone - 请求完成后的回调
- * @param { Function } onBefore - 发送请求前
- */
-export async function fetchLLMStream({
-  url,
-  body,
-  headers = {},
-  onData,
-  onError,
-  onDone,
-  onBefore,
+export async function fetchLLMStream(options = {
+  url:         '',
+  body:        {},
+  headers:     {},
+  onData:      null,
+  onError:     null,
+  onDone:      null,
+  beforeFetch: null,
+  afterFetch:  null,
+  method:      'POST',
+  payload:     {},
+  signal:      null
 }) {
+  let {
+    url, body, headers, onData, onError, onDone, beforeFetch, afterFetch, method = 'POST', payload, signal
+  } = options;
+
   try {
-    if (typeof onBefore === 'function') {
-      onBefore();
+    if (typeof beforeFetch === 'function') {
+      const options = beforeFetch({
+        payload, headers, body, method, url
+      });
+
+      url = options?.url || url;
+      body = options?.body || body;
+      headers = options?.headers || headers;
+      method = options?.method || method;
     }
+
     const response = await fetch(url, {
-      method:  'POST',
+      method,
       headers: {
         'Content-Type': 'application/json',
         ...headers,
       },
-      body: JSON.stringify(body),
+      body,
+      signal
     });
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder('utf-8');
 
-    if (!response.ok) {
-      // catch error
-      const { value, done: readerDone } = await reader.read();
-      const content = decoder.decode(value, { stream: true });
-
-      const jsonContent = JSON.parse(content);
-      const message = jsonContent?.error?.message;
-
-      if (message) {
-        throw new Error(message);
-      } else {
-        throw new Error(`HTTP error! Status: ${ response.status }`);
-      }
-    }
-
     let done = false;
     let buffer = '';
+
+    if (!response.ok) {
+      // catch error
+      while (!done) {
+        try {
+          const { value, done: readerDone } = await reader.read();
+
+          done = readerDone;
+          if (value) {
+            const content = decoder.decode(value, { stream: true });
+
+            try {
+              const jsonContent = JSON.parse(content);
+              const message = jsonContent?.error?.message || jsonContent?.message;
+
+              throw new Error(message || `HTTP error! Status: ${ response.status }`);
+            } catch (parseError) {
+              throw new Error(content || `HTTP error! Status: ${ response.status }`);
+            }
+          }
+        } finally {
+          if (typeof onDone === 'function') {
+            onDone();
+          }
+        }
+      }
+    }
 
     while (!done) {
       const { value, done: readerDone } = await reader.read();
@@ -130,20 +149,9 @@ export async function fetchLLMStream({
             try {
               // 6. 解析 JSON 数据
               const parsed = JSON.parse(jsonStr);
-              const content = parsed.choices?.[0]?.delta?.content || '';
 
-              // reasoning_content  (think)
-              const reasoningContent =
-                parsed.choices?.[0]?.delta?.reasoning_content || '';
-
-              if (reasoningContent && typeof onData === 'function') {
-                onData(reasoningContent, true);
-              }
-
-              // content
-              // 7. 触发 onData 回调
-              if (content && typeof onData === 'function') {
-                onData(content);
+              if (typeof onData === 'function') {
+                onData(parsed);
               }
             } catch (error) {
               if (typeof onError === 'function') {
@@ -162,7 +170,14 @@ export async function fetchLLMStream({
       onDone();
     }
   } catch (error) {
-    if (typeof onError === 'function') {
+    if (error.name === 'AbortError') {
+      // eslint-disable-next-line no-console
+      console.warn('aborted fetch');
+
+      if (typeof onDone === 'function') {
+        onDone();
+      }
+    } else if (typeof onError === 'function') {
       onError(error);
     }
   }

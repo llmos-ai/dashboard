@@ -1,8 +1,7 @@
 <template>
-  <div
-    class="markdown-viewer"
-  >
-    <div ref="markdown-viewer">
+  <div> 
+    <div v-if="isLoading" class="flex h-[32px]"><LoadingOutlined /></div>
+    <div ref="markdown-viewer" v-else>
       <component
         :is="renderItem(token)"
         v-for="(token, index) in tokens"
@@ -16,6 +15,7 @@
 import {
   ref, onMounted, watch, computed, useTemplateRef, h, VNode
 } from 'vue';
+import { LoadingOutlined } from '@ant-design/icons-vue';
 import { Checkbox, Image, Typography } from 'ant-design-vue';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
@@ -33,8 +33,24 @@ const props = defineProps({
   content: {
     type:    String,
     default: ''
+  },
+  showLoading: {
+    type:    Boolean,
+    default: false
+  },
+  isThink: {
+    type: Boolean,
+    default: false
+  },
+  color: {
+    type: String,
+    default: ''
   }
 });
+
+const isLoading = computed(() => {
+  return props.showLoading && props.content?.length === 0;
+})
 
 const renderer = new marked.Renderer();
 
@@ -127,7 +143,11 @@ const renderItem = (token) => {
 
   // // 解析段落 (里面可能有child)
   if (token.type === 'paragraph') {
-    htmlstr = h(Paragraph, {}, () => child);
+    htmlstr = h(Paragraph, {
+      style: {
+        color: props.color
+      }
+    }, () => child);
   }
 
   // // TODO: delete ?
@@ -194,26 +214,26 @@ const renderItem = (token) => {
 
 onMounted(() => {
   nextTick(() => {
-    try {
-      renderMathInElement(markdownDOM.value, {
-        delimiters: [
-          {
-            left: '$$', right: '$$', display: true
-          },
-          {
-            left: '$', right: '$', display: false
-          },
-          {
-            left: '\\(', right: '\\)', display: false
-          },
-          {
-            left: '\\[', right: '\\]', display: true
-          }
-        ],
-        throwOnError: false
-      });
-    } catch (err) {
-    }
+    // try {
+    //   renderMathInElement(markdownDOM.value, {
+    //     delimiters: [
+    //       {
+    //         left: '$$', right: '$$', display: true
+    //       },
+    //       {
+    //         left: '$', right: '$', display: false
+    //       },
+    //       {
+    //         left: '\\(', right: '\\)', display: false
+    //       },
+    //       {
+    //         left: '\\[', right: '\\]', display: true
+    //       }
+    //     ],
+    //     throwOnError: false
+    //   });
+    // } catch (err) {
+    // }
   });
 });
 

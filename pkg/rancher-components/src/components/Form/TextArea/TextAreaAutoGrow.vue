@@ -45,6 +45,11 @@ export default defineComponent({
       default: 25
     },
 
+    autosize: {
+      type:    [Boolean, Object],
+      default: true
+    },
+
     /**
      * Sets the maximum height for Text Area. Prevents the height from becoming
      * larger than the value specified in maxHeight.
@@ -125,17 +130,6 @@ export default defineComponent({
     }
   },
 
-  created() {
-    this.queueResize = debounce(this.autoSize, 100);
-  },
-
-  mounted() {
-    (this.$refs.ta as HTMLElement).style.height = `${ this.curHeight }px`;
-    this.$nextTick(() => {
-      this.autoSize();
-    });
-  },
-
   methods: {
     /**
      * Emits the input event and resizes the Text Area.
@@ -152,40 +146,19 @@ export default defineComponent({
      */
     focus(): void {
       (this.$refs?.ta as HTMLElement).focus();
-    },
-
-    /**
-     * Sets the overflowY and height of the Text Area based on the content
-     * entered (calculated via scroll height).
-     */
-    autoSize(): void {
-      const el = this.$refs.ta as HTMLElement;
-
-      if (!el) {
-        return;
-      }
-
-      el.style.height = '1px';
-
-      const border = parseInt(getComputedStyle(el).getPropertyValue('borderTopWidth'), 10) || 0 + parseInt(getComputedStyle(el).getPropertyValue('borderBottomWidth'), 10) || 0;
-      const neu = Math.max(this.minHeight, Math.min(el.scrollHeight + border, this.maxHeight));
-
-      el.style.overflowY = el.scrollHeight > neu ? 'auto' : 'hidden';
-      el.style.height = `${ neu }px`;
-
-      this.curHeight = neu;
     }
   }
 });
 </script>
 
 <template>
-  <textarea
-    ref="ta"
+  <a-textarea  
+    ref="ta" 
     :value="value"
     :data-testid="$attrs['data-testid'] ? $attrs['data-testid'] : 'text-area-auto-grow'"
     :disabled="isDisabled"
     :style="style"
+    :auto-size="autosize"
     :placeholder="placeholder"
     :class="className"
     class="no-resize no-ease"

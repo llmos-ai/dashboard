@@ -6,6 +6,8 @@ import { _EDIT } from '@shell/config/query-params';
 export default {
   components: { LabeledInput },
 
+  emits: ['update:value', 'update:validation', 'change', 'blur'],
+
   props: {
     /**
      * Convert output to string
@@ -45,11 +47,6 @@ export default {
     baseUnit: {
       type:    String,
       default: 'B',
-    },
-
-    hideUnit: {
-      type:    Boolean,
-      default: false,
     },
 
     /**
@@ -100,11 +97,6 @@ export default {
       default: null
     },
 
-    native: {
-      type:    Boolean,
-      default: false
-    },
-
     tooltip: {
       type:    [String, Object],
       default: null
@@ -136,7 +128,12 @@ export default {
     delay: {
       type:    Number,
       default: 0
-    }
+    },
+
+    positive: {
+      type:    Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -204,18 +201,19 @@ export default {
     update(inputValue) {
       let out = inputValue === '' ? null : inputValue;
 
+      if (this.positive && inputValue < 0) {
+        out = 0;
+      }
+
       if (this.outputModifier) {
-        out = out === null ? null : `${ inputValue }${ this.unit }`;
+        out = out === null ? null : `${ parseInt(inputValue) }${ this.unit }`;
       } else if ( this.outputAs === 'string' ) {
         out = out === null ? '' : `${ inputValue }`;
-      } else if (this.native) {
-        // do nothing
-        out = parseFloat(out);
       } else if (out) {
         out = this.unit ? parseSi(`${ out }${ this.unit }`) : parseInt(out);
       }
 
-      this.$emit('input', out);
+      this.$emit('update:value', out);
     },
   }
 };
@@ -237,12 +235,12 @@ export default {
     :required="required"
     :placeholder="placeholder"
     :hide-arrows="hideArrows"
-    @change="update($event.target.value)"
+    @update:value="update"
     @blur="update($event.target.value)"
   >
     <template #suffix>
       <div
-        v-if="displayUnit && !hideUnit"
+        v-if="displayUnit"
         class="addon"
         :class="{'with-tooltip': tooltip || tooltipKey}"
       >
@@ -254,7 +252,6 @@ export default {
 
 <style lang="scss" scoped>
   .addon.with-tooltip {
-    position: relative;
-    right: 30px;
+    padding-right: 42px;
   }
 </style>
