@@ -4,7 +4,7 @@ import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from '@shell/config/types';
 import { _CREATE, _VIEW } from '@shell/config/query-params';
 import { addObjects, isArray } from '@shell/utils/array';
 import Loading from '@shell/components/Loading';
-import { Checkbox } from '@components/Form/Checkbox';
+import { Checkbox } from '@shell/components/form/Checkbox';
 
 /**
  * Display checkboxes for each global role, checked for given user or principal (group). Can save changes.

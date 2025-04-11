@@ -7,9 +7,11 @@ import {
 } from '@shell/config/table-headers';
 import { LLMOS, NODE as NODE_TYPE, POD } from '@shell/config/types';
 import CopyToClipboard from '@shell/components/CopyToClipboard.vue';
+import ResourceFetch from '@shell/mixins/resource-fetch';
 
 export default {
   name:       'GPUDeviceList',
+  mixins:     [ResourceFetch],
   components: {
     CopyToClipboard,
     ResourceTable,
@@ -25,14 +27,14 @@ export default {
 
     const res = await allHash(hash);
 
-    this.rows = res.gpuDevices;
+    this.gpuDevices = res.gpuDevices;
     this.pods = res.pods;
   },
 
   data() {
     return {
-      rows: [],
-      pods: [],
+      gpuDevices: [],
+      pods:       [],
     };
   },
 
@@ -83,7 +85,7 @@ export default {
     v-bind="$attrs"
     :headers="headers"
     :groupable="true"
-    :rows="rows"
+    :rows="gpuDevices"
     key-field="_key"
     :namespaced="false"
   >

@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 import { _EDIT, _VIEW } from '@shell/config/query-params';
 import { removeAt, findBy } from '@shell/utils/array';
 import { clone } from '@shell/utils/object';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { SERVICE } from '@shell/config/types';
 

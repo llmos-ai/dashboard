@@ -4,7 +4,7 @@ import { colorForState, stateDisplay } from '@shell/plugins/dashboard-store/reso
 import { NAME, NAMESPACE, STATE, TYPE } from '@shell/config/table-headers';
 import { sortableNumericSuffix } from '@shell/utils/sort';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
-import { BadgeState } from '@components/BadgeState';
+import { BadgeState } from '@shell/components/BadgeState';
 
 export default {
   components: { ResourceTable, BadgeState },

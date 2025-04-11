@@ -1,6 +1,6 @@
 <script>
 import { parseSi, formatSi, UNITS, FRACTIONAL } from '@shell/utils/units';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import { _EDIT } from '@shell/config/query-params';
 
 export default {

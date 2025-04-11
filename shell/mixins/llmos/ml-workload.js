@@ -28,8 +28,8 @@ import Tab from '@shell/components/Tabbed/Tab.vue';
 import Volume from '@shell/edit/volume/index.vue';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 
-import { LabeledInput } from '@components/Form/LabeledInput';
-import { Checkbox } from '@components/Form/Checkbox';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
+import { Checkbox } from '@shell/components/form/Checkbox';
 import Resource from '@shell/plugins/dashboard-store/resource-class';
 import { FlatResources, NVIDIA, VolcanoScheduler } from '@shell/utils/container-resource';
 import { PullPolicyOptions, SvcOptions } from '@shell/config/constants';

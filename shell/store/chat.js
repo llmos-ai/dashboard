@@ -68,7 +68,7 @@ export const getters = {
         ...chat,
         content,
         reasoning,
-        canRegenerate: (_chatLength - 1) === index,
+        canRegenerate: (_chatLength - 1) === index || (_chatLength - 2) === index, // last role=assistant 、 last role=user
         isStop:        finishReason === 'stop' || _chat.chat?.length - 1 !== index || chat.abortFromUI,
       };
     }) || [];
@@ -88,7 +88,7 @@ export const mutations = {
   CHANGE_ACTIVE_UUID(state, uuid) {
     state.activeUUID = uuid;
   },
-  // singleChatCompletions
+
   PUSH_CHAT_COMPLETIONS_CHUNK(state, { type = 'single', chunk, addRole = false }) {
     const id = chunk?.id;
     const chat = state.chatsCompletionChunks?.[type]?.chat || '';
@@ -156,6 +156,7 @@ export const mutations = {
       lastMessage.abortFromUI = true;
     }
   },
+
   UPDATE_SINGLE_CHAT_CONFIG(state, config) {
     state.singleChatConfig.config = config;
   },
@@ -189,9 +190,10 @@ export const mutations = {
 
   CLEAR_CHAT_MESSAGES(state, uuid) {
     if (uuid) {
-      state.chatsCompletionChunks[uuid].chat = [cloneDeep(initMessages)];
+      state.chatsCompletionChunks[uuid].chat = cloneDeep(initMessages);
     }
   },
+
   UPDATE_COMPARE_SYSTEM_PROMPT(state, { uuid, content }) {
     const index = state.compareConfigs.findIndex((config) => config.id === uuid);
 
@@ -236,7 +238,9 @@ export const actions = {
     commit('SET_CHAT_TYPE', 'chat');
   },
 
-  REGENERATE_MESSAGE({ state, commit }, key = 'single') {
+  REGENERATE_MESSAGE({ state, commit }, payload = { key: 'single' }) {
+    const { key, question } = payload;
+
     const chat = state.chatsCompletionChunks[key]?.chat;
 
     if (!chat || chat.length < 2) {
@@ -249,6 +253,8 @@ export const actions = {
     if (userMessage.role !== 'user') {
       return null;
     }
+
+    userMessage.content = question || userMessage.content;
 
     chat.pop();
 

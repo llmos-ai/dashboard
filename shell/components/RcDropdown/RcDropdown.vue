@@ -22,7 +22,7 @@
  */
 import { useTemplateRef } from 'vue';
 import { useClickOutside } from '@shell/composables/useClickOutside';
-import { useDropdownContext } from '@components/RcDropdown/useDropdownContext';
+import { useDropdownContext } from '@shell/components/RcDropdown/useDropdownContext';
 
 defineProps<{
   ariaLabel?: string

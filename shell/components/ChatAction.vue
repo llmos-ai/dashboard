@@ -1,7 +1,7 @@
 <script setup>
 import { CopyOutlined, SyncOutlined } from '@ant-design/icons-vue';
 
-defineProps({
+const props = defineProps({
   size: {
     type:    String,
     default: 'small',
@@ -9,12 +9,17 @@ defineProps({
   showRegenerate: {
     type:    Boolean,
     default: false,
-  }
+  },
+  copyContent: {
+    type:    String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['regenerate', 'copy']);
 
 const handleCopy = async() => {
+  await navigator.clipboard.writeText(props.copyContent);
   emit('copy');
 };
 
@@ -25,6 +30,8 @@ const handleRegenerate = () => {
 
 <template>
   <a-space :size="size">
+    <slot name="prefix" />
+
     <a-tooltip title="复制">
       <a-button
         type="text"
@@ -48,6 +55,6 @@ const handleRegenerate = () => {
       </a-button>
     </a-tooltip>
 
-    <slot />
+    <slot name="suffix" />
   </a-space>
 </template>

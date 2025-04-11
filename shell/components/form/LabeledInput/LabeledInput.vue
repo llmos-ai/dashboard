@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, inject } from 'vue';
-import TextAreaAutoGrow from '@components/Form/TextArea/TextAreaAutoGrow.vue';
-import LabeledTooltip from '@components/LabeledTooltip/LabeledTooltip.vue';
+import TextAreaAutoGrow from '@shell/components/form/TextArea/TextAreaAutoGrow.vue';
+import LabeledTooltip from '@shell/components/LabeledTooltip/LabeledTooltip.vue';
 import { escapeHtml, generateRandomAlphaString } from '@shell/utils/string';
 import cronstrue from 'cronstrue';
 import { isValidCron } from 'cron-validator';

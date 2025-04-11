@@ -25,7 +25,7 @@ import { clone, diff } from '@shell/utils/object';
 import IconMessage from '@shell/components/IconMessage';
 import { checkSchemasForFindAllHash } from '@shell/utils/auth';
 import { stringify } from '@shell/utils/error';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 
 function modeFor(route) {
   if (route.query?.mode === _IMPORT) {

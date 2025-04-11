@@ -2,8 +2,8 @@
 import { defineComponent } from "vue";
 import { _VIEW, _CREATE } from "@shell/config/query-params";
 import LabeledSelect from "@shell/components/form/LabeledSelect.vue";
-import Checkbox from "@components/Form/Checkbox/Checkbox.vue";
-import LabeledInput from "@components/Form/LabeledInput/LabeledInput.vue";
+import Checkbox from "@shell/components/form/Checkbox/Checkbox.vue";
+import LabeledInput from "@shell/components/form/LabeledInput/LabeledInput.vue";
 import {
   PSADimension,
   PSAMode,

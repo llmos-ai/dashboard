@@ -2,13 +2,13 @@
 import { MANAGEMENT } from '@shell/config/types';
 import CreateEditView from '@shell/mixins/create-edit-view';
 import ChangePassword from '@shell/components/form/ChangePassword';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import CruResource from '@shell/components/CruResource';
 import { exceptionToErrorsArray } from '@shell/utils/error';
 import { _CREATE, _EDIT } from '@shell/config/query-params';
 import Loading from '@shell/components/Loading';
 import GlobalRoleBindings from '@shell/components/GlobalRoleBindings.vue';
-import { Checkbox } from '@components/Form/Checkbox';
+import { Checkbox } from '@shell/components/form/Checkbox';
 
 export default {
   components: {

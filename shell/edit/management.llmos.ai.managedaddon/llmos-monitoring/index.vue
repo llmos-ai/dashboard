@@ -2,8 +2,8 @@
 import NameNsDescription from '@shell/components/form/NameNsDescription.vue';
 import Tab from '@shell/components/Tabbed/Tab.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
-import { LabeledInput } from '@components/Form/LabeledInput';
-import { Checkbox } from '@components/Form/Checkbox';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
+import { Checkbox } from '@shell/components/form/Checkbox';
 import { allHash } from '@shell/utils/promise';
 import { MANAGEMENT, PVC, STORAGE_CLASS } from '@shell/config/types';
 import jsyaml from 'js-yaml';

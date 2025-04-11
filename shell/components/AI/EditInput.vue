@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { EditOutlined, ArrowUpOutlined } from '@ant-design/icons-vue';
+import ChatAction from '@shell/components/ChatAction.vue';
 
 const props = defineProps({
   value: {
@@ -11,9 +12,13 @@ const props = defineProps({
     type:    Boolean,
     default: false,
   },
+  canEdit: {
+    type:    Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(['update:value']);
+const emits = defineEmits(['update:value']);
 
 const inputValue = ref(props.value);
 const editing = ref(props.isEdit);
@@ -35,7 +40,7 @@ const handleCancel = () => {
 };
 
 const save = () => {
-  emit('update:value', inputValue.value);
+  emits('update:value', inputValue.value);
   editing.value = false;
 };
 </script>
@@ -47,20 +52,32 @@ const save = () => {
       class="relative"
     >
       <div class="flex flex-col items-end group w-auto">
-        <span class="px-[16px] py-[9px] rounded-xl bg-[#a22d2d0a] w-auto">
+        <span class="px-[16px] py-[9px] rounded-xl bg-[#a22d2d0a] w-auto mb-5">
           {{ inputValue }}
         </span>
 
         <div
           class="action w-auto group-hover:opacity-100 opacity-0 transition-opacity duration-300"
         >
-          <a-button
-            type="button"
-            class="btn btn-sm role-link"
-            @click="toggleEdit"
+          <ChatAction
+            :showRegenerate="false"
+            :copyContent="inputValue"
           >
-            <EditOutlined />
-          </a-button>
+            <template #prefix>
+              <a-tooltip
+                v-if="canEdit"
+                title="修改"
+              >
+                <a-button
+                  type="text"
+                  size="small"
+                  @click="toggleEdit"
+                >
+                  <EditOutlined />
+                </a-button>
+              </a-tooltip>
+            </template>
+          </ChatAction>
         </div>
       </div>
     </div>
@@ -77,6 +94,7 @@ const save = () => {
         <a-textarea
           v-model:value="inputValue"
           auto-size
+          @keyup.alt.enter.exact="save"
         />
 
         <a-button
@@ -93,9 +111,3 @@ const save = () => {
     </div>
   </div>
 </template>
-
-<style lang="scss">
-.v-center {
-  vertical-align: 0px !important;
-}
-</style>

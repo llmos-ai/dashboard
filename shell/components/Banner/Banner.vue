@@ -1,7 +1,7 @@
 <script lang="ts">
-import { defineComponent } from "vue";
-import { nlToBr } from "@shell/utils/string";
-import { stringify } from "@shell/utils/error";
+import { defineComponent } from 'vue';
+import { nlToBr } from '@shell/utils/string';
+import { stringify } from '@shell/utils/error';
 
 export default defineComponent({
   props: {
@@ -10,57 +10,55 @@ export default defineComponent({
      * @values primary, secondary, success, warning, error, info
      */
     color: {
-      type: String,
-      default: "secondary",
+      type:    String,
+      default: 'secondary'
     },
     /**
      * The label to display as the banner's default content.
      */
     label: {
-      type: [String, Error, Object],
-      default: null,
+      type:    [String, Error, Object],
+      default: null
     },
     /**
      * The i18n key for the label to display as the banner's default content.
      */
     labelKey: {
-      type: String,
-      default: null,
+      type:    String,
+      default: null
     },
     /**
      * Add icon for the banner
      */
     icon: {
-      type: String,
-      default: null,
+      type:    String,
+      default: null
     },
     /**
      * Toggles the banner's close button.
      */
     closable: {
-      type: Boolean,
-      default: false,
+      type:    Boolean,
+      default: false
     },
     /**
      * Toggles the stacked class for the banner.
      */
     stacked: {
-      type: Boolean,
-      default: false,
-    },
+      type:    Boolean,
+      default: false
+    }
   },
-  emits: ["close"],
+  emits:    ['close'],
   computed: {
     /**
      * Return message text as label.
      */
     messageLabel(): string | void {
-      return !(typeof this.label === "string")
-        ? stringify(this.label)
-        : undefined;
-    },
+      return !(typeof this.label === 'string') ? stringify(this.label) : undefined;
+    }
   },
-  methods: { nlToBr },
+  methods: { nlToBr }
 });
 </script>
 <template>
@@ -71,8 +69,15 @@ export default defineComponent({
     }"
     role="banner"
   >
-    <div v-if="icon" class="banner__icon" data-testid="banner-icon">
-      <i class="icon icon-2x" :class="icon" />
+    <div
+      v-if="icon"
+      class="banner__icon"
+      data-testid="banner-icon"
+    >
+      <i
+        class="icon icon-2x"
+        :class="icon"
+      />
     </div>
     <div
       class="banner__content"
@@ -80,13 +85,20 @@ export default defineComponent({
       :class="{
         closable,
         stacked,
-        icon,
+        icon
       }"
     >
       <slot>
-        <t v-if="labelKey" :k="labelKey" :raw="true" />
+        <t
+          v-if="labelKey"
+          :k="labelKey"
+          :raw="true"
+        />
         <span v-else-if="messageLabel">{{ messageLabel }}</span>
-        <span v-else v-clean-html="nlToBr(label)" />
+        <span
+          v-else
+          v-clean-html="nlToBr(label)"
+        />
       </slot>
       <div
         v-if="closable"
@@ -98,7 +110,10 @@ export default defineComponent({
         @keyup.enter="$emit('close')"
         @keyup.space="$emit('close')"
       >
-        <i data-testid="banner-close" class="icon icon-close closer-icon" />
+        <i
+          data-testid="banner-close"
+          class="icon icon-close closer-icon"
+        />
       </div>
     </div>
   </div>

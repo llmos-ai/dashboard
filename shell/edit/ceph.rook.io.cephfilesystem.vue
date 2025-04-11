@@ -10,8 +10,8 @@ import { cleanUp, set } from '@shell/utils/object';
 import { REPLICATED, ERASURE_CODED } from '@shell/edit/ceph.rook.io.cephblockpool.vue';
 import ArrayListGrouped from '@shell/components/form/ArrayListGrouped.vue';
 import DataPool from '@shell/components/DataPool.vue';
-import { Checkbox } from '@components/Form/Checkbox';
-import { Banner } from '@components/Banner';
+import { Checkbox } from '@shell/components/form/Checkbox';
+import { Banner } from '@shell/components/Banner';
 import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
 import CephConfig from '@shell/mixins/ceph-config';
 

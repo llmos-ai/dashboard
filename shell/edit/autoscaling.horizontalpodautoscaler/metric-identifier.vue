@@ -1,5 +1,5 @@
 <script>
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import { convert, simplify } from '@shell/utils/selector'; /*  matching, */
 import MatchExpressions from '@shell/components/form/MatchExpressions';
 

@@ -1,16 +1,16 @@
 <script>
 import { USERNAME } from '@shell/config/cookies';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import AsyncButton from '@shell/components/AsyncButton';
 import LocaleSelector from '@shell/components/LocaleSelector';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import {
   LOCAL,
   LOGGED_OUT,
   TIMED_OUT,
   _FLAGGED,
 } from '@shell/config/query-params';
-import { Checkbox } from '@components/Form/Checkbox';
+import { Checkbox } from '@shell/components/form/Checkbox';
 import Password from '@shell/components/form/Password';
 import { mapGetters } from 'vuex';
 import { MANAGEMENT } from '@shell/config/types';

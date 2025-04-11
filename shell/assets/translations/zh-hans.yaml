@@ -6378,6 +6378,11 @@ chat:
   addModel: 添加模型对比
   thinking: 深度思考中...
   thinkDone: 已完成思考
+  switchTip: 切换模型将清除当前上下文，是否继续？
+  emptyModelTip: 为本次对话选择一个模型
+  selectModelFirst: 请先选择模型
+  selectModel: 请选择您的模型
+  askAnything: 询问任何问题
   modelSettings:
     label: 模型设置
   type:

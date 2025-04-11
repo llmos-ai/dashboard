@@ -10,6 +10,7 @@ import { matchModelString } from '@shell/utils/ai-model';
 import { useModelLogo } from '../composables/useModelLogo';
 import { useStore } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
+import SelectModel from '@shell/list/chat/components/SelectModel.vue';
 
 const store = useStore();
 const props = defineProps({
@@ -121,16 +122,20 @@ const handleAction = (action) => {
 };
 
 const modelDisplayName = computed(() => {
-  return config.value.model?.modelName || '';
+  return modelResource.value?.modelName || config.value.model;
 });
 
-const updateModel = (_model) => {
-  url.value = _model.modelApi;
+// TODO: high,  url save to vuex
+const modelResource = ref(null);
+const changeModel = (resource) => {
+  config.value.model = resource.spec.model;
+  modelResource.value = resource;
+  url.value = resource.modelApi;
   store.commit('chat/UPDATE_COMPARE_MODEL_CONFIG', {
     uuid:   props.uuid,
     config: {
       ...config.value,
-      model: _model
+      model: resource.spec.model
     }
   });
 };
@@ -140,7 +145,7 @@ const { modelLogo } = useModelLogo(icon);
 const scHeight = ref(0);
 
 const regenerate = async() => {
-  const lastQuestion = await store.dispatch('chat/REGENERATE_MESSAGE', props.uuid);
+  const lastQuestion = await store.dispatch('chat/REGENERATE_MESSAGE', { key: props.uuid });
 
   if (lastQuestion) {
     abortFetch.value = await send({
@@ -151,6 +156,15 @@ const regenerate = async() => {
   }
 };
 </script>
+
+<script>
+export default {
+    setup() {
+        return
+    }
+}
+</script>
+
 
 <template>
   <a-card
@@ -185,7 +199,7 @@ const regenerate = async() => {
             <span v-if="config.model">
               {{ modelDisplayName }}
             </span>
-            <span v-else> 请选择您的模型 </span>
+            <span v-else> {{ t('chat.selectModel') }} </span>
             <SwapOutlined />
           </a-button>
 
@@ -193,11 +207,10 @@ const regenerate = async() => {
             <div class="w-[350px]">
               <div class="row">
                 <div class="col span-12">
-                  <a-select
-                    v-model:value="config.model"
-                    class="w-full mb-10"
-                    :options="modelOptions"
-                    @change="changeModel"
+                  <SelectModel
+                    :model="config.model"
+                    class="mb-10"
+                    @update:value="changeModel"
                   />
                 </div>
               </div>
@@ -239,6 +252,7 @@ const regenerate = async() => {
         :key="i"
         :message="message"
         :loading="message.isStop ? false : loading"
+        :uuid="props.uuid"
         @regenerate="regenerate"
       />
       <div ref="observerTarget" />

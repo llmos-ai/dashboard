@@ -1,7 +1,7 @@
 <script>
 import ProjectMemberEditor from '@shell/components/form/ProjectMemberEditor.vue';
 import AsyncButton from '@shell/components/AsyncButton.vue';
-import Banner from '@components/Banner/Banner.vue';
+import Banner from '@shell/components/Banner/Banner.vue';
 import { MANAGEMENT, MANAGEMENT_GROUP, RBAC_GROUP } from '@shell/config/types';
 
 export default {

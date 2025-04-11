@@ -2,9 +2,9 @@
 import debounce from 'lodash/debounce';
 import { _EDIT, _VIEW } from '@shell/config/query-params';
 import { removeAt } from '@shell/utils/array';
-import { TextAreaAutoGrow } from '@components/Form/TextArea';
+import { TextAreaAutoGrow } from '@shell/components/form/TextArea';
 import { clone } from '@shell/utils/object';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 const DEFAULT_PROTIP =
   'Tip: Paste lines into any list field for easy bulk entry';
 

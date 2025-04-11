@@ -1,7 +1,7 @@
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
 import { _VIEW } from '@shell/config/query-params';
-import RadioButton from '@components/Form/Radio/RadioButton.vue';
+import RadioButton from '@shell/components/form/Radio/RadioButton.vue';
 
 interface Option {
   value: unknown,

@@ -15,7 +15,7 @@ import { _CLONE, _DETAIL } from '@shell/config/query-params';
 import { SCOPED_RESOURCES } from '@shell/config/roles';
 import Loading from '@shell/components/Loading';
 import { SUBTYPE_MAPPING, VERBS } from '@shell/models/management.llmos.ai.globalrole';
-import { RadioGroup } from '@components/Form/Radio';
+import { RadioGroup } from '@shell/components/form/Radio';
 
 const GLOBAL = SUBTYPE_MAPPING.GLOBAL.key;
 const RBAC_ROLE = SUBTYPE_MAPPING.RBAC_ROLE.key;

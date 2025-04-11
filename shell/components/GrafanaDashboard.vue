@@ -1,6 +1,6 @@
 <script>
 import Loading from '@shell/components/Loading';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import { computeDashboardUrl } from '@shell/utils/grafana';
 
 export default {

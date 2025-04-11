@@ -1,12 +1,22 @@
 <script setup>
+import { useStore } from 'vuex';
+import { useI18n } from '@shell/composables/useI18n';
 import { ref, defineProps, defineEmits } from 'vue';
 import {
   ArrowUpOutlined,
   PauseOutlined,
 } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
+
+const store = useStore();
+const { t } = useI18n(store);
 
 const props = defineProps({
   loading: {
+    type:    Boolean,
+    default: false,
+  },
+  disabled: {
     type:    Boolean,
     default: false,
   },
@@ -59,20 +69,37 @@ const fileList = ref([]);
 //   fileList.value = [...fileList.value, file];
 // };
 
-const handleRemove = (file) => {
-  const index = fileList.value.indexOf(file);
-  const newFileList = fileList.value.slice();
+// const handleRemove = (file) => {
+//   const index = fileList.value.indexOf(file);
+//   const newFileList = fileList.value.slice();
 
-  newFileList.splice(index, 1);
-  fileList.value = newFileList;
-};
+//   newFileList.splice(index, 1);
+//   fileList.value = newFileList;
+// };
 
 const submit = () => {
+  if (props.disabled) {
+    message.warning({
+      content: t('chat.selectModelFirst'),
+      style:   { marginTop: '20vh' },
+    });
+
+    return;
+  }
   if (!props.loading) {
     emit('submit', model.value, fileList);
   }
 };
 </script>
+
+<script>
+export default {
+    setup() {
+        return
+    }
+}
+</script>
+
 
 <template>
   <div class="area-wrapper flex-col w-full">
@@ -86,7 +113,7 @@ const submit = () => {
     </div>
     <a-textarea
       v-model:value="model"
-      placeholder="询问任何问题"
+      :placeholder="t('chat.askAnything')"
       :autoSize="{ minRows: 4, maxRows: 7 }"
       :bordered="false"
       @keyup.alt.enter.exact="submit"

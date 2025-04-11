@@ -14,7 +14,7 @@ import {
 } from '@shell/config/types';
 import { VIEW_CONTAINER_DASHBOARD } from '@shell/store/prefs';
 import { allHash, setPromiseResult } from '@shell/utils/promise';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import { getCephClusterAddonUrl } from '@shell/utils/url';
 import { isAdminUser } from '@shell/store/type-map';
 import DashboardMetrics from '@shell/components/DashboardMetrics.vue';

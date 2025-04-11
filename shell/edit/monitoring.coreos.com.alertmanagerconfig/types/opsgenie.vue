@@ -1,8 +1,8 @@
 <script>
 import ArrayList from '@shell/components/form/ArrayList';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import Select from '@shell/components/form/Select';
-import { Checkbox } from '@components/Form/Checkbox';
+import { Checkbox } from '@shell/components/form/Checkbox';
 import InputWithSelect from '@shell/components/form/InputWithSelect';
 import SimpleSecretSelector from '@shell/components/form/SimpleSecretSelector';
 import { _VIEW } from '@shell/config/query-params';
