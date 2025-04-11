@@ -88,6 +88,14 @@ const actionAriaLabel = (opt) => {
 };
 </script>
 
+<script>
+export default {
+  setup() {
+    return
+  }
+}
+</script>
+
 <template>
   <a-radio-group
     :value="value"

@@ -4,8 +4,8 @@ import { CONTAINER_DEFAULT_RESOURCE_LIMIT } from '@shell/config/labels-annotatio
 import { cleanUp } from '@shell/utils/object';
 import { _EDIT, _VIEW, ENABLED, MODE } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
-import { RadioGroup } from '@components/Form/Radio';
-import { ToggleSwitch } from '@components/Form/ToggleSwitch';
+import { RadioGroup } from '@shell/components/form/Radio';
+import { ToggleSwitch } from '@shell/components/form/ToggleSwitch';
 import { Accelerators, NVIDIA } from '@shell/utils/container-resource';
 import { MANAGEMENT } from '@shell/config/types';
 import { SETTING } from '@shell/config/settings';

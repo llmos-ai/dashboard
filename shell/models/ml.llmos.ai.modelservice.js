@@ -113,6 +113,10 @@ export default class ModelService extends MlWorkload {
     ];
   }
 
+  get isRunning() {
+    return this.status?.state === 'Running';
+  }
+
   remove() {
     const opt = { ...arguments };
 

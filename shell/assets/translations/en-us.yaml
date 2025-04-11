@@ -6700,6 +6700,11 @@ chat:
   addModel: Add Model Compare
   thinking: Thinking....
   thinkDone: Done thinking
+  switchTip: Switching models will clear the current context. Continue?
+  emptyModelTip: Choose a model for the conversation
+  selectModelFirst: Please select a model first.
+  askAnything: Ask anything
+  selectModel: Select your model
   modelSettings:
     label: Model Settings
   type:

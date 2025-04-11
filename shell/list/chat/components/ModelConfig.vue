@@ -1,22 +1,15 @@
 <script setup>
-import { computed, defineEmits, ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
-import { ML_WORKLOAD_TYPES } from '@shell/config/types';
+import { computed, defineEmits, ref, watch } from 'vue';
 
-import LabeledInput from '@components/Form/LabeledInput/LabeledInput.vue';
+import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
 import SliderInput from '@shell/components/SliderInput.vue';
+import SelectModel from '@shell/list/chat/components/SelectModel.vue';
 
 const store = useStore();
 const emits = defineEmits(['update:config', 'reset:messages']);
 
 const props = defineProps({
-  messages: {
-    type:    Array,
-    default: () => {
-      return [];
-    },
-  },
   config: {
     type:    Object,
     default: () => {
@@ -29,88 +22,96 @@ const props = defineProps({
         stop:        null,
       };
     },
-  }
+  },
+  uuid: {
+    type:    String,
+    default: '',
+  },
 });
+
+const messages = computed(() => {
+  // filter role:system, it don't show in chat window
+  return store.getters['chat/chatMessages'](props.uuid).filter((chat) => chat.role !== 'system');
+});
+const needClear = computed(() => messages.value.length > 0);
 
 const _config = ref(props.config);
 
 watch(() => props.config, (neuValue) => {
   _config.value = neuValue;
 }, { deep: true });
-const currentModel = ref('');
-const modelService = store.getters['cluster/all'](
-  ML_WORKLOAD_TYPES.MODEL_SERVICE
-);
-
-const modelOptions = computed(() => {
-  return modelService.map((model) => {
-    return {
-      label: model.spec.model,
-      value: model.spec.model,
-      model,
-    };
-  });
-});
 
 const update = () => {
-  // TODO: enhance validation
   _config.value.seed = _config.value.seed ? Number(_config.value.seed) : null;
   _config.value.stop = _config.value.seed ? _config.value.stop : null;
 
-  emits('update:config', _config);
+  emits('update:config', _config.value);
 };
 
+// 是否显示模型切换弹窗
 const visible = ref(false);
 const preventChangeModel = ref(false);
-const confirm = () => {
-  emits('reset:messages', []);
+const currentModelResource = ref(null);
+
+const clearMessages = () => {
+  store.commit('chat/CLEAR_CHAT_MESSAGES', props.uuid);
   visible.value = false;
 };
 
 const cancel = () => {
   visible.value = false;
-  // 还原config.model值
-  _config.value.model = previousModel.value;
+  _config.value.model = previousModelResource.value.spec.model;
+  currentModelResource.value = previousModelResource.value;
+
   preventChangeModel.value = false;
 };
 
-const changeModel = (value, option) => {
+const changeModel = (value) => {
+  _config.value.model = value.spec.model;
+
+  previousModelResource.value = currentModelResource.value;
+  currentModelResource.value = value;
+
   preventChangeModel.value = true;
-  currentModel.value = value;
 };
 
-const previousModel = ref('');
+const previousModelResource = ref('');
 
 watch(
   () => _config.value.model,
   (newValue, oldValue) => {
-    previousModel.value = oldValue;
-    if (
-      newValue !== oldValue &&
-      preventChangeModel.value &&
-      oldValue &&
-      props.messages.length
-    ) {
+    if (newValue !== oldValue && oldValue && needClear.value && preventChangeModel.value) {
       visible.value = true;
     }
-    emits('update:config', _config);
+
+    emits('update:config', _config.value);
+    if (currentModelResource.value) {
+      emits('update:model', currentModelResource.value);
+    }
   }
 );
 </script>
 
+<script>
+export default {
+    setup() {
+        return
+    }
+}
+</script>
+
+
 <template>
   <a-popconfirm
-    title="Changing the model will remove the context, do you want to continue?"
+    :title="t('chat.switchTip')"
     :open="visible"
-    ok-text="Yes"
-    cancel-text="No"
-    @confirm="confirm"
+    :ok-text="t('generic.yes')"
+    :cancel-text="t('generic.no')"
+    @confirm="clearMessages"
     @cancel="cancel"
   >
-    <LabeledSelect
-      v-model:value="_config.model"
-      label="Model"
-      :options="modelOptions"
+    <SelectModel
+      :model="_config.model"
       class="mb-10"
       @update:value="changeModel"
     />

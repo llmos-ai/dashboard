@@ -27,7 +27,7 @@ import {
   RcDropdownItem,
   RcDropdownSeparator,
   RcDropdownTrigger,
-} from '@components/RcDropdown';
+} from '@shell/components/RcDropdown';
 
 const PAGE_HEADER_ACTION = 'page-action';
 

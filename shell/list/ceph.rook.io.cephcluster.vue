@@ -2,7 +2,7 @@
 import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import Loading from '@shell/components/Loading.vue';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import { AGE, NAME, PHASE, STATE } from '@shell/config/table-headers';
 import cephConfig from '@shell/mixins/ceph-config';
 

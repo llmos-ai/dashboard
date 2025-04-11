@@ -1,7 +1,7 @@
 <script>
 import Loading from '@shell/components/Loading';
 import AsyncButton from '@shell/components/AsyncButton';
-import Banner from '@components/Banner/Banner.vue';
+import Banner from '@shell/components/Banner/Banner.vue';
 import { MANAGEMENT } from '@shell/config/types';
 import { _EDIT, _VIEW } from '@shell/config/query-params';
 import KeyValue from '@shell/components/form/KeyValue';

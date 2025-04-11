@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import { RadioGroup } from '@components/Form/Radio';
+import { RadioGroup } from '@shell/components/form/Radio';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import NodeAffinity from '@shell/components/form/NodeAffinity';
 import { _VIEW } from '@shell/config/query-params';

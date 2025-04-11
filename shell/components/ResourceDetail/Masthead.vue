@@ -2,8 +2,8 @@
 import { KUBERNETES, PROJECT } from '@shell/config/labels-annotations';
 import { NAMESPACE, MANAGEMENT } from '@shell/config/types';
 import ButtonGroup from '@shell/components/ButtonGroup';
-import { BadgeState } from '@components/BadgeState';
-import { Banner } from '@components/Banner';
+import { BadgeState } from '@shell/components/BadgeState';
+import { Banner } from '@shell/components/Banner';
 import { get } from '@shell/utils/object';
 import { HIDE_SENSITIVE } from '@shell/store/prefs';
 import {

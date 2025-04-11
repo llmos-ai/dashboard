@@ -19,6 +19,7 @@ import useChat from './composables/useChat';
 import SystemPrompt from '@shell/list/chat/components/SystemPrompt.vue';
 import SideConfig from '@shell/list/chat/components/SideConfig.vue';
 import cloneDeep from 'lodash/cloneDeep';
+import { Banner } from '@shell/components/Banner';
 
 const store = useStore();
 const loadFetch = async() => {
@@ -55,22 +56,22 @@ const { send, loading } = useChat(url, {
       content:   '',
       reasoning: '',
     });
-    const userRole = cloneDeep(
-      {
-        role:    'user',
-        content: options.payload.question,
-      }
-    );
+    const userRole = cloneDeep({
+      role:    'user',
+      content: options.payload.question,
+    });
     const isRegenerate = options?.payload?.isRegenerate;
 
     store.commit('chat/PUSH_CHAT_COMPLETIONS_CHUNK', {
       chunk:   isRegenerate ? assistantRole : [userRole, assistantRole],
       type:    'single',
-      addRole: true
+      addRole: true,
     });
     options.body = JSON.stringify({
       ...toValue(options.body),
-      messages: singleChatMessages.value.map(({ role, content }) => ({ role, content })).slice(0, -1)
+      messages: singleChatMessages.value
+        .map(({ role, content }) => ({ role, content }))
+        .slice(0, -1),
     });
 
     return options;
@@ -121,12 +122,16 @@ const updateModel = (resource) => {
 const icon = ref('');
 const modelDisplayName = ref('');
 
-watch(model, () => {
-  if (model.value) {
-    modelDisplayName.value = model.value.modelName;
-    icon.value = matchModelString(modelDisplayName.value);
-  }
-}, { immediate: true, deep: true });
+watch(
+  model,
+  () => {
+    if (model.value) {
+      modelDisplayName.value = model.value.modelName;
+      icon.value = matchModelString(modelDisplayName.value);
+    }
+  },
+  { immediate: true, deep: true }
+);
 
 // multi chat
 const chatsConfig = computed(() => store.state.chat.chatsConfig);
@@ -138,7 +143,7 @@ const addModel = () => {
 
 const activeUUID = computed({
   get: () => store.state.chat.activeUUID,
-  set: (value) => store.commit('chat/SET_ACTIVE_UUID', value)
+  set: (value) => store.commit('chat/SET_ACTIVE_UUID', value),
 });
 
 const updateModelMessages = (uuid, messages) => {
@@ -148,29 +153,43 @@ const updateModelMessages = (uuid, messages) => {
 // active config
 const activeConfig = ref({});
 
-watch(activeUUID, () => {
-  activeConfig.value = chatsConfig.value[activeUUID.value];
-}, { immediate: true });
+watch(
+  activeUUID,
+  () => {
+    activeConfig.value = chatsConfig.value[activeUUID.value];
+  },
+  { immediate: true }
+);
 
-watch(isChatType, () => {
-  if (!isChatType.value) {
-    activeUUID.value = compareChatIds.value[0];
-  } else {
-    activeUUID.value = 'single';
-  }
-}, { immediate: true });
+watch(
+  isChatType,
+  () => {
+    if (!isChatType.value) {
+      activeUUID.value = compareChatIds.value[0];
+    } else {
+      activeUUID.value = 'single';
+    }
+  },
+  { immediate: true }
+);
 
 // active system prompt
 const activeSystemPrompt = ref('');
 
-watch(() => ({
-  uuid:     activeUUID.value,
-  messages: store.getters['chat/chatMessages'](activeUUID.value),
-}), () => {
-  if (activeUUID.value) {
-    activeSystemPrompt.value = store.getters['chat/chatMessages'](activeUUID.value)[0].content;
-  }
-}, { immediate: true });
+watch(
+  () => ({
+    uuid:     activeUUID.value,
+    messages: store.getters['chat/chatMessages'](activeUUID.value),
+  }),
+  () => {
+    if (activeUUID.value) {
+      activeSystemPrompt.value = store.getters['chat/chatMessages'](
+        activeUUID.value
+      )[0].content;
+    }
+  },
+  { immediate: true }
+);
 
 const updateSystemPrompt = (content) => {
   store.commit('chat/UPDATE_SYSTEM_PROMPT', { content, key: activeUUID.value });
@@ -208,17 +227,28 @@ const callbackAbortFetch = () => {
   }
 };
 
-const regenerate = async() => {
-  const lastQuestion = await store.dispatch('chat/REGENERATE_MESSAGE');
+const regenerate = async(uuid, question = '') => {
+  const lastQuestion = await store.dispatch('chat/REGENERATE_MESSAGE', {
+    key: uuid || 'single',
+    question,
+  });
 
   if (lastQuestion) {
     abortFetch.value = await send({
       question:     lastQuestion,
       config:       activeConfig.value,
-      isRegenerate: true
+      isRegenerate: true,
     });
   }
 };
+</script>
+
+<script>
+export default {
+  setup() {
+      return
+  }
+}
 </script>
 
 <template>
@@ -235,15 +265,13 @@ const regenerate = async() => {
         size="large"
         @click="addModel"
       >
-        + {{ t('chat.addModel') }}
+        + {{ t("chat.addModel") }}
       </a-button>
     </template>
   </Header>
 
   <div class="flex grow-1 border-t-1 border-gray-200">
-    <div
-      class="flex grow-1 flex-col flex-wrap px-5"
-    >
+    <div class="flex grow-1 flex-col flex-wrap px-5">
       <a-collapse
         v-if="isChatType"
         v-model:activeKey="openSystemPrompt"
@@ -279,6 +307,7 @@ const regenerate = async() => {
                 :key="i"
                 :message="message"
                 :loading="message.isStop ? false : loading"
+                :uuid="activeUUID"
                 @regenerate="regenerate"
               />
             </ChatFlex>
@@ -322,10 +351,15 @@ const regenerate = async() => {
           </div>
         </a-col>
       </a-row>
-
+      <Banner
+        v-if="!activeConfig.model"
+        color="warning"
+        :label="t('chat.emptyModelTip')"
+      />
       <ChatInput
         v-model="question"
-        :loading="isChatType ?loading : compareFetchLoading"
+        :disabled="!activeConfig.model"
+        :loading="isChatType ? loading : compareFetchLoading"
         @submit="submit"
         @update:abort="callbackAbortFetch"
       />
@@ -334,6 +368,7 @@ const regenerate = async() => {
     <SideConfig
       v-model:drawerOpen="drawerOpen"
       :activeConfig="activeConfig"
+      @update:model="updateModel"
     />
   </div>
 </template>

@@ -6,7 +6,7 @@ import ModelConfig from './ModelConfig.vue';
 import SystemPrompt from '@shell/list/chat/components/SystemPrompt.vue';
 const store = useStore();
 
-defineProps({
+const props = defineProps({
   activeConfig: {
     type:    Object,
     default: () => {
@@ -14,6 +14,8 @@ defineProps({
     }
   }
 });
+
+const emits = defineEmits(['update:model']);
 
 const drawerOpen = defineModel('drawerOpen', { type: Boolean });
 
@@ -51,7 +53,21 @@ watch(() => ({
     activeSystemPrompt.value = store.getters['chat/chatMessages'](activeUUID.value)[0].content;
   }
 }, { immediate: true });
+
+const updateModel = (resource) => {
+  emits('update:model', resource);
+};
+
 </script>
+
+<script>
+export default {
+    setup() {
+        return
+    }
+}
+</script>
+
 
 <template>
   <StaticDrawer
@@ -63,21 +79,24 @@ watch(() => ({
     <ModelConfig
       v-if="isChatType"
       :config="activeConfig"
+      :uuid="activeUUID"
       @update:config="updateActiveConfig"
+      @update:model="updateModel"
     />
 
     <div v-else>
       <div>
-        <a-space>
+        <a-space class="flex flex-wrap">
           <a-button
-            v-for="(uuid) in compareChatIds"
+            v-for="(uuid, idx) in compareChatIds"
             :key="uuid"
             :type="uuid === activeUUID ? 'primary' : 'default'"
             @click="() => activeUUID = uuid"
           >
-            <span class="italic">#{{ chatsConfig[uuid].modelName }}</span>
+            <span class="italic">{{ chatsConfig[uuid].model ? chatsConfig[uuid].model : `#${idx}` }}</span>
           </a-button>
         </a-space>
+
         <a-divider />
 
         <SystemPrompt
@@ -87,8 +106,10 @@ watch(() => ({
         />
 
         <ModelConfig
+          :uuid="activeUUID"
           :config="activeConfig"
           @update:config="updateActiveConfig"
+          @update:model="updateModel"
         />
       </div>
     </div>

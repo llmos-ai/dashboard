@@ -1,7 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
-import { Checkbox } from '@components/Form/Checkbox';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { Checkbox } from '@shell/components/form/Checkbox';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import StorageClassSelector from '@shell/edit/management.llmos.ai.managedaddon/llmos-monitoring/StorageClassSelector';
 import { set } from '@shell/utils/object';

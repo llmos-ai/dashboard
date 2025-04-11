@@ -1,14 +1,14 @@
 <script>
 import CruResource from '@shell/components/CruResource';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import CreateEditView from '@shell/mixins/create-edit-view';
-import { TextAreaAutoGrow } from '@components/Form/TextArea';
+import { TextAreaAutoGrow } from '@shell/components/form/TextArea';
 import formRulesGenerator from '@shell/utils/validators/formRules/index';
 
 import { ALLOWED_SETTINGS, SETTING } from '@shell/config/settings';
-import { RadioGroup } from '@components/Form/Radio';
+import { RadioGroup } from '@shell/components/form/Radio';
 import FormValidation from '@shell/mixins/form-validation';
 import { setBrand } from '@shell/config/private-label';
 import { keyBy, mapValues } from 'lodash';

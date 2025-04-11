@@ -1,6 +1,6 @@
 <script>
 import AsyncButton from '@shell/components/AsyncButton';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import { exceptionToErrorsArray } from '@shell/utils/error';
 import { decodeHtml } from '@shell/utils/string';
 

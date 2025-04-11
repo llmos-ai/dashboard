@@ -1,6 +1,6 @@
 <script>
 import { mapPref, AFTER_LOGIN_ROUTE } from '@shell/store/prefs';
-import { RadioGroup, RadioButton } from '@components/Form/Radio';
+import { RadioGroup, RadioButton } from '@shell/components/form/Radio';
 import Select from '@shell/components/form/Select';
 import { MANAGEMENT } from '@shell/config/types';
 

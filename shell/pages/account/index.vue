@@ -7,7 +7,7 @@ import Loading from '@shell/components/Loading';
 import { MANAGEMENT } from '@shell/config/types';
 import { SETTING } from '@shell/config/settings';
 import BackRoute from '@shell/mixins/back-link';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import { _MULTI } from '@shell/plugins/dashboard-store/actions';
 import { mapGetters } from 'vuex';
 import Principal from '@shell/components/auth/Principal.vue';

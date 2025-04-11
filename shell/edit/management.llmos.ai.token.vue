@@ -6,9 +6,9 @@ import CreateEditView from '@shell/mixins/create-edit-view';
 import { diffFrom } from '@shell/utils/time';
 import { MANAGEMENT } from '@shell/config/types';
 
-import { RadioGroup } from '@components/Form/Radio';
-import { Banner } from '@components/Banner';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { RadioGroup } from '@shell/components/form/Radio';
+import { Banner } from '@shell/components/Banner';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import { mapGetters } from 'vuex';
 import day from 'dayjs';
 import { DESCRIPTION } from '@shell/config/labels-annotations';

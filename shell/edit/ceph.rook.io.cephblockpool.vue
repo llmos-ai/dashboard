@@ -8,9 +8,9 @@ import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import UnitInput from '@shell/components/form/UnitInput.vue';
 import KeyValue from '@shell/components/form/KeyValue.vue';
-import LabeledInput from '@components/Form/LabeledInput/LabeledInput.vue';
+import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
 import { set } from '@shell/utils/object';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import CephConfig from '@shell/mixins/ceph-config';
 
 export const REPLICATED = 'Replicated';

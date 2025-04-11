@@ -6,10 +6,10 @@ import CruResource from '@shell/components/CruResource.vue';
 import NameNsDescription from '@shell/components/form/NameNsDescription.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
-import LabeledInput from '@components/Form/LabeledInput/LabeledInput.vue';
+import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
 import CephConfig from '@shell/mixins/ceph-config';
-import { Banner } from '@components/Banner';
-import { ToggleSwitch } from '@components/Form/ToggleSwitch';
+import { Banner } from '@shell/components/Banner';
+import { ToggleSwitch } from '@shell/components/form/ToggleSwitch';
 import UnitInput from '@shell/components/form/UnitInput.vue';
 
 const TAB_WEIGHT_MAP = {

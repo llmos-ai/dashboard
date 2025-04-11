@@ -1,9 +1,9 @@
 <script>
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import InfoBox from '@shell/components/InfoBox.vue';
-import { Checkbox } from '@components/Form/Checkbox';
+import { Checkbox } from '@shell/components/form/Checkbox';
 import CopyCode from '@shell/components/CopyCode.vue';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import KeyValue from '@shell/components/form/KeyValue.vue';
 import Taints from '@shell/components/form/Taints.vue';
 import { MANAGEMENT, NODE, SECRET } from '@shell/config/types';

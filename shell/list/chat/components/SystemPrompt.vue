@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import { SYSTEM_PROMPT_TEMPLATE } from '@shell/config/constants';
 
@@ -24,6 +24,14 @@ const SYSTEM_PROMPT_TEMPLATE_OPTIONS = SYSTEM_PROMPT_TEMPLATE.map((template) => 
     value: template.content
   };
 });
+</script>
+
+<script>
+export default {
+  setup() {
+      return
+  }
+}
 </script>
 
 <template>

@@ -1,9 +1,9 @@
 <script>
-import { RadioGroup } from '@components/Form/Radio';
+import { RadioGroup } from '@shell/components/form/Radio';
 import ArrayList from '@shell/components/form/ArrayList';
 import KeyValue from '@shell/components/form/KeyValue';
 import { mapGetters } from 'vuex';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 
 export default {
   components: {

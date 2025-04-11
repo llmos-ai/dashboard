@@ -2,12 +2,12 @@
 import NameNsDescription from '@shell/components/form/NameNsDescription.vue';
 import Tab from '@shell/components/Tabbed/Tab.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs/index.vue';
-import { LabeledInput } from '@components/Form/LabeledInput';
-import { Checkbox } from '@components/Form/Checkbox';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
+import { Checkbox } from '@shell/components/form/Checkbox';
 import { allHash } from '@shell/utils/promise';
 import { NODE } from '@shell/config/types';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
-import { ToggleSwitch } from '@components/Form/ToggleSwitch';
+import { ToggleSwitch } from '@shell/components/form/ToggleSwitch';
 import jsyaml from 'js-yaml';
 import UnitInput from '@shell/components/form/UnitInput.vue';
 import KeyValue from '@shell/components/form/KeyValue.vue';

@@ -1,6 +1,6 @@
 <script>
-import { RadioGroup } from '@components/Form/Radio';
-import { LabeledInput } from '@components/Form/LabeledInput';
+import { RadioGroup } from '@shell/components/form/Radio';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import StorageClassSelector from '@shell/edit/management.llmos.ai.managedaddon/llmos-monitoring/StorageClassSelector';
 import { DEFAULT_GRAFANA_STORAGE_SIZE } from '@shell/config/types';

@@ -1,6 +1,6 @@
 <script>
 import { mapPref, AFTER_LOGIN_ROUTE, READ_WHATS_NEW, HIDE_HOME_PAGE_CARDS } from '@shell/store/prefs';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import IndentedPanel from '@shell/components/IndentedPanel';
 import SingleClusterInfo from '@shell/components/SingleClusterInfo';
 import { mapGetters, mapState } from 'vuex';

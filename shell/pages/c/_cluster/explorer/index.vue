@@ -16,7 +16,7 @@ import {
   SECRET
 } from '@shell/config/types';
 import AlertTable from '@shell/components/AlertTable';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import { parseSi, createMemoryValues } from '@shell/utils/units';
 import {
   NAME,

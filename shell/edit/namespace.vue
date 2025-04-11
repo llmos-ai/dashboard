@@ -11,7 +11,7 @@ import { K8S_TYPES } from '@shell/components/form/ResourceQuota/shared';
 import Labels from '@shell/components/form/Labels';
 import { randomStr } from '@shell/utils/string';
 import ProjectMembershipEditor, { canViewProjectMembershipEditor } from '@shell/components/form/Members/ProjectMembershipEditor';
-import { Banner } from '@components/Banner';
+import { Banner } from '@shell/components/Banner';
 import { MANAGEMENT } from '@shell/config/types';
 
 export default {

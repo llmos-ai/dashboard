@@ -2,7 +2,7 @@
 import Tab from '@shell/components/Tabbed/Tab';
 import CruResource from '@shell/components/CruResource';
 import UnitInput from '@shell/components/form/UnitInput';
-import LabeledInput from '@components/Form/LabeledInput/LabeledInput.vue';
+import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
@@ -19,7 +19,7 @@ import {
   SECRET,
   SERVICE_ACCOUNT,
 } from '@shell/config/types';
-import { Checkbox } from '@components/Form/Checkbox';
+import { Checkbox } from '@shell/components/form/Checkbox';
 import ContainerResourceLimit from '@shell/components/ContainerResourceLimit.vue';
 import {
   FlatResources,

@@ -23,14 +23,10 @@ export default function useChat(url, _options = {}) {
 
     try {
       fetchLLMStream({
-        url:  'https://api.deepseek.com/v1/chat/completions',
+        url:  toValue(url),
         body: {
           ...sOptions.config,
           messages: formatMessage(toValue(messages)),
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization:  'Bearer sk-6070b868bc004dc6a54057b597895431'
         },
         beforeFetch,
         onError,

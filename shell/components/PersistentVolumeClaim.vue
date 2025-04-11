@@ -1,8 +1,8 @@
 <script>
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import UnitInput from '@shell/components/form/UnitInput';
-import { RadioGroup } from '@components/Form/Radio';
-import { Checkbox } from '@components/Form/Checkbox';
+import { RadioGroup } from '@shell/components/form/Radio';
+import { Checkbox } from '@shell/components/form/Checkbox';
 import { mapGetters } from 'vuex';
 import { removeObject, addObject } from '@shell/utils/array';
 import { STORAGE_CLASS, PV } from '@shell/config/types';
