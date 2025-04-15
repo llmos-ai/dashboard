@@ -29,7 +29,7 @@ const props = defineProps({
   },
   size: {
     type:    String,
-    default: 'large',
+    default: 'middle',
   },
   iconSize: {
     type:    String,
@@ -91,9 +91,9 @@ const actionAriaLabel = (opt) => {
 <script>
 export default {
   setup() {
-    return
+
   }
-}
+};
 </script>
 
 <template>

@@ -1,4 +1,3 @@
-import { _CREATE, _EDIT, _VIEW } from '@shell/config/query-params';
 import { getCephClusterAddonUrl } from '@shell/utils/url';
 
 export default {

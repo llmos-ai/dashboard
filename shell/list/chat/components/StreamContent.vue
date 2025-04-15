@@ -118,8 +118,8 @@ watch(() => props.message.content, () => {
 
 <script>
 export default {
-    setup() {
-        return
-    }
-}
+  setup() {
+
+  }
+};
 </script>

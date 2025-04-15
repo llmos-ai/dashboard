@@ -1,26 +1,26 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 import {
   DEFAULT_FOCUS_TRAP_OPTS,
   useBasicSetupFocusTrap,
   getFirstFocusableElement,
-} from "@shell/composables/focusTrap";
+} from '@shell/composables/focusTrap';
 
-export const DEFAULT_ITERABLE_NODE_SELECTOR = "body;";
+export const DEFAULT_ITERABLE_NODE_SELECTOR = 'body;';
 
 export default defineComponent({
-  name: "AppModal",
+  name: 'AppModal',
 
-  emits: ["close"],
+  emits: ['close'],
 
   inheritAttrs: false,
-  props: {
+  props:        {
     /**
      * If set to false, it will not be possible to close modal by clicking on
      * the background or by pressing Esc key.
      */
     clickToClose: {
-      type: Boolean,
+      type:    Boolean,
       default: true,
     },
     /**
@@ -29,14 +29,14 @@ export default defineComponent({
      * Supported string values are <number>% and <number>px
      */
     width: {
-      type: [Number, String],
+      type:    [Number, String],
       default: 600,
       validator(value) {
-        if (typeof value === "number") {
+        if (typeof value === 'number') {
           return value > 0;
         }
 
-        if (typeof value === "string") {
+        if (typeof value === 'string') {
           return /^(0*(?:[1-9][0-9]*|0)\.?\d*)+(px|%)$/.test(value);
         }
 
@@ -47,59 +47,59 @@ export default defineComponent({
      * List of class that will be applied to the modal window
      */
     customClass: {
-      type: String,
-      default: "",
+      type:    String,
+      default: '',
     },
     /**
      * Style that will be applied to the modal window
      */
     styles: {
-      type: String,
-      default: "",
+      type:    String,
+      default: '',
     },
     /**
      * Name of the modal
      */
     name: {
-      type: String,
-      default: "",
+      type:    String,
+      default: '',
     },
     /**
      * trigger focus trap
      */
     triggerFocusTrap: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     /**
      * forcefully set return focus element based on this selector
      */
     returnFocusSelector: {
-      type: String,
-      default: "",
+      type:    String,
+      default: '',
     },
     /**
      * will return focus to the first iterable node of this container select
      */
     returnFocusFirstIterableNodeSelector: {
-      type: String,
+      type:    String,
       default: DEFAULT_ITERABLE_NODE_SELECTOR,
     },
   },
   computed: {
     modalWidth(): string {
       if (this.isValidWidth(this.width)) {
-        const uom = typeof this.width === "number" ? "px" : "";
+        const uom = typeof this.width === 'number' ? 'px' : '';
 
-        return `${this.width}${uom}`;
+        return `${ this.width }${ uom }`;
       }
 
-      return "600px";
+      return '600px';
     },
     stylesPropToObj(): object {
       return this.styles
-        .split(";")
-        .map((line) => line.trim().split(":"))
+        .split(';')
+        .map((line) => line.trim().split(':'))
         .reduce((lines, [key, val]) => {
           return {
             ...lines,
@@ -129,13 +129,11 @@ export default defineComponent({
         opts = {
           ...DEFAULT_FOCUS_TRAP_OPTS,
           setReturnFocus: () => {
-            return document.querySelector(props.returnFocusSelector)
-              ? props.returnFocusSelector
-              : getFirstFocusableElement(
-                  document.querySelector(
-                    props.returnFocusFirstIterableNodeSelector
-                  )
-                );
+            return document.querySelector(props.returnFocusSelector) ? props.returnFocusSelector : getFirstFocusableElement(
+              document.querySelector(
+                props.returnFocusFirstIterableNodeSelector
+              )
+            );
           },
         };
         // otherwise, if we are sure of permanent existance of "returnFocusSelector"
@@ -147,15 +145,15 @@ export default defineComponent({
         };
       }
 
-      useBasicSetupFocusTrap("#modal-container-element", opts);
+      useBasicSetupFocusTrap('#modal-container-element', opts);
     }
   },
 
   mounted() {
-    document.addEventListener("keydown", this.handleEscapeKey);
+    document.addEventListener('keydown', this.handleEscapeKey);
   },
   beforeUnmount() {
-    document.removeEventListener("keydown", this.handleEscapeKey);
+    document.removeEventListener('keydown', this.handleEscapeKey);
   },
   methods: {
     handleClickOutside(event: MouseEvent) {
@@ -164,20 +162,20 @@ export default defineComponent({
         this.$refs.modalRef &&
         !(this.$refs.modalRef as HTMLElement).contains(event.target as Node)
       ) {
-        this.$emit("close");
+        this.$emit('close');
       }
     },
     handleEscapeKey(event: KeyboardEvent) {
-      if (this.clickToClose && event.key === "Escape") {
-        this.$emit("close");
+      if (this.clickToClose && event.key === 'Escape') {
+        this.$emit('close');
       }
     },
     isValidWidth(value: number | string) {
-      if (typeof value === "number") {
+      if (typeof value === 'number') {
         return value > 0;
       }
 
-      if (typeof value === "string") {
+      if (typeof value === 'string') {
         return /^(0*(?:[1-9][0-9]*|0)\.?\d*)+(px|%)$/.test(value);
       }
 
@@ -189,8 +187,15 @@ export default defineComponent({
 
 <template>
   <teleport to="#modals">
-    <transition name="modal-fade" appear>
-      <div class="modal-overlay" :data-modal="name" @click="handleClickOutside">
+    <transition
+      name="modal-fade"
+      appear
+    >
+      <div
+        class="modal-overlay"
+        :data-modal="name"
+        @click="handleClickOutside"
+      >
         <div
           v-bind="$attrs"
           id="modal-container-element"

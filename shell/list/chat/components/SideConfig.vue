@@ -62,12 +62,11 @@ const updateModel = (resource) => {
 
 <script>
 export default {
-    setup() {
-        return
-    }
-}
-</script>
+  setup() {
 
+  }
+};
+</script>
 
 <template>
   <StaticDrawer

@@ -4,7 +4,7 @@ import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
 import Select from '@shell/components/form/Select.vue';
 
-const props = defineProps({
+defineProps({
   mode:     { type: String, default: '' },
   showIcon: { type: Boolean, default: true },
 });

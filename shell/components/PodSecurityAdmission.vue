@@ -1,21 +1,21 @@
 <script lang="ts">
-import { defineComponent } from "vue";
-import { _VIEW, _CREATE } from "@shell/config/query-params";
-import LabeledSelect from "@shell/components/form/LabeledSelect.vue";
-import Checkbox from "@shell/components/form/Checkbox/Checkbox.vue";
-import LabeledInput from "@shell/components/form/LabeledInput/LabeledInput.vue";
+import { defineComponent } from 'vue';
+import { _VIEW, _CREATE } from '@shell/config/query-params';
+import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
+import Checkbox from '@shell/components/form/Checkbox/Checkbox.vue';
+import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
 import {
   PSADimension,
   PSAMode,
-} from "@shell/types/resources/pod-security-admission";
+} from '@shell/types/resources/pod-security-admission';
 import {
   PSADefaultLevel,
   PSADefaultVersion,
   PSADimensions,
   PSALevels,
   PSAModes,
-} from "@shell/config/pod-security-admission";
-import { pickBy, toDictionary } from "@shell/utils/object";
+} from '@shell/config/pod-security-admission';
+import { pickBy, toDictionary } from '@shell/utils/object';
 
 interface PSAControl {
   active: boolean;
@@ -23,9 +23,9 @@ interface PSAControl {
   version: string;
 }
 const getPsaControl = (): PSAControl => ({
-  active: false,
-  level: PSADefaultLevel,
-  version: "",
+  active:  false,
+  level:   PSADefaultLevel,
+  version: '',
 });
 
 // Type and function for exemptions form builder
@@ -35,11 +35,11 @@ interface PSAExemptionControl {
 }
 const getExemptionControl = (): PSAExemptionControl => ({
   active: false,
-  value: "",
+  value:  '',
 });
 
 export default defineComponent({
-  emits: ["updateLabels", "updateExemptions"],
+  emits: ['updateLabels', 'updateExemptions'],
 
   components: {
     Checkbox,
@@ -52,12 +52,12 @@ export default defineComponent({
      * Note: PSA labels are always paired
      */
     labels: {
-      type: Object as () => Record<string, string>,
+      type:    Object as () => Record<string, string>,
       default: () => ({}),
     },
 
     labelsAlwaysActive: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
@@ -65,7 +65,7 @@ export default defineComponent({
      * Map editing capabilities to the component
      */
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
 
@@ -73,7 +73,7 @@ export default defineComponent({
      * List of exemptions used for the resource
      */
     exemptions: {
-      type: Object as () => Record<PSADimension, string[]>,
+      type:    Object as () => Record<PSADimension, string[]>,
       default: () => ({} as Record<PSADimension, string[]>),
     },
 
@@ -81,8 +81,8 @@ export default defineComponent({
      * Prefix used for setting labels
      */
     labelsPrefix: {
-      type: String,
-      default: "",
+      type:    String,
+      default: '',
     },
 
     /**
@@ -90,8 +90,8 @@ export default defineComponent({
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
-      default: "pod-security-admission",
+      type:    String,
+      default: 'pod-security-admission',
     },
   },
 
@@ -108,7 +108,7 @@ export default defineComponent({
       ) as Record<PSADimension, PSAExemptionControl>,
       options: PSALevels.map((level) => ({
         value: level,
-        label: this.t(`podSecurityAdmission.labels.${level}`),
+        label: this.t(`podSecurityAdmission.labels.${ level }`),
       })),
     };
   },
@@ -156,18 +156,18 @@ export default defineComponent({
       const labels = PSAModes.reduce((acc, mode) => {
         return this.psaControls[mode]?.active || this.labelsAlwaysActive
           ? {
-              ...acc,
-              // Set default level if none
-              [`${this.labelsPrefix}${mode}`]:
+            ...acc,
+            // Set default level if none
+            [`${ this.labelsPrefix }${ mode }`]:
                 this.psaControls[mode].level || PSADefaultLevel,
-              // Set default version if none
-              [`${this.labelsPrefix}${mode}-version`]:
+            // Set default version if none
+            [`${ this.labelsPrefix }${ mode }-version`]:
                 this.psaControls[mode].version || PSADefaultVersion,
-            }
+          }
           : acc;
       }, nonPSALabels);
 
-      this.$emit("updateLabels", labels);
+      this.$emit('updateLabels', labels);
     },
 
     /**
@@ -176,7 +176,7 @@ export default defineComponent({
     updateExemptions(): void {
       const exemptions = PSADimensions.reduce((acc, dimension) => {
         const value = this.psaExemptionsControls[dimension].value
-          .split(",")
+          .split(',')
           .map((value) => value.trim());
         const active = this.psaExemptionsControls[dimension].active;
 
@@ -186,7 +186,7 @@ export default defineComponent({
         };
       }, {});
 
-      this.$emit("updateExemptions", exemptions);
+      this.$emit('updateExemptions', exemptions);
     },
 
     /**
@@ -194,22 +194,20 @@ export default defineComponent({
      */
     getPsaControls(): Record<PSAMode, PSAControl> {
       return PSAModes.reduce((acc, mode) => {
-        const level = this.labels[`${this.labelsPrefix}${mode}`];
+        const level = this.labels[`${ this.labelsPrefix }${ mode }`];
         // Retrieve version, hiding the value 'latest' from the user
         const version = (
-          this.labels[`${this.labelsPrefix}${mode}-version`] || ""
-        ).replace(PSADefaultVersion, "");
+          this.labels[`${ this.labelsPrefix }${ mode }-version`] || ''
+        ).replace(PSADefaultVersion, '');
 
-        return level
-          ? {
-              ...acc,
-              [mode]: {
-                active: true,
-                level,
-                version,
-              },
-            }
-          : acc;
+        return level ? {
+          ...acc,
+          [mode]: {
+            active: true,
+            level,
+            version,
+          },
+        } : acc;
       }, {} as Record<PSAMode, PSAControl>);
     },
 
@@ -220,13 +218,13 @@ export default defineComponent({
       return PSADimensions.reduce((acc, dimension) => {
         const values = (this.exemptions[dimension] || [])
           .map((value) => value.trim())
-          .join(",");
+          .join(',');
 
         return {
           ...acc,
           [dimension]: {
             active: !!values.length,
-            value: values,
+            value:  values,
           },
         };
       }, {}) as Record<PSADimension, PSAExemptionControl>;

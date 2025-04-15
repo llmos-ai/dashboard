@@ -94,12 +94,11 @@ watch(
 
 <script>
 export default {
-    setup() {
-        return
-    }
-}
-</script>
+  setup() {
 
+  }
+};
+</script>
 
 <template>
   <a-popconfirm

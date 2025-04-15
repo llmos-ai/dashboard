@@ -1,9 +1,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { _VIEW } from '@shell/config/query-params';
-import AsyncButton, {
-  AsyncButtonCallback,
-} from '@shell/components/AsyncButton.vue';
+import AsyncButton, { AsyncButtonCallback } from '@shell/components/AsyncButton.vue';
 import Banner from '@shell/components/Banner/Banner.vue';
 
 export default defineComponent({
@@ -15,17 +13,17 @@ export default defineComponent({
      * passed to asyncButton to determine lables of the button
      */
     mode: {
-      type: String,
+      type:     String,
       required: true,
     },
 
     errors: {
-      type: Array,
+      type:    Array,
       default: null,
     },
 
     disableSave: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -51,8 +49,14 @@ export default defineComponent({
   <div v-if="!isView">
     <div class="spacer-small" />
 
-    <div v-for="(err, idx) in errors" :key="idx">
-      <Banner color="error" :label="err" />
+    <div
+      v-for="(err, idx) in errors"
+      :key="idx"
+    >
+      <Banner
+        color="error"
+        :label="err"
+      />
     </div>
     <div class="buttons">
       <div class="left">

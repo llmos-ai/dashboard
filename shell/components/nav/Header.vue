@@ -104,8 +104,6 @@ export default {
     },
 
     generateLogoutRoute() {
-      console.log('---aaa');
-
       return { name: 'auth-logout', query: { [LOGGED_OUT]: true } };
     },
 
@@ -300,14 +298,6 @@ export default {
 
     closeImport() {
       this.showImportModal = false;
-    },
-
-    openSearch() {
-      this.showSearchModal = true;
-    },
-
-    hideSearch() {
-      this.showSearchModal = false;
     },
 
     pageAction(action) {

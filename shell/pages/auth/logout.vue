@@ -1,8 +1,9 @@
 <script setup>
-import { useStore } from "vuex";
+import { useStore } from 'vuex';
 
 const store = useStore();
-await store.dispatch("auth/logout", { force: true }, { root: true });
+
+await store.dispatch('auth/logout', { force: true }, { root: true });
 </script>
 
 <template>

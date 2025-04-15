@@ -63,7 +63,7 @@ export async function fetchLLMStream(options = {
   signal:      null
 }) {
   let {
-    url, body, headers, onData, onError, onDone, beforeFetch, afterFetch, method = 'POST', payload, signal
+    url, body, headers, onData, onError, onDone, beforeFetch, method = 'POST', payload, signal
   } = options;
 
   try {
