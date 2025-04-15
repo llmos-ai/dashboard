@@ -3,10 +3,10 @@ import { defineComponent, PropType, inject } from 'vue';
 import typeHelper from '@shell/utils/type-helpers';
 
 export const ASYNC_BUTTON_STATES = {
-  ACTION: 'action',
+  ACTION:  'action',
   WAITING: 'waiting',
   SUCCESS: 'success',
-  ERROR: 'error',
+  ERROR:   'error',
 };
 
 const TEXT = 'text';
@@ -27,20 +27,20 @@ export default defineComponent({
      * Mode maps to keys in asyncButton.* translations
      */
     mode: {
-      type: String,
+      type:    String,
       default: 'edit',
     },
     delay: {
-      type: Number,
+      type:    Number,
       default: 5000,
     },
 
     name: {
-      type: String,
+      type:    String,
       default: null,
     },
     disabled: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
     type: {
@@ -50,59 +50,59 @@ export default defineComponent({
       default: '',
     },
     tabIndex: {
-      type: Number,
+      type:    Number,
       default: null,
     },
 
     actionColor: {
-      type: String,
+      type:    String,
       default: 'role-primary',
     },
     waitingColor: {
-      type: String,
+      type:    String,
       default: 'bg-primary',
     },
     successColor: {
-      type: String,
+      type:    String,
       default: 'bg-success',
     },
     errorColor: {
-      type: String,
+      type:    String,
       default: 'bg-error',
     },
 
     actionLabel: {
-      type: String,
+      type:    String,
       default: null,
     },
     waitingLabel: {
-      type: String,
+      type:    String,
       default: null,
     },
     successLabel: {
-      type: String,
+      type:    String,
       default: null,
     },
     errorLabel: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     icon: {
-      type: String,
+      type:    String,
       default: null,
     },
     labelAs: {
-      type: String,
+      type:    String,
       default: TEXT,
     },
     size: {
-      type: String,
+      type:    String,
       default: '',
     },
 
     currentPhase: {
-      type: String,
+      type:    String,
       default: ASYNC_BUTTON_STATES.ACTION,
     },
 
@@ -111,12 +111,12 @@ export default defineComponent({
      * Define a term based on the parent component to avoid conflicts on multiple components
      */
     componentTestid: {
-      type: String,
+      type:    String,
       default: 'action-button',
     },
 
     manual: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
   },
@@ -154,17 +154,17 @@ export default defineComponent({
     displayIcon(): string {
       const exists = this.$store.getters['i18n/exists'];
       const t = this.$store.getters['i18n/t'];
-      const key = `asyncButton.${this.mode}.${this.phase}Icon`;
-      const defaultKey = `asyncButton.default.${this.phase}Icon`;
+      const key = `asyncButton.${ this.mode }.${ this.phase }Icon`;
+      const defaultKey = `asyncButton.default.${ this.phase }Icon`;
 
       let out = '';
 
       if (this.icon) {
         out = this.icon;
       } else if (exists(key)) {
-        out = `icon-${t(key)}`;
+        out = `icon-${ t(key) }`;
       } else if (exists(defaultKey)) {
-        out = `icon-${t(defaultKey)}`;
+        out = `icon-${ t(defaultKey) }`;
       }
 
       if (this.isSpinning) {
@@ -179,11 +179,11 @@ export default defineComponent({
     },
 
     displayLabel(): string {
-      const override = typeHelper.memberOfComponent(this, `${this.phase}Label`);
+      const override = typeHelper.memberOfComponent(this, `${ this.phase }Label`);
       const exists = this.$store.getters['i18n/exists'];
       const t = this.$store.getters['i18n/t'];
-      const key = `asyncButton.${this.mode}.${this.phase}`;
-      const defaultKey = `asyncButton.default.${this.phase}`;
+      const key = `asyncButton.${ this.mode }.${ this.phase }`;
+      const defaultKey = `asyncButton.default.${ this.phase }`;
 
       if (override) {
         return override;
@@ -211,7 +211,7 @@ export default defineComponent({
     tooltip(): { content: string; hideOnTargetClick: boolean } | null {
       if (this.labelAs === TOOLTIP) {
         return {
-          content: this.displayLabel,
+          content:           this.displayLabel,
           hideOnTargetClick: false,
         };
       }
@@ -252,9 +252,7 @@ export default defineComponent({
       if (success === 'cancelled') {
         this.phase = ASYNC_BUTTON_STATES.ACTION;
       } else {
-        this.phase = success
-          ? ASYNC_BUTTON_STATES.SUCCESS
-          : ASYNC_BUTTON_STATES.ERROR;
+        this.phase = success ? ASYNC_BUTTON_STATES.SUCCESS : ASYNC_BUTTON_STATES.ERROR;
         this.timer = setTimeout(() => {
           this.timerDone();
         }, this.delay);
@@ -296,8 +294,7 @@ export default defineComponent({
         'mr-10': displayIcon && size !== 'sm',
         'mr-5': displayIcon && size === 'sm',
       }"
-      >{{ t('action.refresh') }}</span
-    >
+    >{{ t('action.refresh') }}</span>
     <i
       v-if="displayIcon"
       v-clean-tooltip="tooltip"

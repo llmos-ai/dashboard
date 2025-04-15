@@ -22,9 +22,7 @@ export default function useAutoScrollWithControl(
         // });
       }
     },
-    {
-      root: scrollContainer.value,
-    }
+    { root: scrollContainer.value }
   );
 
   const toggleAutoScroll = (isScroll: boolean) => {

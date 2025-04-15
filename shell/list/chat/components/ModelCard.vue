@@ -1,9 +1,9 @@
 <script setup>
 import {
-  ref, useTemplateRef, nextTick, computed, watch, toValue
+  ref, nextTick, computed, watch, toValue
 } from 'vue';
 import { SwapOutlined } from '@ant-design/icons-vue';
-import useAutoScrollWithControl from '@shell/composables/useAutoScrollWithControl';
+import AutoScrollBox from '@shell/components/AutoScrollBox.vue';
 import useChat from '@shell/list/chat/composables/useChat';
 import StreamContent from '@shell/list/chat/components/StreamContent.vue';
 import { matchModelString } from '@shell/utils/ai-model';
@@ -38,12 +38,6 @@ const actions = [
     action: 'remove',
   },
 ];
-
-const scrollContainer = useTemplateRef('scrollContainer');
-const observerTarget = useTemplateRef('observerTarget');
-
-useAutoScrollWithControl(scrollContainer, observerTarget);
-
 const config = ref({});
 
 watch(() => props.uuid, () => {
@@ -159,12 +153,11 @@ const regenerate = async() => {
 
 <script>
 export default {
-    setup() {
-        return
-    }
-}
-</script>
+  setup() {
 
+  }
+};
+</script>
 
 <template>
   <a-card
@@ -247,15 +240,16 @@ export default {
       class="grow-1 overflow-y-auto"
       :style="{ height: scHeight + 'px' }"
     >
-      <StreamContent
-        v-for="(message, i) in filterSystemMessages"
-        :key="i"
-        :message="message"
-        :loading="message.isStop ? false : loading"
-        :uuid="props.uuid"
-        @regenerate="regenerate"
-      />
-      <div ref="observerTarget" />
+      <AutoScrollBox>
+        <StreamContent
+          v-for="(message, i) in filterSystemMessages"
+          :key="i"
+          :message="message"
+          :loading="message.isStop ? false : loading"
+          :uuid="props.uuid"
+          @regenerate="regenerate"
+        />
+      </AutoScrollBox>
     </div>
   </a-card>
 </template>

@@ -35,12 +35,11 @@ const changeModel = (model) => {
 
 <script>
 export default {
-    setup() {
-        return
-    }
-}
-</script>
+  setup() {
 
+  }
+};
+</script>
 
 <template>
   <LabeledSelect

@@ -48,11 +48,10 @@ const toggleDrawer = () => {
 <script>
 export default {
   setup() {
-    return
-  }
-}
-</script>
 
+  }
+};
+</script>
 
 <template>
   <div class="flex justify-between items-center">

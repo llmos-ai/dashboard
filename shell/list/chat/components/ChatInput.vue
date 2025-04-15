@@ -94,12 +94,11 @@ const submit = () => {
 
 <script>
 export default {
-    setup() {
-        return
-    }
-}
-</script>
+  setup() {
 
+  }
+};
+</script>
 
 <template>
   <div class="area-wrapper flex-col w-full">

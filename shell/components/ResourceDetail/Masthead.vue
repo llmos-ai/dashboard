@@ -602,7 +602,6 @@ export default {
                 data-testid="masthead-action-menu"
                 aria-haspopup="true"
                 class="actions"
-                size="large"
                 @click="showActions"
               >
                 <i class="icon icon-actions" />

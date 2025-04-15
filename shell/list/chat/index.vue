@@ -9,7 +9,6 @@ import useAutoScrollWithControl from '@shell/composables/useAutoScrollWithContro
 
 import { matchModelString } from '@shell/utils/ai-model';
 
-import ChatFlex from '@shell/components/ChatFlex.vue';
 import Header from './components/Header/index.vue';
 import ModelCard from './components/ModelCard.vue';
 import ChatInput from './components/ChatInput.vue';
@@ -20,6 +19,7 @@ import SystemPrompt from '@shell/list/chat/components/SystemPrompt.vue';
 import SideConfig from '@shell/list/chat/components/SideConfig.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Banner } from '@shell/components/Banner';
+import AutoScrollBox from '@shell/components/AutoScrollBox.vue';
 
 const store = useStore();
 const loadFetch = async() => {
@@ -192,7 +192,10 @@ watch(
 );
 
 const updateSystemPrompt = (content) => {
-  store.commit('chat/UPDATE_SYSTEM_PROMPT', { content, key: activeUUID.value });
+  store.commit('chat/UPDATE_SYSTEM_PROMPT', {
+    content,
+    key: activeUUID.value,
+  });
 };
 
 const compareChatIds = computed(() => {
@@ -244,11 +247,7 @@ const regenerate = async(uuid, question = '') => {
 </script>
 
 <script>
-export default {
-  setup() {
-      return
-  }
-}
+export default { setup() {} };
 </script>
 
 <template>
@@ -262,7 +261,6 @@ export default {
       <a-button
         v-if="!isChatType"
         type="primary"
-        size="large"
         @click="addModel"
       >
         + {{ t("chat.addModel") }}
@@ -301,16 +299,16 @@ export default {
           class="h-full"
         >
           <div class="overflow-y-scroll hide-scrollbar h-full">
-            <ChatFlex>
+            <AutoScrollBox>
               <StreamContent
-                v-for="(message, i) in filterSystemMessages.slice().reverse()"
+                v-for="(message, i) in filterSystemMessages.slice()"
                 :key="i"
                 :message="message"
                 :loading="message.isStop ? false : loading"
                 :uuid="activeUUID"
                 @regenerate="regenerate"
               />
-            </ChatFlex>
+            </AutoScrollBox>
           </div>
         </a-col>
 

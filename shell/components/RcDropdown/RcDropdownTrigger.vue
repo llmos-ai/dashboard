@@ -11,9 +11,9 @@ const {
   registerTrigger,
   isMenuOpen,
   handleKeydown,
-} = inject<DropdownContext>('dropdownContext') || defaultContext;
+} = inject < DropdownContext >('dropdownContext') || defaultContext;
 
-const dropdownTrigger = useTemplateRef<RcButtonType>('dropdownTrigger');
+const dropdownTrigger = useTemplateRef < RcButtonType >('dropdownTrigger');
 
 onMounted(() => {
   registerTrigger(dropdownTrigger.value);

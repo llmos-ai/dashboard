@@ -14,7 +14,7 @@ import {
   HPA,
   SECRET
 } from '@shell/config/types';
-import {  CATTLE_PUBLIC_ENDPOINTS } from '@shell/config/labels-annotations';
+import { CATTLE_PUBLIC_ENDPOINTS } from '@shell/config/labels-annotations';
 import { Schema } from '@shell/plugins/steve/schema';
 import { PaginationSettingsStore } from '@shell/types/resources/settings';
 

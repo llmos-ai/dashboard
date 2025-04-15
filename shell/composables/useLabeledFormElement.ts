@@ -1,5 +1,7 @@
-import { ref, computed, ComputedRef, Ref, defineEmits } from "vue";
-import { _VIEW, _EDIT } from "@shell/config/query-params";
+import {
+  ref, computed, ComputedRef, Ref, defineEmits
+} from 'vue';
+import { _VIEW, _EDIT } from '@shell/config/query-params';
 
 interface LabeledFormElementProps {
   mode: string;
@@ -23,71 +25,70 @@ interface UseLabeledFormElement {
 
 export const labeledFormElementProps = {
   tooltipKey: {
-    type: String,
+    type:    String,
     default: null,
   },
   placeholder: {
-    type: [String, Number],
-    default: "",
+    type:    [String, Number],
+    default: '',
   },
   placeholderKey: {
-    type: String,
+    type:    String,
     default: null,
   },
   label: {
-    type: String,
+    type:    String,
     default: null,
   },
   labelKey: {
-    type: String,
+    type:    String,
     default: null,
   },
   value: {
-    type: [String, Number, Object],
-    default: "",
+    type:    [String, Number, Object],
+    default: '',
   },
   mode: {
-    type: String,
+    type:    String,
     default: _EDIT,
   },
   rules: {
-    default: (): Array<unknown> => [],
-    type: Array,
+    default:   (): Array<unknown> => [],
+    type:      Array,
     // we only want functions in the rules array
-    validator: (rules: Array<unknown>): boolean =>
-      rules.every((rule: unknown) => ["function"].includes(typeof rule)),
+    validator: (rules: Array<unknown>): boolean => rules.every((rule: unknown) => ['function'].includes(typeof rule)),
   },
   required: {
-    type: Boolean,
+    type:    Boolean,
     default: false,
   },
   disabled: {
-    type: Boolean,
+    type:    Boolean,
     default: false,
   },
   requireDirty: {
     default: true,
-    type: Boolean,
+    type:    Boolean,
   },
 };
 
 // const labeledFormElementEmits = defineEmits(['update:validation']);
 export type labeledFormElementEmits = {
-  (event: "update:validation"): void;
+  (event: 'update:validation'): void;
 };
 
 export const useLabeledFormElement = (
   props: LabeledFormElementProps,
   emit: labeledFormElementEmits
 ): UseLabeledFormElement => {
-  const raised = ref(props.mode === _VIEW || !!`${props.value}`);
+  const raised = ref(props.mode === _VIEW || !!`${ props.value }`);
   const focused = ref(false);
   const blurred = ref<number | null>(null);
 
   const requiredField = computed(() => {
     return (
       props.required ||
-      props.rules?.some((rule: any) => rule?.name === "required")
+      props.rules?.some((rule: any) => rule?.name === 'required')
     );
   });
 
@@ -101,7 +102,7 @@ export const useLabeledFormElement = (
 
   const validationMessage = computed(() => {
     const requiredRule = props.rules.find(
-      (rule: any) => rule?.name === "required"
+      (rule: any) => rule?.name === 'required'
     ) as Function;
     const ruleMessages = [];
     const value = props.value;
@@ -110,7 +111,7 @@ export const useLabeledFormElement = (
       const message = requiredRule(value);
 
       if (!!message) {
-        emit("update:validation", false);
+        emit('update:validation', false);
 
         return message;
       }
@@ -119,7 +120,7 @@ export const useLabeledFormElement = (
     for (const rule of props.rules) {
       const message = rule(value);
 
-      if (!!message && rule.name !== "required") {
+      if (!!message && rule.name !== 'required') {
         ruleMessages.push(message);
       }
     }
@@ -128,11 +129,11 @@ export const useLabeledFormElement = (
       ruleMessages.length > 0 &&
       (blurred.value || focused.value || !props.requireDirty)
     ) {
-      emit("update:validation", false);
+      emit('update:validation', false);
 
-      return ruleMessages.join(", ");
+      return ruleMessages.join(', ');
     } else {
-      emit("update:validation", true);
+      emit('update:validation', true);
 
       return undefined;
     }

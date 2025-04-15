@@ -29,9 +29,9 @@ const SYSTEM_PROMPT_TEMPLATE_OPTIONS = SYSTEM_PROMPT_TEMPLATE.map((template) => 
 <script>
 export default {
   setup() {
-      return
+
   }
-}
+};
 </script>
 
 <template>

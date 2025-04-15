@@ -292,9 +292,10 @@ const getDevServerConfig = (proxy) => {
             if (proxy.upgrade) {
               proxy.upgrade(req, socket, head);
             } else {
+              // eslint-disable-next-line no-console
               console.log(
                 `Upgrade for Proxy is not defined. Cannot upgrade Web socket for ${ req.url }`
-              ); // eslint-disable-line no-console
+              );
             }
           } else {
             console.log(`Unknown Web socket upgrade request for ${ req.url }`); // eslint-disable-line no-console
@@ -559,11 +560,11 @@ module.exports = function(dir, appConfig = {}) {
 
   const proxy = getProxyConfig(appConfig.proxy);
   const config = {
-    parallel: false,
+    parallel:   false,
     // Vue server
-    devServer:           getDevServerConfig(proxy),
-    publicPath:          resourceBase || undefined,
-    css:                 {
+    devServer:  getDevServerConfig(proxy),
+    publicPath: resourceBase || undefined,
+    css:        {
       extract:       false, // inline css styles instead of including with `<links`
       loaderOptions: {
         sass: {

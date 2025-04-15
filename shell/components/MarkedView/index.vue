@@ -1,7 +1,15 @@
 <template>
-  <div> 
-    <div v-if="isLoading" class="flex h-[32px]"><LoadingOutlined /></div>
-    <div ref="markdown-viewer" v-else>
+  <div>
+    <div
+      v-if="isLoading"
+      class="flex h-[32px]"
+    >
+      <LoadingOutlined />
+    </div>
+    <div
+      v-else
+      ref="markdown-viewer"
+    >
       <component
         :is="renderItem(token)"
         v-for="(token, index) in tokens"
@@ -39,18 +47,18 @@ const props = defineProps({
     default: false
   },
   isThink: {
-    type: Boolean,
+    type:    Boolean,
     default: false
   },
   color: {
-    type: String,
+    type:    String,
     default: ''
   }
 });
 
 const isLoading = computed(() => {
   return props.showLoading && props.content?.length === 0;
-})
+});
 
 const renderer = new marked.Renderer();
 
@@ -143,11 +151,7 @@ const renderItem = (token) => {
 
   // // 解析段落 (里面可能有child)
   if (token.type === 'paragraph') {
-    htmlstr = h(Paragraph, {
-      style: {
-        color: props.color
-      }
-    }, () => child);
+    htmlstr = h(Paragraph, { style: { color: props.color } }, () => child);
   }
 
   // // TODO: delete ?
@@ -176,9 +180,7 @@ const renderItem = (token) => {
   if (token.type === 'code') {
     // TODO: theme
 
-    htmlstr = h(CodeBox, {
-      value: token.text
-    });
+    htmlstr = h(CodeBox, { value: token.text });
   }
 
   if (token.type === 'blockquote') {

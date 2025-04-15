@@ -4,10 +4,6 @@ module.exports = {
     './shell/**/*.{vue,js,ts,jsx,tsx}',
     './pkg/**/*.{vue,js,ts,jsx,tsx}',
   ],
-  theme: {
-    extend: {
-      // --spacing: 1px;
-    },
-  },
+  theme:   { extend: {} },
   plugins: [],
 };

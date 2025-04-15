@@ -8,6 +8,8 @@ module.exports = {
     Timer:  true
   },
   plugins: [
+    'vue',
+    'cypress',
     'jest',
     '@typescript-eslint'
   ],
@@ -16,6 +18,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     '@vue/standard',
+    '@vue/eslint-config-typescript',
     'plugin:vue/vue3-recommended',
     'plugin:cypress/recommended'
   ],
