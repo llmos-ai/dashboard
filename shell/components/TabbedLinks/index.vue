@@ -41,7 +41,6 @@ export default {
         v-for="tab in tabs"
         :key="tab.name"
         :to="tab.route"
-        tag="li"
         role="presentation"
         class="tab"
         exact-active-class="active"

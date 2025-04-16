@@ -94,7 +94,7 @@ export default {
   <Loading v-if="$fetchState.pending" />
   <div v-else>
     <Banner :color="notification.type">
-      <span v-html="notification.msg" />
+      <span v-clean-html="notification.msg" />
     </Banner>
 
     <ResourceTable

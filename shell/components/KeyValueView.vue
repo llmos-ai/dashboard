@@ -52,10 +52,8 @@ export default {
     },
 
     valueLabel: {
-      type: String,
-      default() {
-        return this.$store.getters['i18n/t']('generic.value');
-      },
+      type:    String,
+      default: '',
     },
 
     valueBase64: {

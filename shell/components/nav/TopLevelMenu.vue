@@ -368,8 +368,10 @@ export default {
       class="side-menu-glass"
       @click="hide()"
     />
+
     <transition name="fade">
       <!-- Side menu -->
+      <!-- eslint-disable vue/require-toggle-inside-transition -->
       <div
         data-testid="side-menu"
         class="side-menu"

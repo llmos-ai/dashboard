@@ -4,6 +4,8 @@ import { get } from '@shell/utils/object';
 import capitalize from 'lodash/capitalize';
 
 export default {
+  emits: ['clicked'],
+
   components: { LazyImage },
 
   props: {
@@ -98,20 +100,27 @@ export default {
     v-if="rows.length"
     class="grid"
   >
-    <div
+    <component
       :is="asLink ? 'a' : 'div'"
       v-for="(r, idx) in rows"
       :key="get(r, keyField)"
+      :role="asLink ? 'link' : null"
+      :aria-disabled="asLink && get(r, disabledField) === true ? true : null"
+      :aria-label="get(r, nameField)"
+      :tabindex="get(r, disabledField) === true ? -1 : 0"
       :href="asLink ? get(r, linkField) : null"
       :target="get(r, targetField)"
       :rel="rel"
       class="item"
-      :data-testid="componentTestid + '-' + idx"
+      :data-testid="componentTestid + '-' + get(r, nameField)"
       :class="{
         'has-description': !!get(r, descriptionField),
-        'has-side-label': !!get(r, sideLabelField), [colorFor(r, idx)]: true, disabled: get(r, disabledField) === true
+        'has-side-label': !!get(r, sideLabelField),
+        [colorFor(r, idx)]: true,
+        disabled: get(r, disabledField) === true
       }"
       @click="select(r, idx)"
+      @keyup.enter.space="select(r, idx)"
     >
       <div
         class="side-label"
@@ -139,10 +148,12 @@ export default {
         <i
           v-if="r.iconClass"
           :class="r.iconClass"
+          :alt="t('catalog.charts.iconAlt', { app: get(r, nameField) })"
         />
         <LazyImage
           v-else
           :src="get(r, iconField)"
+          :alt="t('catalog.charts.iconAlt', { app: get(r, nameField) })"
         />
       </div>
       <h4 class="name">
@@ -154,7 +165,7 @@ export default {
       >
         {{ get(r, descriptionField) }}
       </div>
-    </div>
+    </component>
   </div>
   <div
     v-else
@@ -209,6 +220,10 @@ export default {
       border: 1px solid var(--border);
       text-decoration: none !important;
       color: $color;
+
+      &:focus-visible {
+        @include focus-outline;
+      }
 
       &:hover:not(.disabled) {
         box-shadow: 0 0 30px var(--shadow);
@@ -286,13 +301,13 @@ export default {
 
       &.rancher {
         .side-label, .deploys-os-label {
-          background-color: var(--app-dashboard-accent);
+          background-color: var(--app-rancher-accent);
           label {
-            color: var(--app-dashboard-accent-text);
+            color: var(--app-rancher-accent-text);
           }
         }
         &:hover:not(.disabled) {
-          border-color: var(--app-dashboard-accent);
+          border-color: var(--app-rancher-accent);
         }
       }
 
