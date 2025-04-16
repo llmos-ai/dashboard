@@ -138,23 +138,11 @@ class StevePaginationUtils extends NamespaceProjectFilters {
       { field: 'spec.containers.image' },
       { field: 'spec.nodeName' },
     ],
-    [MANAGEMENT.NODE]: [
-      { field: 'status.nodeName' },
-    ],
-    [MANAGEMENT.NODE_POOL]: [
-      { field: 'spec.clusterName' },
-    ],
-    [MANAGEMENT.NODE_TEMPLATE]: [
-      { field: 'spec.clusterName' },
-    ],
     [MANAGEMENT.CLUSTER]: [
       { field: 'spec.internal' },
       { field: 'spec.displayName' },
       { field: `status.provider` },
       { field: `status.connected` },
-    ],
-    [CONFIG_MAP]: [
-      { field: 'metadata.labels[harvesterhci.io/cloud-init-template]' }
     ],
     [NAMESPACE]: [
       { field: 'metadata.labels[field.cattle.io/projectId]' }
@@ -339,8 +327,8 @@ class StevePaginationUtils extends NamespaceProjectFilters {
 
     if (opt.pagination.sort?.length) {
       const validateFields = {
-        checked: new Array<string>(),
-        invalid: new Array<string>(),
+        checked: [] as string[],
+        invalid: [] as string[],
       };
 
       const joined = opt.pagination.sort
@@ -421,8 +409,8 @@ class StevePaginationUtils extends NamespaceProjectFilters {
    */
   private convertPaginationParams(schema: Schema, filters: PaginationParam[] = []): string {
     const validateFields = {
-      checked: new Array<string>(),
-      invalid: new Array<string>(),
+      checked: [] as string[],
+      invalid: [] as string[],
     };
     const filterStrings = filters
       .filter((filter) => !!filter.fields.length)

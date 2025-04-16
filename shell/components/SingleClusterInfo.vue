@@ -250,7 +250,7 @@ export default {
     },
 
     getServerVersion() {
-      if (this.settings === []) {
+      if (this.settings?.length === 0) {
         return 'unknown';
       }
 
@@ -265,7 +265,7 @@ export default {
     },
 
     getServerCreatedTime() {
-      if (this.settings === []) {
+      if (this.settings?.length === 0) {
         return 'unknown';
       }
       const serverVersion = this.settings.find(
@@ -424,7 +424,7 @@ export default {
       class="mb-20"
     >
       <Banner :color="storageNotification.type">
-        <span v-html="storageNotification.msg" />
+        <span v-clean-html="storageNotification.msg" />
       </Banner>
     </div>
 
