@@ -547,24 +547,24 @@ export default {
           @update:item="updateModelInfo"
         />
       </div>
-
-      <div class="self-end">
-        <a-button
-          v-if="current === 0"
-          type="primary"
-          :disabled="disableNext"
-          @click="next"
-        >
-          Next
-        </a-button>
-
-        <a-button
-          v-if="current === 1"
-          @click="prev"
-        >
-          Previous
-        </a-button>
-      </div>
     </div>
+
+    <template #createBtnPrefix>
+      <a-button
+        v-if="current === 0"
+        type="primary"
+        :disabled="disableNext"
+        @click="next"
+      >
+        Next
+      </a-button>
+
+      <a-button
+        v-if="current === 1"
+        @click="prev"
+      >
+        Previous
+      </a-button>
+    </template>
   </CruResource>
 </template>

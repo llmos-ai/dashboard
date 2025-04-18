@@ -19,6 +19,7 @@ import { mapGetters } from 'vuex';
 import { allDashboardsExist } from '@shell/utils/grafana';
 import PlusMinus from '@shell/components/form/PlusMinus';
 import { matches } from '@shell/utils/selector';
+import ModelTags from '@shell/components/ModelTags';
 
 const SCALABLE_TYPES = Object.values(ML_SCALABLE_WORKLOAD_TYPES);
 const WORKLOAD_METRICS_DETAIL_URL = '/api/v1/namespaces/llmos-monitoring-system/services/http:llmos-monitoring-grafana:80/proxy/d/llmos-workload-pods-1/llmos-workload-pods?orgId=1';
@@ -47,7 +48,8 @@ export default {
     ResourceTabs,
     CountGauge,
     ResourceTable,
-    PlusMinus
+    PlusMinus,
+    ModelTags
   },
   props: {
     value: {
@@ -303,18 +305,9 @@ export default {
   <Loading v-if="$fetchState.pending" />
   <div v-else>
     <div class="tags mb-10">
-      <a-space
-        :size="[4, 4]"
-        wrap
-      >
-        <a-tag
-          v-for="tag in tags"
-          :key="tag"
-          color="default"
-        >
-          {{ tag }}
-        </a-tag>
-      </a-space>
+      <ModelTags
+        :tags="tags"
+      />
     </div>
     <div
       v-if="canScale"

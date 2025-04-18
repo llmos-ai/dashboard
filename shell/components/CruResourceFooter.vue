@@ -98,6 +98,7 @@ export default {
           <t k="generic.cancel" />
         </a-button>
       </slot>
+
       <slot :checkCancel="checkCancel">
         <AsyncButton
           v-if="!isView"
