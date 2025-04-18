@@ -136,22 +136,6 @@ export default {
     showCopyConfig() {
       return !this.currentProduct?.hideCopyConfig;
     },
-
-    showPreferencesLink() {
-      return (
-        this.$store.getters['management/schemaFor'](
-          STEVE.PREFERENCE,
-          false,
-          false
-        )?.resourceMethods || []
-      ).includes('PUT');
-    },
-
-    showAccountAndApiKeyLink() {
-      // TODO: why is this here?
-      return this.isMgmt;
-    },
-
     showPageActions() {
       return !this.featureRancherDesktop && this.pageActions?.length;
     },
@@ -371,310 +355,232 @@ export default {
 <template>
   <header
     ref="header"
-    class="flex"
+    class="!flex flex-col"
     data-testid="header"
   >
-    <!-- side menu -->
-    <div>
-      <TopLevelMenu v-if="showTopLevelMenu" />
-    </div>
+    <div class="flex items-center  !h-[46px]">
+      <BrandImage
+        class="side-menu-logo-img pl-2"
+        file-name="logo.svg"
+      />
 
-    <div
-      v-if="!simple"
-      ref="product"
-      class="product"
-    >
-      <div
-        v-if="currentProduct && currentProduct.showClusterSwitcher"
-        v-clean-tooltip="nameTooltip"
-        class="cluster cluster-clipped"
-      >
-        <ClusterProviderIcon
-          v-if="currentCluster"
-          :cluster="currentCluster"
-          class="mr-10"
-        />
+      <div class="grow-1" />
+
+      <div class="rd-header-right">
+        <component :is="navHeaderRight" />
+
         <div
-          v-if="currentCluster"
-          ref="clusterName"
-          class="cluster-name"
+          v-if="showFilter"
+          class="top"
         >
-          {{ currentCluster.displayName }}
-        </div>
-        <ClusterBadge
-          v-if="currentCluster"
-          :cluster="currentCluster"
-          class="ml-10"
-        />
-        <div
-          v-if="!currentCluster"
-          class="simple-title"
-        >
-          <BrandImage
-            class="side-menu-logo-img"
-            file-name="logo.svg"
+          <NamespaceFilter
+            v-if="
+              clusterReady &&
+                currentProduct &&
+                (currentProduct.showNamespaceFilter || isExplorer)
+            "
+          />
+          <WorkspaceSwitcher
+            v-else-if="
+              clusterReady &&
+                currentProduct &&
+                currentProduct.showWorkspaceSwitcher
+            "
           />
         </div>
-      </div>
 
-      <div
-        v-if="currentProduct && !currentProduct.showClusterSwitcher"
-        class="cluster"
-      >
-        <img
-          v-if="currentProduct.iconHeader"
-          v-bind="$attrs"
-          :src="currentProduct.iconHeader"
-          class="cluster-os-logo mr-10"
-          style="width: 44px; height: 36px"
+        <div
+          v-if="currentCluster && !simple"
+          class="header-buttons"
         >
-        <div class="product-name">
-          {{ prod }}
-        </div>
-      </div>
-    </div>
+          <template v-if="currentProduct && currentProduct.showClusterSwitcher">
+            <a-button
+              v-if="showImportYaml"
+              v-clean-tooltip="t('nav.import')"
+              :disabled="!importEnabled"
+              type="text"
+              @click="openImport()"
+            >
+              <i class="icon icon-upload icon-lg" />
+            </a-button>
+            <app-modal
+              v-if="showImportModal"
+              class="import-modal"
+              name="importModal"
+              width="75%"
+              height="auto"
+              styles="max-height: 90vh;"
+              @close="closeImport"
+            >
+              <Import
+                :cluster="currentCluster"
+                @close="closeImport"
+              />
+            </app-modal>
 
-    <div
-      v-else
-      class="simple-title"
-    >
-      <div class="side-menu-logo">
-        <BrandImage
-          class="side-menu-logo-img"
-          file-name="logo.svg"
-        />
-      </div>
-    </div>
+            <a-button
+              v-if="showKubeShell"
+              id="btn-kubectl"
+              v-clean-tooltip="t('nav.shellShortcut', { key: shellShortcut })"
+              v-shortkey="{ windows: ['ctrl', '`'], mac: ['meta', '`'] }"
+              :disabled="!shellEnabled"
+              type="text"
+              @shortkey="currentCluster.openShell()"
+              @click="currentCluster.openShell()"
+            >
+              <i class="icon icon-terminal icon-lg" />
+            </a-button>
 
-    <div class="spacer" />
+            <a-button
+              v-if="showKubeConfig"
+              v-clean-tooltip="t('nav.kubeconfig.download')"
+              :disabled="!kubeConfigEnabled"
+              type="text"
+              @click="currentCluster.downloadKubeConfig()"
+            >
+              <i class="icon icon-file icon-lg" />
+            </a-button>
 
-    <div class="rd-header-right">
-      <component :is="navHeaderRight" />
+            <a-button
+              v-if="showCopyConfig"
+              v-clean-tooltip="t('nav.kubeconfig.copy')"
+              :disabled="!kubeConfigEnabled"
+              type="text"
+              @click="copyKubeConfig($event)"
+            >
+              <i
+                v-if="kubeConfigCopying"
+                class="icon icon-checkmark icon-lg"
+              />
+              <i
+                v-else
+                class="icon icon-copy icon-lg"
+              />
+            </a-button>
+          </template>
 
-      <div
-        v-if="showFilter"
-        class="top"
-      >
-        <NamespaceFilter
-          v-if="
-            clusterReady &&
-              currentProduct &&
-              (currentProduct.showNamespaceFilter || isExplorer)
-          "
-        />
-        <WorkspaceSwitcher
-          v-else-if="
-            clusterReady &&
-              currentProduct &&
-              currentProduct.showWorkspaceSwitcher
-          "
-        />
-      </div>
-      <div
-        v-if="currentCluster && !simple"
-        class="header-buttons"
-      >
-        <template v-if="currentProduct && currentProduct.showClusterSwitcher">
           <a-button
-            v-if="showImportYaml"
-            v-clean-tooltip="t('nav.import')"
-            :disabled="!importEnabled"
+            v-if="showSearch"
+            id="header-btn-search"
+            v-clean-tooltip="
+              t('nav.resourceSearch.toolTip', { key: searchShortcut })
+            "
+            v-shortkey="{ windows: ['ctrl', 'k'], mac: ['meta', 'k'] }"
             type="text"
-            @click="openImport()"
+            @shortkey="openSearch()"
+            @click="openSearch()"
           >
-            <i class="icon icon-upload icon-lg" />
+            <i class="icon icon-search icon-lg" />
           </a-button>
           <app-modal
-            v-if="showImportModal"
-            class="import-modal"
-            name="importModal"
-            width="75%"
+            v-if="showSearch && showSearchModal"
+            class="search-modal"
+            name="searchModal"
+            width="50%"
             height="auto"
-            styles="max-height: 90vh;"
-            @close="closeImport"
+            :trigger-focus-trap="true"
+            return-focus-selector="#header-btn-search"
+            @close="hideSearch()"
           >
-            <Import
-              :cluster="currentCluster"
-              @close="closeImport"
-            />
+            <Jump @closeSearch="hideSearch()" />
           </app-modal>
+        </div>
 
+        <!-- Extension header actions -->
+        <div
+          v-if="extensionHeaderActions.length"
+          class="header-buttons"
+        >
           <a-button
-            v-if="showKubeShell"
-            id="btn-kubectl"
-            v-clean-tooltip="t('nav.shellShortcut', { key: shellShortcut })"
-            v-shortkey="{ windows: ['ctrl', '`'], mac: ['meta', '`'] }"
-            :disabled="!shellEnabled"
+            v-for="(action, i) in extensionHeaderActions"
+            :key="`${action.label}${i}`"
+            v-clean-tooltip="handleExtensionTooltip(action)"
+            v-shortkey="action.shortcutKey"
+            :disabled="action.enabled ? !action.enabled(ctx) : false"
             type="text"
-            @shortkey="currentCluster.openShell()"
-            @click="currentCluster.openShell()"
+            @shortkey="handleExtensionAction(action, $event)"
+            @click="handleExtensionAction(action, $event)"
           >
-            <i class="icon icon-terminal icon-lg" />
-          </a-button>
-
-          <a-button
-            v-if="showKubeConfig"
-            v-clean-tooltip="t('nav.kubeconfig.download')"
-            :disabled="!kubeConfigEnabled"
-            type="text"
-            @click="currentCluster.downloadKubeConfig()"
-          >
-            <i class="icon icon-file icon-lg" />
-          </a-button>
-
-          <a-button
-            v-if="showCopyConfig"
-            v-clean-tooltip="t('nav.kubeconfig.copy')"
-            :disabled="!kubeConfigEnabled"
-            type="text"
-            @click="copyKubeConfig($event)"
-          >
-            <i
-              v-if="kubeConfigCopying"
-              class="icon icon-checkmark icon-lg"
-            />
-            <i
-              v-else
-              class="icon icon-copy icon-lg"
+            <IconOrSvg
+              class="icon icon-lg"
+              :icon="action.icon"
+              :src="action.svg"
+              color="header"
             />
           </a-button>
-        </template>
+        </div>
 
-        <a-button
-          v-if="showSearch"
-          id="header-btn-search"
-          v-clean-tooltip="
-            t('nav.resourceSearch.toolTip', { key: searchShortcut })
-          "
-          v-shortkey="{ windows: ['ctrl', 'k'], mac: ['meta', 'k'] }"
-          type="text"
-          @shortkey="openSearch()"
-          @click="openSearch()"
-        >
-          <i class="icon icon-search icon-lg" />
-        </a-button>
-        <app-modal
-          v-if="showSearch && showSearchModal"
-          class="search-modal"
-          name="searchModal"
-          width="50%"
-          height="auto"
-          :trigger-focus-trap="true"
-          return-focus-selector="#header-btn-search"
-          @close="hideSearch()"
-        >
-          <Jump @closeSearch="hideSearch()" />
-        </app-modal>
-      </div>
+        <div class="flex items-center">
+          <!-- page action -->
+          <header-page-action-menu v-if="showPageActions" />
 
-      <!-- Extension header actions -->
-      <div
-        v-if="extensionHeaderActions.length"
-        class="header-buttons"
-      >
-        <a-button
-          v-for="(action, i) in extensionHeaderActions"
-          :key="`${action.label}${i}`"
-          v-clean-tooltip="handleExtensionTooltip(action)"
-          v-shortkey="action.shortcutKey"
-          :disabled="action.enabled ? !action.enabled(ctx) : false"
-          type="text"
-          @shortkey="handleExtensionAction(action, $event)"
-          @click="handleExtensionAction(action, $event)"
-        >
-          <IconOrSvg
-            class="icon icon-lg"
-            :icon="action.icon"
-            :src="action.svg"
-            color="header"
-          />
-        </a-button>
-      </div>
+          <!-- userMenu action -->
+          <!-- TODO: use option refactor -->
+          <a-dropdown
+            v-if="showUserMenu"
+            trigger="click"
+          >
+            <div>
+              <img
+                v-if="loggedInUser && loggedInUser.avatarSrc"
+                :src="loggedInUser.avatarSrc"
+                :class="{ 'avatar-round': loggedInUser.roundAvatar }"
+                width="36"
+                height="36"
+              >
+              <i
+                v-else
+                class="icon icon-user icon-3x avatar"
+              />
+            </div>
 
-      <div class="flex items-center">
-        <!-- page action -->
-        <header-page-action-menu v-if="showPageActions" />
-
-        <!-- userMenu action -->
-        <!-- TODO: use option refactor -->
-        <a-dropdown
-          v-if="showUserMenu"
-          trigger="click"
-        >
-          <div>
-            <img
-              v-if="loggedInUser && loggedInUser.avatarSrc"
-              :src="loggedInUser.avatarSrc"
-              :class="{ 'avatar-round': loggedInUser.roundAvatar }"
-              width="36"
-              height="36"
-            >
-            <i
-              v-else
-              class="icon icon-user icon-3x avatar"
-            />
-          </div>
-
-          <template #overlay>
-            <a-menu>
-              <a-menu-item class="w-3xs">
-                <div
-                  v-if="authEnabled"
-                  class="user-info"
-                >
-                  <div class="user-name">
-                    <i class="icon icon-lg icon-user" />
-                    {{ loggedInUser.loginName }}
+            <template #overlay>
+              <a-menu>
+                <a-menu-item class="w-[100px]">
+                  <div
+                    v-if="authEnabled"
+                    class="user-info"
+                  >
+                    <div class="user-name">
+                      <i class="icon icon-lg icon-user" />
+                      {{ loggedInUser.loginName }}
+                    </div>
+                    <div class="text-small">
+                      <template
+                        v-if="loggedInUser.loginName !== loggedInUser.name"
+                      >
+                        {{ loggedInUser.name }}
+                      </template>
+                    </div>
                   </div>
-                  <div class="text-small">
-                    <template
-                      v-if="loggedInUser.loginName !== loggedInUser.name"
-                    >
-                      {{ loggedInUser.name }}
-                    </template>
+                </a-menu-item>
+
+                <a-menu-item v-if="authEnabled">
+                  <div @click="$router.push(generateLogoutRoute)">
+                    {{ t('nav.userMenu.logOut') }}
                   </div>
-                </div>
-              </a-menu-item>
-
-              <a-menu-item v-if="showPreferencesLink">
-                <div @click="$router.push({ name: 'prefs' })">
-                  {{ t('nav.userMenu.preferences') }}
-                </div>
-              </a-menu-item>
-
-              <a-menu-item v-if="showAccountAndApiKeyLink">
-                <div @click="$router.push({ name: 'account' })">
-                  {{ t('nav.userMenu.accountAndKeys', {}, true) }}
-                </div>
-              </a-menu-item>
-
-              <!-- <a-menu-item v-if="authEnabled">
-                <div @click="showSloModal">
-                  {{ t("nav.userMenu.logOut") }}
-                </div>
-              </a-menu-item> -->
-
-              <a-menu-item v-if="authEnabled">
-                <div @click="$router.push(generateLogoutRoute)">
-                  {{ t('nav.userMenu.logOut') }}
-                </div>
-              </a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
+                </a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
+        </div>
       </div>
+    </div>
+    <div class="grow-1 first-nav  pl-[4%]">
+      <TopLevelMenu v-if="showTopLevelMenu" />
     </div>
   </header>
 </template>
 
 <style lang="scss" scoped>
-HEADER {
-  display: flex;
+header {
+  // background-color: yellow;
+  // display: flex
   z-index: z-index('mainHeader');
 
-  > .spacer {
-    flex: 1;
-  }
+  // > .spacer {
+  //   flex: 1;
+  // }
 
   > .menu-spacer {
     flex: 0 0 15px;
@@ -773,11 +679,10 @@ HEADER {
 
   .side-menu-logo-img {
     object-fit: contain;
-    height: 30px;
-    max-width: 200px;
+    height: 25px;
   }
 
-  > * {
+  .first-nav {
     background-color: var(--header-bg);
     border-bottom: var(--header-border-size) solid var(--header-border);
   }
