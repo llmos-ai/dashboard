@@ -239,7 +239,7 @@ product:
   gatekeeper: OPA Gatekeeper
   istio: Istio
   logging: Logging
-  settings: Global Settings
+  settings: Settings
   clusterManagement: Cluster Management
   monitoring: Monitoring
   mcapps: Global Configuration

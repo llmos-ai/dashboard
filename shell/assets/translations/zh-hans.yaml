@@ -231,7 +231,7 @@ product:
   gatekeeper: OPA Gatekeeper
   istio: Istio
   logging: Logging
-  settings: 全局设置
+  settings: 设置
   clusterManagement: 集群管理
   monitoring: 监控
   mcapps: 全局配置
