@@ -771,6 +771,7 @@ export default {
                 >
                   <t k="cruResource.previewYaml" />
                 </a-button>
+                <slot name="createBtnPrefix" />
                 <AsyncButton
                   v-if="!showSubtypeSelection"
                   ref="save"
