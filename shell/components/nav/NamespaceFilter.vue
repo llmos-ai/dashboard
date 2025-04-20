@@ -932,6 +932,7 @@ $ns_dropdown_size: 24px;
 .ns-filter {
   width: 280px;
   display: inline-block;
+  position: relative;
 
   .ns-glass {
     top: 0;
@@ -993,7 +994,9 @@ $ns_dropdown_size: 24px;
     color: var(--header-btn-text);
     margin-top: -1px;
     padding-bottom: 10px;
-    position: relative;
+    position: absolute;
+    left: 0;
+    width: 100%;
     z-index: z-index('dropdownOverlay');
 
     .ns-options {

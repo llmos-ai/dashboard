@@ -144,7 +144,6 @@ export default {
     },
 
     updateFlatResources(content) {
-      console.log('🚀 ~ updateFlatResources ~ content:', content);
       this.flatResources = content;
     }
   }

@@ -58,8 +58,6 @@ watch(removeNameArr, (neu) => {
   if (value.value.length === 1) {
     const keys = Object.values(neu[value.value[0].id]);
 
-    console.log('🚀 ~ watch ~ value:', value, keys);
-
     checkedList.value = keys;
   }
 }, { immediate: true, deep: true });

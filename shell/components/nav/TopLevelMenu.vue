@@ -10,12 +10,11 @@ import {
 } from '@shell/store/prefs';
 import { sortBy } from '@shell/utils/sort';
 import { ucFirst } from '@shell/utils/string';
-import { KEY } from '@shell/utils/platform';
 import { getVersionInfo } from '@shell/utils/version';
 import { SETTING } from '@shell/config/settings';
 import { getProductFromRoute } from '@shell/utils/router';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
-import { HomeOutlined, SettingOutlined, UsergroupAddOutlined } from '@ant-design/icons-vue';
+import { HomeOutlined, SettingOutlined, UsergroupAddOutlined, ControlOutlined } from '@ant-design/icons-vue';
 
 export default {
   components: {
@@ -23,6 +22,7 @@ export default {
     SettingOutlined,
     UsergroupAddOutlined,
     IconOrSvg,
+    ControlOutlined
   },
 
   data() {
@@ -112,22 +112,22 @@ export default {
           },
         },
         {
-          key:   'account-api-key',
-          icon:  () => h(UsergroupAddOutlined),
-          label: this.t('nav.userMenu.accountAndKeys', {}, true),
-          to:    { name: 'account' },
-        },
-        {
           key:      'settings',
           icon:     () => h(SettingOutlined),
           label:    this.t('product.settings'),
           children: [
             {
               key:      'preferences',
-              icon:     () => h(SettingOutlined),
+              icon:     () => h(ControlOutlined),
               label:    this.t('nav.userMenu.preferences'),
               to:       { name: 'prefs' },
               disabled: !this.showPreferencesLink,
+            },
+            {
+              key:   'account-api-key',
+              icon:  () => h(UsergroupAddOutlined),
+              label: this.t('nav.userMenu.accountAndKeys', {}, true),
+              to:    { name: 'account' },
             }, {
               key:   'global-settings',
               icon:  () => h(SettingOutlined),
@@ -419,9 +419,6 @@ export default {
       this.$router.push(a.to);
     },
 
-    onOpenChange(openKeys) {
-      this.openKeys = openKeys;
-    },
     checkActiveRoute(obj, isClusterRoute) {
       // for Cluster links in main nav: check if route is a cluster with LLMOS + check if route cluster matches cluster obj id + check if curr product matches route product
       if (isClusterRoute) {
@@ -440,12 +437,13 @@ export default {
 </script>
 
 <template>
-  <a-menu
-    :selectedKeys="selectedKeys"
-    :openKeys="openKeys"
-    mode="horizontal"
-    :items="menuItems"
-    @click="onMenuClick"
-    @openChange="onOpenChange"
-  />
+  <div class="pb-[4px]">
+    <a-menu
+      :selectedKeys="selectedKeys"
+      mode="horizontal"
+      :items="menuItems"
+      class="!bg-[#fafafa]"
+      @click="onMenuClick"
+    />
+  </div>
 </template>

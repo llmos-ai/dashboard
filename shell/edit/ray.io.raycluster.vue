@@ -35,6 +35,7 @@ import { mergeEnvs, mergeObjectValueFromArrayEnv } from '@shell/utils/merge';
 import { SETTING } from '@shell/config/settings';
 import { _EDIT, ENABLED, MODE } from '@shell/config/query-params';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
+import Loading from '@shell/components/Loading';
 
 export const RAY_DEFAULT_MONITORING_CONFIG = {
   RAY_GRAFANA_IFRAME_HOST: '',
@@ -61,6 +62,7 @@ export default {
     CruResource,
     Checkbox,
     ResourceTabs,
+    Loading,
     LabeledInput,
     LabeledSelect,
     AdvancedSection,
@@ -144,7 +146,7 @@ export default {
 
       secondaryResourceData: this.secondaryResourceDataConfig(),
       namespacedConfigMaps:  [],
-      namespacedSecrets:     [],
+      namespacedSecrets:     []
     };
   },
 
@@ -353,7 +355,6 @@ export default {
     willSave() {
       this.errors = [];
       this.update();
-
       if (this.spec.rayVersion === '') {
         this.errors.push(
           this.t('validation.required', { key: 'Ray Version' }, true)
@@ -457,156 +458,142 @@ export default {
 </script>
 
 <template>
-  <CruResource
-    :done-route="doneRoute"
-    :resource="value"
-    :mode="mode"
-    :errors="errors"
-    :apply-hooks="applyHooks"
-    @finish="save"
+  <Loading v-if="$fetchState.pending" />
+  <form
+    v-else
+    class="filled-height"
   >
-    <NameNsDescription
-      :value="value"
-      :namespaced="true"
+    <CruResource
+      :done-route="doneRoute"
+      :resource="value"
       :mode="mode"
-    />
-
-    <ResourceTabs
-      v-model="value"
-      class="mt-15"
-      :need-conditions="false"
-      :tableActions="true"
-      :need-related="false"
-      :side-tabs="true"
-      :mode="mode"
+      :errors="errors"
+      :apply-hooks="applyHooks"
+      @finish="save"
     >
-      <Tab
-        name="basic"
-        :label="t('generic.tabs.basic')"
-        class="bordered-table"
-        :weight="101"
+      <NameNsDescription
+        :value="value"
+        :namespaced="true"
+        :mode="mode"
+      />
+
+      <ResourceTabs
+        v-model="value"
+        class="mt-15"
+        :need-conditions="false"
+        :tableActions="true"
+        :need-related="false"
+        :side-tabs="true"
+        :mode="mode"
       >
-        <h3>AutoScaler Options</h3>
-        <div class="row mb-20">
-          <div class="col span-6">
-            <Checkbox
-              v-model:value="value.spec.enableInTreeAutoscaling"
-              :mode="mode"
-              label="Enabling Autoscaling"
-              @input:value="update"
-            />
-          </div>
-        </div>
-        <div
-          v-if="value.spec.enableInTreeAutoscaling"
-          class="row mb-20"
+        <Tab
+          name="basic"
+          :label="t('generic.tabs.basic')"
+          class="bordered-table"
+          :weight="101"
         >
-          <div class="col span-6">
-            <LabeledSelect
-              v-if="autoScaleOptions"
-              v-model:value="autoScaleOptions.upscalingMode"
-              label="Upscaling Mode"
-              :options="upScalingModeOption"
-              required
-              :mode="mode"
-              @input="update"
-            />
+          <h3>AutoScaler Options</h3>
+          <div class="row mb-20">
+            <div class="col span-6">
+              <Checkbox
+                v-model:value="value.spec.enableInTreeAutoscaling"
+                :mode="mode"
+                label="Enabling Autoscaling"
+                @input:value="update"
+              />
+            </div>
           </div>
-
-          <div class="col span-6">
-            <UnitInput
-              v-if="autoScaleOptions"
-              v-model:value="autoScaleOptions.idleTimeoutSeconds"
-              label="Idle Timeout Seconds"
-              suffix="s"
-              required
-              :mode="mode"
-              @input:value="update"
-            />
-          </div>
-        </div>
-
-        <h3>Monitoring</h3>
-        <div class="row mb-20">
-          <div class="col span-6">
-            <Checkbox
-              v-model:value="enableMonitoring"
-              :mode="mode"
-              :label="t('ray.cluster.enableMonitoring')"
-              @input:value="update"
-            />
-            <span class="text-tips">
-              <a
-                href="https://llmos.1block.ai/docs/monitoring"
-                target="_blank"
-              >
-                View more
-              </a>
-            </span>
-          </div>
-        </div>
-        <div v-if="enableMonitoring">
           <div
-            v-if="!monitoringEnabled"
+            v-if="value.spec.enableInTreeAutoscaling"
             class="row mb-20"
           >
-            <div class="text-banner">
-              <span class="warning">
-                LLMOS monitoring is not installed, click
-                <nuxt-link :to="monitoringAddonLink">here</nuxt-link>
-                to enable it now.
+            <div class="col span-6">
+              <LabeledSelect
+                v-if="autoScaleOptions"
+                v-model:value="autoScaleOptions.upscalingMode"
+                label="Upscaling Mode"
+                :options="upScalingModeOption"
+                required
+                :mode="mode"
+                @input="update"
+              />
+            </div>
+
+            <div class="col span-6">
+              <UnitInput
+                v-if="autoScaleOptions"
+                v-model:value="autoScaleOptions.idleTimeoutSeconds"
+                label="Idle Timeout Seconds"
+                suffix="s"
+                required
+                :mode="mode"
+                @input:value="update"
+              />
+            </div>
+          </div>
+
+          <h3>Monitoring</h3>
+          <div class="row mb-20">
+            <div class="col span-6">
+              <Checkbox
+                v-model:value="enableMonitoring"
+                :mode="mode"
+                :label="t('ray.cluster.enableMonitoring')"
+                @input:value="update"
+              />
+              <span class="text-tips">
+                <a
+                  href="https://llmos.1block.ai/docs/monitoring"
+                  target="_blank"
+                >
+                  View more
+                </a>
               </span>
             </div>
           </div>
-          <div class="row mb-20">
-            <div class="col span-6">
-              <LabeledInput
-                v-model:value="monitoringConfig.RAY_GRAFANA_IFRAME_HOST"
-                :label="t('ray.monitoring.grafana.iframe')"
-                required
-                :mode="mode"
-                @input:value="update"
-              />
+          <div v-if="enableMonitoring">
+            <div
+              v-if="!monitoringEnabled"
+              class="row mb-20"
+            >
+              <div class="text-banner">
+                <span class="warning">
+                  LLMOS monitoring is not installed, click
+                  <router-link :to="monitoringAddonLink">here</router-link>
+                  to enable it now.
+                </span>
+              </div>
             </div>
-            <div class="col span-6">
-              <LabeledInput
-                v-model:value="monitoringConfig.RAY_GRAFANA_HOST"
-                :label="t('ray.monitoring.grafana.host')"
-                required
-                :mode="mode"
-                @input:value="update"
-              />
+            <div class="row mb-20">
+              <div class="col span-6">
+                <LabeledInput
+                  v-model:value="monitoringConfig.RAY_GRAFANA_IFRAME_HOST"
+                  :label="t('ray.monitoring.grafana.iframe')"
+                  required
+                  :mode="mode"
+                  @input:value="update"
+                />
+              </div>
+              <div class="col span-6">
+                <LabeledInput
+                  v-model:value="monitoringConfig.RAY_GRAFANA_HOST"
+                  :label="t('ray.monitoring.grafana.host')"
+                  required
+                  :mode="mode"
+                  @input:value="update"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div
-          v-if="enableMonitoring"
-          class="row mb-20"
-        >
-          <div class="col span-6">
-            <LabeledInput
-              v-model:value="monitoringConfig.RAY_PROMETHEUS_HOST"
-              :label="t('ray.monitoring.prometheus.host')"
-              required
-              :mode="mode"
-              @input:value="update"
-            />
-          </div>
-        </div>
-
-        <AdvancedSection
-          class="col span-12 advanced"
-          :mode="mode"
-        >
-          <h3 class="mb-10">
-            {{ t('generic.tabs.advanced') }}
-          </h3>
-          <div class="row mb-20">
+          <div
+            v-if="enableMonitoring"
+            class="row mb-20"
+          >
             <div class="col span-6">
               <LabeledInput
-                v-model:value="value.spec.rayVersion"
-                label="Cluster Ray Version"
+                v-model:value="monitoringConfig.RAY_PROMETHEUS_HOST"
+                :label="t('ray.monitoring.prometheus.host')"
                 required
                 :mode="mode"
                 @input:value="update"
@@ -614,125 +601,145 @@ export default {
             </div>
           </div>
 
-          <div class="row mb-20">
-            <div class="col span-6">
-              <Checkbox
-                v-model:value="enableGCSFaultTolerance"
-                :mode="mode"
-                :label="t('ray.cluster.enableGCS')"
-                @input:value="update"
-              />
-            </div>
-          </div>
-          <div class="row">
-            <div class="col span-12">
-              <h3>{{ t('workload.container.titles.env') }}</h3>
-              <EnvVars
-                :mode="mode"
-                :config-maps="namespacedConfigMaps"
-                :secrets="namespacedSecrets"
-                :value="headGroupSpec.template.spec.containers[0]"
-                :excludes="excludeEnvs"
-                :loading="isLoadingSecondaryResources"
-                class="mb-20"
-              />
-            </div>
-          </div>
-        </AdvancedSection>
-      </Tab>
-      <Tab
-        name="headGroup"
-        label="Head Group"
-        class="bordered-table"
-        :weight="100"
-      >
-        <div class="mb-20">
-          <!-- Resources and Limitations -->
-          <ContainerResourceLimit
-            v-model:value="headGroupFlatResources"
+          <AdvancedSection
+            class="col span-12 advanced"
             :mode="mode"
-            :runtime-classes="runtimeClasses"
-            :pod-spec="headGroupSpec.template.spec"
-            :show-tip="false"
-            @input:value="update"
-          />
-        </div>
+          >
+            <h3 class="mb-10">
+              {{ t('generic.tabs.advanced') }}
+            </h3>
+            <div class="row mb-20">
+              <div class="col span-6">
+                <LabeledInput
+                  v-model:value="value.spec.rayVersion"
+                  label="Cluster Ray Version"
+                  required
+                  :mode="mode"
+                  @input:value="update"
+                />
+              </div>
+            </div>
 
-        <AdvancedSection
-          class="col span-12 advanced"
-          :mode="mode"
+            <div class="row mb-20">
+              <div class="col span-6">
+                <Checkbox
+                  v-model:value="enableGCSFaultTolerance"
+                  :mode="mode"
+                  :label="t('ray.cluster.enableGCS')"
+                  @input:value="update"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col span-12">
+                <h3>{{ t('workload.container.titles.env') }}</h3>
+                <EnvVars
+                  :mode="mode"
+                  :config-maps="namespacedConfigMaps"
+                  :secrets="namespacedSecrets"
+                  :value="headGroupSpec.template.spec.containers[0]"
+                  :excludes="excludeEnvs"
+                  :loading="isLoadingSecondaryResources"
+                  class="mb-20"
+                />
+              </div>
+            </div>
+          </AdvancedSection>
+        </Tab>
+        <Tab
+          name="headGroup"
+          label="Head Group"
+          class="bordered-table"
+          :weight="100"
+        >
+          <div class="mb-20">
+            <!-- Resources and Limitations -->
+            <ContainerResourceLimit
+              v-model:value="headGroupFlatResources"
+              :mode="mode"
+              :runtime-classes="runtimeClasses"
+              :pod-spec="headGroupSpec.template.spec"
+              :show-tip="false"
+              @input:value="update"
+            />
+          </div>
+
+          <AdvancedSection
+            class="col span-12 advanced"
+            :mode="mode"
+          >
+            <div class="row mb-20">
+              <div class="col span-6">
+                <Checkbox
+                  v-model:value="scheduleOnHeadNode"
+                  :mode="mode"
+                  :label="t('ray.cluster.allowScheduling')"
+                  @input:value="update"
+                />
+              </div>
+            </div>
+          </AdvancedSection>
+        </Tab>
+
+        <Tab
+          name="workerGroup"
+          label="Worker Group"
+          class="bordered-table"
+          :weight="99"
         >
           <div class="row mb-20">
             <div class="col span-6">
-              <Checkbox
-                v-model:value="scheduleOnHeadNode"
+              <UnitInput
+                v-model:value="workerGroupSpecs[0].replicas"
+                :hide-unit="true"
+                label="Replicas"
+                required
                 :mode="mode"
-                :label="t('ray.cluster.allowScheduling')"
+                @input:value="update"
+              />
+            </div>
+            <div class="col span-6">
+              <UnitInput
+                v-model:value="workerGroupSpecs[0].minReplicas"
+                label="Min Replicas"
+                :hide-unit="true"
+                required
+                :mode="mode"
                 @input:value="update"
               />
             </div>
           </div>
-        </AdvancedSection>
-      </Tab>
 
-      <Tab
-        name="workerGroup"
-        label="Worker Group"
-        class="bordered-table"
-        :weight="99"
-      >
-        <div class="row mb-20">
-          <div class="col span-6">
-            <UnitInput
-              v-model:value="workerGroupSpecs[0].replicas"
-              :hide-unit="true"
-              label="Replicas"
-              required
+          <div class="row mb-20">
+            <div class="col span-6">
+              <UnitInput
+                v-model:value="workerGroupSpecs[0].maxReplicas"
+                label="Max Replicas"
+                :hide-unit="true"
+                required
+                :mode="mode"
+                @input:value="update"
+              />
+            </div>
+          </div>
+
+          <h4>Worker Resources</h4>
+          <div class="mb-20">
+            <!-- Worker Group Resources and Limitations -->
+            <ContainerResourceLimit
+              v-model:value="workerGroupFlatResources"
               :mode="mode"
+              :runtime-classes="runtimeClasses"
+              :pod-spec="workerGroupSpecs[0].template.spec"
+              :handle-gpu-limit="true"
+              :show-tip="false"
               @input:value="update"
             />
           </div>
-          <div class="col span-6">
-            <UnitInput
-              v-model:value="workerGroupSpecs[0].minReplicas"
-              label="Min Replicas"
-              :hide-unit="true"
-              required
-              :mode="mode"
-              @input:value="update"
-            />
-          </div>
-        </div>
-
-        <div class="row mb-20">
-          <div class="col span-6">
-            <UnitInput
-              v-model:value="workerGroupSpecs[0].maxReplicas"
-              label="Max Replicas"
-              :hide-unit="true"
-              required
-              :mode="mode"
-              @input:value="update"
-            />
-          </div>
-        </div>
-
-        <h4>Worker Resources</h4>
-        <div class="mb-20">
-          <!-- Worker Group Resources and Limitations -->
-          <ContainerResourceLimit
-            v-model:value="workerGroupFlatResources"
-            :mode="mode"
-            :runtime-classes="runtimeClasses"
-            :pod-spec="workerGroupSpecs[0].template.spec"
-            :handle-gpu-limit="true"
-            :show-tip="false"
-            @input:value="update"
-          />
-        </div>
-      </Tab>
-    </ResourceTabs>
-  </CruResource>
+        </Tab>
+      </ResourceTabs>
+    </CruResource>
+  </form>
 </template>
 
 <style lang="scss" scoped>

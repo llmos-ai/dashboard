@@ -8,20 +8,18 @@ import { SETTING } from '@shell/config/settings';
 import { allHash } from '@shell/utils/promise';
 import RemoteModelList from '@shell/edit/ml.llmos.ai.modelservice/RemoteModelList.vue';
 import { _CREATE } from '@shell/config/query-params';
-import { VLLM_CONFIG } from '@shell/config/vllm-config';
-import LabeledAutoComplete from '@shell/components/form/LabeledAutoComplete.vue';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
+import ArgumentVars from './components/ArgumentVars.vue';
 
 export default {
   name:       'EditModelService',
   mixins:     [CreateEditView, FormValidation, LLMOSWorkload, LabeledSelect],
-  components: { RemoteModelList, LabeledAutoComplete },
+  components: { RemoteModelList, ArgumentVars },
   props:      {
     value: {
       type:     Object,
       required: true,
     },
-
     mode: {
       type:    String,
       default: 'create',
@@ -118,36 +116,6 @@ export default {
   },
 
   computed: {
-    vllmOptions() {
-      const argsOptions = VLLM_CONFIG.find((item) => {
-        const equalCount = (this.container.args[0]?.match(/=/g) || []).length;
-
-        if (equalCount === 1) {
-          const key = this.container.args[0]?.split('=')[0];
-
-          return item.value === key;
-        } else {
-          return false;
-        }
-      });
-      const hasArgsOptions = argsOptions && argsOptions.options?.length > 0;
-
-      const allOptions = VLLM_CONFIG.map((item) => {
-        return {
-          label: item.label || item,
-          value: item.value || item,
-        };
-      });
-
-      const options = hasArgsOptions ? argsOptions.options.map((item) => {
-        return {
-          value: `${ this.container.args[0]?.split('=')[0] }=${ item }`,
-          label: item
-        };
-      }) : allOptions;
-
-      return options;
-    },
     showRemoteList() {
       return (
         this.spec.modelRegistry === 'huggingface' ||
@@ -215,10 +183,6 @@ export default {
 
     update() {
       this.mergeEnvs();
-    },
-
-    filterArgsOption(inputValue, option) {
-      return option.value.toLowerCase().includes(inputValue.toLowerCase());
     },
 
     mergeEnvs() {
@@ -383,22 +347,6 @@ export default {
                 :tooltip="t('modelService.modelNamePlaceholder')"
               />
             </a-col>
-            <a-col :span="12">
-              <LabeledAutoComplete
-                v-model="container.args[0]"
-                :placeholder="
-                  t(
-                    'generic.placeholder',
-                    { text: '--dtype=half --cpu-offload-gb=10' },
-                    true
-                  )
-                "
-                :label="t('workload.container.command.args')"
-                :options="vllmOptions"
-                :filter-option="filterArgsOption"
-                @update:value="update"
-              />
-            </a-col>
           </a-row>
 
           <h4>{{ t("modelService.huggingFaceToken") }}</h4>
@@ -425,6 +373,19 @@ export default {
                 :mode="mode"
                 class="mb-20"
                 :label="t('modelService.hf.endpoint')"
+              />
+            </a-col>
+          </a-row>
+
+          <a-row
+            :gutter="[16]"
+            class="mb-[16px]"
+          >
+            <a-col :span="12">
+              <h3>{{ t('workload.container.command.args') }}</h3>
+              <ArgumentVars
+                v-model="container.args"
+                class="w-full"
               />
             </a-col>
           </a-row>

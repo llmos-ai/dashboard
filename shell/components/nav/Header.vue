@@ -21,6 +21,7 @@ import { getApplicableExtensionEnhancements } from '@shell/core/plugin-helpers';
 import IconOrSvg from '@shell/components/IconOrSvg';
 import { wait } from '@shell/utils/async';
 import HeaderPageActionMenu from './HeaderPageActionMenu.vue';
+import { UploadOutlined, SearchOutlined } from '@ant-design/icons-vue';
 
 import {
   RcDropdown,
@@ -48,6 +49,8 @@ export default {
     RcDropdownItem,
     RcDropdownSeparator,
     RcDropdownTrigger,
+    UploadOutlined,
+    SearchOutlined
   },
 
   props: {
@@ -135,9 +138,6 @@ export default {
 
     showCopyConfig() {
       return !this.currentProduct?.hideCopyConfig;
-    },
-    showPageActions() {
-      return !this.featureRancherDesktop && this.pageActions?.length;
     },
 
     showUserMenu() {
@@ -355,12 +355,12 @@ export default {
 <template>
   <header
     ref="header"
-    class="!flex flex-col"
+    class="!flex flex-col bg-[#fafafa]"
     data-testid="header"
   >
-    <div class="flex items-center  !h-[46px]">
+    <div class="flex items-center h-[45px] pt-[10px]">
       <BrandImage
-        class="side-menu-logo-img pl-2"
+        class="side-menu-logo-img pl-[4px]"
         file-name="logo.svg"
       />
 
@@ -371,7 +371,6 @@ export default {
 
         <div
           v-if="showFilter"
-          class="top"
         >
           <NamespaceFilter
             v-if="
@@ -380,110 +379,111 @@ export default {
                 (currentProduct.showNamespaceFilter || isExplorer)
             "
           />
-          <WorkspaceSwitcher
-            v-else-if="
-              clusterReady &&
-                currentProduct &&
-                currentProduct.showWorkspaceSwitcher
-            "
-          />
         </div>
 
         <div
           v-if="currentCluster && !simple"
           class="header-buttons"
         >
-          <template v-if="currentProduct && currentProduct.showClusterSwitcher">
+          <a-space>
+            <template v-if="currentProduct && currentProduct.showClusterSwitcher">
+              <a-button
+                v-if="showImportYaml"
+                v-clean-tooltip="t('nav.import')"
+                :disabled="!importEnabled"
+                type="text"
+                @click="openImport()"
+              >
+                <!-- <i class="icon icon-upload icon-lg" /> -->
+                <template #icon>
+                  <UploadOutlined class="text-xl" />
+                </template>
+              </a-button>
+              <app-modal
+                v-if="showImportModal"
+                class="import-modal"
+                name="importModal"
+                width="75%"
+                height="auto"
+                styles="max-height: 90vh;"
+                @close="closeImport"
+              >
+                <Import
+                  :cluster="currentCluster"
+                  @close="closeImport"
+                />
+              </app-modal>
+
+              <a-button
+                v-if="showKubeShell"
+                id="btn-kubectl"
+                v-clean-tooltip="t('nav.shellShortcut', { key: shellShortcut })"
+                v-shortkey="{ windows: ['ctrl', '`'], mac: ['meta', '`'] }"
+                :disabled="!shellEnabled"
+                type="text"
+                @shortkey="currentCluster.openShell()"
+                @click="currentCluster.openShell()"
+              >
+                <i class="icon icon-terminal icon-lg" />
+              </a-button>
+
+              <a-button
+                v-if="showKubeConfig"
+                v-clean-tooltip="t('nav.kubeconfig.download')"
+                :disabled="!kubeConfigEnabled"
+                type="text"
+                @click="currentCluster.downloadKubeConfig()"
+              >
+                <i class="icon icon-file icon-lg" />
+              </a-button>
+
+              <a-button
+                v-if="showCopyConfig"
+                v-clean-tooltip="t('nav.kubeconfig.copy')"
+                :disabled="!kubeConfigEnabled"
+                type="text"
+                @click="copyKubeConfig($event)"
+              >
+                <i
+                  v-if="kubeConfigCopying"
+                  class="icon icon-checkmark icon-lg"
+                />
+                <i
+                  v-else
+                  class="icon icon-copy icon-lg"
+                />
+              </a-button>
+            </template>
+
             <a-button
-              v-if="showImportYaml"
-              v-clean-tooltip="t('nav.import')"
-              :disabled="!importEnabled"
+              v-if="showSearch"
+              id="header-btn-search"
+              v-clean-tooltip="
+                t('nav.resourceSearch.toolTip', { key: searchShortcut })
+              "
+              v-shortkey="{ windows: ['ctrl', 'k'], mac: ['meta', 'k'] }"
               type="text"
-              @click="openImport()"
+              @shortkey="openSearch()"
+              @click="openSearch()"
             >
-              <i class="icon icon-upload icon-lg" />
+              <!-- <i class="icon icon-search icon-lg" /> -->
+              <template #icon>
+                <SearchOutlined class="text-xl" />
+              </template>
             </a-button>
             <app-modal
-              v-if="showImportModal"
-              class="import-modal"
-              name="importModal"
-              width="75%"
+              v-if="showSearch && showSearchModal"
+              class="search-modal"
+              name="searchModal"
+              width="50%"
               height="auto"
-              styles="max-height: 90vh;"
-              @close="closeImport"
+              :trigger-focus-trap="true"
+              return-focus-selector="#header-btn-search"
+              @close="hideSearch()"
             >
-              <Import
-                :cluster="currentCluster"
-                @close="closeImport"
-              />
+              <Jump @closeSearch="hideSearch()" />
             </app-modal>
-
-            <a-button
-              v-if="showKubeShell"
-              id="btn-kubectl"
-              v-clean-tooltip="t('nav.shellShortcut', { key: shellShortcut })"
-              v-shortkey="{ windows: ['ctrl', '`'], mac: ['meta', '`'] }"
-              :disabled="!shellEnabled"
-              type="text"
-              @shortkey="currentCluster.openShell()"
-              @click="currentCluster.openShell()"
-            >
-              <i class="icon icon-terminal icon-lg" />
-            </a-button>
-
-            <a-button
-              v-if="showKubeConfig"
-              v-clean-tooltip="t('nav.kubeconfig.download')"
-              :disabled="!kubeConfigEnabled"
-              type="text"
-              @click="currentCluster.downloadKubeConfig()"
-            >
-              <i class="icon icon-file icon-lg" />
-            </a-button>
-
-            <a-button
-              v-if="showCopyConfig"
-              v-clean-tooltip="t('nav.kubeconfig.copy')"
-              :disabled="!kubeConfigEnabled"
-              type="text"
-              @click="copyKubeConfig($event)"
-            >
-              <i
-                v-if="kubeConfigCopying"
-                class="icon icon-checkmark icon-lg"
-              />
-              <i
-                v-else
-                class="icon icon-copy icon-lg"
-              />
-            </a-button>
-          </template>
-
-          <a-button
-            v-if="showSearch"
-            id="header-btn-search"
-            v-clean-tooltip="
-              t('nav.resourceSearch.toolTip', { key: searchShortcut })
-            "
-            v-shortkey="{ windows: ['ctrl', 'k'], mac: ['meta', 'k'] }"
-            type="text"
-            @shortkey="openSearch()"
-            @click="openSearch()"
-          >
-            <i class="icon icon-search icon-lg" />
-          </a-button>
-          <app-modal
-            v-if="showSearch && showSearchModal"
-            class="search-modal"
-            name="searchModal"
-            width="50%"
-            height="auto"
-            :trigger-focus-trap="true"
-            return-focus-selector="#header-btn-search"
-            @close="hideSearch()"
-          >
-            <Jump @closeSearch="hideSearch()" />
-          </app-modal>
+          </a-space>
         </div>
 
         <!-- Extension header actions -->
@@ -511,9 +511,6 @@ export default {
         </div>
 
         <div class="flex items-center">
-          <!-- page action -->
-          <header-page-action-menu v-if="showPageActions" />
-
           <!-- userMenu action -->
           <!-- TODO: use option refactor -->
           <a-dropdown
@@ -566,8 +563,11 @@ export default {
         </div>
       </div>
     </div>
-    <div class="grow-1 first-nav  pl-[4%]">
-      <TopLevelMenu v-if="showTopLevelMenu" />
+    <div class="grow-1 first-nav bg-[#fafafa]">
+      <TopLevelMenu
+        v-if="showTopLevelMenu"
+        class="!bg-[#fafafa]"
+      />
     </div>
   </header>
 </template>
@@ -581,10 +581,6 @@ header {
   // > .spacer {
   //   flex: 1;
   // }
-
-  > .menu-spacer {
-    flex: 0 0 15px;
-  }
 
   .title {
     border-left: 1px solid var(--header-border);
@@ -682,11 +678,6 @@ header {
     height: 25px;
   }
 
-  .first-nav {
-    background-color: var(--header-bg);
-    border-bottom: var(--header-border-size) solid var(--header-border);
-  }
-
   .rd-header-right {
     display: flex;
     flex-direction: row;
@@ -729,29 +720,28 @@ header {
     .header-buttons {
       align-items: center;
       display: flex;
-      margin-top: 1px;
 
       // Spacing between header buttons
-      .btn:not(:last-of-type) {
-        margin-right: 10px;
-      }
+      // .btn:not(:last-of-type) {
+      //   margin-right: 10px;
+      // }
 
-      .btn:focus {
-        box-shadow: none;
-      }
+      // .btn:focus {
+      //   box-shadow: none;
+      // }
 
-      > .header-btn {
-        &.header-btn-active,
-        &.header-btn-active:hover {
-          background-color: var(--success);
-          color: var(--success-text);
-        }
+      // > .header-btn {
+      //   &.header-btn-active,
+      //   &.header-btn-active:hover {
+      //     background-color: var(--success);
+      //     color: var(--success-text);
+      //   }
 
-        img {
-          height: 20px;
-          width: 20px;
-        }
-      }
+      //   img {
+      //     height: 20px;
+      //     width: 20px;
+      //   }
+      // }
     }
 
     .header-btn {

@@ -10,12 +10,7 @@ import SortableTable from '@shell/components/SortableTable';
 import { sortBy } from '@shell/utils/sort';
 import { exceptionToErrorsArray } from '@shell/utils/error';
 import { NAMESPACE } from '@shell/config/types';
-import {
-  NAME as NAME_COL,
-  TYPE,
-  NAMESPACE as NAMESPACE_COL,
-  AGE,
-} from '@shell/config/table-headers';
+import { NAME as NAME_COL, TYPE, NAMESPACE as NAMESPACE_COL, AGE } from '@shell/config/table-headers';
 
 export default {
   emits: ['close', 'onReadyYamlEditor'],
@@ -27,21 +22,18 @@ export default {
     YamlEditor,
     FileSelector,
     LabeledSelect,
-    SortableTable,
+    SortableTable
   },
 
   props: {
     defaultNamespace: {
       type:    String,
-      default: 'default',
+      default: 'default'
     },
   },
 
   async fetch() {
-    this.allNamespaces = await this.$store.dispatch('cluster/findAll', {
-      type: NAMESPACE,
-      opt:  { url: 'namespaces' },
-    });
+    this.allNamespaces = await this.$store.dispatch('cluster/findAll', { type: NAMESPACE, opt: { url: 'namespaces' } });
   },
 
   data() {
@@ -69,7 +61,12 @@ export default {
     },
 
     headers() {
-      return [TYPE, NAME_COL, NAMESPACE_COL, AGE];
+      return [
+        TYPE,
+        NAME_COL,
+        NAMESPACE_COL,
+        AGE
+      ];
     },
   },
 
@@ -84,6 +81,7 @@ export default {
       if (component) {
         this.errors = null;
         component.updateValue(value);
+        this.currentYaml = value;
       }
     },
 
@@ -108,14 +106,14 @@ export default {
     },
 
     rowClick(e) {
-      if (e.target.tagName === 'A') {
+      if ( e.target.tagName === 'A' ) {
         this.close();
       }
     },
 
     onReadyYamlEditor(arg) {
       this.$emit('onReadyYamlEditor', arg);
-    },
+    }
   },
 };
 </script>
@@ -128,21 +126,19 @@ export default {
     :trigger-focus-trap="true"
   >
     <template #title>
-      <!-- TODO: enhancement -->
-      <div>
-        <!-- TODO: test -->
+      <div style="display: block; width: 100%;">
         <template v-if="done">
-          {{ t('import.success', { count: rows.length }) }}
+          <h4 data-testid="import-yaml-success">
+            {{ t('import.success', {count: rows.length}) }}
+          </h4>
         </template>
         <template v-else>
-          {{ t('import.title') }}
-          <div class="row mb-10">
+          <h4 v-t="'import.title'" />
+          <div class="row">
             <div class="col span-6">
               <FileSelector
                 role="button"
-                :aria-label="
-                  t('generic.readFromFileArea', { area: t('import.title') })
-                "
+                :aria-label="t('generic.readFromFileArea', { area: t('import.title') })"
                 class="btn role-secondary pull-left"
                 :label="t('generic.readFromFile')"
                 @selected="onFileSelected"
@@ -154,13 +150,14 @@ export default {
                 :options="namespaceOptions"
                 label-key="import.defaultNamespace.label"
                 mode="edit"
-                @update:value="(newValue) => (defaultNamespace = newValue)"
+                @update:value="newValue => defaultNamespace = newValue"
               />
             </div>
           </div>
         </template>
       </div>
     </template>
+
     <template v-if="done">
       <div class="results">
         <SortableTable
@@ -190,6 +187,7 @@ export default {
       color="error"
       :label="err"
     />
+
     <template #actions>
       <div
         v-if="done"
@@ -199,7 +197,7 @@ export default {
         <a-button
           :aria-label="t('generic.close')"
           role="button"
-          type="primary"
+          class="btn role-primary"
           data-testid="import-yaml-close"
           @click="close"
         >
@@ -214,7 +212,7 @@ export default {
         <a-button
           :aria-label="t('generic.cancel')"
           role="button"
-          class="mr-10"
+          class="btn role-secondary mr-10"
           data-testid="import-yaml-cancel"
           @click="close"
         >
@@ -223,6 +221,7 @@ export default {
         <AsyncButton
           v-if="!done"
           mode="import"
+          type="primary"
           :disabled="!currentYaml.length"
           data-testid="import-yaml-import-action"
           :aria-label="t('import.title')"
@@ -233,26 +232,26 @@ export default {
   </a-card>
 </template>
 
-<style lang="scss" scoped>
-$min: 50vh;
-$max: 50vh;
+<style lang='scss' scoped>
+  $min: 50vh;
+  $max: 50vh;
 
-.yaml-editor {
-  flex: 1;
-  min-height: $min;
-  max-height: $max;
+  .yaml-editor {
+    flex: 1;
+    min-height: $min;
+    max-height: $max;
 
-  :deep() .code-mirror {
-    .CodeMirror {
-      position: initial;
-    }
+    :deep() .code-mirror {
+      .CodeMirror {
+        position: initial;
+      }
 
-    .CodeMirror,
-    .CodeMirror-scroll,
-    .CodeMirror-gutters {
-      min-height: $min;
-      max-height: $max;
+      .CodeMirror,
+      .CodeMirror-scroll,
+      .CodeMirror-gutters {
+        min-height: $min;
+        max-height: $max;
+      }
     }
   }
-}
 </style>
