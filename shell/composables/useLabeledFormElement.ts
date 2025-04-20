@@ -1,6 +1,4 @@
-import {
-  ref, computed, ComputedRef, Ref, defineEmits
-} from 'vue';
+import { ref, computed, ComputedRef, Ref } from 'vue';
 import { _VIEW, _EDIT } from '@shell/config/query-params';
 
 interface LabeledFormElementProps {

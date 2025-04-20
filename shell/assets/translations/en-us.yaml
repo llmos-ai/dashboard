@@ -228,7 +228,7 @@ nav:
 
 product:
   apps: Apps
-  auth: Users & Authentication
+  auth: User Management
   backup: Rancher Backups
   cis: CIS Benchmark
   ecm: Cluster Manager
@@ -239,7 +239,7 @@ product:
   gatekeeper: OPA Gatekeeper
   istio: Istio
   logging: Logging
-  settings: Settings
+  settings: Global Settings
   clusterManagement: Cluster Management
   monitoring: Monitoring
   mcapps: Global Configuration

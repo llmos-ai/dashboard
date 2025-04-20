@@ -30,6 +30,8 @@ const ALLOWED_TAGS = [
   'blockquote',
 ];
 
+let linkInterceptors = [];
+
 // Allow 'A' tags to keep the target=_blank attribute if they have it
 DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
   if (

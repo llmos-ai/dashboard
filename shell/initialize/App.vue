@@ -60,11 +60,19 @@ export default {
 </script>
 <template>
   <div id="__nuxt">
-    <NuxtLoading ref="loading" />
-    <div
-      id="__layout"
+    <a-config-provider
+      :theme="{
+        token: {
+          colorPrimary: '#5D8BE3',
+        },
+      }"
     >
-      <router-view />
-    </div>
+      <NuxtLoading ref="loading" />
+      <div
+        id="__layout"
+      >
+        <router-view />
+      </div>
+    </a-config-provider>
   </div>
 </template>

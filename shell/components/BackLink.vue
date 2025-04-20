@@ -16,13 +16,6 @@ export default {
   >
     <i class="icon icon-chevron-left" /> {{ t('generic.back') }}
   </router-link>
-  <router-link
-    v-else
-    to="/"
-    class="back-link"
-  >
-    <i class="icon icon-chevron-left" /> {{ t('nav.home') }}
-  </router-link>
 </template>
 
 <style lang="scss" scoped>

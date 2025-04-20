@@ -174,7 +174,6 @@ import { normalizeType } from '@shell/plugins/dashboard-store/normalize';
 import { sortBy } from '@shell/utils/sort';
 import { haveMonitoring } from '@shell/utils/monitoring';
 import { createHeaders, rowValueGetter } from '@shell/store/type-map.utils';
-import cloneDeep from 'lodash/cloneDeep';
 
 export const NAMESPACED = 'namespaced';
 export const CLUSTER_LEVEL = 'cluster';
