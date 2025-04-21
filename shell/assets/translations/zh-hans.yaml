@@ -5751,6 +5751,11 @@ typeLabel:
       one { GPU 设备 }
       other { GPU 设备 }
     }
+  ml.llmos.ai.registry: |-
+    {count, plural,
+      one { 模型仓库 }
+      other { 模型仓库 }
+    }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
     {count, plural,
@@ -6416,3 +6421,31 @@ modelService:
   huggingFaceToken: Hugging Face Hub Token
   hf:
     endpoint: Hugging Face Mirror Endpoint
+
+modelRegistry:
+  tabs:
+    config: 
+      label: 配置
+  endpoint: 
+    label: 端点
+  bucket: 
+    label: 存储桶
+  backendType:
+    label: 类型
+    options:
+      s3: S3
+  useSSL:
+    label: 使用SSL
+  accessCredentialSecretName:
+    label: 秘文名称
+    placeholder: e.g. secret
+  selectOrCreateSecret: 创建一个新秘文
+
+createSecretModal:
+  title: 创建秘文
+  accessKeyID:
+    label: Access Key ID
+    placeholder: e.g. AKIAIOSFODNN7EXAMPLE
+  accessKeySecret:
+    label: Access Key Secret
+    placeholder: e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY

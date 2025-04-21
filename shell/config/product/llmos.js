@@ -340,6 +340,20 @@ export function init(store) {
     weight:     101,
   });
 
+  virtualType({
+    ifHaveType: LLMOS.REGISTRY,
+    labelKey:   'typeLabel."ml.llmos.ai.registry"',
+    group:      'advanced',
+    name:       LLMOS.REGISTRY,
+    namespaced: false,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.REGISTRY }
+    },
+    exact:  false,
+    weight: 102,
+  });
+
   basicType(
     [
       MANAGEMENT.MANAGED_ADDON,
@@ -347,6 +361,7 @@ export function init(store) {
       SECRET,
       CONFIG_MAP,
       LLMOS.TOOL,
+      LLMOS.REGISTRY,
     ],
     'advanced',
   );
