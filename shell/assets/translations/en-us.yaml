@@ -6059,6 +6059,11 @@ typeLabel:
       one { GPU Device }
       other { GPU Devices }
     }
+  ml.llmos.ai.registry: |-
+    {count, plural,
+      one { Model Registry }
+      other { Model Registries }
+    }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
     {count, plural,
@@ -6725,3 +6730,33 @@ chat:
     top_p: "Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered."
     seed: "Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered."
     stop: A stop sequence is a predefined or user-specified text string that signals the AI to stop generating further tokens when these sequences appear.
+
+modelRegistry:
+  tabs:
+    config: 
+      label: Configure
+  endpoint: 
+    label: Endpoint
+    placeholder: e.g. a.registry.com:5000
+  bucket: 
+    label: Bucket
+    placeholder: e.g. bucket
+  backendType:
+    label: Backend Type
+    options:
+      s3: S3
+  useSSL:
+    label: Use SSL
+  accessCredentialSecretName:
+    label: Secret Name
+    placeholder: e.g. secret
+  selectOrCreateSecret: Create a New Secret
+
+createSecretModal:
+  title: Create Secret
+  accessKeyID:
+    label: Access Key ID
+    placeholder: e.g. AKIAIOSFODNN7EXAMPLE
+  accessKeySecret:
+    label: Access Key Secret
+    placeholder: e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
