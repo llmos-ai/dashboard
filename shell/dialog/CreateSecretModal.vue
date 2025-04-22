@@ -169,7 +169,6 @@ export default {
 
     <template #actions>
       <a-button
-        class="mr-10"
         @click="close"
       >
         {{ t('generic.cancel') }}
