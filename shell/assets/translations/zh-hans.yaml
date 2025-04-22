@@ -6437,12 +6437,12 @@ modelRegistry:
   useSSL:
     label: 使用SSL
   accessCredentialSecretName:
-    label: 秘文名称
+    label: 密文名称
     placeholder: e.g. secret
-  selectOrCreateSecret: 创建一个新秘文
+  selectOrCreateSecret: 创建一个新密文
 
 createSecretModal:
-  title: 创建秘文
+  title: 创建密文
   accessKeyID:
     label: Access Key ID
     placeholder: e.g. AKIAIOSFODNN7EXAMPLE
