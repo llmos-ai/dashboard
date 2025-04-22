@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - release-*
+      - vue3
   workflow_dispatch:
     environment:
       description: 'Build resources for a specific environment'
