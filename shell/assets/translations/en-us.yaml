@@ -6067,6 +6067,11 @@ typeLabel:
       one { Model Registry }
       other { Model Registries }
     }
+  ml.llmos.ai.model: |-
+    {count, plural,
+      one { Model }
+      other { Models }
+    }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
     {count, plural,
@@ -6763,3 +6768,25 @@ createSecretModal:
   accessKeySecret:
     label: Access Key Secret
     placeholder: e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+modelCard:
+  registry:
+    label: Model Registry
+  license:
+    label: License
+  tags:
+    label: Model Tags
+  datasets:
+    label: Datasets
+  language:
+    label: Language
+  framework:
+    label: Framework
+  baseModel:
+    label: Base Model
+  description:
+    label: Model Description
+
+LabeledTag:
+  addLabel: Add Tag
+  title: Tags

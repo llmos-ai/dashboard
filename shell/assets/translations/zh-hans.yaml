@@ -5758,6 +5758,11 @@ typeLabel:
       one { 模型仓库 }
       other { 模型仓库 }
     }
+  ml.llmos.ai.model: |-
+    {count, plural,
+      one { 模型 }
+      other { 模型 }
+    }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
     {count, plural,

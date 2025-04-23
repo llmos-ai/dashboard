@@ -13,7 +13,7 @@ import Tab from '@shell/components/Tabbed/Tab';
 import SelectOrCreateSecret from '@shell/components/SelectOrCreateSecret';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 
-import { SECRET, AUTH_TYPE } from '@shell/config/types';
+import { SECRET, AUTH_TYPE, DEFAULT_WORKSPACE } from '@shell/config/types';
 
 const S3 = 'S3';
 
@@ -105,7 +105,7 @@ export default {
         return [
           ...out,
           groupOption,
-          ...map[namespace].map((secret) => ({
+          ...map[namespace].filter(secret => s.metadata.namespace === DEFAULT_WORKSPACE).map((secret) => ({
             label: secret.metadata.name,
             value: secret.metadata.name,
           })),
