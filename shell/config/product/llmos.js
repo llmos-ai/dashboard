@@ -141,6 +141,23 @@ export function init(store) {
     ML_WORKLOAD_TYPES.MODEL_SERVICE,
   ]);
 
+  virtualType({
+    ifHaveType: LLMOS.MODEL,
+    labelKey:   'typeLabel."ml.llmos.ai.model"',
+    name:       LLMOS.MODEL,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.MODEL }
+    },
+    exact:  false,
+    weight: 97,
+  });
+
+  basicType([
+    LLMOS.MODEL,
+  ]);
+
   // playground
   basicType(
     [CHAT],

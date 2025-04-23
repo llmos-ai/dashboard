@@ -105,6 +105,7 @@ export const LLMOS = {
   CHAT:      'chat',
   TOOL:      'llmos.tool',
   REGISTRY:  'ml.llmos.ai.registry',
+  MODEL:     'ml.llmos.ai.model',
 };
 
 export const ML_WORKLOAD = 'ml_workload';

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, defineEmits } from 'vue';
 import { useStore } from 'vuex';
 
 import { AUTH_TYPE } from '@shell/config/types';

@@ -8,6 +8,7 @@ import { LabeledInput } from '@shell/components/form/LabeledInput';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 
 import { SECRET_TYPES } from '@shell/config/secret';
+import { DEFAULT_WORKSPACE } from '@shell/config/types';
 
 import { base64Encode } from '@shell/utils/crypto';
 
@@ -50,7 +51,7 @@ const errors = ref([]);
 const value = reactive({
   metadata: {
     name:      '',
-    namespace: 'llmos-system',
+    namespace: DEFAULT_WORKSPACE,
   },
   type: SECRET_TYPES.OPAQUE,
   data: {
