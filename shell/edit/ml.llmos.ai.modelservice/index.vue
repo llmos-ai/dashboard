@@ -511,21 +511,26 @@ export default {
     </div>
 
     <template #createBtnPrefix>
-      <a-button
-        v-if="current === 0"
-        type="primary"
-        :disabled="disableNext"
-        @click="next"
+      <div
+        v-if="isCreate"
+        class="inline-block"
       >
-        Next
-      </a-button>
+        <a-button
+          v-if="current === 0"
+          type="primary"
+          :disabled="disableNext"
+          @click="next"
+        >
+          Next
+        </a-button>
 
-      <a-button
-        v-if="current === 1"
-        @click="prev"
-      >
-        Previous
-      </a-button>
+        <a-button
+          v-if="current === 1"
+          @click="prev"
+        >
+          Previous
+        </a-button>
+      </div>
     </template>
   </CruResource>
 </template>
