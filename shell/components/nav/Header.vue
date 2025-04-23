@@ -361,7 +361,7 @@ export default {
     <div class="flex items-center h-[45px] pt-[10px]">
       <BrandImage
         class="side-menu-logo-img pl-[4px]"
-        file-name="logo.svg"
+        file-name="logo.png"
       />
 
       <div class="grow-1" />

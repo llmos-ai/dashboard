@@ -1,39 +1,42 @@
-<script>
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
 import { SERVICE } from '@shell/config/types';
 import { fetchClusterResources } from '@shell/pages/c/_cluster/explorer/explorer-utils';
 
-export default {
-  layout: 'rayDashboard',
-  async asyncData({ route, redirect, store }) {
-    // TODO: fetch
-    const services = await fetchClusterResources(store, SERVICE);
-    const id = route.params.id;
-    const namespace = route.params.namespace;
+const route = useRoute();
+const store = useStore();
 
-    let dashboardUrl = '';
+const services = ref([]);
+const dashboardUrl = ref('');
 
-    if (services && services.length > 0) {
-      // find service by svc name and namespace
-      const svc = services.find((s) => {
-        return s.metadata.ownerReferences?.find((o) => o.name === id);
-      });
+onMounted(async() => {
+  services.value = await fetchClusterResources(store, SERVICE);
+
+  const id = route.params.id;
+  const namespace = route.params.namespace;
+
+  if (services.value && services.value.length > 0) {
+    const svc = services.value.find((s) => s.metadata.ownerReferences?.find((o) => o.name === id)
+    );
+
+    if (svc) {
       const port = svc.spec.ports.find((p) => p.port === 8265);
 
-      dashboardUrl = `${ window.location.origin }/api/v1/namespaces/${ namespace }/services/http:${ svc.name }:${ port.name }/proxy/#/overview`;
+      if (port) {
+        dashboardUrl.value = `${ window.location.origin }/api/v1/namespaces/${ namespace }/services/http:${ svc.metadata.name }:${ port.name }/proxy/#/overview`;
+      }
     }
+  }
+});
+</script>
 
-    return {
-      services,
-      dashboardUrl,
-    };
-  },
+<script>
+export default {
+  setup() {
 
-  data() {
-    return {
-      services:     [],
-      dashboardUrl: '',
-    };
-  },
+  }
 };
 </script>
 
