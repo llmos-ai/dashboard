@@ -84,6 +84,6 @@ export function setTitle() {
 
     head.appendChild(link);
   } else {
-    document.title = v;
+    document.title = 'LLMOS';
   }
 }
