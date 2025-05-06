@@ -154,8 +154,22 @@ export function init(store) {
     weight: 97,
   });
 
+  virtualType({
+    ifHaveType: LLMOS.DATASET,
+    labelKey:   'typeLabel."ml.llmos.ai.dataset"',
+    name:       LLMOS.DATASET,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.DATASET }
+    },
+    exact:  false,
+    weight: 96,
+  });
+
   basicType([
     LLMOS.MODEL,
+    LLMOS.DATASET,
   ]);
 
   // playground

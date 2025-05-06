@@ -21,7 +21,7 @@ import { allHash } from '@shell/utils/promise';
 const S3 = 'S3';
 
 export default {
-  name: 'Model',
+  name: 'Dataset',
 
   components: {
     CruResource,
@@ -62,9 +62,9 @@ export default {
   data() {
     const resource = {
       spec: {
-        modelCard:    {
+        datasetCard:    {
           metadata: {
-            datasets:  [],
+            splitTypes:  [],
           },
         },
       }
@@ -81,6 +81,7 @@ export default {
 
   created() {
     this.registerBeforeHook(this.willSave, 'willSave');
+    this.registerAfterHook(this.afterSave, 'afterSave');
   },
 
   computed: {
@@ -95,7 +96,6 @@ export default {
       return (
         !!this.value.metadata.name
         && !!this.resource.spec.registry
-        && !!this.resource.spec.modelCard.description
       );
     },
 
@@ -113,11 +113,21 @@ export default {
       }]
     },
 
-    baseModelOptions() {
+    splitTypeOptions() {
       return [{
-        label: 'llama',
-        value: 'llama',
+        label: 'train',
+        value: 'train',
+      }, {
+        label: 'test',
+        value: 'test',
+      }, {
+        label: 'validation',
+        value: 'validation',
       }]
+    },
+
+    featureOptions() {
+      return []
     },
 
     languageOptions() {
@@ -127,19 +137,20 @@ export default {
       }]
     },
 
-    frameworkOptions() {
-      return [{
-        label: 'Pytorch',
-        value: 'pytorch',
-      }]
-    },
-
-    datasetOptions() {
+    authorOptions() {
       return []
     },
 
     tagOptions() {
       return []
+    },
+
+    inStore() {
+      return this.$store.getters['currentProduct'].inStore;
+    },
+
+    versionSchema() {
+      return this.$store.getters[`${ this.inStore }/schemaFor`](LLMOS.DATASET_VERSION);
     },
   },
 
@@ -147,6 +158,36 @@ export default {
     willSave() {
       Object.assign(this.value, this.resource);
     },
+
+    async afterSave() {
+      const errors = [];
+
+      try {
+        const url = this.versionSchema.linkFor('collection');
+
+        const model = await this.$store.dispatch(`${ this.inStore }/create`, {
+          metadata: {
+            name:      'v1',
+            namespace: this.value.metadata.namespace,
+          },
+          spec: {
+            dataset: this.value.metadata.name,
+            version: 'v1.0.0',
+            enableFastLoading: true
+          },
+        });
+
+        await model.save({ url });
+      } catch (e) {
+        errors.push(e.message);
+      }
+
+      if (errors.length === 0) {
+        return Promise.resolve();
+      } else {
+        return Promise.reject(errors);
+      }
+    }
   }
 };
 </script>
@@ -188,17 +229,19 @@ export default {
               :options="registryOptions"
               :mode="mode"
               :multiple="false"
-              label-key="modelCard.registry.label"
+              label-key="datasetCard.registry.label"
               required
             />
           </div>
           <div class="col span-6">
             <LabeledSelect
-              v-model:value="resource.spec.modelCard.metadata.baseModel"
-              :options="baseModelOptions"
+              v-model:value="resource.spec.datasetCard.splitTypes"
+              :options="splitTypeOptions"
               :mode="mode"
-              :multiple="false"
-              label-key="modelCard.baseModel.label"
+              :multiple="true"
+              label-key="datasetCard.splitTypes.label"
+              :taggable="true"
+              searchable
             />
           </div>
         </div>
@@ -206,20 +249,22 @@ export default {
         <div class="row mb-10 mt-10">
           <div class="col span-6">
             <LabeledSelect
-              v-model:value="resource.spec.modelCard.metadata.license"
+              v-model:value="resource.spec.datasetCard.metadata.license"
               :options="licenseOptions"
               :mode="mode"
               :multiple="false"
-              label-key="modelCard.license.label"
+              label-key="datasetCard.license.label"
             />
           </div>
           <div class="col span-6">
             <LabeledSelect
-              v-model:value="resource.spec.modelCard.metadata.datasets"
-              :options="datasetOptions"
+              v-model:value="resource.spec.datasetCard.features"
+              :options="featureOptions"
               :mode="mode"
               :multiple="true"
-              label-key="modelCard.datasets.label"
+              label-key="datasetCard.features.label"
+              :taggable="true"
+              searchable
             />
           </div>
         </div>
@@ -227,22 +272,24 @@ export default {
         <div class="row mb-10 mt-10">
           <div class="col span-6">
             <LabeledSelect
-              v-model:value="resource.spec.modelCard.metadata.language"
+              v-model:value="resource.spec.datasetCard.metadata.language"
               :options="languageOptions"
               :mode="mode"
               :multiple="false"
-              label-key="modelCard.language.label"
+              label-key="datasetCard.language.label"
               :taggable="true"
               searchable
             />
           </div>
           <div class="col span-6">
             <LabeledSelect
-              v-model:value="resource.spec.modelCard.metadata.framework"
-              :options="frameworkOptions"
+              v-model:value="resource.spec.datasetCard.authors"
+              :options="authorOptions"
               :mode="mode"
-              :multiple="false"
-              label-key="modelCard.framework.label"
+              :multiple="true"
+              label-key="datasetCard.authors.label"
+              :taggable="true"
+              searchable
             />
           </div>
         </div>
@@ -250,53 +297,29 @@ export default {
         <div class="row mb-10 mt-10">
           <div class="col span-6">
             <LabeledSelect
-              v-model:value="resource.spec.modelCard.metadata.tags"
+              v-model:value="resource.spec.datasetCard.metadata.tags"
               :options="tagOptions"
               :mode="mode"
               :multiple="true"
-              label-key="modelCard.tags.label"
+              label-key="datasetCard.tags.label"
               :taggable="true"
               searchable
             />
-          </div>
-        </div>
-
-        <div class="row mt-10 mb-10">
-          <div class="col span-6">
-            <div class="label">
-              <div class="text-label">
-                <t k="modelCard.requiredResources.label" />
-              </div>
-            </div>
-            <div class="mt-10">
-              <a-checkbox
-                v-model:checked="resource.spec.modelCard.metadata.cpu"
-                type="checkbox"
-              />
-              {{ t('modelCard.cpu.label') }}
-              <a-checkbox
-                v-model:checked="resource.spec.modelCard.metadata.gpu"
-                type="checkbox"
-                class="ml-10"
-              />
-              {{ t('modelCard.gpu.label') }}
-            </div>
           </div>
         </div>
 
         <div class="row mb-10 mt-10">
           <div class="col span-12">
             <LabeledInput
-              v-model:value="resource.spec.modelCard.description"
+              v-model:value="resource.spec.datasetCard.description"
               :mode="mode"
-              :label="t('modelCard.description.label')"
+              :label="t('datasetCard.description.label')"
               :placeholder="t('nameNsDescription.description.placeholder')"
-              required
               type="multiline"
             >
               <template #field>
                 <a-textarea
-                  v-model:value="resource.spec.modelCard.description"
+                  v-model:value="resource.spec.datasetCard.description"
                   :rows="10"
                 />
               </template>

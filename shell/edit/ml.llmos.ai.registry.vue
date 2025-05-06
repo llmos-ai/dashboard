@@ -97,19 +97,23 @@ export default {
       const map = groupBy(this.allSecrets, 'metadata.namespace');
 
       const out = Object.keys(map).reduce((out, namespace) => {
-        const groupOption = {
-          kind:  'group',
-          label: `${ this.t('nameNsDescription.namespace.label') }: ${ namespace }`,
-        };
+        if (namespace === DEFAULT_WORKSPACE) {
+          const groupOption = {
+            kind:  'group',
+            label: `${ this.t('nameNsDescription.namespace.label') }: ${ namespace }`,
+          };
 
-        return [
-          ...out,
-          groupOption,
-          ...map[namespace].filter(secret => s.metadata.namespace === DEFAULT_WORKSPACE).map((secret) => ({
-            label: secret.metadata.name,
-            value: secret.metadata.name,
-          })),
-        ];
+          return [
+            ...out,
+            groupOption,
+            ...map[namespace].filter(secret => secret.metadata.namespace === DEFAULT_WORKSPACE).map((secret) => ({
+              label: secret.metadata.name,
+              value: secret.metadata.name,
+            })),
+          ];
+        } else {
+          return out
+        }
       }, [{
         label: this.t('modelRegistry.selectOrCreateSecret'),
         value: AUTH_TYPE._S3,
