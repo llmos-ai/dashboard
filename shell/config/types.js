@@ -106,6 +106,8 @@ export const LLMOS = {
   TOOL:      'llmos.tool',
   REGISTRY:  'ml.llmos.ai.registry',
   MODEL:     'ml.llmos.ai.model',
+  DATASET:   'ml.llmos.ai.dataset',
+  DATASET_VERSION: 'ml.llmos.ai.datasetversion',
 };
 
 export const ML_WORKLOAD = 'ml_workload';

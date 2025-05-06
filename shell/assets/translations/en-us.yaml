@@ -6072,6 +6072,11 @@ typeLabel:
       one { Model }
       other { Models }
     }
+  ml.llmos.ai.dataset: |-
+    {count, plural,
+      one { Dataset }
+      other { Datasets }
+    }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
     {count, plural,
@@ -6771,7 +6776,7 @@ createSecretModal:
 
 modelCard:
   registry:
-    label: Model Registry
+    label: Registry
   license:
     label: License
   tags:
@@ -6786,7 +6791,45 @@ modelCard:
     label: Base Model
   description:
     label: Model Description
+  requiredResources:
+    label: Required Resources
+  cpu:
+    label: CPU
+  gpu:
+    label: GPU
+  empty: There are no models to show.
 
 LabeledTag:
   addLabel: Add Tag
   title: Tags
+
+labelSelect:
+  noOptions:
+    empty: No options
+labeledSelect:
+  startTyping: Start typing to define an item
+  pressEnter: Press enter to add "{input}"
+
+datasetCard:
+  registry:
+    label: Registry
+  license:
+    label: License
+  tags:
+    label: Model Tags
+  language:
+    label: Language
+  description:
+    label: Dataset Description
+  splitTypes:
+    label: Split Types
+  features:
+    label: Features
+  authors:
+    label: Authors
+
+createFolderModal:
+  title: Create Folder
+  targetDirectory:
+    label: Folder Name
+    placeholder: e.g. folder/subfolder

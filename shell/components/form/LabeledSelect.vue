@@ -150,7 +150,11 @@ export default {
     // update placeholder text to inform user they can add their own opts when none are found
     showTagPrompts() {
       return !this.options.length && this.$attrs.taggable && this.isSearchable;
-    }
+    },
+
+    searching() {
+      return this.$refs['select-input']?.searchEl?.searching;
+    },
   },
 
   methods: {

@@ -38,11 +38,11 @@ export default class ModelRegistry extends SteveModel {
   }
 
   get stateObj() {
-    return this.isAccessible ? this.metadata.state : {
-      ...this.metadata.state,
+    return this.isAccessible ? this.metadata?.state : {
+      ...this.metadata?.state,
       name:    'Inactive',
       error:   true,
-      message: this.accessibleCondition.message,
+      message: this.accessibleCondition?.message,
     };
   }
 }
