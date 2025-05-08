@@ -44,11 +44,13 @@ export default {
   },
 
   methods: {
-    async fetchFiles() {
+    async fetchFiles(targetFilePath) {
       const inStore = this.$store.getters['currentProduct'].inStore;
 
       const hash = await allHash({
-        files: this.value.doAction('list', {}),
+        files: this.value.doAction('list', {
+          targetFilePath,
+        }),
       });
 
       const files = hash.files || [];
@@ -60,7 +62,7 @@ export default {
         if (a.Size !== 0 && b.Size === 0) {
           return 1;
         }
-        
+
         return a.Name.localeCompare(b.Name);
       });
     }

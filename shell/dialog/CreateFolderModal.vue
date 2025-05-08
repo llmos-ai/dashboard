@@ -30,6 +30,11 @@ const props = defineProps({
     type:    Function,
     default: () => {},
   },
+
+  currentPath: {
+    type:    String,
+    default: '',
+  },
 });
 
 const errors = ref([]);
@@ -61,7 +66,9 @@ const save = async() => {
   errors.value = [];
 
   try {
-    const res = await resource.value.doAction('createDirectory', value)
+    const res = await resource.value.doAction('createDirectory', {
+      targetDirectory: `${ props.currentPath }/${ value.targetDirectory}`
+    })
 
     if (res._status === 204) {
       message.success('Folder Created');
