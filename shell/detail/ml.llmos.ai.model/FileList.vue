@@ -25,6 +25,8 @@ const props = defineProps({
 const emit = defineEmits(['fetchFiles']);
 
 const downloading = ref(false);
+const uploading = ref(false);
+const currentPath = ref('');
 
 const onCreateFolder = async () => {
   store.dispatch('cluster/promptModal', {
@@ -33,8 +35,9 @@ const onCreateFolder = async () => {
     resources:      [props.resource],
     componentProps: {
       saveCb: () => {
-        emit('fetchFiles');
-      }
+        emit('fetchFiles', currentPath.value);
+      },
+      currentPath: currentPath.value,
     },
   });
 }
@@ -62,6 +65,41 @@ const onDownload = async () => {
   
   downloading.value = false;
 }
+
+const fetchFiles = async (targetFilePath) => {
+  currentPath.value = targetFilePath;
+  emit('fetchFiles', targetFilePath);
+}
+
+const onUpload = async (options) => {
+  const { file, onSuccess, onError } = options;// file 是一个 File 对象，包含了上传的文件信息，如文件名、大小等
+  
+  try {
+    uploading.value = true;
+    
+    const formData = new FormData();
+    formData.append('sourceFilePath', file);
+    
+    await props.resource.doAction('upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    onSuccess('上传成功');
+    emit('fetchFiles');
+  } catch (err) {
+    onError('上传失败');
+  } finally {
+    uploading.value = false;
+  }
+};
+
+const onBack = () => {
+  console.log(currentPath.value, 'currentPath')
+  const parentPath = currentPath.value.split('/').slice(0, -2).join('/');
+  emit('fetchFiles', parentPath);
+}
 </script>
 
 <script>
@@ -75,6 +113,15 @@ export default {
 <template>
   <div class="row">
     <div class="col span-12">
+      <div>
+        <a-button
+          type="primary"
+          @click="onBack"
+        >
+          Back
+        </a-button>
+        {{ currentPath  }}
+      </div>
       <div class="pull-right">
         <a-button
           type="primary"
@@ -82,12 +129,17 @@ export default {
         >
           Create Folder
         </a-button>
-        <a-button
-          type="primary"
-          @click="onUpload"
+        <a-upload
+          :customRequest="onUpload"
+          :showUploadList="false"
         >
-          Add File
-        </a-button>
+          <a-button
+            type="primary"
+            :loading="uploading"
+          >
+            Add File
+          </a-button>
+        </a-upload>
         <a-button
           type="primary"
           @click="onDownload"
@@ -99,10 +151,24 @@ export default {
     </div>
   </div>
   <div class="file-list mt-10">
+    <div 
+      v-if="files.length === 0"
+      class="file-empty"
+    >
+      <a-empty
+        :imageStyle="{
+          'min-height': '50vh',
+        }" 
+        :description="null"
+      />
+    </div>
     <FileItem 
+      v-else
       v-for="file in files" 
       :key="file.Name"
       :file="file"
+      :resource="resource"
+      @fetchFiles="fetchFiles"
     />
   </div>
 </template>
@@ -111,5 +177,6 @@ export default {
 .file-list {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
+  min-height: 50vh;
 }
 </style>
