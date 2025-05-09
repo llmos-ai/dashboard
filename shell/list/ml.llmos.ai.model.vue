@@ -219,6 +219,7 @@ export default {
         :options="providerOptions" 
         optionType="button"
         size="small"
+        class="custom-radio-group"
       />
     </a-flex>
 
@@ -231,6 +232,7 @@ export default {
         :options="typeOptions" 
         optionType="button"
         size="small"
+        class="custom-radio-group"
       />
     </a-flex>
 
@@ -243,6 +245,7 @@ export default {
         :options="contextOptions" 
         optionType="button"
         size="small"
+        class="custom-radio-group"
       />
     </a-flex>
 
@@ -484,5 +487,50 @@ $logo: 50px;
     text-align: right;
     justify-content: flex-end;
   }
+}
+
+.custom-radio-group {
+  :deep(.ant-radio-button-wrapper) {
+    height: 32px;
+    padding: 4px 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-right: 8px;
+    background: transparent;
+    
+    &::before {
+      display: none;  // 移除按钮之间的分隔线
+    }
+    
+    &:first-child {
+      border-radius: 6px;
+    }
+    
+    &:last-child {
+      border-radius: 6px;
+    }
+    
+    &:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+    
+    &.ant-radio-button-wrapper-checked {
+      color: var(--primary);
+      border-color: var(--primary);
+      box-shadow: none;
+      
+      &::before {
+        display: none;
+      }
+    }
+  }
+}
+
+.tag-label {
+  min-width: 60px;
+  font-size: 14px;
+  color: var(--input-label);
+  line-height: 32px;  // 添加这行以垂直居中对齐
 }
 </style>

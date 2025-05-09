@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
-import FileItem from '@shell/detail/ml.llmos.ai.model/FileItem'
+import FileItem from './FileItem'
 
 const store = useStore();
 
@@ -96,8 +96,8 @@ const onUpload = async (options) => {
 };
 
 const onBack = () => {
-  console.log(currentPath.value, 'currentPath')
   const parentPath = currentPath.value.split('/').slice(0, -2).join('/');
+  currentPath.value = parentPath || '';
   emit('fetchFiles', parentPath);
 }
 </script>
@@ -113,14 +113,14 @@ export default {
 <template>
   <div class="row">
     <div class="col span-12">
-      <div>
+      <div class="pull-left">
         <a-button
           type="primary"
           @click="onBack"
         >
           Back
         </a-button>
-        {{ currentPath  }}
+        {{ '/' + currentPath  }}
       </div>
       <div class="pull-right">
         <a-button

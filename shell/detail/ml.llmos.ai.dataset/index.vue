@@ -3,9 +3,10 @@ import ResourceTabs from '@shell/components/form/ResourceTabs';
 import DetailText from '@shell/components/DetailText';
 import Tab from '@shell/components/Tabbed/Tab';
 import Loading from '@shell/components/Loading';
-import FileList from '@shell/detail/ml.llmos.ai.model/FileList'
+import FileList from './FileList'
 
 import CreateEditView from '@shell/mixins/create-edit-view';
+import { LLMOS } from '@shell/config/types';
 
 import { allHash } from '@shell/utils/promise';
 
@@ -32,6 +33,8 @@ export default {
   data() {
     return {
       files: [],
+      loading: false,
+      datasetVersions: [],
     };
   },  
 
@@ -40,18 +43,31 @@ export default {
   },
 
   computed: {
-    
+    datasetVersionOptions() {
+      return this.datasetVersions.map(d => ({
+        label: d.spec.version,
+        value: d.id,
+      }));
+    },
   },
 
   methods: {
     async fetchFiles(targetFilePath) {
+      this.loading = true;
+
       const inStore = this.$store.getters['currentProduct'].inStore;
+      const res = await this.$store.dispatch(`${inStore}/findAll`, { type: LLMOS.DATASET_VERSION });
+      
+      const datasetVersions = (res || []).filter(d => (d?.status?.rootPath || '').includes(`datasets/${this.value.id}`));
+      this.datasetVersions = datasetVersions;      
 
       const hash = await allHash({
-        files: this.value.doAction('list', {
+        files: datasetVersions[0].doAction('list', {
           targetFilePath,
         }),
       });
+
+      this.loading = false;
 
       const files = hash.files || [];
 
@@ -83,11 +99,13 @@ export default {
       name="files"
       label="Files"
     >
-      <FileList 
-        :files="files"
-        :resource="value"
-        @fetchFiles="fetchFiles"
-      />
+      <a-spin :spinning="loading">
+        <FileList 
+          :files="files"
+          :resource="value"
+          @fetchFiles="fetchFiles"
+        />
+      </a-spin>
     </Tab>
   </ResourceTabs>
 </template>

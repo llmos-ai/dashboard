@@ -1,0 +1,307 @@
+<script setup>
+import { ref, defineProps, computed, reactive } from 'vue';
+import { useStore } from 'vuex';
+
+import Banner from '@shell/components/Banner/Banner.vue';
+import { LLMOS } from '@shell/config/types';
+import { LabeledInput } from '@shell/components/form/LabeledInput';
+import LabelValue from '@shell/components/LabelValue'
+import LabeledSelect from '@shell/components/form/LabeledSelect';
+import NameNsDescription from '@shell/components/form/NameNsDescription';
+
+import { SECRET_TYPES } from '@shell/config/secret';
+import { DEFAULT_WORKSPACE } from '@shell/config/types';
+
+import { base64Encode } from '@shell/utils/crypto';
+
+const store = useStore();
+
+const props = defineProps({
+  resources: {
+    type:     Array,
+    required: true,
+  },
+
+  onAdd: {
+    type:    Function,
+    default: () => {},
+  },
+
+  projectId: {
+    type:    String,
+    default: null,
+  },
+
+  saveInModal: {
+    type:    Boolean,
+    default: false,
+  },
+
+  beforeClose: {
+    type:    Function,
+    default: () => {},
+  },
+
+  saveCb: {
+    type:    Function,
+    default: () => {},
+  },
+
+  datasetId: {
+    type: String,
+    default: '',
+  },
+});
+
+const errors = ref([]);
+
+const emit = defineEmits(['close']);
+
+const value = reactive({
+  metadata: {
+    name:      '',
+    namespace: DEFAULT_WORKSPACE,
+  },
+  spec: {
+    dataset: props.datasetId,
+    version: '',
+    enableFastLoading: true
+  },
+});
+
+const canSave = computed(() => {
+  const out = value.spec.enableFastLoading 
+    ? !!value?.spec?.version 
+    : true;
+
+  return out;
+});
+
+const inStore = computed(() => {
+  const inStore = store.getters['currentStore'](value.type);
+
+  return inStore;
+});
+
+const dataset = computed(() => {
+  const dataset = store.getters[`${ inStore.value }/byId`](LLMOS.DATASET, props.datasetId)
+  
+  return dataset || {}
+})
+
+const datasetVersions = computed(() => {  
+  return (dataset.value.datasetVersions || []).sort((a, b) => {
+    const versionA = parseInt(a.metadata.name.replace(/[^0-9]/g, ''));
+    const versionB = parseInt(b.metadata.name.replace(/[^0-9]/g, ''));
+    
+    return versionB - versionA;
+  });
+})
+
+const datasetVersionOptions = computed(() => {
+  return datasetVersions.value.map(version => {
+    return {
+      label: version.metadata.name,
+      value: version.spec.version,
+    }
+  })
+})
+
+const latestDatasetVersion = computed(() => {  
+  return datasetVersions.value?.[0] || {}
+});
+
+const latestVersion = computed(() => {  
+  const currentMax = parseInt((latestDatasetVersion.value?.metadata?.name || '').replace(/[^0-9]/g, ''));
+  return `v${currentMax + 1}`;
+});
+
+const schema = computed(() => {
+  return store.getters[`${ inStore.value }/schemaFor`](LLMOS.DATASET_VERSION);
+});
+
+value.spec.version = datasetVersions.value?.[0]?.spec.version;
+
+const close = () => {
+  props.beforeClose();
+  emit('close');
+};
+
+const save = async() => {
+  errors.value = [];
+
+  try {
+    const url = schema.value.linkFor('collection');
+    console.log(url, 'url')
+    const model = await store.dispatch(`${ inStore.value }/create`, {
+      metadata: {
+        name:      latestVersion.value,
+        namespace: latestDatasetVersion.value.metadata.namespace,
+      },
+      spec: {
+        dataset: latestDatasetVersion.value.spec.dataset,
+        version: `${ latestVersion.value }.0.0`,
+        enableFastLoading: value.spec.enableFastLoading
+      },
+    });
+
+     console.log(model, 'model')
+
+    await model.save({ url });
+
+    // props.saveCb(res);
+
+    emit('close');
+  } catch (e) {
+    errors.value.push(e.message);
+  }
+};
+</script>
+
+<script>
+export default {
+  setup() {
+
+  }
+};
+</script>
+
+<template>
+  <a-Card
+    :title="t('createDatasetVersionModal.title')"
+    :show-highlight-border="false"
+    :sticky="true"
+  >
+    <div class="pl-10 pr-10">
+      <Banner
+        v-if="errors.length > 0"
+        color="error"
+      >
+        {{ errors }}
+      </Banner>
+    </div>
+
+    <div class="row mb-10">
+      <div class="col span-12">
+        <LabelValue
+          v-model:value="latestVersion"
+          :name="t('createDatasetVersionModal.versionName.label')"
+        />
+      </div>
+    </div>
+
+    <div class="row mb-10">
+      <div class="col span-12">
+        <div class="version-type-label mb-5">数据继承：</div>
+        <a-radio-group v-model:value="value.spec.enableFastLoading" class="version-type-group">
+          <div class="version-type-option">
+            <a-radio :value="true">
+              <div class="option-content">
+                <div class="option-title">继承模式</div>
+                <div class="option-desc">继承模式下，新版本将继承原版本所有的数据，可在此数据基础上进行修改</div>
+              </div>
+            </a-radio>
+          </div>
+          <div class="version-type-option">
+            <a-radio :value="false">
+              <div class="option-content">
+                <div class="option-title">新建模式</div>
+                <div class="option-desc">新版本内容为空，需要另外导入内容</div>
+              </div>
+            </a-radio>
+          </div>
+        </a-radio-group>
+      </div>
+    </div>
+
+    <div v-if="value.spec.enableFastLoading" class="row mb-10">
+      <div class="col span-12">
+        <LabeledSelect
+          v-model:value="value.spec.version"
+          :options="datasetVersionOptions"
+          required
+          :label="t('createDatasetVersionModal.version.label')"
+        />
+      </div>
+    </div>
+
+    <template #actions>
+      <a-button
+        @click="close"
+      >
+        {{ t('generic.cancel') }}
+      </a-button>
+
+      <a-button
+        type="primary"
+        :disabled="!canSave"
+        @click="save"
+      >
+        {{ t('generic.create') }}
+      </a-button>
+    </template>
+  </a-Card>
+</template>
+
+<style lang="scss" scoped>
+.version-type-label,
+.version-select-label {
+  font-size: 14px;
+  color: var(--text-label);
+}
+
+.version-type-group {
+  width: 100%;
+  display: flex;
+  gap: 20px;
+}
+
+.version-type-option {
+  flex: 1;
+  display: flex;
+  
+  :deep(.ant-radio-wrapper) {
+    width: 100%;
+    height: 100%;
+    margin-right: 0;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;  // 添加这行
+    align-items: flex-start;  // 添加这行
+    
+    &:hover, &.ant-radio-wrapper-checked {
+      border-color: var(--primary);
+    }
+
+    :deep(.ant-radio) {
+      margin-top: 2px;  // 微调单选框的垂直位置
+    }
+  }
+}
+
+.option-content {
+  margin-left: 8px;
+  flex: 1;  // 添加这行
+  min-height: 100%;  // 添加这行
+  display: flex;  // 添加这行
+  flex-direction: column; 
+  justify-content: center;
+}
+
+.option-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.option-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.version-select {
+  width: 100%;
+}
+</style>

@@ -6827,9 +6827,20 @@ datasetCard:
     label: Features
   authors:
     label: Authors
+  actions:
+    newVersion: New Version
 
 createFolderModal:
   title: Create Folder
   targetDirectory:
     label: Folder Name
     placeholder: e.g. folder/subfolder
+
+createDatasetVersionModal:
+  title: Create Dataset Version
+  enableFastLoading:
+    label: 数据继承
+  version:
+    label: Successor Version
+  versionName:
+    label: Version Name
