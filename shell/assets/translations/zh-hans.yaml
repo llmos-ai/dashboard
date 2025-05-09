@@ -41,6 +41,7 @@ generic:
   never: 从不
   none: 无
   notFound: 未找到
+  next: 下一步
   number: '{prefix}{value, number}{suffix}'
   notification:
     title:
@@ -77,6 +78,7 @@ generic:
   unknown: 未知
   upload: 上传
   provisioning: '—'
+  previous: 上一步
   key: 键
   value: 值
   yes: 是
@@ -220,7 +222,7 @@ nav:
 
 product:
   apps: 应用
-  auth: 用户 & 认证
+  auth: 用户管理
   backup: Rancher 备份
   cis: CIS Benchmark
   ecm: Cluster Manager

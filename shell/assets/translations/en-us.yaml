@@ -39,6 +39,7 @@ generic:
   na: N/A
   name: Name
   never: Never
+  next: Next
   none: None
   notFound: Not Found
   number: "{prefix}{value, number}{suffix}"
@@ -103,6 +104,7 @@ generic:
 
   deprecated: Deprecated
   placeholder: "e.g. {text}"
+  previous: Previous
   moreInfo: More Info
   selectors:
     label: Selector
@@ -260,6 +262,7 @@ suffix:
   ib: iB
   mib: MiB
   gb: GB
+  gib: GiB
   revisions: |-
     {count, plural,
       =1 { Revision }
