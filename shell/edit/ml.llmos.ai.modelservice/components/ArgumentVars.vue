@@ -4,18 +4,29 @@
       direction="vertical"
       class="w-full"
     >
-      <a-auto-complete
+      <div
         v-for="(arg, idx) in model"
         :key="idx"
-        v-model:value="model[idx]"
-        class="w-full"
-        size="large"
-        :placeholder="t('generic.placeholder', { text: '--dtype=half' }, true)"
-        :label="t('workload.container.command.args')"
-        :options="vllmOptions(idx)"
-        :filter-option="filterArgsOption"
-        @update:value="val => onUpdate(val, idx)"
-      />
+        class="flex items-center w-full"
+      >
+        <a-auto-complete
+          v-model:value="model[idx]"
+          class="w-full"
+          size="large"
+          :placeholder="t('generic.placeholder', { text: '--dtype=half' }, true)"
+          :label="t('workload.container.command.args')"
+          :options="vllmOptions(idx)"
+          :filter-option="filterArgsOption"
+          @update:value="val => onUpdate(val, idx)"
+        />
+        <a-button
+          type="link"
+          class="ml-2"
+          @click="removeArg(idx)"
+        >
+          {{ t('generic.remove') }}
+        </a-button>
+      </div>
       <a-button
         class="mt-10"
         type="primary"
@@ -32,7 +43,8 @@ import { VLLM_CONFIG } from '@shell/config/vllm-config';
 
 const model = defineModel({
   type:     Array,
-  required: true
+  required: true,
+  default:  () => []
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -78,5 +90,12 @@ function onUpdate(val, idx) {
 
 function filterArgsOption(inputValue, option) {
   return option.value.toLowerCase().includes(inputValue.toLowerCase());
+}
+
+function removeArg(idx) {
+  const newArgs = [...model.value];
+
+  newArgs.splice(idx, 1);
+  emit('update:modelValue', newArgs);
 }
 </script>

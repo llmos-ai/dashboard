@@ -155,6 +155,11 @@ export default {
   methods: {
     willSave() {
       this.errors = [];
+
+      if (Array.isArray(this.container.args)) {
+        this.container.args = this.container.args.filter((arg) => !!arg && arg.trim() !== '');
+      }
+
       this.update();
 
       if (this.container.image === '') {
@@ -349,7 +354,20 @@ export default {
             </a-col>
           </a-row>
 
-          <h4>{{ t("modelService.huggingFaceToken") }}</h4>
+          <a-row
+            :gutter="[16]"
+            class="mb-[16px]"
+          >
+            <a-col :span="12">
+              <h3>{{ t('workload.container.command.args') }}</h3>
+              <ArgumentVars
+                v-model="container.args"
+                class="w-full"
+              />
+            </a-col>
+          </a-row>
+
+          <h3>{{ t("modelService.huggingFaceToken") }}</h3>
           <a-row
             :gutter="[16]"
             class="mb-[16px]"
@@ -373,19 +391,6 @@ export default {
                 :mode="mode"
                 class="mb-20"
                 :label="t('modelService.hf.endpoint')"
-              />
-            </a-col>
-          </a-row>
-
-          <a-row
-            :gutter="[16]"
-            class="mb-[16px]"
-          >
-            <a-col :span="12">
-              <h3>{{ t('workload.container.command.args') }}</h3>
-              <ArgumentVars
-                v-model="container.args"
-                class="w-full"
               />
             </a-col>
           </a-row>
@@ -521,14 +526,14 @@ export default {
           :disabled="disableNext"
           @click="next"
         >
-          Next
+          {{ t('generic.next') }}
         </a-button>
 
         <a-button
           v-if="current === 1"
           @click="prev"
         >
-          Previous
+          {{ t('generic.previous') }}
         </a-button>
       </div>
     </template>
