@@ -43,11 +43,12 @@ export default {
   <div v-if="error">
     <main class="main-layout error">
       <div class="text-center">
-        <BrandImage
-          file-name="error-desert-landscape.svg"
-          width="900"
-          height="300"
-        />
+        <div class="flex justify-center">
+          <BrandImage
+            file-name="error-desert-landscape.png"
+            class="!max-w-full !max-h-[400px]"
+          />
+        </div>
         <h1 v-if="error.status">
           HTTP Error {{ error.status }}: {{ error.statusText }}
         </h1>
@@ -61,7 +62,10 @@ export default {
           {{ displayError }}
         </h2>
         <p class="mt-20">
-          <a-button :href="home">
+          <a-button
+            :href="home"
+            type="primary"
+          >
             {{ t('nav.home') }}
           </a-button>
         </p>
