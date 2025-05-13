@@ -17,6 +17,8 @@ import LabeledTag from '@shell/components/form/LabeledTag';
 import { SECRET, AUTH_TYPE, LLMOS } from '@shell/config/types';
 
 import { allHash } from '@shell/utils/promise';
+import { LICENSES, LANGUAGES } from '@shell/utils/dictionary'
+import { allModelName as MODELS } from '@shell/utils/ai-model'
 
 const S3 = 'S3';
 
@@ -54,9 +56,11 @@ export default {
 
     const hash = await allHash({
       registries: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.REGISTRY }),
+      datasets:  this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET }),
     });
 
     this.registries = hash.registries || [];
+    this.datasets = hash.datasets || [];
   },
 
   data() {
@@ -75,6 +79,7 @@ export default {
     return {
       errors:     [],
       registries: [],
+      datasets: [],
       resource,
     };
   },
@@ -107,24 +112,18 @@ export default {
     },
 
     licenseOptions() {
-      return [{
-        label: 'llama2',
-        value: 'llama2',
-      }]
+      return LICENSES
     },
 
     baseModelOptions() {
-      return [{
-        label: 'llama',
-        value: 'llama',
-      }]
+      return MODELS.map((model) => ({
+        label: model,
+        value: model,
+      }));
     },
 
     languageOptions() {
-      return [{
-        label: 'English',
-        value: 'en',
-      }]
+      return LANGUAGES
     },
 
     frameworkOptions() {
@@ -135,7 +134,10 @@ export default {
     },
 
     datasetOptions() {
-      return []
+      return this.datasets.map((dataset) => ({
+        label: dataset.metadata.name,
+        value: dataset.id,
+      }));
     },
 
     tagOptions() {

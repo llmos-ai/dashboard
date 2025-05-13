@@ -1,4 +1,4 @@
-const allModelName = [
+export const allModelName = [
   'topazlabs',
   'clipdrop',
   'commanda',

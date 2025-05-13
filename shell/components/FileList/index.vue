@@ -78,7 +78,43 @@ const onUpload = async (options) => {
     uploading.value = true;
     
     const formData = new FormData();
-    formData.append('sourceFilePath', file);
+    formData.append('file', file);
+    formData.append('data', JSON.stringify({
+      targetDirectory: currentPath.value,
+      relativePath: '',
+    }));
+    
+    await props.resource.doAction('upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    onSuccess('上传成功');
+    emit('fetchFiles');
+  } catch (err) {
+    onError('上传失败');
+  } finally {
+    uploading.value = false;
+  }
+};
+
+const onFolderUpload = async (options) => {
+  const { file, onSuccess, onError } = options;
+  
+  try {
+    uploading.value = true;
+    
+    const relativePath = file.webkitRelativePath || '';
+    const pathArray = relativePath.split('/');
+    pathArray.pop();
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('data', JSON.stringify({
+      targetDirectory: currentPath.value,
+      relativePaths: pathArray,  // 传入文件的相对路径数组
+    }));
     
     await props.resource.doAction('upload', formData, {
       headers: {
@@ -129,17 +165,6 @@ export default {
         >
           Create Folder
         </a-button>
-        <a-upload
-          :customRequest="onUpload"
-          :showUploadList="false"
-        >
-          <a-button
-            type="primary"
-            :loading="uploading"
-          >
-            Add File
-          </a-button>
-        </a-upload>
         <a-button
           type="primary"
           @click="onDownload"
@@ -147,6 +172,37 @@ export default {
         >
           Download
         </a-button>
+        <a-dropdown-button 
+          type="primary"
+          :loading="uploading"
+        >
+          <a-upload
+            :customRequest="onUpload"
+            :showUploadList="false"
+          >
+            <span class="btn-text p-0">
+              Add File
+            </span>
+          </a-upload>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item key="uploadFolder">
+                <a-upload
+                  :customRequest="onFolderUpload"
+                  :showUploadList="false"
+                  directory
+                >
+                  <span class="">
+                    Upload Folder
+                  </span>
+                </a-upload>
+              </a-menu-item>
+            </a-menu>
+          </template>
+          <template #icon>
+            <DownOutlined @click.prevent/>
+          </template>
+        </a-dropdown-button>
       </div>
     </div>
   </div>
@@ -178,5 +234,9 @@ export default {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
   min-height: 50vh;
+}
+
+.btn-text {
+  color: #fff;
 }
 </style>

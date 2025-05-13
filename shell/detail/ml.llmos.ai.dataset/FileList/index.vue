@@ -20,6 +20,16 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+
+  datasetVersions: {
+    type: Array,
+    default: () => ([]),
+  },
+
+  datasetVersion: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const emit = defineEmits(['fetchFiles']);
@@ -27,30 +37,28 @@ const emit = defineEmits(['fetchFiles']);
 const downloading = ref(false);
 const uploading = ref(false);
 const currentPath = ref('');
+const selectedVersion = ref('')
 
-const onCreateFolder = async () => {
-  store.dispatch('cluster/promptModal', {
-    component:      'CreateFolderModal',
-    modalWidth:     '600px',
-    resources:      [props.resource],
-    componentProps: {
-      saveCb: () => {
-        emit('fetchFiles', currentPath.value);
-      },
-      currentPath: currentPath.value,
-    },
-  });
-}
+const datesetVersionOptions = computed(() => {
+  return props.resource.datasetVersions.map((version) => {
+    return {
+      value: version.spec.version,
+      label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
+    }
+  })
+})
+
+selectedVersion.value = (datesetVersionOptions.value[0] || {}).value
 
 const onDownload = async () => {
   downloading.value = true;
 
   const inStore = store.getters['currentProduct'].inStore;
-  const res = await props.resource.doAction('download', {}, {
+  const res = await props.datasetVersion.doAction('download', {}, {
     responseType: 'blob',
   })
 
-  const fileName = `${props.resource.metadata.name}.zip`;
+  const fileName = `${props.datasetVersion.metadata.name}.zip`;
   
   const url = window.URL.createObjectURL(res.data);
   const link = document.createElement('a');
@@ -66,6 +74,20 @@ const onDownload = async () => {
   downloading.value = false;
 }
 
+const onCreateFolder = async () => {
+  store.dispatch('cluster/promptModal', {
+    component:      'CreateFolderModal',
+    modalWidth:     '600px',
+    resources:      [props.datasetVersion],
+    componentProps: {
+      saveCb: () => {
+        emit('fetchFiles', currentPath.value);
+      },
+      currentPath: currentPath.value,
+    },
+  });
+}
+
 const fetchFiles = async (targetFilePath) => {
   currentPath.value = targetFilePath;
   emit('fetchFiles', targetFilePath);
@@ -78,7 +100,7 @@ const onUpload = async (options) => {
     uploading.value = true;
     
     const formData = new FormData();
-    formData.append('sourceFilePath', file);
+    formData.append('file', file);
     
     await props.resource.doAction('upload', formData, {
       headers: {
@@ -100,6 +122,10 @@ const onBack = () => {
   currentPath.value = parentPath || '';
   emit('fetchFiles', parentPath);
 }
+
+const switchVersion = () => {
+  emit('fetchFiles', '', selectedVersion.value)
+}
 </script>
 
 <script>
@@ -114,7 +140,15 @@ export default {
   <div class="row">
     <div class="col span-12">
       <div class="pull-left">
+        <a-select 
+          v-if="!currentPath"
+          style="width: 120px"
+          v-model:value="selectedVersion"
+          :options="datesetVersionOptions"
+          @change="switchVersion"
+        />
         <a-button
+          v-else
           type="primary"
           @click="onBack"
         >
@@ -167,7 +201,7 @@ export default {
       v-for="file in files" 
       :key="file.Name"
       :file="file"
-      :resource="resource"
+      :resource="datasetVersion"
       @fetchFiles="fetchFiles"
     />
   </div>
