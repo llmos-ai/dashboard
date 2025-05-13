@@ -46,7 +46,9 @@ const lastModified = computed(() => {
 })
 
 const currentPath = computed(() => {
-  return props.file.Path ? props.file.Path.replace(`models/${props.resource.id}/`, '') : '';
+  const prefix = `datasets/${props.resource.namespace}/${props.resource.spec.dataset}/${props.resource.spec.version}/`;
+
+  return props.file.Path ? props.file.Path.replace(prefix, '') : '';
 })
 
 const currentFolder = computed(() => {

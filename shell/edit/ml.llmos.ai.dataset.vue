@@ -167,7 +167,7 @@ export default {
 
         const model = await this.$store.dispatch(`${ this.inStore }/create`, {
           metadata: {
-            name:      'v1',
+            generateName:      'v1-',
             namespace: this.value.metadata.namespace,
           },
           spec: {

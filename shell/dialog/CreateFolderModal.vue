@@ -65,6 +65,8 @@ const close = () => {
 const save = async() => {
   errors.value = [];
 
+  console.log(resource.value, 'resource')
+
   try {
     const res = await resource.value.doAction('createDirectory', {
       targetDirectory: `${ props.currentPath }/${ value.targetDirectory}`

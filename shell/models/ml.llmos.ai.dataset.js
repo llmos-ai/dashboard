@@ -31,6 +31,17 @@ export default class Dataset extends SteveModel {
   }
  
   get datasetVersions() {
-    return (this.$getters['all'](LLMOS.DATASET_VERSION) || []).filter(d => (d?.status?.rootPath || '').includes(`datasets/${this.id}`));
+    return (this.$getters['all'](LLMOS.DATASET_VERSION) || [])
+      .filter(d => (d?.status?.rootPath || '').includes(`datasets/${this.id}`))
+      .sort((a, b) => {
+        const versionA = parseInt(a.metadata.name.replace(/[^0-9]/g, ''));
+        const versionB = parseInt(b.metadata.name.replace(/[^0-9]/g, ''));
+        
+        return versionB - versionA;
+      });
+  }
+
+  get latestDatasetVersion() {
+    return this.datasetVersions?.[0] || {};
   }
 }

@@ -35,6 +35,7 @@ export default {
       files: [],
       loading: false,
       datasetVersions: [],
+      datasetVersion: {},
     };
   },  
 
@@ -52,17 +53,33 @@ export default {
   },
 
   methods: {
-    async fetchFiles(targetFilePath) {
+    async fetchFiles(targetFilePath, version) {
       this.loading = true;
 
       const inStore = this.$store.getters['currentProduct'].inStore;
-      const res = await this.$store.dispatch(`${inStore}/findAll`, { type: LLMOS.DATASET_VERSION });
+      await this.$store.dispatch(`${inStore}/findAll`, { type: LLMOS.DATASET_VERSION });     
+
+      const datasetVersions = this.value.datasetVersions;
+      this.datasetVersions = datasetVersions;
       
-      const datasetVersions = (res || []).filter(d => (d?.status?.rootPath || '').includes(`datasets/${this.value.id}`));
-      this.datasetVersions = datasetVersions;      
+      let datasetVersion = this.datasetVersion?.id ? this.datasetVersion : datasetVersions[0]
+
+      if (version) {
+        datasetVersion = datasetVersions.filter(d => d.spec.version === version)[0];
+      }
+
+      if (!datasetVersion.id) {
+        this.loading = false;
+
+        this.$message.error('Version not found');
+
+        return;
+      } else {
+        this.datasetVersion = datasetVersion;
+      }
 
       const hash = await allHash({
-        files: datasetVersions[0].doAction('list', {
+        files: datasetVersion.doAction('list', {
           targetFilePath,
         }),
       });
@@ -104,6 +121,8 @@ export default {
           :files="files"
           :resource="value"
           @fetchFiles="fetchFiles"
+          :datasetVersions="datasetVersions"
+          :datasetVersion="datasetVersion"
         />
       </a-spin>
     </Tab>
