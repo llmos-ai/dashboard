@@ -113,7 +113,7 @@ const onFolderUpload = async (options) => {
     formData.append('file', file);
     formData.append('data', JSON.stringify({
       targetDirectory: currentPath.value,
-      relativePaths: pathArray,  // 传入文件的相对路径数组
+      relativePaths: pathArray,
     }));
     
     await props.resource.doAction('upload', formData, {
