@@ -277,24 +277,24 @@ export default {
     padding: 16px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    display: flex;  // 添加这行
-    align-items: flex-start;  // 添加这行
+    display: flex;
+    align-items: flex-start;
 
     &:hover, &.ant-radio-wrapper-checked {
       border-color: var(--primary);
     }
 
     :deep(.ant-radio) {
-      margin-top: 2px;  // 微调单选框的垂直位置
+      margin-top: 2px;
     }
   }
 }
 
 .option-content {
   margin-left: 8px;
-  flex: 1;  // 添加这行
-  min-height: 100%;  // 添加这行
-  display: flex;  // 添加这行
+  flex: 1;
+  min-height: 100%;
+  display: flex;
   flex-direction: column;
   justify-content: center;
 }
