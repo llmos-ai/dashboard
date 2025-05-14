@@ -3,12 +3,11 @@ import { ref, defineProps, computed, reactive } from 'vue';
 import { useStore } from 'vuex';
 
 import Banner from '@shell/components/Banner/Banner.vue';
-import { SECRET } from '@shell/config/types';
+import { SECRET, DEFAULT_WORKSPACE } from '@shell/config/types';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 
 import { SECRET_TYPES } from '@shell/config/secret';
-import { DEFAULT_WORKSPACE } from '@shell/config/types';
 
 import { base64Encode } from '@shell/utils/crypto';
 

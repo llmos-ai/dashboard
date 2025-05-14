@@ -1,23 +1,25 @@
 <script setup>
-import { ref, defineProps, computed, reactive, defineEmits } from 'vue';
+import {
+  ref, defineProps, computed, reactive, defineEmits
+} from 'vue';
 import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
 
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
-import FileItem from './FileItem'
+import FileItem from './FileItem';
 
 const store = useStore();
 
 const props = defineProps({
   files: {
-    type:     Array,
-    default:  () => ([]),
+    type:    Array,
+    default: () => ([]),
   },
 
   resource: {
-    type: Object,
+    type:     Object,
     required: true,
   },
 });
@@ -28,7 +30,7 @@ const downloading = ref(false);
 const uploading = ref(false);
 const currentPath = ref('');
 
-const onCreateFolder = async () => {
+const onCreateFolder = async() => {
   store.dispatch('cluster/promptModal', {
     component:      'CreateFolderModal',
     modalWidth:     '600px',
@@ -40,56 +42,52 @@ const onCreateFolder = async () => {
       currentPath: currentPath.value,
     },
   });
-}
+};
 
-const onDownload = async () => {
+const onDownload = async() => {
   downloading.value = true;
 
   const inStore = store.getters['currentProduct'].inStore;
-  const res = await props.resource.doAction('download', {}, {
-    responseType: 'blob',
-  })
+  const res = await props.resource.doAction('download', {}, { responseType: 'blob' });
 
-  const fileName = `${props.resource.metadata.name}.zip`;
-  
+  const fileName = `${ props.resource.metadata.name }.zip`;
+
   const url = window.URL.createObjectURL(res.data);
   const link = document.createElement('a');
+
   link.href = url;
   link.download = fileName;
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  
-  window.URL.revokeObjectURL(url);
-  
-  downloading.value = false;
-}
 
-const fetchFiles = async (targetFilePath) => {
+  window.URL.revokeObjectURL(url);
+
+  downloading.value = false;
+};
+
+const fetchFiles = async(targetFilePath) => {
   currentPath.value = targetFilePath;
   emit('fetchFiles', targetFilePath);
-}
+};
 
-const onUpload = async (options) => {
+const onUpload = async(options) => {
   const { file, onSuccess, onError } = options;// file 是一个 File 对象，包含了上传的文件信息，如文件名、大小等
-  
+
   try {
     uploading.value = true;
-    
+
     const formData = new FormData();
+
     formData.append('file', file);
     formData.append('data', JSON.stringify({
       targetDirectory: currentPath.value,
-      relativePath: '',
+      relativePath:    '',
     }));
-    
-    await props.resource.doAction('upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
+
+    await props.resource.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+
     onSuccess('上传成功');
     emit('fetchFiles');
   } catch (err) {
@@ -99,29 +97,27 @@ const onUpload = async (options) => {
   }
 };
 
-const onFolderUpload = async (options) => {
+const onFolderUpload = async(options) => {
   const { file, onSuccess, onError } = options;
-  
+
   try {
     uploading.value = true;
-    
+
     const relativePath = file.webkitRelativePath || '';
     const pathArray = relativePath.split('/');
+
     pathArray.pop();
-    
+
     const formData = new FormData();
+
     formData.append('file', file);
     formData.append('data', JSON.stringify({
       targetDirectory: currentPath.value,
-      relativePaths: pathArray,
+      relativePaths:   pathArray,
     }));
-    
-    await props.resource.doAction('upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
+
+    await props.resource.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+
     onSuccess('上传成功');
     emit('fetchFiles');
   } catch (err) {
@@ -133,9 +129,10 @@ const onFolderUpload = async (options) => {
 
 const onBack = () => {
   const parentPath = currentPath.value.split('/').slice(0, -2).join('/');
+
   currentPath.value = parentPath || '';
   emit('fetchFiles', parentPath);
-}
+};
 </script>
 
 <script>
@@ -156,7 +153,7 @@ export default {
         >
           Back
         </a-button>
-        {{ '/' + currentPath  }}
+        {{ '/' + currentPath }}
       </div>
       <div class="pull-right">
         <a-button
@@ -167,12 +164,12 @@ export default {
         </a-button>
         <a-button
           type="primary"
-          @click="onDownload"
           :loading="downloading"
+          @click="onDownload"
         >
           Download
         </a-button>
-        <a-dropdown-button 
+        <a-dropdown-button
           type="primary"
           :loading="uploading"
         >
@@ -200,27 +197,27 @@ export default {
             </a-menu>
           </template>
           <template #icon>
-            <DownOutlined @click.prevent/>
+            <DownOutlined @click.prevent />
           </template>
         </a-dropdown-button>
       </div>
     </div>
   </div>
   <div class="file-list mt-10">
-    <div 
+    <div
       v-if="files.length === 0"
       class="file-empty"
     >
       <a-empty
         :imageStyle="{
           'min-height': '50vh',
-        }" 
+        }"
         :description="null"
       />
     </div>
-    <FileItem 
+    <FileItem
+      v-for="file in files"
       v-else
-      v-for="file in files" 
       :key="file.Name"
       :file="file"
       :resource="resource"

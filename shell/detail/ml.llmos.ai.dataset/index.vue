@@ -3,7 +3,7 @@ import ResourceTabs from '@shell/components/form/ResourceTabs';
 import DetailText from '@shell/components/DetailText';
 import Tab from '@shell/components/Tabbed/Tab';
 import Loading from '@shell/components/Loading';
-import FileList from './FileList'
+import FileList from './FileList';
 
 import CreateEditView from '@shell/mixins/create-edit-view';
 import { LLMOS } from '@shell/config/types';
@@ -32,12 +32,12 @@ export default {
 
   data() {
     return {
-      files: [],
-      loading: false,
+      files:           [],
+      loading:         false,
       datasetVersions: [],
-      datasetVersion: {},
+      datasetVersion:  {},
     };
-  },  
+  },
 
   async fetch() {
     await this.fetchFiles();
@@ -45,7 +45,7 @@ export default {
 
   computed: {
     datasetVersionOptions() {
-      return this.datasetVersions.map(d => ({
+      return this.datasetVersions.map((d) => ({
         label: d.spec.version,
         value: d.id,
       }));
@@ -57,15 +57,17 @@ export default {
       this.loading = true;
 
       const inStore = this.$store.getters['currentProduct'].inStore;
-      await this.$store.dispatch(`${inStore}/findAll`, { type: LLMOS.DATASET_VERSION });     
+
+      await this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET_VERSION });
 
       const datasetVersions = this.value.datasetVersions;
+
       this.datasetVersions = datasetVersions;
-      
-      let datasetVersion = this.datasetVersion?.id ? this.datasetVersion : datasetVersions[0]
+
+      let datasetVersion = this.datasetVersion?.id ? this.datasetVersion : datasetVersions[0];
 
       if (version) {
-        datasetVersion = datasetVersions.filter(d => d.spec.version === version)[0];
+        datasetVersion = datasetVersions.filter((d) => d.spec.version === version)[0];
       }
 
       if (!datasetVersion.id) {
@@ -78,11 +80,7 @@ export default {
         this.datasetVersion = datasetVersion;
       }
 
-      const hash = await allHash({
-        files: datasetVersion.doAction('list', {
-          targetFilePath,
-        }),
-      });
+      const hash = await allHash({ files: datasetVersion.doAction('list', { targetFilePath }) });
 
       this.loading = false;
 
@@ -105,7 +103,7 @@ export default {
 
 <template>
   <Loading v-if="$fetchState.pending" />
-  <ResourceTabs 
+  <ResourceTabs
     v-else
     :value="value"
     :needConditions="false"
@@ -117,12 +115,12 @@ export default {
       label="Files"
     >
       <a-spin :spinning="loading">
-        <FileList 
+        <FileList
           :files="files"
           :resource="value"
-          @fetchFiles="fetchFiles"
           :datasetVersions="datasetVersions"
           :datasetVersion="datasetVersion"
+          @fetchFiles="fetchFiles"
         />
       </a-spin>
     </Tab>

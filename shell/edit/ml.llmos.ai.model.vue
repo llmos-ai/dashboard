@@ -17,8 +17,8 @@ import LabeledTag from '@shell/components/form/LabeledTag';
 import { SECRET, AUTH_TYPE, LLMOS } from '@shell/config/types';
 
 import { allHash } from '@shell/utils/promise';
-import { LICENSES, LANGUAGES } from '@shell/utils/dictionary'
-import { allModelName as MODELS } from '@shell/utils/ai-model'
+import { LICENSES, LANGUAGES } from '@shell/utils/dictionary';
+import { allModelName as MODELS } from '@shell/utils/ai-model';
 
 const S3 = 'S3';
 
@@ -56,7 +56,7 @@ export default {
 
     const hash = await allHash({
       registries: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.REGISTRY }),
-      datasets:  this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET }),
+      datasets:   this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET }),
     });
 
     this.registries = hash.registries || [];
@@ -64,22 +64,14 @@ export default {
   },
 
   data() {
-    const resource = {
-      spec: {
-        modelCard:    {
-          metadata: {
-            datasets:  [],
-          },
-        },
-      }
-    };
+    const resource = { spec: { modelCard: { metadata: { datasets: [] } } } };
 
     Object.assign(resource, this.value);
 
     return {
       errors:     [],
       registries: [],
-      datasets: [],
+      datasets:   [],
       resource,
     };
   },
@@ -98,9 +90,9 @@ export default {
 
     validationPassed() {
       return (
-        !!this.value.metadata.name
-        && !!this.resource.spec.registry
-        && !!this.resource.spec.modelCard.description
+        !!this.value.metadata.name &&
+        !!this.resource.spec.registry &&
+        !!this.resource.spec.modelCard.description
       );
     },
 
@@ -112,7 +104,7 @@ export default {
     },
 
     licenseOptions() {
-      return LICENSES
+      return LICENSES;
     },
 
     baseModelOptions() {
@@ -123,14 +115,14 @@ export default {
     },
 
     languageOptions() {
-      return LANGUAGES
+      return LANGUAGES;
     },
 
     frameworkOptions() {
       return [{
         label: 'Pytorch',
         value: 'pytorch',
-      }]
+      }];
     },
 
     datasetOptions() {
@@ -141,7 +133,7 @@ export default {
     },
 
     tagOptions() {
-      return []
+      return [];
     },
   },
 
@@ -225,7 +217,7 @@ export default {
             />
           </div>
         </div>
-        
+
         <div class="row mb-10 mt-10">
           <div class="col span-6">
             <LabeledSelect

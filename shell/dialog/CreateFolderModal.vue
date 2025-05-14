@@ -1,15 +1,16 @@
 <script setup>
-import { ref, defineProps, computed, reactive, defineEmits } from 'vue';
+import {
+  ref, defineProps, computed, reactive, defineEmits
+} from 'vue';
 import { useStore } from 'vuex';
 import { message } from 'ant-design-vue';
 
 import Banner from '@shell/components/Banner/Banner.vue';
-import { SECRET } from '@shell/config/types';
+import { SECRET, DEFAULT_WORKSPACE } from '@shell/config/types';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 
 import { SECRET_TYPES } from '@shell/config/secret';
-import { DEFAULT_WORKSPACE } from '@shell/config/types';
 
 import { base64Encode } from '@shell/utils/crypto';
 
@@ -39,9 +40,7 @@ const props = defineProps({
 
 const errors = ref([]);
 
-const value = reactive({
-  targetDirectory: '',
-});
+const value = reactive({ targetDirectory: '' });
 
 const emit = defineEmits(['close']);
 
@@ -54,8 +53,8 @@ const canSave = computed(() => {
 });
 
 const resource = computed(() => {
-  return props.resources[0] || {}
-})
+  return props.resources[0] || {};
+});
 
 const close = () => {
   props.beforeClose();
@@ -65,12 +64,10 @@ const close = () => {
 const save = async() => {
   errors.value = [];
 
-  console.log(resource.value, 'resource')
+  console.log(resource.value, 'resource');
 
   try {
-    const res = await resource.value.doAction('createDirectory', {
-      targetDirectory: `${ props.currentPath }/${ value.targetDirectory}`
-    })
+    const res = await resource.value.doAction('createDirectory', { targetDirectory: `${ props.currentPath }/${ value.targetDirectory }` });
 
     if (res._status === 204) {
       message.success('Folder Created');

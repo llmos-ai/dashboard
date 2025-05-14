@@ -99,14 +99,14 @@ export const MANAGEMENT = {
 };
 
 export const LLMOS = {
-  VERSION:   'v1',
-  GPUDEVICE: 'gpustack.llmos.ai.gpudevice',
-  VOLUME:    'llmos.ai.volume',
-  CHAT:      'chat',
-  TOOL:      'llmos.tool',
-  REGISTRY:  'ml.llmos.ai.registry',
-  MODEL:     'ml.llmos.ai.model',
-  DATASET:   'ml.llmos.ai.dataset',
+  VERSION:         'v1',
+  GPUDEVICE:       'gpustack.llmos.ai.gpudevice',
+  VOLUME:          'llmos.ai.volume',
+  CHAT:            'chat',
+  TOOL:            'llmos.tool',
+  REGISTRY:        'ml.llmos.ai.registry',
+  MODEL:           'ml.llmos.ai.model',
+  DATASET:         'ml.llmos.ai.dataset',
   DATASET_VERSION: 'ml.llmos.ai.datasetversion',
 };
 

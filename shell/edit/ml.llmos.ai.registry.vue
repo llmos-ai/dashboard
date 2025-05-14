@@ -106,13 +106,13 @@ export default {
           return [
             ...out,
             groupOption,
-            ...map[namespace].filter(secret => secret.metadata.namespace === DEFAULT_WORKSPACE).map((secret) => ({
+            ...map[namespace].filter((secret) => secret.metadata.namespace === DEFAULT_WORKSPACE).map((secret) => ({
               label: secret.metadata.name,
               value: secret.metadata.name,
             })),
           ];
         } else {
-          return out
+          return out;
         }
       }, [{
         label: this.t('modelRegistry.selectOrCreateSecret'),

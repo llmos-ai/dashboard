@@ -52,23 +52,13 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const hash = await allHash({
-      registries: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.REGISTRY }),
-    });
+    const hash = await allHash({ registries: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.REGISTRY }) });
 
     this.registries = hash.registries || [];
   },
 
   data() {
-    const resource = {
-      spec: {
-        datasetCard:    {
-          metadata: {
-            splitTypes:  [],
-          },
-        },
-      }
-    };
+    const resource = { spec: { datasetCard: { metadata: { splitTypes: [] } } } };
 
     Object.assign(resource, this.value);
 
@@ -94,8 +84,8 @@ export default {
 
     validationPassed() {
       return (
-        !!this.value.metadata.name
-        && !!this.resource.spec.registry
+        !!this.value.metadata.name &&
+        !!this.resource.spec.registry
       );
     },
 
@@ -110,7 +100,7 @@ export default {
       return [{
         label: 'llama2',
         value: 'llama2',
-      }]
+      }];
     },
 
     splitTypeOptions() {
@@ -123,26 +113,26 @@ export default {
       }, {
         label: 'validation',
         value: 'validation',
-      }]
+      }];
     },
 
     featureOptions() {
-      return []
+      return [];
     },
 
     languageOptions() {
       return [{
         label: 'English',
         value: 'en',
-      }]
+      }];
     },
 
     authorOptions() {
-      return []
+      return [];
     },
 
     tagOptions() {
-      return []
+      return [];
     },
 
     inStore() {
@@ -167,12 +157,12 @@ export default {
 
         const model = await this.$store.dispatch(`${ this.inStore }/create`, {
           metadata: {
-            generateName:      'v1-',
-            namespace: this.value.metadata.namespace,
+            generateName: 'v1-',
+            namespace:    this.value.metadata.namespace,
           },
           spec: {
-            dataset: this.value.metadata.name,
-            version: 'v1.0.0',
+            dataset:           this.value.metadata.name,
+            version:           'v1.0.0',
             enableFastLoading: true
           },
         });
@@ -268,7 +258,7 @@ export default {
             />
           </div>
         </div>
-        
+
         <div class="row mb-10 mt-10">
           <div class="col span-6">
             <LabeledSelect
