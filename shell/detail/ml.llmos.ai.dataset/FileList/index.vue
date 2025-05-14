@@ -5,6 +5,7 @@ import {
 import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
+import { message } from 'ant-design-vue';
 
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
@@ -95,7 +96,7 @@ const fetchFiles = async(targetFilePath) => {
 };
 
 const onUpload = async(options) => {
-  const { file, onSuccess, onError } = options;// file 是一个 File 对象，包含了上传的文件信息，如文件名、大小等
+  const { file } = options;
 
   try {
     uploading.value = true;
@@ -110,17 +111,17 @@ const onUpload = async(options) => {
 
     await props.datasetVersion.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-    onSuccess('上传成功');
+    message.success('Upload Success');
     emit('fetchFiles');
   } catch (err) {
-    onError('上传失败');
+    message.error('Upload Fail');
   } finally {
     uploading.value = false;
   }
 };
 
 const onFolderUpload = async(options) => {
-  const { file, onSuccess, onError } = options;
+  const { file } = options;
 
   try {
     uploading.value = true;
@@ -140,10 +141,10 @@ const onFolderUpload = async(options) => {
 
     await props.datasetVersion.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-    onSuccess('上传成功');
+    message.success('Upload Success');
     emit('fetchFiles');
   } catch (err) {
-    onError('上传失败');
+    message.error('Upload Fail');
   } finally {
     uploading.value = false;
   }

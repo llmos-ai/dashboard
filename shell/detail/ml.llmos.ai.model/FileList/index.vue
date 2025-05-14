@@ -5,6 +5,7 @@ import {
 import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
+import { message } from 'ant-design-vue';
 
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
@@ -88,10 +89,10 @@ const onUpload = async(options) => {
 
     await props.resource.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-    onSuccess('上传成功');
+    message.success('Upload Success');
     emit('fetchFiles');
   } catch (err) {
-    onError('上传失败');
+    message.error('Upload Fail');
   } finally {
     uploading.value = false;
   }
@@ -118,10 +119,10 @@ const onFolderUpload = async(options) => {
 
     await props.resource.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-    onSuccess('上传成功');
+    message.success('Upload Success');
     emit('fetchFiles');
   } catch (err) {
-    onError('上传失败');
+    message.error('Upload Fail');
   } finally {
     uploading.value = false;
   }
