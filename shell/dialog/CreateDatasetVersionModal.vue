@@ -131,10 +131,9 @@ const save = async() => {
   try {
     const url = schema.value.linkFor('collection');
 
-    console.log(url, 'url');
     const model = await store.dispatch(`${ inStore.value }/create`, {
       metadata: {
-        name:      latestVersion.value,
+        generateName:      `${latestVersion.value}-`,
         namespace: latestDatasetVersion.value.metadata.namespace,
       },
       spec: {
@@ -144,11 +143,7 @@ const save = async() => {
       },
     });
 
-    console.log(model, 'model');
-
     await model.save({ url });
-
-    // props.saveCb(res);
 
     emit('close');
   } catch (e) {
@@ -192,7 +187,7 @@ export default {
     <div class="row mb-10">
       <div class="col span-12">
         <div class="version-type-label mb-5">
-          数据继承：
+          {{ t('createDatasetVersionModal.inheritance.label') }}
         </div>
         <a-radio-group
           v-model:value="value.spec.enableFastLoading"
@@ -202,10 +197,10 @@ export default {
             <a-radio :value="true">
               <div class="option-content">
                 <div class="option-title">
-                  继承模式
+                  {{ t('createDatasetVersionModal.inheritance.inherit.title') }}
                 </div>
                 <div class="option-desc">
-                  继承模式下，新版本将继承原版本所有的数据，可在此数据基础上进行修改
+                  {{ t('createDatasetVersionModal.inheritance.inherit.desc') }}
                 </div>
               </div>
             </a-radio>
@@ -214,10 +209,10 @@ export default {
             <a-radio :value="false">
               <div class="option-content">
                 <div class="option-title">
-                  新建模式
+                  {{ t('createDatasetVersionModal.inheritance.new.title') }}
                 </div>
                 <div class="option-desc">
-                  新版本内容为空，需要另外导入内容
+                  {{ t('createDatasetVersionModal.inheritance.new.desc') }}
                 </div>
               </div>
             </a-radio>

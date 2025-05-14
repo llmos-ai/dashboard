@@ -6839,8 +6839,16 @@ createFolderModal:
 createDatasetVersionModal:
   title: Create Dataset Version
   enableFastLoading:
-    label: 数据继承
+    label: Data Inheritance
   version:
     label: Successor Version
   versionName:
     label: Version Name
+  inheritance:
+    label: "Data Inheritance"
+    inherit:
+      title: "Inherit Mode"
+      desc: "In inheritance mode, the new version will inherit all data from the original version and can be modified based on this data"
+    new:
+      title: "New Mode"
+      desc: "The new version will be empty and needs to import content separately"

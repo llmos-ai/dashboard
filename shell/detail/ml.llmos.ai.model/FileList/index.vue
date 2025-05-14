@@ -74,7 +74,7 @@ const fetchFiles = async(targetFilePath) => {
 };
 
 const onUpload = async(options) => {
-  const { file, onSuccess, onError } = options;// file 是一个 File 对象，包含了上传的文件信息，如文件名、大小等
+  const { file } = options;
 
   try {
     uploading.value = true;
@@ -99,7 +99,7 @@ const onUpload = async(options) => {
 };
 
 const onFolderUpload = async(options) => {
-  const { file, onSuccess, onError } = options;
+  const { file } = options;
 
   try {
     uploading.value = true;
