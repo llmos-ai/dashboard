@@ -1,5 +1,7 @@
 <script setup>
-import { ref, reactive, nextTick, defineEmits, defineProps } from 'vue';
+import {
+  ref, reactive, nextTick, defineEmits, defineProps
+} from 'vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import { title } from 'process';
 
@@ -7,25 +9,25 @@ const MAX_TAG_LENGTH = 20;
 
 const props = defineProps({
   value: {
-    type:     Array,
+    type:    Array,
     default: () => {
       return [];
     },
   },
 
   mode: {
-    type:     String,
-    default:  'edit',
+    type:    String,
+    default: 'edit',
   },
 
   addLabelKey: {
-    type:     String,
-    default:  'LabeledTag.addLabel',
+    type:    String,
+    default: 'LabeledTag.addLabel',
   },
 
   titleKey: {
-    type:     String,
-    default:  'LabeledTag.title',
+    type:    String,
+    default: 'LabeledTag.title',
   },
 });
 
@@ -40,7 +42,7 @@ const state = reactive({
 });
 
 const onClose = (removedTag) => {
-  const tags = state.tags.filter(tag => tag !== removedTag);
+  const tags = state.tags.filter((tag) => tag !== removedTag);
 
   state.tags = tags;
 };
@@ -65,7 +67,7 @@ const onInputConfirm = () => {
   Object.assign(state, {
     tags,
     inputVisible: false,
-    inputValue: '',
+    inputValue:   '',
   });
 
   emit('update:value', tags);
@@ -87,15 +89,15 @@ export default {
     </div>
   </div>
   <div class="mt-10">
-    <template 
-      v-for="(tag, index) in state.tags" 
+    <template
+      v-for="(tag, index) in state.tags"
       :key="tag"
     >
-      <a-tag 
+      <a-tag
+        v-clean-tooltip="tag"
         color="blue"
         closable
         @close="onClose(tag)"
-        v-clean-tooltip="tag"
       >
         {{ (tag || '').length > MAX_TAG_LENGTH ? `${tag.slice(0, MAX_TAG_LENGTH)}...` : tag }}
       </a-tag>
@@ -106,14 +108,14 @@ export default {
       v-model:value="state.inputValue"
       type="text"
       size="small"
+      class="input"
       @blur="onInputConfirm"
       @keyup.enter="onInputConfirm"
-      class="input"
     />
-    <a-tag 
-      v-else 
+    <a-tag
+      v-else
       class="new-tag hand"
-      @click="showInput" 
+      @click="showInput"
     >
       <PlusOutlined />
       {{ t(addLabelKey) }}
@@ -127,7 +129,7 @@ export default {
 }
 
 .new-tag {
-  background: #fff; 
+  background: #fff;
   border-style: dashed
 }
 </style>

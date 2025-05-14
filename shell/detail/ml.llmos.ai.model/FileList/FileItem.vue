@@ -14,12 +14,12 @@ const { t } = useI18n(store);
 
 const props = defineProps({
   file: {
-    type:     Object,
-    default:  () => ({}),
+    type:    Object,
+    default: () => ({}),
   },
 
   resource: {
-    type: Object,
+    type:     Object,
     required: true,
   },
 });
@@ -27,56 +27,52 @@ const props = defineProps({
 const emit = defineEmits(['fetchFiles']);
 
 const isFile = computed(() => {
-  return props.file.Size !== 0
-})
+  return props.file.Size !== 0;
+});
 
 const fileSize = computed(() => {
   return isFile.value ? formatSi(props.file.Size, {
     increment: 1024,
     addSuffix: true,
-    suffix: 'B',
+    suffix:    'B',
   }) : '';
-})
+});
 
 const lastModified = computed(() => {
   const now = dayjs();
-  const out = diffFrom(dayjs(props.file.LastModified), now, (key, args) => t(key, args))
+  const out = diffFrom(dayjs(props.file.LastModified), now, (key, args) => t(key, args));
 
-  return isFile.value ? `${out.string} ago` : '';
-})
+  return isFile.value ? `${ out.string } ago` : '';
+});
 
 const currentPath = computed(() => {
-  return props.file.Path ? props.file.Path.replace(`models/${props.resource.id}/`, '') : '';
-})
+  return props.file.Path ? props.file.Path.replace(`models/${ props.resource.id }/`, '') : '';
+});
 
 const currentFolder = computed(() => {
   return currentPath.value.split('/').slice(0, -1).join('/');
-})
+});
 
-const removeFile = async (file) => {
+const removeFile = async(file) => {
   Modal.confirm({
     title: 'Are you sure you want to delete this file?',
     async onOk() {
-      await props.resource.doAction('remove', {
-        targetFilePath: currentPath.value,
-      });
+      await props.resource.doAction('remove', { targetFilePath: currentPath.value });
 
       message.success('File removed successfully');
 
       emit('fetchFiles', currentFolder.value);
     },
-  })
-}
+  });
+};
 
 const onRowClick = () => {
   if (isFile.value) {
-    props.resource.doAction('download', {
-      targetFilePath: currentPath.value,
-    });
+    props.resource.doAction('download', { targetFilePath: currentPath.value });
   } else {
     emit('fetchFiles', currentPath.value);
   }
-}
+};
 
 </script>
 
@@ -89,35 +85,47 @@ export default {
 </script>
 
 <template>
-  <div 
+  <div
     class="file-item"
   >
     <div class="file-icon">
-      <FileTextTwoTone v-if="isFile"/>
-      <FolderTwoTone v-else/>
+      <FileTextTwoTone v-if="isFile" />
+      <FolderTwoTone v-else />
     </div>
 
-    <a-row 
+    <a-row
       class="file-info"
     >
-      <a-col class="file-name" :span="12">
-        <span class="hand" @click="onRowClick">
+      <a-col
+        class="file-name"
+        :span="12"
+      >
+        <span
+          class="hand"
+          @click="onRowClick"
+        >
           {{ file.Name }}
         </span>
       </a-col>
-      <a-col class="file-size" :span="4">
+      <a-col
+        class="file-size"
+        :span="4"
+      >
         {{ fileSize }}
       </a-col>
-      <a-col class="file-date" :span="4">
+      <a-col
+        class="file-date"
+        :span="4"
+      >
         {{ lastModified }}
       </a-col>
-      <a-col 
+      <a-col
         :span="4"
         class="file-action"
       >
-        <span 
-          @click="removeFile(file)"
+        <span
           class="hand text-error"
+          @click="removeFile(file)"
         >
           Remove
         </span>
@@ -140,7 +148,7 @@ export default {
 
 .file-icon {
   margin-right: 8px;
-  
+
   .anticon {
     font-size: 20px;
   }
@@ -163,7 +171,7 @@ export default {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
-  
+
   .file-size {
     margin-right: 16px;
   }

@@ -13,11 +13,7 @@ export default class ModelRegistry extends SteveModel {
         labels:      {},
         annotations: {},
       },
-      spec: {
-        modelCard: {
-          metadata: {},
-        },
-      },
+      spec: { modelCard: { metadata: {} } },
     };
 
     this.metadata = value.metadata;
@@ -64,10 +60,10 @@ export default class ModelRegistry extends SteveModel {
 
   get displayTags() {
     return (this.spec.modelCard.metadata.tags || [])
-            .filter((tag) => {
-              if (tag.endsWith('k') || tag.endsWith('K')) {
-                return true;
-              }
-            });
+      .filter((tag) => {
+        if (tag.endsWith('k') || tag.endsWith('K')) {
+          return true;
+        }
+      });
   }
 }

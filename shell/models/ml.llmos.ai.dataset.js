@@ -24,19 +24,17 @@ export default class Dataset extends SteveModel {
     this.$dispatch('promptModal', {
       component:      'CreateDatasetVersionModal',
       modalWidth:     '600px',
-      componentProps: {
-        datasetId: this.id,
-      },
+      componentProps: { datasetId: this.id },
     });
   }
- 
+
   get datasetVersions() {
     return (this.$getters['all'](LLMOS.DATASET_VERSION) || [])
-      .filter(d => (d?.status?.rootPath || '').includes(`datasets/${this.id}`))
+      .filter((d) => (d?.status?.rootPath || '').includes(`datasets/${ this.id }`))
       .sort((a, b) => {
         const versionA = parseInt(a.metadata.name.replace(/[^0-9]/g, ''));
         const versionB = parseInt(b.metadata.name.replace(/[^0-9]/g, ''));
-        
+
         return versionB - versionA;
       });
   }

@@ -3,7 +3,7 @@ import ResourceTabs from '@shell/components/form/ResourceTabs';
 import DetailText from '@shell/components/DetailText';
 import Tab from '@shell/components/Tabbed/Tab';
 import Loading from '@shell/components/Loading';
-import FileList from './FileList'
+import FileList from './FileList';
 
 import CreateEditView from '@shell/mixins/create-edit-view';
 
@@ -31,18 +31,16 @@ export default {
 
   data() {
     return {
-      files: [],
+      files:   [],
       loading: false,
     };
-  },  
+  },
 
   async fetch() {
     await this.fetchFiles();
   },
 
-  computed: {
-    
-  },
+  computed: {},
 
   methods: {
     async fetchFiles(targetFilePath) {
@@ -50,11 +48,7 @@ export default {
 
       this.loading = true;
 
-      const hash = await allHash({
-        files: this.value.doAction('list', {
-          targetFilePath,
-        }),
-      });
+      const hash = await allHash({ files: this.value.doAction('list', { targetFilePath }) });
 
       this.loading = false;
 
@@ -77,7 +71,7 @@ export default {
 
 <template>
   <Loading v-if="$fetchState.pending" />
-  <ResourceTabs 
+  <ResourceTabs
     v-else
     :value="value"
     :needConditions="false"
@@ -89,7 +83,7 @@ export default {
       label="Files"
     >
       <a-spin :spinning="loading">
-        <FileList 
+        <FileList
           :files="files"
           :resource="value"
           @fetchFiles="fetchFiles"

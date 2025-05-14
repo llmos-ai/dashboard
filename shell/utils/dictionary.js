@@ -1,7 +1,7 @@
 export const LANGUAGES = [
   { label: 'Chinese', value: 'zh' },
   { label: 'English', value: 'en' },
-]
+];
 
 export const LICENSES = [
   { label: 'Apache license 2.0', value: 'apache-2.0' },
@@ -81,5 +81,4 @@ export const LICENSES = [
   { label: 'Gemma Terms of Use', value: 'gemma' },
   { label: 'Unknown', value: 'unknown' },
   { label: 'Other', value: 'other' }
-]
-
+];

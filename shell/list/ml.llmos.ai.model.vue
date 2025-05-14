@@ -14,15 +14,15 @@ import { allHash } from '@shell/utils/promise';
 export default {
   name: 'ModelList',
 
-  components: { 
+  components: {
     ResourceTable,
-    LazyImage, 
+    LazyImage,
     Loading,
     BadgeStateFormatter,
   },
 
   mixins: [
-    ResourceFetch, 
+    ResourceFetch,
   ],
 
   props: {
@@ -45,19 +45,19 @@ export default {
   data() {
     return {
       currentPageNumber: 1,
-      pageSize: 9,
-      searchQuery: '',
-      searchContext: '',
-      selectedTag: '',
-      selectedType: '',
-      selectedProvider: '',
-    }
+      pageSize:          9,
+      searchQuery:       '',
+      searchContext:     '',
+      selectedTag:       '',
+      selectedType:      '',
+      selectedProvider:  '',
+    };
   },
 
   computed: {
     splitDataSource() {
-      console.log(this.pagination, 'pagination')
-      console.log(this.namespaceFilter, 'namespaceFilter')
+      console.log(this.pagination, 'pagination');
+      console.log(this.namespaceFilter, 'namespaceFilter');
       const rows = this.filteredRows || [];
 
       if (rows.length > (this.currentPageNumber - 1) * this.pageSize) {
@@ -78,7 +78,7 @@ export default {
         this.ignoreFilter ||
         this.externalPaginationEnabled ||
         (isAll && !this.currentProduct?.hideSystemResources) ||
-        (this.inStore ? this.$store.getters[`${this.inStore}/haveNamespace`](this.schema.id)?.length : false)
+        (this.inStore ? this.$store.getters[`${ this.inStore }/haveNamespace`](this.schema.id)?.length : false)
       ) {
         filteredByNamespace = rows;
       } else {
@@ -129,7 +129,7 @@ export default {
       }, {
         label: '256K',
         value: '256K',
-      }]
+      }];
     },
 
     providerOptions() {
@@ -145,7 +145,7 @@ export default {
       }, {
         label: '其他',
         value: '其他',
-      }]
+      }];
     },
 
     typeOptions() {
@@ -161,7 +161,7 @@ export default {
       }, {
         label: '推理模型',
         value: '推理模型',
-      }]
+      }];
     },
   },
 
@@ -171,7 +171,7 @@ export default {
 
   methods: {
     onDeleteModel(row) {
-      row.promptRemove()
+      row.promptRemove();
     },
   },
 };
@@ -180,7 +180,7 @@ export default {
 <template>
   <Loading v-if="$fetchState.pending" />
   <div class="model-list">
-    <a-flex 
+    <a-flex
       class="mb-10"
       justify="space-between"
     >
@@ -195,39 +195,48 @@ export default {
       />
     </a-flex>
 
-    <a-flex gap="32" class="mb-5">
+    <a-flex
+      gap="32"
+      class="mb-5"
+    >
       <span class="tag-label">
         Provider
       </span>
-      <a-radio-group 
-        v-model:value="selectedProvider" 
-        :options="providerOptions" 
+      <a-radio-group
+        v-model:value="selectedProvider"
+        :options="providerOptions"
         optionType="button"
         size="small"
         class="custom-radio-group"
       />
     </a-flex>
 
-    <a-flex gap="32" class="mb-5">
+    <a-flex
+      gap="32"
+      class="mb-5"
+    >
       <span class="tag-label">
         Type
       </span>
-      <a-radio-group 
-        v-model:value="selectedType" 
-        :options="typeOptions" 
+      <a-radio-group
+        v-model:value="selectedType"
+        :options="typeOptions"
         optionType="button"
         size="small"
         class="custom-radio-group"
       />
     </a-flex>
 
-    <a-flex gap="32" class="mb-5">
+    <a-flex
+      gap="32"
+      class="mb-5"
+    >
       <span class="tag-label">
         Tags
       </span>
-      <a-radio-group 
-        v-model:value="selectedTag" 
-        :options="contextOptions" 
+      <a-radio-group
+        v-model:value="selectedTag"
+        :options="contextOptions"
         optionType="button"
         size="small"
         class="custom-radio-group"
@@ -236,8 +245,7 @@ export default {
 
     <div class="grid">
       <template v-if="splitDataSource.length === 0">
-        <a-empty
-        />
+        <a-empty />
       </template>
       <template v-else>
         <div
@@ -264,7 +272,7 @@ export default {
               </router-link>
             </div>
             <div class="tags mt-5">
-              <a-tag 
+              <a-tag
                 v-for="tag in row.displayTags"
                 color="blue"
               >
@@ -280,7 +288,7 @@ export default {
               <a-button
                 type="primary"
                 size="small"
-              > 
+              >
                 Upload
               </a-button>
             </router-link>
@@ -288,7 +296,7 @@ export default {
               danger
               size="small"
               @click="onDeleteModel(row)"
-            > 
+            >
               {{ t('asyncButton.delete.action') }}
             </a-button>
           </div>
@@ -296,12 +304,12 @@ export default {
       </template>
     </div>
   </div>
-  
-  <a-pagination 
-    v-model:current="currentPageNumber" 
+
+  <a-pagination
+    v-model:current="currentPageNumber"
     :defaultPageSize="pageSize"
-    :total="splitDataSource.length" 
-    show-less-items 
+    :total="splitDataSource.length"
+    show-less-items
     hideOnSinglePage
   />
 </template>
@@ -338,11 +346,11 @@ $logo: 50px;
   justify-content: flex-start;
   flex-wrap: wrap;
   margin: 0 -1 * $margin;
-  
+
   :deep(.ant-empty) {
     margin: auto;  // 让空状态组件居中显示
   }
-  
+
   @media only screen and (min-width: map-get($breakpoints, '--viewport-4')) {
     .item {
       width: 100%;
@@ -492,29 +500,29 @@ $logo: 50px;
     border-radius: 6px;
     margin-right: 8px;
     background: transparent;
-    
+
     &::before {
       display: none;  // 移除按钮之间的分隔线
     }
-    
+
     &:first-child {
       border-radius: 6px;
     }
-    
+
     &:last-child {
       border-radius: 6px;
     }
-    
+
     &:hover {
       color: var(--primary);
       border-color: var(--primary);
     }
-    
+
     &.ant-radio-button-wrapper-checked {
       color: var(--primary);
       border-color: var(--primary);
       box-shadow: none;
-      
+
       &::before {
         display: none;
       }

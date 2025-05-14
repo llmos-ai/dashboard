@@ -33,8 +33,8 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     const res = await allHash({
-      resource:  await this.$fetchType(this.resource),
-      datasetVersions: await this.$store.dispatch(`${inStore}/findAll`, { type: LLMOS.DATASET_VERSION }),
+      resource:        await this.$fetchType(this.resource),
+      datasetVersions: await this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET_VERSION }),
     });
   }
 };
