@@ -67,57 +67,44 @@ export default {
       }
     },
 
-    // filteredRows() {
-    //   const rows = this.filterTagRows || []
-
-    //   if (this.searchQuery) {
-    //     return rows.filter((row) => {
-    //       return row.metadata.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-    //     });
-    //   }
-
-    //   return rows;
-    // },
-
     filteredRows() {
+      const rows = this.filterTagRows || [];
+
+      let filteredByNamespace = [];
       const isAll = this.$store.getters['isAllNamespaces'];
 
-      // Do we need to filter by namespace like things?
       if (
-        !this.isNamespaced || // Resource type isn't namespaced
-        this.ignoreFilter || // Component owner strictly states no filtering
+        !this.isNamespaced ||
+        this.ignoreFilter ||
         this.externalPaginationEnabled ||
-        (isAll && !this.currentProduct?.hideSystemResources) || // Need all
-        (this.inStore ? this.$store.getters[`${ this.inStore }/haveNamespace`](this.schema.id)
-          ?.length : false) // Store reports type has namespace filter, so rows already contain the correctly filtered resources
+        (isAll && !this.currentProduct?.hideSystemResources) ||
+        (this.inStore ? this.$store.getters[`${this.inStore}/haveNamespace`](this.schema.id)?.length : false)
       ) {
-        return this.rows || [];
+        filteredByNamespace = rows;
+      } else {
+        const includedNamespaces = this.$store.getters['namespaces']();
+        const haveAllNamespace = this.$store.getters['haveAllNamespace'];
+
+        filteredByNamespace = rows.filter((row) => {
+          if (this.currentProduct?.hideSystemResources && this.isNamespaced) {
+            return !!includedNamespaces[row.metadata.namespace] && !row.isSystemResource;
+          } else if (!this.isNamespaced) {
+            return true;
+          } else if (haveAllNamespace) {
+            return true;
+          } else {
+            return !!includedNamespaces[row.metadata.namespace];
+          }
+        });
       }
 
-      const includedNamespaces = this.$store.getters['namespaces']();
-
-      // Shouldn't happen, but does for resources like management.cattle.io.preference
-      if (!this.rows) {
-        return [];
+      if (this.searchQuery) {
+        return filteredByNamespace.filter((row) => {
+          return row.metadata.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+        });
       }
 
-      const haveAllNamespace = this.$store.getters['haveAllNamespace'];
-
-      return this.rows.filter((row) => {
-        if (this.currentProduct?.hideSystemResources && this.isNamespaced) {
-          return (
-            !!includedNamespaces[row.metadata.namespace] &&
-            !row.isSystemResource
-          );
-        } else if (!this.isNamespaced) {
-          return true;
-        } else if (haveAllNamespace) {
-          // `rows` only contains resource from a single namespace
-          return true;
-        } else {
-          return !!includedNamespaces[row.metadata.namespace];
-        }
-      });
+      return filteredByNamespace;
     },
 
     filterTagRows() {
@@ -125,8 +112,6 @@ export default {
 
       if (this.selectedTag) {
         return rows.filter((row) => {
-          console.log(row.spec.modelCard.metadata.tags, 'row.spec.modelCard.metadata.tags')
-          console.log(this.selectedTag, 'selectedTag')
           return (row.spec.modelCard.metadata.tags || []).includes(this.selectedTag);
         });
       }
@@ -250,59 +235,65 @@ export default {
     </a-flex>
 
     <div class="grid">
-      <div
-        v-for="(row, i) in splitDataSource"
-        :key="i"
-        class="item"
-        :data-testid="`cluster-tools-app-${row.id}`"
-      >
-        <div class="logo">
-          <img
-            class="size-[20px] mr-2"
-            :src="row.iconUrl"
-          >
-        </div>
-        <div class="name-version">
-          <div>
-            <router-link :to="row.editUrl">
-              <h3 class="name">
-                {{ row.metadata.name }}
-              </h3>
-              <div class="state ml-10">
-                <BadgeStateFormatter :row="row" />
-              </div>
-            </router-link>
-          </div>
-          <div class="tags mt-5">
-            <a-tag 
-              v-for="tag in row.displayTags"
-              color="blue"
+      <template v-if="splitDataSource.length === 0">
+        <a-empty
+        />
+      </template>
+      <template v-else>
+        <div
+          v-for="(row, i) in splitDataSource"
+          :key="i"
+          class="item"
+          :data-testid="`cluster-tools-app-${row.id}`"
+        >
+          <div class="logo">
+            <img
+              class="size-[20px] mr-2"
+              :src="row.iconUrl"
             >
-              {{ tag }}
-            </a-tag>
+          </div>
+          <div class="name-version">
+            <div>
+              <router-link :to="row.editUrl">
+                <h3 class="name">
+                  {{ row.metadata.name }}
+                </h3>
+                <div class="state ml-10">
+                  <BadgeStateFormatter :row="row" />
+                </div>
+              </router-link>
+            </div>
+            <div class="tags mt-5">
+              <a-tag 
+                v-for="tag in row.displayTags"
+                color="blue"
+              >
+                {{ tag }}
+              </a-tag>
+            </div>
+          </div>
+          <div class="description mt-10">
+            {{ row.spec.modelCard.description }}
+          </div>
+          <div class="action">
+            <router-link :to="row.detailLocation">
+              <a-button
+                type="primary"
+                size="small"
+              > 
+                Upload
+              </a-button>
+            </router-link>
+            <a-button
+              danger
+              size="small"
+              @click="onDeleteModel(row)"
+            > 
+              {{ t('asyncButton.delete.action') }}
+            </a-button>
           </div>
         </div>
-        <div class="description mt-10">
-          {{ row.spec.modelCard.description }}
-        </div>
-        <div class="action">
-          <router-link :to="row.detailLocation">
-            <a-button
-              type="primary"
-              size="small"
-            > 
-              Upload
-            </a-button>
-          </router-link>
-          <a-button
-            danger
-            size="small"
-            @click="onDeleteModel(row)"
-          > 
-            {{ t('asyncButton.delete.action') }}
-          </a-button>
-        </div>
-      </div>
+      </template>
     </div>
   </div>
   
@@ -347,7 +338,11 @@ $logo: 50px;
   justify-content: flex-start;
   flex-wrap: wrap;
   margin: 0 -1 * $margin;
-
+  
+  :deep(.ant-empty) {
+    margin: auto;  // 让空状态组件居中显示
+  }
+  
   @media only screen and (min-width: map-get($breakpoints, '--viewport-4')) {
     .item {
       width: 100%;
