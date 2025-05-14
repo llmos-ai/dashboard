@@ -6759,7 +6759,7 @@ modelRegistry:
     options:
       s3: S3
   useSSL:
-    label: Use SSL
+    label: Use Https
   accessCredentialSecretName:
     label: Secret Name
     placeholder: e.g. secret

@@ -122,6 +122,9 @@ export default {
       return [{
         label: 'Pytorch',
         value: 'pytorch',
+      }, {
+        label: 'Tensorflow',
+        value: 'tensorflow',
       }];
     },
 

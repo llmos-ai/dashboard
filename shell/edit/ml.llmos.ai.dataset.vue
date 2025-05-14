@@ -17,6 +17,7 @@ import LabeledTag from '@shell/components/form/LabeledTag';
 import { SECRET, AUTH_TYPE, LLMOS } from '@shell/config/types';
 
 import { allHash } from '@shell/utils/promise';
+import { LICENSES, LANGUAGES, ML_FEATURES } from '@shell/utils/dictionary';
 
 const S3 = 'S3';
 
@@ -97,34 +98,28 @@ export default {
     },
 
     licenseOptions() {
-      return [{
-        label: 'llama2',
-        value: 'llama2',
-      }];
+      return LICENSES;
     },
 
     splitTypeOptions() {
       return [{
-        label: 'train',
+        label: 'Train',
         value: 'train',
       }, {
-        label: 'test',
+        label: 'Test',
         value: 'test',
       }, {
-        label: 'validation',
+        label: 'Validation',
         value: 'validation',
       }];
     },
 
     featureOptions() {
-      return [];
+      return ML_FEATURES;
     },
 
     languageOptions() {
-      return [{
-        label: 'English',
-        value: 'en',
-      }];
+      return LANGUAGES;
     },
 
     authorOptions() {
