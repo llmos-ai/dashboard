@@ -82,3 +82,48 @@ export const LICENSES = [
   { label: 'Unknown', value: 'unknown' },
   { label: 'Other', value: 'other' }
 ];
+
+export const ML_FEATURES = [{
+    label: 'Text Classification',
+    value: 'text-classification'
+  }, {
+    label: 'Question Answering',
+    value: 'question-answering'
+  }, {
+    label: 'Text Generation',
+    value: 'text-generation'
+  }, {
+    label: 'Machine Translation',
+    value: 'machine-translation'
+  }, {
+    label: 'Named Entity Recognition',
+    value: 'named-entity-recognition'
+  }, {
+    label: 'Sentiment Analysis',
+    value: 'sentiment-analysis'
+  }, {
+    label: 'Summarization',
+    value: 'summarization'
+  }, {
+    label: 'Image Classification',
+    value: 'image-classification'
+  }, {
+    label: 'Object Detection',
+    value: 'object-detection'
+  }, {
+    label: 'Speech Recognition',
+    value: 'speech-recognition'
+  }, {
+    label: 'Regression',
+    value: 'regression'
+  }, {
+    label: 'Clustering',
+    value: 'clustering'
+  }, {
+    label: 'Time Series',
+    value: 'time-series'
+  }, {
+    label: 'Anomaly Detection',
+    value: 'anomaly-detection'
+  }]
+  
