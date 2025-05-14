@@ -6456,3 +6456,14 @@ createSecretModal:
   accessKeySecret:
     label: Access Key Secret
     placeholder: e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+createDatasetVersionModal:
+  inheritance:
+    label: "数据继承"
+    inherit:
+      title: "继承模式"
+      desc: "继承模式下，新版本将继承原版本所有的数据，可在此数据基础上进行修改"
+    new:
+      title: "新建模式"
+      desc: "新版本内容为空，需要另外导入内容"
+      
