@@ -534,6 +534,6 @@ $logo: 50px;
   min-width: 60px;
   font-size: 14px;
   color: var(--input-label);
-  line-height: 32px;  // 添加这行以垂直居中对齐
+  line-height: 32px;
 }
 </style>
