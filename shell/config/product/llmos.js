@@ -167,11 +167,6 @@ export function init(store) {
     weight: 96,
   });
 
-  basicType([
-    LLMOS.MODEL,
-    LLMOS.DATASET,
-  ]);
-
   // playground
   basicType(
     [CHAT],
@@ -387,18 +382,27 @@ export function init(store) {
 
   basicType(
     [
+      LLMOS.REGISTRY,
+      LLMOS.MODEL,
+      LLMOS.DATASET,
+    ],
+    'registry',
+  );
+
+  basicType(
+    [
       MANAGEMENT.MANAGED_ADDON,
       NAMESPACE,
       SECRET,
       CONFIG_MAP,
       LLMOS.TOOL,
-      LLMOS.REGISTRY,
     ],
     'advanced',
   );
 
   mapType(LLMOS.TOOL, store.getters['i18n/t'](`typeLabel.${ LLMOS.TOOL }`, { count: 2 }));
 
+  weightGroup('registry', 110, true);
   weightGroup('gpuManagement', 100, true);
   weightGroup('playground', 90, true);
   weightGroup('llmosStorage', 80, true);

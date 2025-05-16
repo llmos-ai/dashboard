@@ -183,6 +183,7 @@ nav:
     gpuManagement: GPU Management
     llmosStorage: Storage
     ceph: Ceph Management
+    registry: Registry
   ns:
     all: All Namespaces
     clusterLevel: Only Cluster Resources
@@ -6064,8 +6065,8 @@ typeLabel:
     }
   ml.llmos.ai.registry: |-
     {count, plural,
-      one { Model Registry }
-      other { Model Registries }
+      one { Registry }
+      other { Registries }
     }
   ml.llmos.ai.model: |-
     {count, plural,
