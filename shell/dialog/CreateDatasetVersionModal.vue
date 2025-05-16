@@ -1,6 +1,7 @@
 <script setup>
 import { ref, defineProps, computed, reactive } from 'vue';
 import { useStore } from 'vuex';
+import { message } from 'ant-design-vue';
 
 import Banner from '@shell/components/Banner/Banner.vue';
 import { LLMOS, DEFAULT_WORKSPACE } from '@shell/config/types';
@@ -87,18 +88,15 @@ const dataset = computed(() => {
 });
 
 const datasetVersions = computed(() => {
-  return (dataset.value.datasetVersions || []).sort((a, b) => {
-    const versionA = parseInt(a.metadata.name.replace(/[^0-9]/g, ''));
-    const versionB = parseInt(b.metadata.name.replace(/[^0-9]/g, ''));
-
-    return versionB - versionA;
-  });
+  return dataset.value.datasetVersions || []
 });
 
 const datasetVersionOptions = computed(() => {
   return datasetVersions.value.map((version) => {
+    const names = (version.metadata.name || '').split('-');
+
     return {
-      label: version.metadata.name,
+      label: names[0],
       value: version.spec.version,
     };
   });
@@ -109,9 +107,11 @@ const latestDatasetVersion = computed(() => {
 });
 
 const latestVersion = computed(() => {
-  const currentMax = parseInt((latestDatasetVersion.value?.metadata?.name || '').replace(/[^0-9]/g, ''));
+  const versionStr = latestDatasetVersion.value?.metadata?.name || '';
+  const match = versionStr.match(/^v(\d+)/);
+  const currentMax = match ? parseInt(match[1]) : 0;
 
-  return `v${ currentMax + 1 }`;
+  return `v${currentMax + 1}`;
 });
 
 const schema = computed(() => {
@@ -149,6 +149,8 @@ const save = async() => {
     });
 
     await model.save({ url });
+
+    message.success(t('createDatasetVersionModal.success'));
 
     emit('close');
   } catch (e) {

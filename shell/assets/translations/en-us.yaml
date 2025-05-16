@@ -6853,3 +6853,5 @@ createDatasetVersionModal:
     new:
       title: "New Mode"
       desc: "The new version will be empty and needs to import content separately"
+  success: Create successfully
+  
