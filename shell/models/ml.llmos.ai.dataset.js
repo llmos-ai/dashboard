@@ -32,8 +32,11 @@ export default class Dataset extends SteveModel {
     return (this.$getters['all'](LLMOS.DATASET_VERSION) || [])
       .filter((d) => (d?.status?.rootPath || '').includes(`datasets/${ this.id }`))
       .sort((a, b) => {
-        const versionA = parseInt(a.metadata.name.replace(/[^0-9]/g, ''));
-        const versionB = parseInt(b.metadata.name.replace(/[^0-9]/g, ''));
+        const matchA = (a.metadata.name || '').match(/^v(\d+)/);
+        const matchB = (b.metadata.name || '').match(/^v(\d+)/);
+
+        const versionA = matchA ? parseInt(matchA[1]) : 0;
+        const versionB = matchB ? parseInt(matchB[1]) : 0;
 
         return versionB - versionA;
       });
