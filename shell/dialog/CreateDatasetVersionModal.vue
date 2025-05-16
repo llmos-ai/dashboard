@@ -139,7 +139,12 @@ const save = async() => {
       spec: {
         dataset:           latestDatasetVersion.value.spec.dataset,
         version:           `${ latestVersion.value }.0.0`,
-        enableFastLoading: value.spec.enableFastLoading
+        enableFastLoading: value.spec.enableFastLoading,
+        copyFrom: {
+          namespace: latestDatasetVersion.value.metadata.namespace,
+          dataset: latestDatasetVersion.value.spec.dataset,
+          version: value.spec.version,
+        },
       },
     });
 

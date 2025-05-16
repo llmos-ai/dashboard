@@ -180,69 +180,74 @@ export default {
 <template>
   <Loading v-if="$fetchState.pending" />
   <div class="model-list">
-    <a-flex
-      class="mb-10"
-      justify="space-between"
-    >
-      <div class="filter-label">
-        Model Filter
-      </div>
-      <a-input
-        v-model:value="searchQuery"
-        :aria-label="t('sortableTable.searchLabel')"
-        :placeholder="t('sortableTable.search')"
-        :style="{ width: '200px' }"
-      />
-    </a-flex>
+    <div>
+      <a-flex
+        class="mb-10"
+        justify="flex-end"
+      >
+        <div class="filter-label" v-if="false">
+          Model Filter
+        </div>
+        <a-input
+          v-model:value="searchQuery"
+          :aria-label="t('sortableTable.searchLabel')"
+          :placeholder="t('sortableTable.search')"
+          :style="{ width: '200px' }"
+        />
+      </a-flex>
 
-    <a-flex
-      gap="32"
-      class="mb-5"
-    >
-      <span class="tag-label">
-        Provider
-      </span>
-      <a-radio-group
-        v-model:value="selectedProvider"
-        :options="providerOptions"
-        optionType="button"
-        size="small"
-        class="custom-radio-group"
-      />
-    </a-flex>
+      <a-flex
+        gap="32"
+        class="mb-5"
+        v-if="false"
+      >
+        <span class="tag-label">
+          Provider
+        </span>
+        <a-radio-group
+          v-model:value="selectedProvider"
+          :options="providerOptions"
+          optionType="button"
+          size="small"
+          class="custom-radio-group"
+        />
+      </a-flex>
 
-    <a-flex
-      gap="32"
-      class="mb-5"
-    >
-      <span class="tag-label">
-        Type
-      </span>
-      <a-radio-group
-        v-model:value="selectedType"
-        :options="typeOptions"
-        optionType="button"
-        size="small"
-        class="custom-radio-group"
-      />
-    </a-flex>
+      <a-flex
+        gap="32"
+        class="mb-5"
+        v-if="false"
+      >
+        <span class="tag-label">
+          Type
+        </span>
+        <a-radio-group
+          v-model:value="selectedType"
+          :options="typeOptions"
+          optionType="button"
+          size="small"
+          class="custom-radio-group"
+        />
+      </a-flex>
 
-    <a-flex
-      gap="32"
-      class="mb-5"
-    >
-      <span class="tag-label">
-        Tags
-      </span>
-      <a-radio-group
-        v-model:value="selectedTag"
-        :options="contextOptions"
-        optionType="button"
-        size="small"
-        class="custom-radio-group"
-      />
-    </a-flex>
-
+      <a-flex
+        gap="32"
+        class="mb-5"
+        v-if="false"
+      >
+        <span class="tag-label">
+          Tags
+        </span>
+        <a-radio-group
+          v-model:value="selectedTag"
+          :options="contextOptions"
+          optionType="button"
+          size="small"
+          class="custom-radio-group"
+        />
+      </a-flex>
+    </div>
+    
     <div class="grid">
       <template v-if="splitDataSource.length === 0">
         <a-empty />
@@ -262,7 +267,7 @@ export default {
           </div>
           <div class="name-version">
             <div>
-              <router-link :to="row.editUrl">
+              <router-link :to="row.detailLocation">
                 <h3 class="name">
                   {{ row.metadata.name }}
                 </h3>
@@ -282,23 +287,6 @@ export default {
           </div>
           <div class="description mt-10">
             {{ row.spec.modelCard.description }}
-          </div>
-          <div class="action">
-            <router-link :to="row.detailLocation">
-              <a-button
-                type="primary"
-                size="small"
-              >
-                Upload
-              </a-button>
-            </router-link>
-            <a-button
-              danger
-              size="small"
-              @click="onDeleteModel(row)"
-            >
-              {{ t('asyncButton.delete.action') }}
-            </a-button>
           </div>
         </div>
       </template>

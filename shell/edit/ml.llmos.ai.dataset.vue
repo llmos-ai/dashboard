@@ -191,6 +191,7 @@ export default {
       :value="value"
       :namespaced="true"
       :mode="mode"
+      descriptionHidden
     />
 
     <ResourceTabs
@@ -208,7 +209,7 @@ export default {
         :weight="2"
       >
         <div class="row mb-10">
-          <div class="col span-6">
+          <div class="col span-12">
             <LabeledSelect
               v-model:value="resource.spec.registry"
               :options="registryOptions"
@@ -218,7 +219,7 @@ export default {
               required
             />
           </div>
-          <div class="col span-6">
+          <div class="col span-6" v-if="false">
             <LabeledSelect
               v-model:value="resource.spec.datasetCard.splitTypes"
               :options="splitTypeOptions"
@@ -231,7 +232,7 @@ export default {
           </div>
         </div>
 
-        <div class="row mb-10 mt-10">
+        <div class="row mb-10 mt-10" v-if="false">
           <div class="col span-6">
             <LabeledSelect
               v-model:value="resource.spec.datasetCard.metadata.license"
@@ -254,7 +255,7 @@ export default {
           </div>
         </div>
 
-        <div class="row mb-10 mt-10">
+        <div class="row mb-10 mt-10" v-if="false">
           <div class="col span-6">
             <LabeledSelect
               v-model:value="resource.spec.datasetCard.metadata.language"
@@ -279,7 +280,7 @@ export default {
           </div>
         </div>
 
-        <div class="row mb-10 mt-10">
+        <div class="row mb-10 mt-10" v-if="false">
           <div class="col span-6">
             <LabeledSelect
               v-model:value="resource.spec.datasetCard.metadata.tags"
