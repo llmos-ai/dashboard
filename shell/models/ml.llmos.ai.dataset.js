@@ -1,7 +1,4 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
-import { set } from '@shell/utils/object';
-import { matchModelString } from '@shell/utils/ai-model';
-import { _EDIT, ENABLED, MODE } from '@shell/config/query-params';
 import { LLMOS } from '@shell/config/types';
 
 export default class Dataset extends SteveModel {

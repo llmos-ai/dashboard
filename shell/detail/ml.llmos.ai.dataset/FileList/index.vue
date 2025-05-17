@@ -1,14 +1,9 @@
 <script setup>
-import {
-  ref, defineProps, computed, reactive, defineEmits
-} from 'vue';
+import { ref, defineProps, computed, defineEmits } from 'vue';
 import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
-import dayjs from 'dayjs';
 import { message } from 'ant-design-vue';
 
-import { formatSi } from '@shell/utils/units';
-import { diffFrom } from '@shell/utils/time';
 import FileItem from './FileItem';
 
 const store = useStore();

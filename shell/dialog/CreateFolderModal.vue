@@ -2,13 +2,10 @@
 import {
   ref, defineProps, computed, reactive, defineEmits
 } from 'vue';
-import { useStore } from 'vuex';
 import { message } from 'ant-design-vue';
 
 import Banner from '@shell/components/Banner/Banner.vue';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
-
-const store = useStore();
 
 const props = defineProps({
   resources: {
@@ -57,8 +54,6 @@ const close = () => {
 
 const save = async() => {
   errors.value = [];
-
-  console.log(resource.value, 'resource');
 
   try {
     const res = await resource.value.doAction('createDirectory', { targetDirectory: `${ props.currentPath }/${ value.targetDirectory }` });

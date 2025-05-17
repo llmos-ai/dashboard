@@ -90,7 +90,7 @@ export default {
   </div>
   <div class="mt-10">
     <template
-      v-for="(tag, index) in state.tags"
+      v-for="tag in state.tags"
       :key="tag"
     >
       <a-tag

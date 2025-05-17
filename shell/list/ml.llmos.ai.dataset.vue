@@ -1,7 +1,6 @@
 <script>
 import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
-import { NAME, STATE } from '@shell/config/table-headers';
 import { allHash } from '@shell/utils/promise';
 import { LLMOS } from '@shell/config/types';
 
@@ -32,7 +31,7 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const res = await allHash({
+    await allHash({
       resource:        await this.$fetchType(this.resource),
       datasetVersions: await this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET_VERSION }),
     });

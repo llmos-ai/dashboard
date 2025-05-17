@@ -1,22 +1,13 @@
 <script>
-import { debounce } from 'lodash';
-
-import ResourceTable from '@shell/components/ResourceTable';
-import LazyImage from '@shell/components/LazyImage';
 import Loading from '@shell/components/Loading';
 import BadgeStateFormatter from '@shell/components/formatter/BadgeStateFormatter';
 
 import ResourceFetch from '@shell/mixins/resource-fetch';
 
-import { NAME, STATE } from '@shell/config/table-headers';
-import { allHash } from '@shell/utils/promise';
-
 export default {
   name: 'ModelList',
 
   components: {
-    ResourceTable,
-    LazyImage,
     Loading,
     BadgeStateFormatter,
   },
@@ -56,8 +47,6 @@ export default {
 
   computed: {
     splitDataSource() {
-      console.log(this.pagination, 'pagination');
-      console.log(this.namespaceFilter, 'namespaceFilter');
       const rows = this.filteredRows || [];
 
       if (rows.length > (this.currentPageNumber - 1) * this.pageSize) {
@@ -185,7 +174,10 @@ export default {
         class="mb-10"
         justify="flex-end"
       >
-        <div class="filter-label" v-if="false">
+        <div
+          v-if="false"
+          class="filter-label"
+        >
           Model Filter
         </div>
         <a-input
@@ -197,9 +189,9 @@ export default {
       </a-flex>
 
       <a-flex
+        v-if="false"
         gap="32"
         class="mb-5"
-        v-if="false"
       >
         <span class="tag-label">
           Provider
@@ -214,9 +206,9 @@ export default {
       </a-flex>
 
       <a-flex
+        v-if="false"
         gap="32"
         class="mb-5"
-        v-if="false"
       >
         <span class="tag-label">
           Type
@@ -231,9 +223,9 @@ export default {
       </a-flex>
 
       <a-flex
+        v-if="false"
         gap="32"
         class="mb-5"
-        v-if="false"
       >
         <span class="tag-label">
           Tags
@@ -247,7 +239,7 @@ export default {
         />
       </a-flex>
     </div>
-    
+
     <div class="grid">
       <template v-if="splitDataSource.length === 0">
         <a-empty />
@@ -279,6 +271,7 @@ export default {
             <div class="tags mt-5">
               <a-tag
                 v-for="tag in row.displayTags"
+                :key="tag"
                 color="blue"
               >
                 {{ tag }}
