@@ -14,7 +14,9 @@ import { getVersionInfo } from '@shell/utils/version';
 import { SETTING } from '@shell/config/settings';
 import { getProductFromRoute } from '@shell/utils/router';
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
-import { HomeOutlined, SettingOutlined, UsergroupAddOutlined, ControlOutlined } from '@ant-design/icons-vue';
+import {
+  HomeOutlined, SettingOutlined, UsergroupAddOutlined, ControlOutlined, AppstoreOutlined
+} from '@ant-design/icons-vue';
 
 export default {
   components: {
@@ -22,7 +24,8 @@ export default {
     SettingOutlined,
     UsergroupAddOutlined,
     IconOrSvg,
-    ControlOutlined
+    ControlOutlined,
+    AppstoreOutlined
   },
 
   data() {
@@ -96,6 +99,15 @@ export default {
               cluster:  'local',
               resource: 'node'
             }
+          },
+        },
+        {
+          key:   'llmos-apps',
+          icon:  () => h(AppstoreOutlined),
+          label: this.t('product.apps'),
+          to:    {
+            name:   'c-cluster-apps-manage',
+            params: { cluster: 'local' }
           },
         },
         {

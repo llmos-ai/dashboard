@@ -6854,4 +6854,11 @@ createDatasetVersionModal:
       title: "New Mode"
       desc: "The new version will be empty and needs to import content separately"
   success: Create successfully
-  
+
+apps:
+  manage:
+    label: Application Management
+  data:
+    label: Data Center
+  knowledge:
+    label: Knowledge Base
