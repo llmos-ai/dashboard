@@ -6460,6 +6460,7 @@ modelRegistry:
     label: 密文名称
     placeholder: e.g. secret
   selectOrCreateSecret: 创建一个新密文
+  useDefault: 使用默认模型仓库
 
 createSecretModal:
   title: 创建密文

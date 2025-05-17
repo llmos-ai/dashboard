@@ -1,7 +1,7 @@
 <script>
 import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
-import { NAME, STATE } from '@shell/config/table-headers';
+import { NAME, STATE, STORAGE_CLASS_DEFAULT } from '@shell/config/table-headers';
 
 export default {
   name: 'ModelRegistryList',
@@ -44,6 +44,7 @@ export default {
         NAME,
         ENDPOINT,
         BUCKET,
+        STORAGE_CLASS_DEFAULT,
       ];
 
       return headers;
