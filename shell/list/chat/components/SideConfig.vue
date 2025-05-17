@@ -6,7 +6,7 @@ import ModelConfig from './ModelConfig.vue';
 import SystemPrompt from '@shell/list/chat/components/SystemPrompt.vue';
 const store = useStore();
 
-const props = defineProps({
+defineProps({
   activeConfig: {
     type:    Object,
     default: () => {

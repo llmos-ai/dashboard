@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
 import ButtonGroup from '@/shell/components/ButtonGroup.vue';
-import { useModelLogo } from '../../composables/useModelLogo';
+// import { useModelLogo } from '../../composables/useModelLogo';
 
 const props = defineProps({
   icon: {
@@ -21,7 +21,7 @@ const emits = defineEmits(['update:drawer']);
 const store = useStore();
 const { t } = useI18n(store);
 
-const { modelLogo } = useModelLogo(() => props.icon);
+// const { modelLogo } = useModelLogo(() => props.icon);
 
 const options = [
   {
@@ -34,7 +34,7 @@ const options = [
   },
 ];
 
-const isChatType = computed(() => store.getters['chat/isChatType']);
+// const isChatType = computed(() => store.getters['chat/isChatType']);
 const chatType = computed({
   get: () => store.state.chat.chatType,
   set: (value) => store.commit('chat/SET_CHAT_TYPE', value)

@@ -23,7 +23,6 @@ import Masthead from '@shell/components/ResourceDetail/Masthead';
 import DetailTop from '@shell/components/DetailTop';
 import { clone, diff } from '@shell/utils/object';
 import IconMessage from '@shell/components/IconMessage';
-import { checkSchemasForFindAllHash } from '@shell/utils/auth';
 import { stringify } from '@shell/utils/error';
 import { Banner } from '@shell/components/Banner';
 

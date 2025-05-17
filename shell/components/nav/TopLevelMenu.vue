@@ -19,15 +19,6 @@ import {
 } from '@ant-design/icons-vue';
 
 export default {
-  components: {
-    HomeOutlined,
-    SettingOutlined,
-    UsergroupAddOutlined,
-    IconOrSvg,
-    ControlOutlined,
-    AppstoreOutlined
-  },
-
   data() {
     const { displayVersion, fullVersion } = getVersionInfo(this.$store);
 

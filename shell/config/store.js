@@ -10,6 +10,7 @@ let store = {};
   // If store is an exported method = classic mode (deprecated)
 
   if (typeof store === 'function') {
+    // eslint-disable-next-line no-console
     return console.warn(
       'Classic mode for store/ is deprecated and will be removed in Nuxt 3.'
     ); // eslint-disable-line no-console
@@ -92,6 +93,7 @@ function normalizeRoot(moduleData, filePath) {
 
 function normalizeModule(moduleData, filePath) {
   if (moduleData.state && typeof moduleData.state !== 'function') {
+    // eslint-disable-next-line no-console
     console.warn(
       `'state' should be a method that returns an object in ${ filePath }`
     ); // eslint-disable-line no-console

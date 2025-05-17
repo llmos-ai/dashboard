@@ -35,6 +35,7 @@ export default {
     },
     component() {
       // Looks for a dialog component by looking up in plugins and @shell/dialog/${name}.
+      // eslint-disable-next-line no-console
       console.log(
         this.$store.getters['type-map/importDialog'](this.modalData?.component)
       );

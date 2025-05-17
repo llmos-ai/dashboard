@@ -22,7 +22,10 @@ const props = defineProps({
   },
 });
 
-const model = defineModel();
+const model = defineModel({
+  type:    String,
+  default: '',
+});
 
 const emit = defineEmits(['input', 'submit', 'update:abort']);
 

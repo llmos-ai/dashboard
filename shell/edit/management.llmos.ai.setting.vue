@@ -61,14 +61,11 @@ export default {
       this.value.value = JSON.stringify(jsonVal, null, 2);
     }
 
-    this.enumOptions =
-      this.setting?.kind === 'enum'
-        ? this.setting.options.map((id) => ({
-          // i18n-uses advancedSettings.enum.*
-          label: `advancedSettings.enum.${ this.value.id }.${ id }`,
-          value: id,
-        }))
-        : [];
+    this.enumOptions = this.setting?.kind === 'enum' ? this.setting.options.map((id) => ({
+      // i18n-uses advancedSettings.enum.*
+      label: `advancedSettings.enum.${ this.value.id }.${ id }`,
+      value: id,
+    })) : [];
     this.canReset = this.setting?.canReset || !!this.value.default;
     this.fvFormRuleSets = this.setting?.ruleSet ? [
       {
@@ -89,17 +86,15 @@ export default {
       const t = this.$store.getters['i18n/t'];
 
       // We map the setting rulesets to use values to define validation from factory
-      return this.setting?.ruleSet
-        ? mapValues(
-          keyBy(this.setting.ruleSet, 'name'),
-          // The validation is curried and may require the factory argument for the ValidatorFactory
-          ({ key, name, factoryArg }) => {
-            const rule = formRulesGenerator(t, key ? { key } : {})[name];
+      return this.setting?.ruleSet ? mapValues(
+        keyBy(this.setting.ruleSet, 'name'),
+        // The validation is curried and may require the factory argument for the ValidatorFactory
+        ({ key, name, factoryArg }) => {
+          const rule = formRulesGenerator(t, key ? { key } : {})[name];
 
-            return factoryArg ? rule(factoryArg) : rule;
-          }
-        )
-        : {};
+          return factoryArg ? rule(factoryArg) : rule;
+        }
+      ) : {};
     },
 
     showLocalhostWarning() {

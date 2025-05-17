@@ -21,20 +21,21 @@
 
 <script setup lang="ts">
 import {
-  ref, onMounted, watch, computed, useTemplateRef, h, VNode
+  ref, onMounted, watch, computed,
+  // useTemplateRef,
+  h, VNode
 } from 'vue';
 import { LoadingOutlined } from '@ant-design/icons-vue';
 import { Checkbox, Image, Typography } from 'ant-design-vue';
 import 'katex/dist/katex.min.css';
-import katex from 'katex';
-import renderMathInElement from 'katex/dist/contrib/auto-render';
+// import renderMathInElement from 'katex/dist/contrib/auto-render';
 import { unescape } from 'lodash';
 import { marked } from 'marked';
 
 import { nextTick } from 'process';
 import CodeBox from './CodeBox.vue';
 
-const markdownDOM = useTemplateRef('markdown-viewer');
+// const markdownDOM = useTemplateRef('markdown-viewer');
 const { Text, Link, Paragraph } = Typography;
 
 const props = defineProps({
@@ -60,7 +61,7 @@ const isLoading = computed(() => {
   return props.showLoading && props.content?.length === 0;
 });
 
-const renderer = new marked.Renderer();
+// const renderer = new marked.Renderer();
 
 const reDefineTypes = [
   'image',

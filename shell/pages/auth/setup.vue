@@ -113,7 +113,7 @@ export default {
       //   opt:  { url: `/v3/settings/${ SETTING.PL }` }
       // });
     }
-    console.log('-------cccc');
+
     if (plSetting.value?.length && plSetting.value !== getVendor()) {
       setVendor(plSetting.value);
     }
@@ -121,7 +121,8 @@ export default {
     const productName = plSetting.default;
 
     // const principals = await this.$store.dispatch('rancher/findAll', { type: NORMAN.PRINCIPAL, opt: { url: '/v3/principals' } });
-    // const me = findBy(principals, 'me', true);
+    const principals = [];
+    const me = findBy(principals, 'me', true);
 
     const current = this.$route.query[SETUP] || this.$store.getters['auth/initialPass'];
     const v3User = this.$store.getters['auth/v3User'] ?? {};

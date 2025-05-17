@@ -4,20 +4,16 @@ import Brand from '@shell/mixins/brand';
 import FixedBanner from '@shell/components/FixedBanner';
 import GrowlManager from '@shell/components/GrowlManager';
 import { mapPref, THEME_SHORTCUT } from '@shell/store/prefs';
-import AwsComplianceBanner from '@shell/components/AwsComplianceBanner';
 import BrowserTabVisibility from '@shell/mixins/browser-tab-visibility';
 import { mapState, mapGetters } from 'vuex';
 import PromptModal from '@shell/components/PromptModal';
-import SideNav from '@shell/components/SideNav';
 
 export default {
   components: {
     Header,
     FixedBanner,
     GrowlManager,
-    AwsComplianceBanner,
     PromptModal,
-    SideNav,
   },
 
   mixins: [Brand, BrowserTabVisibility],

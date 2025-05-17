@@ -2,7 +2,7 @@
 import { onBeforeMount } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router';
-import { MANAGEMENT, ML_WORKLOAD_TYPES, NODE } from '@shell/config/types';
+import { ML_WORKLOAD_TYPES, NODE } from '@shell/config/types';
 
 import { NAME as LLMOS } from '@shell/config/product/llmos';
 
@@ -12,10 +12,6 @@ const router = useRouter();
 const user = store.getters['auth/user'];
 
 onBeforeMount(() => {
-  const hasSettings = !!store.getters[`management/schemaFor`](
-    MANAGEMENT.SETTING
-  );
-
   router.replace({
     name:   'c-cluster-product-resource',
     params: {

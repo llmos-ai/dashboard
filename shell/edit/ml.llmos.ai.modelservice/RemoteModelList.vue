@@ -10,7 +10,6 @@ import dayjs from 'dayjs';
 import { addUnit } from '@shell/utils/units';
 import { useFetch, debouncedRef } from '@vueuse/core';
 import MarkedView from '@shell/components/MarkedView';
-import { message } from 'ant-design-vue';
 
 const emits = defineEmits(['update:item']);
 const props = defineProps({

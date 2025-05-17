@@ -7,7 +7,6 @@ import IndentedPanel from '@shell/components/IndentedPanel';
 import Brand from '@shell/mixins/brand';
 import FixedBanner from '@shell/components/FixedBanner';
 import GrowlManager from '@shell/components/GrowlManager';
-import AwsComplianceBanner from '@shell/components/AwsComplianceBanner';
 import BrowserTabVisibility from '@shell/mixins/browser-tab-visibility';
 import { mapGetters } from 'vuex';
 import PromptModal from '@shell/components/PromptModal';
@@ -21,7 +20,6 @@ export default {
     PromptModal,
     FixedBanner,
     GrowlManager,
-    AwsComplianceBanner,
   },
 
   mixins: [Brand, BrowserTabVisibility],

@@ -936,6 +936,7 @@ export default {
       const expr = col.value || col.name;
 
       if (!expr) {
+        // eslint-disable-next-line no-console
         console.error(
           'No path has been defined for this column, unable to get value of cell',
           col

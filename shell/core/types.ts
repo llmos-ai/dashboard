@@ -1,5 +1,5 @@
+import { RouteRecordRaw as RouteConfig } from 'vue-router';
 import { ProductFunction } from './plugin';
-import { RouteRecordRaw, RouteLocation } from 'vue-router';
 
 // package.json metadata
 export interface PackageMetadata {
