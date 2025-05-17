@@ -83,10 +83,21 @@ export default {
     },
 
     registryOptions() {
-      return (this.registries || []).map((registry) => ({
-        label: registry.metadata.name,
-        value: registry.metadata.name,
+      const out = (this.registries || []).map((registry) => ({
+        label: registry.id,
+        value: registry.id,
       }));
+
+      const defaultRegistry = this.registries.find((registry) => registry.isDefault) || {};
+
+      if (defaultRegistry?.id) {
+        out.unshift({
+          label: this.t('modelRegistry.useDefault'),
+          value: this.t('modelRegistry.useDefault'),
+        });
+      }
+
+      return out
     },
 
     licenseOptions() {
@@ -134,6 +145,11 @@ export default {
   methods: {
     willSave() {
       Object.assign(this.value, this.resource);
+
+      if (this.resource.spec.registry === this.t('modelRegistry.useDefault')) {
+        const defaultRegistry = this.registries.find((registry) => registry.isDefault) || {};
+        this.resource.spec.registry = defaultRegistry.id;
+      }
     },
 
     async afterSave() {

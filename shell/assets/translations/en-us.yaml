@@ -6765,6 +6765,7 @@ modelRegistry:
     label: Secret Name
     placeholder: e.g. secret
   selectOrCreateSecret: Create a New Secret
+  useDefault: Use the default Registry
 
 createSecretModal:
   title: Create Secret

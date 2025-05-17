@@ -13,7 +13,10 @@ export default class ModelRegistry extends SteveModel {
         labels:      {},
         annotations: {},
       },
-      spec: { modelCard: { metadata: {} } },
+      spec: { 
+        modelCard: { metadata: {} },
+        registry: this.t('modelRegistry.useDefault'), 
+      },
     };
 
     this.metadata = value.metadata;
