@@ -37,7 +37,7 @@ import {
 
 export const NAME = 'llmos';
 
-export const PLAY_GROUND = 'Playground';
+export const PLAY_GROUND = 'playground';
 export const CHAT = 'chat';
 
 export function init(store) {
@@ -377,14 +377,14 @@ export function init(store) {
       params: { resource: LLMOS.REGISTRY }
     },
     exact:  false,
-    weight: 102,
+    weight: 94,
   });
 
   basicType(
     [
-      LLMOS.REGISTRY,
       LLMOS.MODEL,
       LLMOS.DATASET,
+      LLMOS.REGISTRY,
     ],
     'registry',
   );
@@ -403,8 +403,8 @@ export function init(store) {
   mapType(LLMOS.TOOL, store.getters['i18n/t'](`typeLabel.${ LLMOS.TOOL }`, { count: 2 }));
 
   weightGroup('registry', 110, true);
-  weightGroup('gpuManagement', 100, true);
-  weightGroup('playground', 90, true);
+  weightGroup('playground', 100, true);
+  weightGroup('gpuManagement', 90, true);
   weightGroup('llmosStorage', 80, true);
   weightGroup('monitoring', 70, true);
   weightGroup('advanced', 60, true);

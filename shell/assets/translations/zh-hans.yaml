@@ -180,6 +180,8 @@ nav:
     gpuManagement: GPU 管理
     llmosStorage: 存储
     ceph: Ceph 管理
+    registry: 模型管理
+    playground: 试验场
   ns:
     all: 所有命名空间
     clusterLevel: 集群资源
@@ -233,7 +235,8 @@ product:
   gatekeeper: OPA Gatekeeper
   istio: Istio
   logging: Logging
-  settings: 全局设置
+  settings: 设置
+  globalSettings: 全局设置
   clusterManagement: 集群管理
   monitoring: 监控
   mcapps: 全局配置
@@ -5760,8 +5763,18 @@ typeLabel:
     }
   ml.llmos.ai.model: |-
     {count, plural,
-      one { 模型 }
-      other { 模型 }
+      one { 我的模型 }
+      other { 我的模型 }
+    }
+  ml.llmos.ai.dataset: |-
+    {count, plural,
+      one { 数据集 }
+      other { 数据集 }
+    }
+  chat: |-
+    {count, plural,
+      one { 对话 }
+      other { 对话 }
     }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
