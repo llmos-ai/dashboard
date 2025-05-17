@@ -13,17 +13,14 @@ import {
   DATE_FORMAT,
   TIME_FORMAT,
   ROWS_PER_PAGE,
-  HIDE_DESC,
   VIEW_IN_API,
   ALL_NAMESPACES,
   THEME_SHORTCUT,
   PLUGIN_DEVELOPER,
   MENU_MAX_CLUSTERS,
-  VIEW_CONTAINER_DASHBOARD,
 } from '@shell/store/prefs';
 
 import LabeledSelect from '@shell/components/form/LabeledSelect';
-import { addObject } from '@shell/utils/array';
 import LocaleSelector from '@shell/components/LocaleSelector';
 import { isDevBuild } from '@shell/utils/version';
 

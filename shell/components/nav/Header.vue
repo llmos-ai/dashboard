@@ -1,7 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import debounce from 'lodash/debounce';
-import { MANAGEMENT, STEVE } from '@shell/config/types';
+import { MANAGEMENT } from '@shell/config/types';
 import { ucFirst } from '@shell/utils/string';
 import { isAlternate, isMac } from '@shell/utils/platform';
 import Import from '@shell/components/Import';

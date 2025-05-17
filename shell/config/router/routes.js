@@ -1,9 +1,6 @@
 import { NAME as EXPLORER } from '@shell/config/product/explorer';
-import { MANAGEMENT, BACKUP_RESTORE, CIS } from '@shell/config/types';
+import { MANAGEMENT } from '@shell/config/types';
 import { NAME as AUTH } from '@shell/config/product/auth';
-
-import { installRedirectRouteMeta } from '@shell/config/router/navigation-guards/install-redirect';
-import { NAME as MONITORING_NAME } from '@shell/config/product/monitoring';
 
 const interopDefault = (promise) => promise.then((page) => page.default || page);
 

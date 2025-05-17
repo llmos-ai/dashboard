@@ -1,6 +1,5 @@
 <script>
 import ResourceTabs from '@shell/components/form/ResourceTabs';
-import DetailText from '@shell/components/DetailText';
 import Tab from '@shell/components/Tabbed/Tab';
 import Loading from '@shell/components/Loading';
 import FileList from './FileList';
@@ -13,7 +12,6 @@ import { allHash } from '@shell/utils/promise';
 export default {
   components: {
     ResourceTabs,
-    DetailText,
     Tab,
     Loading,
     FileList,

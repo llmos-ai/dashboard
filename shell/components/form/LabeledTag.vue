@@ -3,11 +3,10 @@ import {
   ref, reactive, nextTick, defineEmits, defineProps
 } from 'vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
-import { title } from 'process';
 
 const MAX_TAG_LENGTH = 20;
 
-const props = defineProps({
+defineProps({
   value: {
     type:    Array,
     default: () => {

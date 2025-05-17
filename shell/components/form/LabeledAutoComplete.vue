@@ -175,12 +175,12 @@ const focusInput = () => {
 
       <template
         v-if="$slots.option"
-        #option="{ value: optionValue, label, ...restProps }"
+        #option="{ value: optionValue, label: optionLabel, ...restProps }"
       >
         <slot
           name="option"
           :value="optionValue"
-          :label="label"
+          :label="optionLabel"
           v-bind="restProps"
         />
       </template>

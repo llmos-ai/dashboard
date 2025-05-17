@@ -1,8 +1,7 @@
-import { DEFAULT_WORKSPACE } from '@shell/config/types';
 import { ClusterNotFoundError, RedirectToError } from '@shell/utils/error';
 import { get } from '@shell/utils/object';
-import { AFTER_LOGIN_ROUTE, WORKSPACE } from '@shell/store/prefs';
-import { validateResource, setProduct } from '@shell/utils/auth';
+import { AFTER_LOGIN_ROUTE } from '@shell/store/prefs';
+import { validateResource } from '@shell/utils/auth';
 import { getClusterFromRoute, getProductFromRoute, getPackageFromRoute, routeRequiresAuthentication } from '@shell/utils/router';
 
 export function install(router, context) {

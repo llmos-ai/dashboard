@@ -154,17 +154,15 @@ export default defineComponent({
         (_, key) => !key.includes(this.labelsPrefix)
       );
       const labels = PSAModes.reduce((acc, mode) => {
-        return this.psaControls[mode]?.active || this.labelsAlwaysActive
-          ? {
-            ...acc,
-            // Set default level if none
-            [`${ this.labelsPrefix }${ mode }`]:
+        return this.psaControls[mode]?.active || this.labelsAlwaysActive ? {
+          ...acc,
+          // Set default level if none
+          [`${ this.labelsPrefix }${ mode }`]:
                 this.psaControls[mode].level || PSADefaultLevel,
-            // Set default version if none
-            [`${ this.labelsPrefix }${ mode }-version`]:
+          // Set default version if none
+          [`${ this.labelsPrefix }${ mode }-version`]:
                 this.psaControls[mode].version || PSADefaultVersion,
-          }
-          : acc;
+        } : acc;
       }, nonPSALabels);
 
       this.$emit('updateLabels', labels);

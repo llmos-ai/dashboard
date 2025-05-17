@@ -1,9 +1,12 @@
 <script setup>
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 
-const model = defineModel();
+const model = defineModel({
+  type:    Number,
+  default: 0,
+});
 
-const props = defineProps({
+defineProps({
   min: {
     type:    Number,
     default: 0,

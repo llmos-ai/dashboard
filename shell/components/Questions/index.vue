@@ -452,8 +452,8 @@ export default {
   />
   <form v-else-if="asTabs">
     <Tab
-      v-for="(g, i) in groups"
-      :key="i"
+      v-for="(g, idx) in groups"
+      :key="idx"
       :name="g.name"
       :label="g.name"
       :weight="g.weight"
@@ -480,8 +480,8 @@ export default {
   </form>
   <form v-else>
     <div
-      v-for="(g, i) in groups"
-      :key="i"
+      v-for="(g, idx) in groups"
+      :key="idx"
     >
       <h3 v-if="groups.length > 1">
         {{ g.label }}

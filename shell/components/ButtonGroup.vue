@@ -72,12 +72,12 @@ const change = (value) => {
   emit('update:value', value);
 };
 
-const actionDescription = (opt) => {
-  const tooltip = opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip;
-  const label = opt.labelKey ? t(opt.labelKey) : opt.label;
+// const actionDescription = (opt) => {
+//   const tooltip = opt.tooltipKey ? t(opt.tooltipKey) : opt.tooltip;
+//   const label = opt.labelKey ? t(opt.labelKey) : opt.label;
 
-  return tooltip || label || '';
-};
+//   return tooltip || label || '';
+// };
 
 const actionAriaLabel = (opt) => {
   const ariaLabel = opt.ariaLabel;
