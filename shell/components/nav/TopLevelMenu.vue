@@ -131,7 +131,7 @@ export default {
             }, {
               key:   'global-settings',
               icon:  () => h(SettingOutlined),
-              label: this.t('product.settings'),
+              label: this.t('product.globalSettings'),
               to:    {
                 name:   'c-cluster-settings',
                 params: { cluster: 'local' }
