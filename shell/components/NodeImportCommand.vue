@@ -60,25 +60,19 @@ export default {
       installationScript: 'curl -sfL https://get-llmos.1block.ai |',
       skipDownloadBinary: false,
       useMirror:          false,
-      llmosConfig:        {},
     };
   },
 
   computed: {
-    llmosConfigCommand() {
-      if (!this.showAdvanced) {
-        return '';
-      }
+    llmosConfig() {
+      const config = {};
 
-      this.llmosConfig = {};
+      if (this.nodeName) config.nodeName = this.nodeName;
+      if (this.address) config.address = sanitizeIP(this.address);
+      if (this.internalAddress) config.internalAddress = sanitizeIP(this.internalAddress);
 
-      if (this.nodeName) this.llmosConfig.nodeName = this.nodeName;
-      if (this.address) this.llmosConfig.address = sanitizeIP(this.address);
-      if (this.internalAddress) this.llmosConfig.internalAddress = sanitizeIP(this.internalAddress);
-
-      // Process labels
       if (this.labels && this.labels.length !== 0) {
-        this.llmosConfig.labels = Object.entries(this.labels).reduce((arr, [key, value]) => {
+        config.labels = Object.entries(this.labels).reduce((arr, [key, value]) => {
           const k = sanitizeKey(key);
           const v = sanitizeValue(value);
 
@@ -88,9 +82,8 @@ export default {
         }, []);
       }
 
-      // Process taints
       if (this.taints && this.taints.length !== 0) {
-        this.llmosConfig.taints = this.taints.reduce((arr, t) => {
+        config.taints = this.taints.reduce((arr, t) => {
           const k = sanitizeKey(t.key);
           const v = sanitizeValue(t.value);
           const e = sanitizeValue(t.effect);
@@ -101,21 +94,25 @@ export default {
         }, []);
       }
 
-      // Return early if advanced config is empty
-      if (this.isEmptyObject(this.llmosConfig)) return '';
+      if (this.serverUrl) config.server = this.serverUrl;
 
-      // Add server and token information if present
-      if (this.serverUrl) this.llmosConfig.server = this.serverUrl;
-      if (this.tokenSecret) {
-        const decodedToken = atob(this.tokenSecret.serverToken);
-
-        this.llmosConfig.token = decodedToken;
+      if (this.tokenSecret?.serverToken) {
+        try {
+          config.token = atob(this.tokenSecret.serverToken);
+        } catch (e) {
+          console.error('Invalid base64 token:', e);
+        }
       }
 
-      if (this.useMirror) this.llmosConfig.mirror = 'cn';
+      if (this.useMirror) config.mirror = 'cn';
+      config.role = this.server ? 'server' : 'agent';
 
-      // Determine role based on server presence
-      this.llmosConfig.role = this.server ? 'server' : 'agent';
+      return config;
+    },
+    llmosConfigCommand() {
+      if (!this.showAdvanced || this.isEmptyObject(this.llmosConfig)) {
+        return '';
+      }
 
       const parsed = jsyaml.dump(this.llmosConfig);
       const result = `mkdir -p /etc/llmos
