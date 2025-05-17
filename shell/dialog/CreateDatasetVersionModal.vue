@@ -5,16 +5,13 @@ import { message } from 'ant-design-vue';
 
 import Banner from '@shell/components/Banner/Banner.vue';
 import { LLMOS, DEFAULT_WORKSPACE } from '@shell/config/types';
-import { LabeledInput } from '@shell/components/form/LabeledInput';
 import LabelValue from '@shell/components/LabelValue';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
-import NameNsDescription from '@shell/components/form/NameNsDescription';
-
-import { SECRET_TYPES } from '@shell/config/secret';
-
-import { base64Encode } from '@shell/utils/crypto';
+import { useI18n } from '@shell/composables/useI18n';
 
 const store = useStore();
+
+const { t } = useI18n(store);
 
 const props = defineProps({
   resources: {
@@ -88,7 +85,7 @@ const dataset = computed(() => {
 });
 
 const datasetVersions = computed(() => {
-  return dataset.value.datasetVersions || []
+  return dataset.value.datasetVersions || [];
 });
 
 const datasetVersionOptions = computed(() => {
@@ -111,7 +108,7 @@ const latestVersion = computed(() => {
   const match = versionStr.match(/^v(\d+)/);
   const currentMax = match ? parseInt(match[1]) : 0;
 
-  return `v${currentMax + 1}`;
+  return `v${ currentMax + 1 }`;
 });
 
 const schema = computed(() => {
@@ -133,17 +130,17 @@ const save = async() => {
 
     const model = await store.dispatch(`${ inStore.value }/create`, {
       metadata: {
-        generateName:      `${latestVersion.value}-`,
-        namespace: latestDatasetVersion.value.metadata.namespace,
+        generateName: `${ latestVersion.value }-`,
+        namespace:    latestDatasetVersion.value.metadata.namespace,
       },
       spec: {
         dataset:           latestDatasetVersion.value.spec.dataset,
         version:           `${ latestVersion.value }.0.0`,
         enableFastLoading: value.spec.enableFastLoading,
-        copyFrom: {
+        copyFrom:          {
           namespace: latestDatasetVersion.value.metadata.namespace,
-          dataset: latestDatasetVersion.value.spec.dataset,
-          version: value.spec.version,
+          dataset:   latestDatasetVersion.value.spec.dataset,
+          version:   value.spec.version,
         },
       },
     });

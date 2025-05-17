@@ -1,6 +1,4 @@
 <script>
-import { groupBy } from 'lodash';
-
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 
@@ -8,13 +6,10 @@ import CruResource from '@shell/components/CruResource';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
-import { Checkbox } from '@shell/components/form/Checkbox';
 import Tab from '@shell/components/Tabbed/Tab';
-import SelectOrCreateSecret from '@shell/components/SelectOrCreateSecret';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
-import LabeledTag from '@shell/components/form/LabeledTag';
 
-import { SECRET, AUTH_TYPE, LLMOS } from '@shell/config/types';
+import { LLMOS } from '@shell/config/types';
 
 import { allHash } from '@shell/utils/promise';
 import { LICENSES, LANGUAGES } from '@shell/utils/dictionary';
@@ -31,10 +26,7 @@ export default {
     Tab,
     LabeledSelect,
     LabeledInput,
-    Checkbox,
-    SelectOrCreateSecret,
     ResourceTabs,
-    LabeledTag,
   },
 
   mixins: [CreateEditView, FormValidation],
@@ -190,7 +182,10 @@ export default {
               required
             />
           </div>
-          <div class="col span-6" v-if="false">
+          <div
+            v-if="false"
+            class="col span-6"
+          >
             <LabeledSelect
               v-model:value="resource.spec.modelCard.metadata.baseModel"
               :options="baseModelOptions"
@@ -201,7 +196,10 @@ export default {
           </div>
         </div>
 
-        <div class="row mb-10 mt-10" v-if="false">
+        <div
+          v-if="false"
+          class="row mb-10 mt-10"
+        >
           <div class="col span-6">
             <LabeledSelect
               v-model:value="resource.spec.modelCard.metadata.license"
@@ -222,7 +220,10 @@ export default {
           </div>
         </div>
 
-        <div class="row mb-10 mt-10" v-if="false">
+        <div
+          v-if="false"
+          class="row mb-10 mt-10"
+        >
           <div class="col span-6">
             <LabeledSelect
               v-model:value="resource.spec.modelCard.metadata.language"
@@ -245,7 +246,10 @@ export default {
           </div>
         </div>
 
-        <div class="row mb-10 mt-10" v-if="false">
+        <div
+          v-if="false"
+          class="row mb-10 mt-10"
+        >
           <div class="col span-6">
             <LabeledSelect
               v-model:value="resource.spec.modelCard.metadata.tags"
@@ -259,7 +263,10 @@ export default {
           </div>
         </div>
 
-        <div class="row mt-10 mb-10" v-if="false">
+        <div
+          v-if="false"
+          class="row mt-10 mb-10"
+        >
           <div class="col span-6">
             <div class="label">
               <div class="text-label">

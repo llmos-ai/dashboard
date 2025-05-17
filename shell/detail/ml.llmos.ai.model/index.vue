@@ -1,6 +1,5 @@
 <script>
 import ResourceTabs from '@shell/components/form/ResourceTabs';
-import DetailText from '@shell/components/DetailText';
 import Tab from '@shell/components/Tabbed/Tab';
 import Loading from '@shell/components/Loading';
 import FileList from './FileList';
@@ -12,7 +11,6 @@ import { allHash } from '@shell/utils/promise';
 export default {
   components: {
     ResourceTabs,
-    DetailText,
     Tab,
     Loading,
     FileList,
@@ -44,8 +42,6 @@ export default {
 
   methods: {
     async fetchFiles(targetFilePath) {
-      const inStore = this.$store.getters['currentProduct'].inStore;
-
       this.loading = true;
 
       const hash = await allHash({ files: this.value.doAction('list', { targetFilePath }) });
