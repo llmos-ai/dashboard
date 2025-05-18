@@ -1,6 +1,8 @@
 <script>
 import Loading from '@shell/components/Loading';
 import BadgeStateFormatter from '@shell/components/formatter/BadgeStateFormatter';
+import LiveDate from '@shell/components/formatter/LiveDate.vue';
+import ActionMenu from '@shell/components/ActionMenuShell.vue';
 
 import ResourceFetch from '@shell/mixins/resource-fetch';
 
@@ -10,6 +12,8 @@ export default {
   components: {
     Loading,
     BadgeStateFormatter,
+    LiveDate,
+    ActionMenu,
   },
 
   mixins: [
@@ -258,15 +262,22 @@ export default {
             >
           </div>
           <div class="name-version">
-            <div>
+            <div class="d-flex">
               <router-link :to="row.detailLocation">
                 <h3 class="name">
-                  {{ row.metadata.name }}
+                  {{ row.id }}
                 </h3>
-                <div class="state ml-10">
-                  <BadgeStateFormatter :row="row" />
-                </div>
               </router-link>
+              <div class="state">
+                <BadgeStateFormatter :row="row" />
+              </div>
+            </div>
+            <div class="text-muted">
+              <LiveDate
+                :value="row.creationTimestamp"
+                :add-suffix="true"
+                :show-tooltip="false"
+              />
             </div>
             <div class="tags mt-5">
               <a-tag
@@ -277,6 +288,11 @@ export default {
                 {{ tag }}
               </a-tag>
             </div>
+          </div>
+          <div class="action">
+            <ActionMenu
+              :resource="row"
+            />
           </div>
           <div class="description mt-10">
             {{ row.spec.modelCard.description }}
@@ -356,12 +372,11 @@ $logo: 50px;
   .item {
     display: grid;
     grid-template-areas:
-      'logo name-version name-version'
-      'description description description'
-      'state state action';
+      'logo name-version action'
+      'description description description';
     grid-template-columns: $logo auto min-content;
-    grid-template-rows: 50px 75px 35px;
-    row-gap: $margin;
+    grid-template-rows: 50px 115px;
+    row-gap: 5px;
     column-gap: $margin;
 
     margin: $margin;
@@ -398,7 +413,12 @@ $logo: 50px;
 
     .name-version {
       grid-area: name-version;
-      padding: 10px 0 0 0;
+      padding: 5px 0 0 0;
+      
+      .d-flex {
+        display: flex;
+        align-items: center;
+      }
     }
 
     .name {
@@ -406,31 +426,25 @@ $logo: 50px;
       overflow: hidden;
       text-overflow: ellipsis;
       margin: 0;
-      float: left;
-      padding: 0 5px 0 0;
+      padding: 0 10px 0 0;  // Increased right padding
     }
 
     .state {
-      grid-area: state;
-    }
-
-    .version {
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: 0.9em;
-      margin-top: 4px;
+      display: flex;
+      align-items: center;
     }
 
     .description {
+      padding-left: 10px;
+      padding-right: 10px;
       grid-area: description;
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      -webkit-line-clamp: 4;  // 控制显示行数
+      -webkit-line-clamp: 5;  // Reduced from 4 to 3 lines
       overflow: hidden;
       text-overflow: ellipsis;
-      color: rgba(0, 0, 0, 0.65)
+      color: var(--text-muted);  // Changed to use design system color
+      line-height: 1.5;  // Added line height for better readability
     }
 
     .description-content {
