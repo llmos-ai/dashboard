@@ -37,7 +37,7 @@ export default class ModelRegistry extends SteveModel {
       try {
         return require(`~shell/assets/images/model-providers/${ this.icon }.svg`);
       } catch (err) {
-        return require(`~shell/assets/images/model-providers/ai.svg`);
+        return require(`~shell/assets/images/model-providers/ai-folder.svg`);
       }
     }
   }
