@@ -186,50 +186,52 @@ export default {
         {{ '/' + currentPath }}
       </div>
       <div class="pull-right">
-        <a-button
-          type="primary"
-          @click="onCreateFolder"
-        >
-          {{ t('fileList.createFolder') }}
-        </a-button>
-        <a-button
-          type="primary"
-          :loading="downloading"
-          @click="onDownload"
-        >
-          {{ t('fileList.download') }}
-        </a-button>
-        <a-dropdown-button
-          type="primary"
-          :loading="uploading"
-        >
-          <a-upload
-            :customRequest="onUpload"
-            :showUploadList="false"
+        <a-space>
+          <a-button
+            type="primary"
+            @click="onCreateFolder"
           >
-            <span class="btn-text p-0">
-              {{ t('fileList.addFile') }}
-            </span>
-          </a-upload>
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="uploadFolder">
-                <a-upload
-                  :customRequest="onFolderUpload"
-                  :showUploadList="false"
-                  directory
-                >
-                  <span class="">
-                    {{ t('fileList.uploadFolder') }}
-                  </span>
-                </a-upload>
-              </a-menu-item>
-            </a-menu>
-          </template>
-          <template #icon>
-            <DownOutlined @click.prevent />
-          </template>
-        </a-dropdown-button>
+            {{ t('fileList.createFolder') }}
+          </a-button>
+          <a-button
+            type="primary"
+            :loading="downloading"
+            @click="onDownload"
+          >
+            {{ t('fileList.download') }}
+          </a-button>
+          <a-dropdown-button
+            type="primary"
+            :loading="uploading"
+          >
+            <a-upload
+              :customRequest="onUpload"
+              :showUploadList="false"
+            >
+              <span class="btn-text p-0">
+                {{ t('fileList.addFile') }}
+              </span>
+            </a-upload>
+            <template #overlay>
+              <a-menu>
+                <a-menu-item key="uploadFolder">
+                  <a-upload
+                    :customRequest="onFolderUpload"
+                    :showUploadList="false"
+                    directory
+                  >
+                    <span class="">
+                      {{ t('fileList.uploadFolder') }}
+                    </span>
+                  </a-upload>
+                </a-menu-item>
+              </a-menu>
+            </template>
+            <template #icon>
+              <DownOutlined @click.prevent />
+            </template>
+          </a-dropdown-button>
+        </a-space>
       </div>
     </div>
   </div>
