@@ -147,7 +147,7 @@ export default {
           type="primary"
           @click="onBack"
         >
-          Back
+          {{ t('fileList.back') }}
         </a-button>
         {{ '/' + currentPath }}
       </div>
@@ -156,14 +156,14 @@ export default {
           type="primary"
           @click="onCreateFolder"
         >
-          Create Folder
+          {{ t('fileList.createFolder') }}
         </a-button>
         <a-button
           type="primary"
           :loading="downloading"
           @click="onDownload"
         >
-          Download
+          {{ t('fileList.download') }}
         </a-button>
         <a-dropdown-button
           type="primary"
@@ -174,7 +174,7 @@ export default {
             :showUploadList="false"
           >
             <span class="btn-text p-0">
-              Add File
+              {{ t('fileList.addFile') }}
             </span>
           </a-upload>
           <template #overlay>
@@ -186,7 +186,7 @@ export default {
                   directory
                 >
                   <span class="">
-                    Upload Folder
+                    {{ t('fileList.uploadFolder') }}
                   </span>
                 </a-upload>
               </a-menu-item>

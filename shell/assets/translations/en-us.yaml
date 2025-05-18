@@ -6856,6 +6856,18 @@ createDatasetVersionModal:
       desc: "The new version will be empty and needs to import content separately"
   success: Create successfully
 
+fileList:
+  back: "Back"
+  createFolder: "Create Folder"
+  download: "Download"
+  addFile: "Add File"
+  uploadFolder: "Upload Folder"
+
+fileItem:
+  deleteConfirm: "Are you sure you want to delete this file?"
+  deleteSuccess: "File removed successfully"
+  remove: "Remove"
+
 apps:
   manage:
     label: Application Management
