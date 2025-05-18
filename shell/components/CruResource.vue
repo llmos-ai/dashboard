@@ -764,23 +764,25 @@ export default {
               #default
             >
               <div>
-                <a-button
-                  v-if="showYaml"
-                  :data-testid="componentTestid + '-yaml'"
-                  @click="showPreviewYaml"
-                >
-                  <t k="cruResource.previewYaml" />
-                </a-button>
-                <slot name="createBtnPrefix" />
-                <AsyncButton
-                  v-if="!showSubtypeSelection"
-                  ref="save"
-                  type="primary"
-                  :disabled="!canSave"
-                  :mode="finishButtonMode || mode"
-                  :data-testid="componentTestid + '-save'"
-                  @click="clickSave($event)"
-                />
+                <a-space>
+                  <a-button
+                    v-if="showYaml"
+                    :data-testid="componentTestid + '-yaml'"
+                    @click="showPreviewYaml"
+                  >
+                    <t k="cruResource.previewYaml" />
+                  </a-button>
+                  <slot name="createBtnPrefix" />
+                  <AsyncButton
+                    v-if="!showSubtypeSelection"
+                    ref="save"
+                    type="primary"
+                    :disabled="!canSave"
+                    :mode="finishButtonMode || mode"
+                    :data-testid="componentTestid + '-save'"
+                    @click="clickSave($event)"
+                  />
+                </a-space>
               </div>
             </template>
           </CruResourceFooter>
@@ -824,44 +826,48 @@ export default {
                 @cancel-confirmed="confirmCancel"
               >
                 <template #default="{ checkCancel }">
-                  <div class="controls-middle">
-                    <a-button
-                      v-if="showPreview"
-                      :data-testid="componentTestid + '-yaml-yaml'"
-                      @click="yamlUnpreview"
+                  <a-space>
+                    <div class="controls-middle">
+                      <a-button
+                        v-if="showPreview"
+                        :data-testid="componentTestid + '-yaml-yaml'"
+                        @click="yamlUnpreview"
+                      >
+                        <t k="resourceYaml.buttons.continue" />
+                      </a-button>
+                      <a-button
+                        v-if="!showPreview && isEdit"
+                        :data-testid="componentTestid + '-yaml-yaml-preview'"
+                        :disabled="!canDiff"
+                        @click="yamlPreview"
+                      >
+                        <t k="resourceYaml.buttons.diff" />
+                      </a-button>
+                    </div>
+                    <div
+                      v-if="_selectedSubtype || !subtypes.length"
+                      class="controls-right"
                     >
-                      <t k="resourceYaml.buttons.continue" />
-                    </a-button>
-                    <a-button
-                      v-if="!showPreview && isEdit"
-                      :data-testid="componentTestid + '-yaml-yaml-preview'"
-                      :disabled="!canDiff"
-                      @click="yamlPreview"
-                    >
-                      <t k="resourceYaml.buttons.diff" />
-                    </a-button>
-                  </div>
-                  <div
-                    v-if="_selectedSubtype || !subtypes.length"
-                    class="controls-right"
-                  >
-                    <a-button
-                      :data-testid="componentTestid + '-yaml-cancel'"
-                      @click="checkCancel(false)"
-                    >
-                      <t k="cruResource.backToForm" />
-                    </a-button>
-                    <AsyncButton
-                      v-if="!showSubtypeSelection"
-                      :data-testid="componentTestid + '-yaml-save'"
-                      :disabled="!canSave"
-                      type="primary"
-                      :action-label="
-                        isEdit ? t('generic.save') : t('generic.create')
-                      "
-                      @click="(cb) => yamlSave(cb)"
-                    />
-                  </div>
+                      <a-space>
+                        <a-button
+                          :data-testid="componentTestid + '-yaml-cancel'"
+                          @click="checkCancel(false)"
+                        >
+                          <t k="cruResource.backToForm" />
+                        </a-button>
+                        <AsyncButton
+                          v-if="!showSubtypeSelection"
+                          :data-testid="componentTestid + '-yaml-save'"
+                          :disabled="!canSave"
+                          type="primary"
+                          :action-label="
+                            isEdit ? t('generic.save') : t('generic.create')
+                          "
+                          @click="(cb) => yamlSave(cb)"
+                        />
+                      </a-space>
+                    </div>
+                  </a-space>
                 </template>
               </CruResourceFooter>
             </slot>
