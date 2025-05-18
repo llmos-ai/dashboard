@@ -3,6 +3,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import { allHash } from '@shell/utils/promise';
 import { LLMOS } from '@shell/config/types';
+import { NAME, STATE, NAMESPACE, AGE } from '@shell/config/table-headers';
 
 export default {
   name: 'ModelRegistryList',
@@ -35,7 +36,26 @@ export default {
       resource:        await this.$fetchType(this.resource),
       datasetVersions: await this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET_VERSION }),
     });
-  }
+  },
+
+  computed: {
+    headers() {
+      const REGISTRY = {
+        name:  'spec.registry',
+        label: this.t('modelCard.registry.label')
+      };
+
+      const headers = [
+        STATE,
+        NAME,
+        NAMESPACE,
+        REGISTRY,
+        AGE,
+      ];
+
+      return headers;
+    }
+  },
 };
 </script>
 
