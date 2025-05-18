@@ -253,6 +253,7 @@ product:
   elemental: OS Management
   plugins: Plugins
   llmos: LLMOS Management
+  globalSettings: Global Settings
 
 suffix:
   percent: "%"
