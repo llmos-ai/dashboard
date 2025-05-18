@@ -57,11 +57,11 @@ const currentFolder = computed(() => {
 
 const removeFile = async(file) => {
   Modal.confirm({
-    title: 'Are you sure you want to delete this file?',
+    title: t('fileItem.deleteConfirm'),
     async onOk() {
       await props.resource.doAction('remove', { targetFilePath: currentPath.value });
 
-      message.success('File removed successfully');
+      message.success(t('fileItem.deleteSuccess'));
 
       emit('fetchFiles', currentFolder.value);
     },
@@ -129,7 +129,7 @@ export default {
           class="hand text-error"
           @click="removeFile(file)"
         >
-          Remove
+          {{ t('fileItem.remove') }}
         </span>
       </a-col>
     </a-row>

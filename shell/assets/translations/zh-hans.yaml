@@ -6472,6 +6472,13 @@ createSecretModal:
     placeholder: e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 createDatasetVersionModal:
+  title: 创建数据集版本
+  enableFastLoading:
+    label: 数据继承
+  version:
+    label: 继承版本
+  versionName:
+    label: 版本名
   inheritance:
     label: "数据继承"
     inherit:
@@ -6480,6 +6487,19 @@ createDatasetVersionModal:
     new:
       title: "新建模式"
       desc: "新版本内容为空，需要另外导入内容"
+  success: 创建成功
+
+fileList:
+  back: "返回"
+  createFolder: "创建文件夹"
+  download: "下载"
+  addFile: "添加文件"
+  uploadFolder: "上传文件夹"
+
+fileItem:
+  deleteConfirm: "确定要删除这个文件吗？"
+  deleteSuccess: "文件删除成功"
+  remove: "删除"
 
 apps:
   manage:
