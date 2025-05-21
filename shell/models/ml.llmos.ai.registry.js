@@ -55,13 +55,7 @@ export default class ModelRegistry extends SteveModel {
   updateDefault(value) {
     this.setAnnotation(REGISTRY.DEFAULT_REGISTRY, value.toString());
 
-    const data = {
-      metadata: {
-        annotations: {
-          [REGISTRY.DEFAULT_REGISTRY]:      value.toString(),
-        }
-      }
-    };
+    const data = { metadata: { annotations: { [REGISTRY.DEFAULT_REGISTRY]: value.toString() } } };
 
     return this.patch(data, {}, true, true);
   }

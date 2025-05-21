@@ -414,7 +414,7 @@ $logo: 50px;
     .name-version {
       grid-area: name-version;
       padding: 5px 0 0 0;
-      
+
       .d-flex {
         display: flex;
         align-items: center;
