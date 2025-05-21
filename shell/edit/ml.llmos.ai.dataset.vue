@@ -97,7 +97,7 @@ export default {
         });
       }
 
-      return out
+      return out;
     },
 
     licenseOptions() {
@@ -148,6 +148,7 @@ export default {
 
       if (this.resource.spec.registry === this.t('modelRegistry.useDefault')) {
         const defaultRegistry = this.registries.find((registry) => registry.isDefault) || {};
+
         this.resource.spec.registry = defaultRegistry.id;
       }
     },

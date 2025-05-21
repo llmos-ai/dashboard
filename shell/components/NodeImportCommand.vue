@@ -100,6 +100,7 @@ export default {
         try {
           config.token = atob(this.tokenSecret.serverToken);
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.error('Invalid base64 token:', e);
         }
       }

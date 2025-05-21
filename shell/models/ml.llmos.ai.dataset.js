@@ -1,5 +1,6 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { LLMOS } from '@shell/config/types';
+import { set } from '@shell/utils/object';
 
 export default class Dataset extends SteveModel {
   applyDefaults() {
@@ -10,11 +11,9 @@ export default class Dataset extends SteveModel {
         labels:      {},
         annotations: {},
       },
-      spec: { 
-        datasetCard: { metadata: {
-          splitTypes: [],
-        } },
-        registry: this.t('modelRegistry.useDefault'), 
+      spec: {
+        datasetCard: { metadata: { splitTypes: [] } },
+        registry:    this.t('modelRegistry.useDefault'),
       },
     };
 
