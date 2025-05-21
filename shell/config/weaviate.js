@@ -1,0 +1,1 @@
+export const getAllSchemaAPI = '/api/v1/namespaces/weaviate/services/http:weaviate:80/proxy/v1/schema'
