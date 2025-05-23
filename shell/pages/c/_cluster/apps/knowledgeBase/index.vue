@@ -3,6 +3,8 @@ import { getAllSchemaAPI } from '@/shell/config/weaviate';
 import ResourceTable from '@shell/components/ResourceTable';
 import ButtonLink from '@shell/components/ButtonLink';
 
+import { NAME, AGE } from '@shell/config/table-headers';
+
 export default {
   layout: 'plain',
 
@@ -39,6 +41,15 @@ export default {
         name:   `c-cluster-apps-knowledgeBase-create`,
         params: { cluster: 'local' }
       };
+    },
+
+    headers() {
+      return [
+        {
+          ...NAME,
+          value: 'class',
+        },
+      ];
     },
   },
 };
