@@ -4,6 +4,8 @@ import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
+import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList'
+
 import { CSRF } from '@shell/config/cookies';
 
 import FileItem from './FileItem';
@@ -27,8 +29,12 @@ const emit = defineEmits(['fetchFiles']);
 const downloading = ref(false);
 const uploading = ref(false);
 const currentPath = ref('');
-const percent = ref(0);
-const uploadStatus = ref('');
+
+const {
+  percent,
+  uploadStatus,
+  uploadFile,
+} = useFileList({props});
 
 const onCreateFolder = async() => {
   store.dispatch('cluster/promptModal', {
@@ -72,68 +78,6 @@ const fetchFiles = async(targetFilePath) => {
   emit('fetchFiles', targetFilePath);
 };
 
-const onUpload = async(options) => {
-  const { file } = options;
-
-  try {
-    uploading.value = true;
-
-    const formData = new FormData();
-
-    formData.append('file', file);
-    formData.append('data', JSON.stringify({
-      targetDirectory: currentPath.value,
-      relativePath:    '',
-    }));
-
-    const csrf = store.$cookies.get(CSRF, { parseJSON: false })
-
-    const res = await fetch(props.resource.actions.upload, {
-      method: 'POST',
-      headers: {
-        'Accept': 'text/event-stream',
-        'x-api-csrf': csrf,
-      },
-      body: formData,
-    });
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      
-      if (done) {
-        break;
-      }
-
-      const chunk = decoder.decode(value);
-      
-      const lines = chunk.split('\n');
-      for (const line of lines) {
-        if (line.startsWith('data:')) {
-          try {
-            const eventData = JSON.parse(line.slice(5));
-            percent.value = Math.floor((eventData.readSize / eventData.totalSize) * 100);
-            uploadStatus.value = `正在上传: ${eventData.destPath}`;
-          } catch (e) {
-            console.error('Failed to parse SSE data:', e);
-          }
-        }
-      }
-    }
-
-    message.success('Upload Success');
-    emit('fetchFiles');
-  } catch (err) {
-    message.error(`Upload Fail: ${err}`);
-  } finally {
-    uploading.value = false;
-    uploadStatus.value = '';
-    percent.value = 0;
-  }
-};
-
 const onFolderUpload = async(options) => {
   const { file } = options;
 
@@ -142,25 +86,47 @@ const onFolderUpload = async(options) => {
 
     const relativePath = file.webkitRelativePath || '';
     const pathArray = relativePath.split('/');
-
     pathArray.pop();
 
     const formData = new FormData();
-
     formData.append('file', file);
     formData.append('data', JSON.stringify({
       targetDirectory: currentPath.value,
-      relativePaths:   pathArray,
+      relativePaths: pathArray,
     }));
 
-    await props.resource.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-
-    message.success('Upload Success');
+    await uploadFile(formData);
     emit('fetchFiles');
   } catch (err) {
-    message.error('Upload Fail');
+    message.error(`Upload Fail: ${ err }`);
   } finally {
     uploading.value = false;
+    uploadStatus.value = '';
+    percent.value = 0;
+  }
+};
+
+const onUpload = async(options) => {
+  const { file } = options;
+
+  try {
+    uploading.value = true;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('data', JSON.stringify({
+      targetDirectory: currentPath.value,
+      relativePath:    '',
+    }));
+
+    await uploadFile(formData);
+    emit('fetchFiles');
+  } catch (err) {
+    message.error(`Upload Fail: ${ err }`);
+  } finally {
+    uploading.value = false;
+    uploadStatus.value = '';
+    percent.value = 0;
   }
 };
 
@@ -243,8 +209,8 @@ export default {
     </div>
   </div>
   <div class="file-list mt-10">
-    <div v-if="uploadStatus" class="upload-progress mb-4">
-      <div class="mb-2">{{ uploadStatus }}</div>
+    <div v-if="uploadStatus" class="upload-progress mb-5">
+      <div class="mb-5">{{ uploadStatus }}</div>
       <a-progress :percent="percent" :status="percent === 100 ? 'success' : 'active'" />
     </div>
     <div

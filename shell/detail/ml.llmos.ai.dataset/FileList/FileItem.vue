@@ -1,7 +1,10 @@
 <script setup>
 import { defineProps, computed } from 'vue';
 import { useStore } from 'vuex';
+
 import { useI18n } from '@shell/composables/useI18n';
+import { useFileItem } from '@shell/detail/ml.llmos.ai.model/FileList/useFileItem'
+
 import { FileTextTwoTone, FolderTwoTone } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
 import { Modal, message } from 'ant-design-vue';
@@ -51,8 +54,11 @@ const currentPath = computed(() => {
   return props.file.Path ? props.file.Path.replace(prefix, '') : '';
 });
 
-const currentFolder = computed(() => {
-  return currentPath.value.split('/').slice(0, -1).join('/');
+const { currentFolder } = useFileItem({
+  props: {
+    isFile,
+    currentPath,
+  }
 });
 
 const removeFile = async(file) => {

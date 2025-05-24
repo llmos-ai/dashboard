@@ -4,6 +4,8 @@ import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
+import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList'
+
 import FileItem from './FileItem';
 
 const store = useStore();
@@ -36,6 +38,16 @@ const downloading = ref(false);
 const uploading = ref(false);
 const currentPath = ref('');
 const selectedVersion = ref('');
+
+const {
+  percent,
+  uploadStatus,
+  uploadFile,
+} = useFileList({
+  props: {
+    resource: props.datasetVersion,
+  },
+});
 
 const datesetVersionOptions = computed(() => {
   return props.resource.datasetVersions.map((version) => {
@@ -104,14 +116,16 @@ const onUpload = async(options) => {
       relativePath:    '',
     }));
 
-    await props.datasetVersion.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+    await uploadFile(formData);
 
     message.success('Upload Success');
     emit('fetchFiles');
   } catch (err) {
-    message.error('Upload Fail');
+    message.error(`Upload Fail: ${ err }`);
   } finally {
     uploading.value = false;
+    uploadStatus.value = '';
+    percent.value = 0;
   }
 };
 
@@ -134,14 +148,16 @@ const onFolderUpload = async(options) => {
       relativePaths:   pathArray,
     }));
 
-    await props.datasetVersion.doAction('upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+    await uploadFile(formData);
 
     message.success('Upload Success');
     emit('fetchFiles');
   } catch (err) {
-    message.error('Upload Fail');
+    message.error(`Upload Fail: ${ err }`);
   } finally {
     uploading.value = false;
+    uploadStatus.value = '';
+    percent.value = 0;
   }
 };
 
@@ -236,6 +252,13 @@ export default {
     </div>
   </div>
   <div class="file-list mt-10">
+    <div 
+      v-if="uploadStatus" 
+      class="upload-progress mb-5"
+    >
+      <div class="mb-5">{{ uploadStatus }}</div>
+      <a-progress :percent="percent" :status="percent === 100 ? 'success' : 'active'" />
+    </div>
     <div
       v-if="files.length === 0"
       class="file-empty"
