@@ -1,8 +1,11 @@
+import { message } from 'ant-design-vue';
+
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { set } from '@shell/utils/object';
 import { matchModelString } from '@shell/utils/ai-model';
 import { _EDIT, ENABLED, MODE } from '@shell/config/query-params';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
+import { LLMOS as LLMOS_TYPES } from '@shell/config/types';
 
 export default class ModelRegistry extends SteveModel {
   applyDefaults() {
@@ -68,5 +71,30 @@ export default class ModelRegistry extends SteveModel {
           return true;
         }
       });
+  }
+
+  get availableActions() {
+    const out = super._availableActions;
+
+    const cache = {
+      action:  'cache',
+      enabled: true,
+      icon:    'icon icon-copy',
+      label:   this.t('modelCard.actions.cache'),
+    };
+
+    out.unshift(cache);
+
+    return out;
+  }
+
+  async cache() {
+    this.$dispatch('promptModal', {
+      component:      'CreateLocalModelVersionModal',
+      modalWidth:     '600px',
+      componentProps: { 
+        modelId: this.id 
+      },
+    });
   }
 }

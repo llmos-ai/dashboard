@@ -5771,6 +5771,11 @@ typeLabel:
       one { 数据集 }
       other { 数据集 }
     }
+  ml.llmos.ai.localmodelversion: |-
+    {count, plural,
+      one { 本地模型 }
+      other { 本地模型 }
+    }
   chat: |-
     {count, plural,
       one { 对话 }

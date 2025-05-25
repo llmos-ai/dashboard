@@ -1,5 +1,5 @@
-import Cookie from 'universal-cookie'
-import { shallowRef } from 'vue'
+import Cookie from 'universal-cookie';
+import { shallowRef } from 'vue';
 
 export function useCookies(
   vuexStore

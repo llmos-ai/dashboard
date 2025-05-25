@@ -10,11 +10,9 @@ export default {
   data() {
     return {
       classes: [],
-      schema: {
-        
-      },
+      schema:  {},
       headers: [
-        
+
       ],
     };
   },
@@ -31,9 +29,7 @@ export default {
 
   computed: {
     createLocation() {
-      return {
-        name:   `c-cluster-app-knowledgeBase-create`,
-      };
+      return { name: `c-cluster-app-knowledgeBase-create` };
     },
   },
 
@@ -42,28 +38,28 @@ export default {
       const inStore = this.$store.getters['currentProduct'].inStore;
       const res = await this.$store.dispatch(
         `${ inStore }/request`,
-        { 
-          url: getAllSchemaAPI,
+        {
+          url:    getAllSchemaAPI,
           method: 'POST',
-          data: {
-            "class": 'qy-dev',
-            "description": "A collection for product information",
-            "vectorizer": "none",
-            "vectorIndexType": "hnsw",
-            "vectorIndexConfig": {
-              "distance": "cosine",
-              "efConstruction": 200,
-              "maxConnections": 64
+          data:   {
+            class:             'qy-dev',
+            description:       'A collection for product information',
+            vectorizer:        'none',
+            vectorIndexType:   'hnsw',
+            vectorIndexConfig: {
+              distance:       'cosine',
+              efConstruction: 200,
+              maxConnections: 64
             },
-            "properties": [
-                {
-                    "name": "text",
-                    "description": "The text content",
-                    "dataType": ["text"],
-                    "tokenization": "word",
-                    "indexFilterable": true,
-                    "indexSearchable": true
-                }
+            properties: [
+              {
+                name:            'text',
+                description:     'The text content',
+                dataType:        ['text'],
+                tokenization:    'word',
+                indexFilterable: true,
+                indexSearchable: true
+              }
             ]
           }
         }

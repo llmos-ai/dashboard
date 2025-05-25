@@ -8,7 +8,7 @@ import { NAME, AGE } from '@shell/config/table-headers';
 export default {
   layout: 'plain',
 
-  components: { 
+  components: {
     ResourceTable,
     ButtonLink,
   },
@@ -16,11 +16,9 @@ export default {
   data() {
     return {
       classes: [],
-      schema: {
-        
-      },
+      schema:  {},
       headers: [
-        
+
       ],
     };
   },

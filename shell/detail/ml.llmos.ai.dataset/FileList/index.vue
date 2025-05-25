@@ -4,7 +4,7 @@ import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
-import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList'
+import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
 
 import FileItem from './FileItem';
 
@@ -43,11 +43,7 @@ const {
   percent,
   uploadStatus,
   uploadFile,
-} = useFileList({
-  props: {
-    resource: props.datasetVersion,
-  },
-});
+} = useFileList({ props: { resource: props.datasetVersion } });
 
 const datesetVersionOptions = computed(() => {
   return props.resource.datasetVersions.map((version) => {
@@ -252,12 +248,17 @@ export default {
     </div>
   </div>
   <div class="file-list mt-10">
-    <div 
-      v-if="uploadStatus" 
+    <div
+      v-if="uploadStatus"
       class="upload-progress mb-5"
     >
-      <div class="mb-5">{{ uploadStatus }}</div>
-      <a-progress :percent="percent" :status="percent === 100 ? 'success' : 'active'" />
+      <div class="mb-5">
+        {{ uploadStatus }}
+      </div>
+      <a-progress
+        :percent="percent"
+        :status="percent === 100 ? 'success' : 'active'"
+      />
     </div>
     <div
       v-if="files.length === 0"

@@ -4,7 +4,7 @@ import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
-import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList'
+import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
 
 import { CSRF } from '@shell/config/cookies';
 
@@ -34,7 +34,7 @@ const {
   percent,
   uploadStatus,
   uploadFile,
-} = useFileList({props});
+} = useFileList({ props });
 
 const onCreateFolder = async() => {
   store.dispatch('cluster/promptModal', {
@@ -86,13 +86,15 @@ const onFolderUpload = async(options) => {
 
     const relativePath = file.webkitRelativePath || '';
     const pathArray = relativePath.split('/');
+
     pathArray.pop();
 
     const formData = new FormData();
+
     formData.append('file', file);
     formData.append('data', JSON.stringify({
       targetDirectory: currentPath.value,
-      relativePaths: pathArray,
+      relativePaths:   pathArray,
     }));
 
     await uploadFile(formData);
@@ -113,6 +115,7 @@ const onUpload = async(options) => {
     uploading.value = true;
 
     const formData = new FormData();
+
     formData.append('file', file);
     formData.append('data', JSON.stringify({
       targetDirectory: currentPath.value,
@@ -209,9 +212,17 @@ export default {
     </div>
   </div>
   <div class="file-list mt-10">
-    <div v-if="uploadStatus" class="upload-progress mb-5">
-      <div class="mb-5">{{ uploadStatus }}</div>
-      <a-progress :percent="percent" :status="percent === 100 ? 'success' : 'active'" />
+    <div
+      v-if="uploadStatus"
+      class="upload-progress mb-5"
+    >
+      <div class="mb-5">
+        {{ uploadStatus }}
+      </div>
+      <a-progress
+        :percent="percent"
+        :status="percent === 100 ? 'success' : 'active'"
+      />
     </div>
     <div
       v-if="files.length === 0"

@@ -3945,6 +3945,7 @@ resourceTable:
     node: Group by Node
     role: Group by Role
     cluster: Group by Cluster
+    model: Group by Model
   groupLabel:
     cluster: "<span>Cluster:</span> {name}"
     notInACluster: Not in a Cluster
@@ -3959,6 +3960,7 @@ resourceTable:
     notInANodePool: "Not in a Pool"
     nodePool: "<span>Pool:</span> {name}"
     node: "<span>Node:</span> {name}"
+    model: "<span>Model:</span> {name}"
 
 resourceTabs:
   conditions:
@@ -6079,6 +6081,11 @@ typeLabel:
       one { Dataset }
       other { Datasets }
     }
+  ml.llmos.ai.localmodelversion: |-
+    {count, plural,
+      one { Local Model }
+      other { Local Models }
+    }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
     {count, plural,
@@ -6801,6 +6808,8 @@ modelCard:
   gpu:
     label: GPU
   empty: There are no models to show.
+  actions: 
+    cache: Cache
 
 LabeledTag:
   addLabel: Add Tag
@@ -6868,6 +6877,18 @@ fileItem:
   deleteConfirm: "Are you sure you want to delete this file?"
   deleteSuccess: "File removed successfully"
   remove: "Remove"
+
+localModel:
+  localModel:
+    label: Source Model
+  volumeSnapshot:
+    label: Volume Snapshot
+
+createLocalModelVersionModal:
+  title: Cache Model
+  name:
+    label: Version Name
+    placeholder: e.g. v1
 
 apps:
   manage:
