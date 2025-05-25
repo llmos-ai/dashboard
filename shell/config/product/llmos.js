@@ -178,7 +178,8 @@ export function init(store) {
         hideColumn: 'groupByModel',
         tooltipKey: 'resourceTable.groupBy.model'
       }
-    ]
+    ],
+    hiddenNamespaceGroupButton: true,
   });
 
   virtualType({

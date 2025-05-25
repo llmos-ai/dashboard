@@ -3960,7 +3960,7 @@ resourceTable:
     notInANodePool: "Not in a Pool"
     nodePool: "<span>Pool:</span> {name}"
     node: "<span>Node:</span> {name}"
-    model: "<span>Model:</span> {name}"
+    model: "<span>Local Model:</span> {name}"
 
 resourceTabs:
   conditions:
