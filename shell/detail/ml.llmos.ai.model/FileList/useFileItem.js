@@ -1,9 +1,7 @@
 import { computed } from 'vue';
 
-export const useFileItem = ({
-  props = {},
-}) => {
-  const {isFile, currentPath} = props;
+export const useFileItem = ({ props = {} }) => {
+  const { isFile, currentPath } = props;
   const currentFolder = computed(() => {
     if (isFile.value) {
       return currentPath.value.split('/').slice(0, -1).join('/');
@@ -12,7 +10,5 @@ export const useFileItem = ({
     }
   });
 
-  return {
-    currentFolder
-  };
+  return { currentFolder };
 };

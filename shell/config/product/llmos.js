@@ -151,7 +151,34 @@ export function init(store) {
       params: { resource: LLMOS.MODEL }
     },
     exact:  false,
-    weight: 97,
+    weight: 99,
+  });
+
+  virtualType({
+    ifHaveType: LLMOS.LOCAL_MODEL_VERSION,
+    labelKey:   `typeLabel."${ LLMOS.LOCAL_MODEL_VERSION }"`,
+    name:       LLMOS.LOCAL_MODEL_VERSION,
+    namespaced: true,
+    route:      {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.LOCAL_MODEL_VERSION  }
+    },
+    exact:  false,
+    weight: 89,
+  });
+
+  configureType(LLMOS.LOCAL_MODEL_VERSION, {
+    isCreatable: false, 
+    isEditable: true,
+    listGroups: [
+      {
+        icon:       'icon-cluster',
+        value:      'role',
+        field:      'groupByModel',
+        hideColumn: 'groupByModel',
+        tooltipKey: 'resourceTable.groupBy.model'
+      }
+    ]
   });
 
   virtualType({
@@ -164,7 +191,7 @@ export function init(store) {
       params: { resource: LLMOS.DATASET }
     },
     exact:  false,
-    weight: 96,
+    weight: 79,
   });
 
   // playground
@@ -377,12 +404,13 @@ export function init(store) {
       params: { resource: LLMOS.REGISTRY }
     },
     exact:  false,
-    weight: 94,
+    weight: 79,
   });
 
   basicType(
     [
       LLMOS.MODEL,
+      LLMOS.LOCAL_MODEL_VERSION,
       LLMOS.DATASET,
       LLMOS.REGISTRY,
     ],

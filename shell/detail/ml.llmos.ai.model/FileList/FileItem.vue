@@ -3,7 +3,7 @@ import { defineProps, computed } from 'vue';
 import { useStore } from 'vuex';
 
 import { useI18n } from '@shell/composables/useI18n';
-import { useFileItem } from '@shell/detail/ml.llmos.ai.model/FileList/useFileItem'
+import { useFileItem } from '@shell/detail/ml.llmos.ai.model/FileList/useFileItem';
 
 import { FileTextTwoTone, FolderTwoTone } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';

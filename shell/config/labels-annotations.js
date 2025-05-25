@@ -92,4 +92,7 @@ export const ANNOTATIONS = {
   RAY_CLUSTER_FT_ENABLED: 'ray.io/ft-enabled',
 };
 
-export const REGISTRY = { DEFAULT_REGISTRY: 'ml.llmos.ai/is-default-registry' };
+export const REGISTRY = { 
+  DEFAULT_REGISTRY: 'ml.llmos.ai/is-default-registry',
+  DEFAULT_LOCAL_MODEL_VERSION:'ml.llmos.ai/is-default-local-model-version', 
+};
