@@ -8,41 +8,34 @@ import { escapeHtml } from '@shell/utils/string';
 
 export default class LocalModelVersion extends SteveModel {
   get isDefault() {
-    return this.annotations[REGISTRY.DEFAULT_LOCAL_MODEL_VERSION] === 'true';
-  }
-
-  updateDefault(value) {
-    this.setAnnotation(REGISTRY.DEFAULT_LOCAL_MODEL_VERSION, value.toString());
-
-    const data = { metadata: { annotations: { [REGISTRY.DEFAULT_LOCAL_MODEL_VERSION]: value.toString() } } };
-
-    return this.patch(data, {}, true, true);
-  }
-
-  resetDefault() {
-    if (this.isDefault) {
-      this.updateDefault(false);
-    }
+    return this.localModel?.spec?.defaultVersion === this.id;
   }
 
   setDefault() {
-    const versions = this.$rootGetters['cluster/all'](LLMOS.LOCAL_MODEL_VERSION) || [];
+    const data = { 
+      spec: {
+        defaultVersion: this.id,
+      } 
+    };
 
-    versions.filter(v => v.spec.localModel = this.spec.localModel).map((version) => version.resetDefault());
-    this.updateDefault(true);
+    return this.localModel.patch(data, {
+      headers: {
+        'content-type': 'application/merge-patch+json',
+      },
+    }, true, true);
+  }
+
+  get localModel() {
+    const localModel = this.spec?.localModel;
+    const namespace = this.metadata?.namespace;
+
+    return this.$getters['byId'](LLMOS.LOCAL_MODEL, `${ namespace }/${ localModel }`)
   }
 
   get _availableActions() {
     const out = super._availableActions;
 
-    if (this.isDefault) {
-      out.unshift({
-        action:  'resetDefault',
-        enabled: true,
-        icon:    'icon icon-fw icon-checkmark',
-        label:   this.t('storageClass.actions.resetDefault'),
-      });
-    } else {
+    if (!this.isDefault) {
       out.unshift({
         action:  'setDefault',
         enabled: true,

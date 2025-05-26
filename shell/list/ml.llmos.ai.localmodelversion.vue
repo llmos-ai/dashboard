@@ -116,6 +116,7 @@ export default {
 
         <div class="right">
           <ActionMenu
+            v-if="false"
             :resource="group.group.rows[0]"
           />
         </div>

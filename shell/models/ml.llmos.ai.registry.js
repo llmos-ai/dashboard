@@ -57,7 +57,11 @@ export default class ModelRegistry extends SteveModel {
 
     const data = { metadata: { annotations: { [REGISTRY.DEFAULT_REGISTRY]: value.toString() } } };
 
-    return this.patch(data, {}, true, true);
+    return this.patch(data, {
+      headers: {
+        'content-type': 'application/merge-patch+json',
+      },
+    }, true, true);
   }
 
   resetDefault() {

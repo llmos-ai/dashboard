@@ -405,7 +405,7 @@ export function init(store) {
       params: { resource: LLMOS.REGISTRY }
     },
     exact:  false,
-    weight: 79,
+    weight: 69,
   });
 
   basicType(

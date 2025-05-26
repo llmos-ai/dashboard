@@ -136,21 +136,28 @@ const save = async() => {
 
   try {
     const newLocalModel = await createLocalModel();
+    const localModelName = newLocalModel?.metadata?.name
 
     const localModelVersion = await store.dispatch(`${ inStore.value }/create`, {
       type:     LLMOS.LOCAL_MODEL_VERSION,
       metadata: {
-        name:      value.metadata.name,
+        name:      `${localModelName}-${value.metadata.name}`,
         namespace: model.value.metadata?.namespace,
       },
-      spec: { localModel: newLocalModel?.metadata?.name },
+      spec: { localModel: localModelName },
     });
 
     await localModelVersion.save();
 
     const patchData = { spec: { defaultVersion: localModelVersion?.id } };
 
-    return newLocalModel.patch(patchData, {}, true, true);
+    newLocalModel.patch(patchData, {
+      headers: {
+        'content-type': 'application/merge-patch+json',
+      },
+    }, true, true);
+
+    emit('close');
   } catch (err) {
     message.error(`Cache Fail: ${ err.message || err }`);
   }

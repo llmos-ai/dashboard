@@ -7,6 +7,7 @@ import { mergeEnvs } from '@shell/utils/merge';
 import { SETTING } from '@shell/config/settings';
 import { allHash } from '@shell/utils/promise';
 import RemoteModelList from '@shell/edit/ml.llmos.ai.modelservice/RemoteModelList.vue';
+import LocalModelList from '@shell/edit/ml.llmos.ai.modelservice/LocalModelList';
 import { _CREATE } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import ArgumentVars from './components/ArgumentVars.vue';
@@ -14,7 +15,7 @@ import ArgumentVars from './components/ArgumentVars.vue';
 export default {
   name:       'EditModelService',
   mixins:     [CreateEditView, FormValidation, LLMOSWorkload, LabeledSelect],
-  components: { RemoteModelList, ArgumentVars },
+  components: { RemoteModelList, ArgumentVars, LocalModelList },
   props:      {
     value: {
       type:     Object,
@@ -507,6 +508,13 @@ export default {
         <RemoteModelList
           v-if="current === 0 && showRemoteList"
           :key="spec.modelRegistry"
+          :default-search="spec.model"
+          class="h-full overflow-hidden"
+          :source="spec.modelRegistry"
+          @update:item="updateModelInfo"
+        />
+        <LocalModelList
+          v-else-if="current === 0 && spec.modelRegistry === 'local'"
           :default-search="spec.model"
           class="h-full overflow-hidden"
           :source="spec.modelRegistry"
