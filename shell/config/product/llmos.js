@@ -139,6 +139,7 @@ export function init(store) {
     ML_WORKLOAD_TYPES.RAY_CLUSTER,
     ML_WORKLOAD_TYPES.NOTEBOOK,
     ML_WORKLOAD_TYPES.MODEL_SERVICE,
+    LLMOS.LOCAL_MODEL,
   ]);
 
   virtualType({
@@ -155,13 +156,13 @@ export function init(store) {
   });
 
   virtualType({
-    ifHaveType: LLMOS.LOCAL_MODEL_VERSION,
-    labelKey:   `typeLabel."${ LLMOS.LOCAL_MODEL_VERSION }"`,
-    name:       LLMOS.LOCAL_MODEL_VERSION,
+    ifHaveType: LLMOS.LOCAL_MODEL,
+    labelKey:   `typeLabel."${ LLMOS.LOCAL_MODEL }"`,
+    name:       LLMOS.LOCAL_MODEL,
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.LOCAL_MODEL_VERSION  }
+      params: { resource: LLMOS.LOCAL_MODEL  }
     },
     exact:  false,
     weight: 89,
@@ -411,7 +412,6 @@ export function init(store) {
   basicType(
     [
       LLMOS.MODEL,
-      LLMOS.LOCAL_MODEL_VERSION,
       LLMOS.DATASET,
       LLMOS.REGISTRY,
     ],

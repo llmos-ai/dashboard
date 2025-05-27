@@ -80,7 +80,7 @@ export default class ModelRegistry extends SteveModel {
       action:  'cache',
       enabled: true,
       icon:    'icon icon-copy',
-      label:   this.t('modelCard.actions.cache'),
+      label:   this.t('modelCard.actions.cache.label'),
     };
 
     out.unshift(cache);
@@ -88,13 +88,53 @@ export default class ModelRegistry extends SteveModel {
     return out;
   }
 
+  get localModel() {
+    const localModel = this.$getters[`byId`](LLMOS_TYPES.LOCAL_MODEL, `${this.id}`);
+
+    return localModel || {};
+  }
+
+  async createLocalModel() {
+    const name = this.metadata?.name
+
+    if (!this.localModel.id) {
+      const resource = await this.$dispatch(`create`, {
+        type:     LLMOS_TYPES.LOCAL_MODEL,
+        metadata: {
+          name,
+          namespace: this.metadata?.namespace,
+        },
+        spec: {
+          registry:  this.spec?.registry,
+          modelName: `${ this.id }`
+        },
+      });
+
+      return await resource.save();
+    } else {
+      return this.localModel;
+    }
+  }
+
   async cache() {
-    this.$dispatch('promptModal', {
-      component:      'CreateLocalModelVersionModal',
-      modalWidth:     '600px',
-      componentProps: { 
-        modelId: this.id 
-      },
-    });
+    try {
+      const newLocalModel = await this.createLocalModel();
+      const localModelName = newLocalModel?.metadata?.name
+
+      const localModelVersion = await this.$dispatch(`create`, {
+        type:     LLMOS_TYPES.LOCAL_MODEL_VERSION,
+        metadata: {
+          name:      `${localModelName}-v1`,
+          namespace: this.metadata?.namespace,
+        },
+        spec: { localModel: localModelName },
+      });
+
+      await localModelVersion.save();
+
+      message.success(this.t('modelCard.actions.cache.success'));
+    } catch (err) {
+      message.error(`${ err.message || err }`);
+    }
   }
 }
