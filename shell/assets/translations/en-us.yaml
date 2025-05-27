@@ -6081,7 +6081,7 @@ typeLabel:
       one { Dataset }
       other { Datasets }
     }
-  ml.llmos.ai.localmodelversion: |-
+  ml.llmos.ai.localmodel: |-
     {count, plural,
       one { Local Model }
       other { Local Models }
@@ -6809,7 +6809,9 @@ modelCard:
     label: GPU
   empty: There are no models to show.
   actions: 
-    cache: Cache
+    cache: 
+      label: Create Local Model
+      success: Create Local Model Successfully
 
 LabeledTag:
   addLabel: Add Tag

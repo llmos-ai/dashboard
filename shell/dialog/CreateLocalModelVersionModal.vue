@@ -116,7 +116,7 @@ const createLocalModel = async() => {
     const resource = await store.dispatch(`${ inStore.value }/create`, {
       type:     LLMOS.LOCAL_MODEL,
       metadata: {
-        name:      `${ name }-local`,
+        name,
         namespace: model.value.metadata?.namespace,
       },
       spec: {

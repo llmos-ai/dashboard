@@ -231,6 +231,13 @@ export default {
       this.spec.model = item.id;
     },
 
+    updateLocalModelInfo(item) {
+      this.spec.model = item.id;
+      console.log(this.spec, 'spec')
+      const volume = this.spec.volumes[0]
+      
+    },
+
     updateModelRegistry() {
       this.spec.model = '';
     }
@@ -518,7 +525,7 @@ export default {
           :default-search="spec.model"
           class="h-full overflow-hidden"
           :source="spec.modelRegistry"
-          @update:item="updateModelInfo"
+          @update:item="updateLocalModelInfo"
         />
       </div>
     </div>
