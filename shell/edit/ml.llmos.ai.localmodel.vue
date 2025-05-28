@@ -1,4 +1,7 @@
 <script>
+import { groupBy } from 'lodash';
+import { message } from 'ant-design-vue';
+
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 
@@ -12,6 +15,7 @@ import ResourceTabs from '@shell/components/form/ResourceTabs';
 import { LLMOS } from '@shell/config/types';
 
 import { allHash } from '@shell/utils/promise';
+import { set } from '@shell/utils/object';
 import { LICENSES, LANGUAGES, ML_FEATURES } from '@shell/utils/dictionary';
 
 const S3 = 'S3';
@@ -45,19 +49,23 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const hash = await allHash({ registries: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.REGISTRY }) });
+    const hash = await allHash({ 
+      models: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.MODEL }),
+      localModels: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.LOCAL_MODEL }),
+      localModelVersions: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
+    });
 
-    this.registries = hash.registries || [];
+    set(this, 'models', hash.models || []);
   },
 
   data() {
-    const resource = { spec: { datasetCard: { metadata: { splitTypes: [] } } } };
+    const resource = { spec: {  } };
 
     Object.assign(resource, this.value);
 
     return {
       errors:     [],
-      registries: [],
+      models: [],
       resource,
     };
   },
@@ -68,110 +76,83 @@ export default {
   },
 
   computed: {
-    backendTypes() {
-      return [{
-        label: this.t('modelRegistry.backendType.options.s3'),
-        value: S3,
-      }];
-    },
-
-    validationPassed() {
-      return (
-        !!this.value.metadata.name &&
-        !!this.resource.spec.registry
-      );
-    },
-
-    registryOptions() {
-      const out = (this.registries || []).map((registry) => ({
-        label: registry.id,
-        value: registry.id,
-      }));
-
-      const defaultRegistry = this.registries.find((registry) => registry.isDefault) || {};
-
-      if (defaultRegistry?.id) {
-        out.unshift({
-          label: this.t('modelRegistry.useDefault'),
-          value: this.t('modelRegistry.useDefault'),
-        });
+    modelOptions() {
+      if (!this.models) {
+        return [];
       }
+
+      const map = groupBy(this.models, 'metadata.namespace');
+
+      const out = Object.keys(map).reduce((out, namespace) => {
+        const groupOption = {
+          kind: 'group',
+          label: `${this.t('nameNsDescription.namespace.label')}: ${namespace}`,
+        };
+
+        return [
+          ...out,
+          groupOption,
+          ...map[namespace].map((model) => ({
+            label: model.metadata.name,
+            value: model.id,
+          })),
+        ];
+      }, []);
 
       return out;
     },
 
-    licenseOptions() {
-      return LICENSES;
-    },
-
-    splitTypeOptions() {
-      return [{
-        label: 'Train',
-        value: 'train',
-      }, {
-        label: 'Test',
-        value: 'test',
-      }, {
-        label: 'Validation',
-        value: 'validation',
-      }];
-    },
-
-    featureOptions() {
-      return ML_FEATURES;
-    },
-
-    languageOptions() {
-      return LANGUAGES;
-    },
-
-    authorOptions() {
-      return [];
-    },
-
-    tagOptions() {
-      return [];
+    selectedModel() {
+      return this.models.find((model) => model.id === this.resource.spec.modelName);
     },
 
     inStore() {
       return this.$store.getters['currentProduct'].inStore;
     },
 
-    versionSchema() {
-      return this.$store.getters[`${ this.inStore }/schemaFor`](LLMOS.DATASET_VERSION);
+    hasLocalModel() {
+      const localModel = this.$store.getters[`${ this.inStore }/byId`](LLMOS.LOCAL_MODEL, this.resource.spec.modelName) || {};
+
+      return !!localModel.id
     },
   },
 
   methods: {
-    willSave() {
-      Object.assign(this.value, this.resource);
+    async willSave() {
+      const model = this.selectedModel;
+      const name = model.metadata?.name
 
-      if (this.resource.spec.registry === this.t('modelRegistry.useDefault')) {
-        const defaultRegistry = this.registries.find((registry) => registry.isDefault) || {};
-
-        this.resource.spec.registry = defaultRegistry.id;
-      }
+      Object.assign(this.value, {
+        metadata: {
+          name,
+          namespace: model?.metadata?.namespace,
+        },
+        spec: {
+          registry:  model?.spec?.registry,
+          modelName: this.resource.spec.modelName,
+        },
+      });
     },
 
     async afterSave() {
       const errors = [];
 
       try {
-        const url = this.versionSchema.linkFor('collection');
+        const newLocalModel = this.value;
+        const localModelName = newLocalModel?.metadata?.name
 
-        const model = await this.$store.dispatch(`${ this.inStore }/create`, {
+        const localModelVersion = await this.$store.dispatch(`${ this.inStore }/create`, {
+          type:     LLMOS.LOCAL_MODEL_VERSION,
           metadata: {
-            generateName: 'v1-',
-            namespace:    this.value.metadata.namespace,
+            name:      `${localModelName}-${newLocalModel.nextVersion}`,
+            namespace: newLocalModel.metadata?.namespace,
           },
-          spec: {
-            dataset:           this.value.metadata.name,
-            version:           'v1.0.0',
-            enableFastLoading: true
-          },
+          spec: { localModel: localModelName },
         });
 
-        await model.save({ url });
+        await localModelVersion.save();
+
+        message.success(`Local Model ${localModelName} Version ${newLocalModel.nextVersion} created successfully`);
       } catch (e) {
         errors.push(e.message);
       }
@@ -181,7 +162,24 @@ export default {
       } else {
         return Promise.reject(errors);
       }
-    }
+    },
+
+    async actuallySave(url) {
+      if ( this.isCreate ) {
+        if (this.hasLocalModel) {
+          return Promise.resolve();
+        }
+
+        url = url || this.schema.linkFor('collection');
+        const res = await this.value.save({ url });
+
+        if (res) {
+          Object.assign(this.value, res);
+        }
+      } else {
+        await this.value.save();
+      }
+    },
   }
 };
 </script>
@@ -213,11 +211,11 @@ export default {
         <div class="row mb-10">
           <div class="col span-12">
             <LabeledSelect
-              v-model:value="resource.spec.registry"
-              :options="registryOptions"
+              v-model:value="resource.spec.modelName"
+              :options="modelOptions"
               :mode="mode"
               :multiple="false"
-              label-key="datasetCard.registry.label"
+              label-key="localModel.modelName.label"
               required
             />
           </div>

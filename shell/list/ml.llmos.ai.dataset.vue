@@ -67,5 +67,6 @@ export default {
     :headers="headers"
     :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
     :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
+    groupable
   />
 </template>

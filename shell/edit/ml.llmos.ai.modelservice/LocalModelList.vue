@@ -5,6 +5,7 @@ import {
   FolderOutlined,
   HeartOutlined,
   DownloadOutlined,
+  MenuUnfoldOutlined,
 } from '@ant-design/icons-vue';
 import LiveDate from '@shell/components/formatter/LiveDate.vue';
 import dayjs from 'dayjs';
@@ -66,6 +67,7 @@ const apiConfig = computed(() => {
 onMounted(async() => {
   await allHash({
     localModels: await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL }),
+    localModelVersions: await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
   });
 });
 
@@ -74,11 +76,12 @@ const listData = computed(() => {
 });
 
 const formatDataSource = computed(() => {
-  console.log(listData.value, 'vale')
   return listData.value.map((item) => {
     return {
       id:          item.id,
-      createdAt:   item.createdAt,
+      createdAt:   item.creationTimestamp,
+      versions:    item.localModelVersionOptions,
+      item,
     };
   })
 });
@@ -95,15 +98,6 @@ const handleItemClick = (item) => {
   readme.value = '';
 };
 
-// readme logic
-const readmeUrl = computed(() => {
-  if (!activeItem.value.id) return '';
-
-  return `/proxy?url=${ encodeURIComponent(apiConfig.value.detailUrl(activeItem.value.id)) }`;
-});
-
-const debouncedReadmeUrl = debouncedRef(readmeUrl, 500);
-const { data: readme, isFetching: readmeLoading, execute: readmeFetchExecute } = useFetch(readmeUrl, { immediate: false }, { refetch: true }).get();
 const formatReadme = computed(() => {
   if (props.source === 'huggingface') {
     return removeFrontMatter(readme.value);
@@ -120,8 +114,6 @@ const formatReadme = computed(() => {
   }
 });
 
-watch(debouncedReadmeUrl, () => readmeFetchExecute);
-
 watchEffect(() => {
   if (formatDataSource.value && formatDataSource.value.length > 0 && !activeItem.value.id) {
     if (!props.defaultSearch) {
@@ -133,16 +125,21 @@ watchEffect(() => {
   }
 });
 
+// 添加展开状态控制
+const expandedItems = ref(new Set());
+
+const toggleExpand = (itemId) => {
+  if (expandedItems.value.has(itemId)) {
+    expandedItems.value.delete(itemId);
+  } else {
+    expandedItems.value.add(itemId);
+  }
+};
 </script>
 
 <template>
   <a-row :gutter="16">
-    <a-col
-      :sm="10"
-      :lg="10"
-      :xl="9"
-      :xxl="6"
-    >
+    <a-col :sm="10" :lg="10" :xl="9" :xxl="6">
       <div class="flex flex-col h-full">
         <a-input
           v-model:value="search"
@@ -159,37 +156,60 @@ watchEffect(() => {
               :loading="loading"
             >
               <template #renderItem="{ item }">
-                <a-list-item
-                  :key="item._id"
-                  class="border-gray-200 border mb-2 p-2 cursor-pointer rounded-lg pr-2"
-                  :class="{ 'bg-gray-200': activeItem.id === item.id }"
-                  @click="handleItemClick(item)"
-                >
-                  <a-list-item-meta>
-                    <template #description>
-                      <div class="title flex items-center mb-2">
-                        <FolderOutlined class="mr-2" />
-                        <span class="text-black text-sm">{{ item.id }}</span>
-                      </div>
-                      <div class="footer flex items-center space-x-1">
-                        <span
-                          class="text-xs w-[80px] flex items-center justify-start"
-                        >
-                          <LiveDate
-                            :add-suffix="true"
-                            :value="item.createdAt"
-                          />
-                        </span>
-                        <div class="ml-auto flex">
-                          <span
-                            class="text-xs w-[50px] flex items-center justify-start"
-                          >
-                          </span>
+                <div class="model-item-container">
+                  <a-list-item
+                    :key="item._id"
+                    class="border-gray-200 border mb-2 p-2 cursor-pointer rounded-lg pr-2"
+                    :class="{ 'bg-gray-200': activeItem.id === item.id }"
+                  >
+                    <a-list-item-meta @click="handleItemClick(item)">
+                      <template #description>
+                        <div class="title flex items-center mb-2">
+                          <FolderOutlined class="mr-2" />
+                          <span class="text-black text-sm">{{ item.id }}</span>
                         </div>
-                      </div>
-                    </template>
-                  </a-list-item-meta>
-                </a-list-item>
+                        <div class="footer flex items-center space-x-1">
+                          <span class="text-xs w-[80px] flex items-center justify-start">
+                            <LiveDate :add-suffix="true" :value="item.createdAt" />
+                          </span>
+                          <div class="ml-auto flex items-center">
+                            <a-button
+                              type="link"
+                              size="small"
+                              class="p-0"
+                              @click.stop="toggleExpand(item.id)"
+                            >
+                              <MenuUnfoldOutlined
+                                :class="{ 'transform rotate-90': expandedItems.has(item.id) }"
+                              />
+                            </a-button>
+                          </div>
+                        </div>
+                      </template>
+                    </a-list-item-meta>
+                  </a-list-item>
+                  
+                  <!-- 版本子列表 -->
+                  <div v-if="expandedItems.has(item.id)" class="ml-4">
+                    <a-list
+                      :data-source="item.versions"
+                      :split="false"
+                      size="small"
+                    >
+                      <template #renderItem="{ item: version }">
+                        <a-list-item
+                          class="border-gray-200 border mb-2 p-1 cursor-pointer rounded-lg"
+                          :class="{ 'bg-gray-100': activeItem.id === version.id }"
+                        >
+                          <div class="text-sm">{{ version.label }}</div>
+                          <div class="text-xs text-gray-500">
+                            <LiveDate :add-suffix="true" :value="version.age" />
+                          </div>
+                        </a-list-item>
+                      </template>
+                    </a-list>
+                  </div>
+                </div>
               </template>
             </a-list>
           </simplebar>
@@ -207,21 +227,28 @@ watchEffect(() => {
       <div class="flex flex-col h-full">
         <div class="h-[0] grow-1">
           <simplebar class="h-full">
-            <a-spin
-              :spinning="readmeLoading"
-              style="height: 100%"
-              class="!h-full"
-              :delay="500"
-            >
-              <MarkedView
-                v-if="formatReadme"
-                :content="formatReadme"
-                :clearHtml="false"
-              />
-            </a-spin>
+            <MarkedView
+              v-if="formatReadme"
+              :content="formatReadme"
+              :clearHtml="false"
+            />
           </simplebar>
         </div>
       </div>
     </a-col>
   </a-row>
 </template>
+
+<style scoped>
+.model-item-container {
+  margin-bottom: 8px;
+}
+
+.transform {
+  transition: transform 0.2s;
+}
+
+.rotate-90 {
+  transform: rotate(90deg);
+}
+</style>
