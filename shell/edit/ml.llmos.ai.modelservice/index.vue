@@ -234,7 +234,7 @@ export default {
     updateLocalModelInfo(item) {
       this.spec.model = item.id;
       console.log(this.spec, 'spec')
-      const volume = this.spec.volumes[0]
+      const volume = this.spec.volumeClaimTemplates[0]
       
     },
 

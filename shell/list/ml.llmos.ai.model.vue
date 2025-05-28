@@ -6,6 +6,9 @@ import ActionMenu from '@shell/components/ActionMenuShell.vue';
 
 import ResourceFetch from '@shell/mixins/resource-fetch';
 
+import { allHash } from '@shell/utils/promise';
+import { LLMOS } from '@shell/config/types';
+
 export default {
   name: 'ModelList',
 
@@ -156,10 +159,18 @@ export default {
         value: '推理模型',
       }];
     },
+
+    inStore() {
+      return this.$store.getters['currentProduct'].inStore;
+    },
   },
 
   async fetch() {
-    await this.$fetchType(this.resource);
+    await allHash({ 
+      models: this.$fetchType(this.resource),
+      localModels: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL }),
+      localModelVersions: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
+    });
   },
 
   methods: {

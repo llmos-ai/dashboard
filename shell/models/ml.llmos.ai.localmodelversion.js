@@ -47,11 +47,6 @@ export default class LocalModelVersion extends SteveModel {
     return out;
   }
 
-  get sourceModelDisplay() {
-    const name = (this.spec?.localModel || '').slice(0, -6)
-    return `${this.metadata.namespace}/${name}`
-  }
-
   get groupByModel() {
     const name = `${this.metadata.namespace}/${this.spec?.localModel}` || this.$rootGetters['i18n/t']('generic.none');
 

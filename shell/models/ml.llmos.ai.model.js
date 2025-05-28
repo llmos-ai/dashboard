@@ -124,7 +124,7 @@ export default class ModelRegistry extends SteveModel {
       const localModelVersion = await this.$dispatch(`create`, {
         type:     LLMOS_TYPES.LOCAL_MODEL_VERSION,
         metadata: {
-          name:      `${localModelName}-v1`,
+          name:      `${localModelName}-${newLocalModel.nextVersion}`,
           namespace: this.metadata?.namespace,
         },
         spec: { localModel: localModelName },
@@ -132,7 +132,7 @@ export default class ModelRegistry extends SteveModel {
 
       await localModelVersion.save();
 
-      message.success(this.t('modelCard.actions.cache.success'));
+      message.success(`Local Model ${localModelName} Version ${newLocalModel.nextVersion} created successfully`);
     } catch (err) {
       message.error(`${ err.message || err }`);
     }

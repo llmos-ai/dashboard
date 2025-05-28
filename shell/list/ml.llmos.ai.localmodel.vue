@@ -34,6 +34,7 @@ export default {
 
     await allHash({
       resource:        await this.$fetchType(this.resource),
+      localModelVersions: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
     });
   },
 
@@ -53,7 +54,7 @@ export default {
       ];
 
       return headers;
-    }
+    },
   },
 };
 </script>
@@ -66,5 +67,6 @@ export default {
     :headers="headers"
     :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
     :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
+    groupable
   />
 </template>

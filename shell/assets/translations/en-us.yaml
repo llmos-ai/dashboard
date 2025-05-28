@@ -6885,6 +6885,11 @@ localModel:
     label: Source Model
   volumeSnapshot:
     label: Volume Snapshot
+  modelName:
+    label: Model Name
+  actions:
+    fetchOrigin:
+      label: Fetch Origin Model
 
 createLocalModelVersionModal:
   title: Cache Model
