@@ -9,6 +9,7 @@ import { STORAGE_CLASS, PV } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
 import { get } from '@shell/utils/object';
 import Mount from '@shell/edit/workload/storage/Mount.vue';
+import { REGISTRY as REGISTRY_ANNOTATIONS } from '@shell/config/labels-annotations';
 
 export default {
 
@@ -52,6 +53,7 @@ export default {
     },
   },
   async fetch() {
+    console.log(this.value, 'value')
     const hash = await allHash({
       storageClasses:    this.$store.dispatch('cluster/findAll', { type: STORAGE_CLASS }),
       persistentVolumes: this.$store.dispatch('cluster/findAll', { type: PV }),
@@ -109,6 +111,10 @@ export default {
 
     isCreate() {
       return this.mode === 'create';
+    },
+
+    isLocalModel() {
+      return this.value.metadata?.annotations?.[REGISTRY_ANNOTATIONS.IS_LOCAL_MODEL] === 'true';
     },
 
     ...mapGetters({ t: 'i18n/t' })
@@ -178,7 +184,7 @@ export default {
             :mode="mode"
             :label="t('volume.persistentVolumeClaim.name')"
             :required="true"
-            :disabled="!isCreate"
+            :disabled="!isCreate || isLocalModel"
             @update:value="$emit('input', value)"
           />
         </div>
@@ -207,7 +213,7 @@ export default {
             data-testid="storage-class-name"
             :mode="mode"
             :required="true"
-            :disabled="!isCreate"
+            :disabled="!isCreate || isLocalModel"
             :label="t('persistentVolumeClaim.storageClass')"
             :options="storageClassNames"
           />

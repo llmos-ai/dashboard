@@ -12,6 +12,7 @@ import SteveModel from '@shell/plugins/steve/steve-class';
 import { STATES_ENUM } from '@shell/plugins/dashboard-store/resource-class';
 import { LLMOS, STORAGE_CLASS } from '@shell/config/types';
 import { clone } from '@shell/utils/object';
+import { REGISTRY as REGISTRY_ANNOTATIONS } from '@shell/config/labels-annotations'
 
 export default class PVC extends SteveModel {
   applyDefaults(_, realMode) {
@@ -93,5 +94,10 @@ export default class PVC extends SteveModel {
 
   get phaseState() {
     return this.status?.phase || 'N/A';
+  }
+
+  get isLocalModel() {
+    console.log(this.metadata?.annotations, 'annotations');
+    return this.metadata?.annotations?.[REGISTRY_ANNOTATIONS.IS_LOCAL_MODEL] === 'true';
   }
 }

@@ -36,39 +36,27 @@ const props = defineProps({
 });
 
 const search = ref(props.defaultSearch);
-const apiConfig = computed(() => {
-  if (props.source === 'huggingface') {
-    return {
-      listUrl:   `https://huggingface.co/api/models?limit=100&search=${ search.value }&pipeline_tag=text-generation&sort=trendingScore`,
-      detailUrl: (id) => `https://huggingface.co/${ id }/resolve/main/README.md`,
-      method:    'GET',
-      body:      null,
-    };
-  } else if (props.source === 'modelscope') {
-    return {
-      listUrl:   `https://www.modelscope.cn/api/v1/dolphin/models`,
-      detailUrl: (id) => `https://modelscope.cn/api/v1/models/${ id }`,
-      method:    'PUT',
-      body:      JSON.stringify({
-        Name:       search.value,
-        tags:       [],
-        tasks:      [],
-        SortBy:     'Default',
-        PageSize:   100,
-        PageNumber: 1,
-      }),
-    };
-  }
-
-  return {};
-});
-
+const loading = ref(false);
+const activeItem = ref({});
+const activeVersion = ref(null);
 
 onMounted(async() => {
-  await allHash({
+  loading.value = true;
+
+  const res = await allHash({
     localModels: await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL }),
     localModelVersions: await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
   });
+
+  const localModel = res.localModels[0] || {}
+  activeItem.value = localModel
+
+  const defaultVersion = localModel.defaultLocalModelVersion
+
+  emits('update:item', defaultVersion);
+  activeVersion.value = defaultVersion.id;
+
+  loading.value = false;
 });
 
 const listData = computed(() => {
@@ -76,14 +64,9 @@ const listData = computed(() => {
 });
 
 const formatDataSource = computed(() => {
-  return listData.value.map((item) => {
-    return {
-      id:          item.id,
-      createdAt:   item.creationTimestamp,
-      versions:    item.localModelVersionOptions,
-      item,
-    };
-  })
+  return listData.value.filter((item) => {
+    return item.id.includes(search.value);
+  });
 });
 
 const removeFrontMatter = (markdown) => {
@@ -91,38 +74,40 @@ const removeFrontMatter = (markdown) => {
 };
 
 // click choose logic
-const activeItem = ref({});
+
 const handleItemClick = (item) => {
-  emits('update:item', item);
+  if (activeItem.value?.id !== item.id) {
+    expandedItems.value.clear();
+  }
+
   activeItem.value = item;
-  readme.value = '';
+
+  const version = item.defaultLocalModelVersion || {};
+  emits('update:item', version);
+  activeVersion.value = version.id;
+};
+
+const onVersionClick = (version) => {
+  activeVersion.value = version.value;
+
+  const selectedVersion = store.getters[`cluster/byId`](LLMOS.LOCAL_MODEL_VERSION, version.value) || {};
+  emits('update:item', selectedVersion);
 };
 
 const formatReadme = computed(() => {
-  if (props.source === 'huggingface') {
-    return removeFrontMatter(readme.value);
-  } else {
-    let readmeJson = '';
+  let readmeJson = '';
 
-    try {
-      readmeJson = JSON.parse(readme.value);
-    } catch (err) {
-      return '';
-    }
-
-    return readmeJson?.Data?.ReadMeContent;
+  try {
+    readmeJson = JSON.parse(readme.value);
+  } catch (err) {
+    return '';
   }
+
+  return readmeJson?.Data?.ReadMeContent;
 });
 
-watchEffect(() => {
-  if (formatDataSource.value && formatDataSource.value.length > 0 && !activeItem.value.id) {
-    if (!props.defaultSearch) {
-      activeItem.value = formatDataSource.value[0];
-      emits('update:item', formatDataSource.value[0]);
-    } else {
-      activeItem.value = formatDataSource.value.find((item) => item.id === props.defaultSearch);
-    }
-  }
+const canShowVersions = computed(() => {
+  return activeItem.value?.id || '';
 });
 
 // 添加展开状态控制
@@ -170,10 +155,11 @@ const toggleExpand = (itemId) => {
                         </div>
                         <div class="footer flex items-center space-x-1">
                           <span class="text-xs w-[80px] flex items-center justify-start">
-                            <LiveDate :add-suffix="true" :value="item.createdAt" />
+                            <LiveDate :add-suffix="true" :value="item.creationTimestamp" />
                           </span>
                           <div class="ml-auto flex items-center">
                             <a-button
+                              v-if="canShowVersions === item.id"
                               type="link"
                               size="small"
                               class="p-0"
@@ -192,14 +178,16 @@ const toggleExpand = (itemId) => {
                   <!-- 版本子列表 -->
                   <div v-if="expandedItems.has(item.id)" class="ml-4">
                     <a-list
-                      :data-source="item.versions"
+                      :data-source="item.localModelVersionOptions"
                       :split="false"
                       size="small"
                     >
                       <template #renderItem="{ item: version }">
+                        <!-- 在版本列表项中添加选中状态 -->
                         <a-list-item
                           class="border-gray-200 border mb-2 p-1 cursor-pointer rounded-lg"
-                          :class="{ 'bg-gray-100': activeItem.id === version.id }"
+                          :class="{ 'bg-gray-100': activeVersion === version.value }"
+                          @click="onVersionClick(version)"
                         >
                           <div class="text-sm">{{ version.label }}</div>
                           <div class="text-xs text-gray-500">

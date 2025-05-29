@@ -168,9 +168,13 @@ export function init(store) {
     weight: 89,
   });
 
+  configureType(LLMOS.LOCAL_MODEL, {
+    isEditable: false,
+  });
+
   configureType(LLMOS.LOCAL_MODEL_VERSION, {
     isCreatable: false, 
-    isEditable: true,
+    isEditable: false,
     listGroups: [
       {
         icon:       'icon-cluster',

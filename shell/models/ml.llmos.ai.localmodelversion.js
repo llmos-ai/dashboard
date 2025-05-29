@@ -1,7 +1,7 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
 
 import { REGISTRY } from '@shell/config/labels-annotations';
-import { LLMOS } from '@shell/config/types';
+import { LLMOS, PVC } from '@shell/config/types';
 
 import { set } from '@shell/utils/object';
 import { escapeHtml } from '@shell/utils/string';
@@ -45,6 +45,10 @@ export default class LocalModelVersion extends SteveModel {
     }
 
     return out;
+  }
+
+  get volumeClaims() {
+    return this.$getters['byId'](PVC, this.id) || {}
   }
 
   get groupByModel() {
