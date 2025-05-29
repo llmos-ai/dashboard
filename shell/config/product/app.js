@@ -1,4 +1,7 @@
 import { DSL } from '@shell/store/type-map';
+import {
+  LLMOS,
+} from '@shell/config/types';
 
 export const NAME = 'apps';
 
@@ -7,6 +10,7 @@ export function init(store) {
     product,
     basicType,
     virtualType,
+    configureType,
   } = DSL(store, NAME);
 
   product({
@@ -31,14 +35,25 @@ export function init(store) {
 
   virtualType({
     labelKey:   'apps.data.label',
-    name:       'app-data',
+    name:       'apps.dataset',
     namespaced: false,
     weight:     98,
     icon:       'folder',
     route:      {
-      name:   `c-cluster-apps-dataCenter`,
-      params: { cluster: 'local' }
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.DATASET  }
     },
+  });
+
+  configureType('apps.dataset', {
+    location:   {
+      name:   `c-cluster-product-resource`,
+      params: { resource: LLMOS.DATASET }
+    },
+    resource:       LLMOS.DATASET,
+    resourceDetail: 'apps.dataset',
+    resourceEdit:   'apps.dataset',
+    isCreatable: true,
   });
 
   virtualType({
@@ -55,7 +70,7 @@ export function init(store) {
 
   basicType([
     'app-manage',
-    'app-data',
+    'apps.dataset',
     'app-knowledge'
   ]);
 }
