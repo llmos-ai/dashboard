@@ -2,8 +2,9 @@
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkload from '@shell/mixins/llmos/ml-workload';
-import { MANAGEMENT } from '@shell/config/types';
+import { MANAGEMENT, PVC } from '@shell/config/types';
 import { mergeEnvs } from '@shell/utils/merge';
+import { REGISTRY as REGISTRY_ANNOTATIONS } from '@shell/config/labels-annotations'
 import { SETTING } from '@shell/config/settings';
 import { allHash } from '@shell/utils/promise';
 import RemoteModelList from '@shell/edit/ml.llmos.ai.modelservice/RemoteModelList.vue';
@@ -44,6 +45,7 @@ export default {
         SETTING.MODEL_SERVICE_DEFAULT_IMAGE
       ),
       settings: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }),
+      volumeClaims: this.$store.dispatch(`${ inStore }/findAll`, { type: PVC }),
     });
 
     const huggingFaceProxy = hash.settings?.find(
@@ -231,11 +233,42 @@ export default {
       this.spec.model = item.id;
     },
 
-    updateLocalModelInfo(item) {
-      this.spec.model = item.id;
-      console.log(this.spec, 'spec')
-      const volume = this.spec.volumeClaimTemplates[0]
-      
+    async updateLocalModelInfo(localModelVersion={}) {
+      const volumeClaims = localModelVersion.volumeClaims
+      this.spec.model = `${localModelVersion.metadata.namespace}/${localModelVersion.spec.localModel}`;
+
+      const volumeClaimTemplate = this.spec.volumeClaimTemplates[0]
+      const containerTemplate = this.spec.template.spec.containers[0]
+      const volumeMounts = containerTemplate.volumeMounts[0];
+
+      Object.assign(containerTemplate, {
+        volumeMounts: [{
+          name: volumeClaims?.spec?.volumeName,
+          mountPath: '/root/.cache',
+        }]
+      })
+
+      const pvc = await this.$store.dispatch('cluster/create', {
+        metadata: {
+          name: volumeClaims?.spec?.volumeName,
+          namespace: volumeClaims?.metadata?.namespace,
+          annotations: {
+            [REGISTRY_ANNOTATIONS.IS_LOCAL_MODEL]: 'true',
+          },
+        },
+        spec: {
+          storageClassName: volumeClaims?.spec?.storageClassName,
+          resources: {
+            requests: {
+              storage: volumeClaims?.spec?.resources?.requests?.storage,
+            }
+          },
+          accessModes: ['ReadWriteOnce'],
+        },
+        type: PVC,
+      });
+
+      Object.assign(volumeClaimTemplate, pvc)
     },
 
     updateModelRegistry() {
