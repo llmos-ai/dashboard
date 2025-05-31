@@ -1,1 +1,2 @@
-export const getAllSchemaAPI = '/api/v1/namespaces/llmos-agents/services/http:weaviate:80/proxy/v1/schema';
+const baseUrl = '/proxy/vectorDB'
+export const getAllSchemaAPI = `${ baseUrl }/v1/schema`;
