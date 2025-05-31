@@ -1,5 +1,5 @@
 <script>
-import { getAllSchemaAPI } from '@/shell/config/weaviate';
+import { getAllSchemaAPI, createObjectAPI } from '@/shell/config/weaviate';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
@@ -92,6 +92,52 @@ export default {
         buttonDone(false);
       }
     },
+    
+    // async clickSave(buttonDone) {
+    //   const inStore = this.$store.getters['currentProduct'].inStore;
+
+    //   try {
+    //     await this.$store.dispatch(
+    //       `${inStore}/request`,
+    //       {
+    //         url: createObjectAPI,
+    //         method: 'POST',
+    //         data: {
+    //           class: this.value.className,
+    //           description: '知识库集合',
+    //           vectorizer: 'none',
+    //           vectorIndexType: 'hnsw',
+    //           vectorIndexConfig: {
+    //             distance: 'cosine',
+    //             efConstruction: 200,
+    //             maxConnections: 64
+    //           },
+    //           properties: [
+    //             {
+    //               name: 'text',
+    //               description: '文本内容',
+    //               dataType: ['text'],
+    //               tokenization: 'word',
+    //               indexFilterable: true,
+    //               indexSearchable: true
+    //             }
+    //           ]
+    //         }
+    //       }
+    //     );
+    //     this.$message.success('创建成功');
+
+    //     buttonDone(true);
+
+    //     this.confirmCancel()
+
+    //     return 
+    //   } catch (error) {
+    //     this.$message.error('创建失败：' + error?.error?.[0]?.message);
+
+    //     buttonDone(false);
+    //   }
+    // },
 
     confirmCancel() {
       this.$router.push(this.location);
