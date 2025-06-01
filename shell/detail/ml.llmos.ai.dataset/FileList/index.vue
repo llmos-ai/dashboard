@@ -1,6 +1,4 @@
-<script setup>
-import { ref, defineProps, computed, defineEmits } from 'vue';
-import { useStore } from 'vuex';
+<script>
 import { DownOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
@@ -8,172 +6,176 @@ import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileLis
 
 import FileItem from './FileItem';
 
-const store = useStore();
-
-const props = defineProps({
-  files: {
-    type:    Array,
-    default: () => ([]),
-  },
-
-  resource: {
-    type:     Object,
-    required: true,
-  },
-
-  datasetVersions: {
-    type:    Array,
-    default: () => ([]),
-  },
-
-  datasetVersion: {
-    type:    Object,
-    default: () => ({}),
-  },
-});
-
-const emit = defineEmits(['fetchFiles']);
-
-const downloading = ref(false);
-const uploading = ref(false);
-const currentPath = ref('');
-const selectedVersion = ref('');
-
-const {
-  percent,
-  uploadStatus,
-  uploadFile,
-} = useFileList({ props: { resource: props.datasetVersion } });
-
-const datesetVersionOptions = computed(() => {
-  return props.resource.datasetVersions.map((version) => {
-    return {
-      value: version.spec.version,
-      label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
-    };
-  });
-});
-
-selectedVersion.value = (datesetVersionOptions.value[0] || {}).value;
-
-const onDownload = async() => {
-  downloading.value = true;
-
-  const inStore = store.getters['currentProduct'].inStore;
-  const res = await props.datasetVersion.doAction('download', {}, { responseType: 'blob' });
-
-  const fileName = `${ props.datasetVersion.metadata.name }.zip`;
-
-  const url = window.URL.createObjectURL(res.data);
-  const link = document.createElement('a');
-
-  link.href = url;
-  link.download = fileName;
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  window.URL.revokeObjectURL(url);
-
-  downloading.value = false;
-};
-
-const onCreateFolder = async() => {
-  store.dispatch('cluster/promptModal', {
-    component:      'CreateFolderModal',
-    modalWidth:     '600px',
-    resources:      [props.datasetVersion],
-    componentProps: {
-      saveCb: () => {
-        emit('fetchFiles', currentPath.value);
-      },
-      currentPath: currentPath.value,
-    },
-  });
-};
-
-const fetchFiles = async(targetFilePath) => {
-  currentPath.value = targetFilePath;
-  emit('fetchFiles', targetFilePath);
-};
-
-const onUpload = async(options) => {
-  const { file } = options;
-
-  try {
-    uploading.value = true;
-
-    const formData = new FormData();
-
-    formData.append('file', file);
-    formData.append('data', JSON.stringify({
-      targetDirectory: currentPath.value,
-      relativePath:    '',
-    }));
-
-    await uploadFile(formData);
-
-    message.success('Upload Success');
-    emit('fetchFiles');
-  } catch (err) {
-    message.error(`Upload Fail: ${ err }`);
-  } finally {
-    uploading.value = false;
-    uploadStatus.value = '';
-    percent.value = 0;
-  }
-};
-
-const onFolderUpload = async(options) => {
-  const { file } = options;
-
-  try {
-    uploading.value = true;
-
-    const relativePath = file.webkitRelativePath || '';
-    const pathArray = relativePath.split('/');
-
-    pathArray.pop();
-
-    const formData = new FormData();
-
-    formData.append('file', file);
-    formData.append('data', JSON.stringify({
-      targetDirectory: currentPath.value,
-      relativePaths:   pathArray,
-    }));
-
-    await uploadFile(formData);
-
-    message.success('Upload Success');
-    emit('fetchFiles');
-  } catch (err) {
-    message.error(`Upload Fail: ${ err }`);
-  } finally {
-    uploading.value = false;
-    uploadStatus.value = '';
-    percent.value = 0;
-  }
-};
-
-const onBack = () => {
-  const parentPath = currentPath.value.split('/').slice(0, -2).join('/');
-
-  currentPath.value = parentPath || '';
-  emit('fetchFiles', parentPath);
-};
-
-const switchVersion = () => {
-  emit('fetchFiles', '', selectedVersion.value);
-};
-</script>
-
-<script>
 export default {
-  setup() {
+  components: {
+    DownOutlined,
+    FileItem
+  },
 
-  }
+  props: {
+    files: {
+      type:    Array,
+      default: () => ([]),
+    },
+
+    resource: {
+      type:     Object,
+      required: true,
+    },
+
+    datasetVersions: {
+      type:    Array,
+      default: () => ([]),
+    },
+
+    datasetVersion: {
+      type:    Object,
+      default: () => ({}),
+    },
+  },
+
+  emits: ['fetchFiles'],
+
+  data() {
+    return {
+      downloading: false,
+      uploading: false,
+      currentPath: '',
+      selectedVersion: '',
+      percent: 0,
+      uploadStatus: '',
+    };
+  },
+
+  computed: {
+    datesetVersionOptions() {
+      return this.resource.datasetVersions.map((version) => {
+        return {
+          value: version.spec.version,
+          label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
+        };
+      });
+    },
+  },
+
+  created() {
+    this.selectedVersion = (this.datesetVersionOptions[0] || {}).value;
+    const { percent, uploadStatus, uploadFile } = useFileList({ props: { resource: this.datasetVersion } });
+    this.uploadFile = uploadFile;
+    this.percent = percent;
+    this.uploadStatus = uploadStatus;
+  },
+
+  methods: {
+    async onDownload() {
+      this.downloading = true;
+
+      const res = await this.datasetVersion.doAction('download', {}, { responseType: 'blob' });
+      const fileName = `${ this.datasetVersion.metadata.name }.zip`;
+      const url = window.URL.createObjectURL(res.data);
+      const link = document.createElement('a');
+
+      link.href = url;
+      link.download = fileName;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(url);
+
+      this.downloading = false;
+    },
+
+    async onCreateFolder() {
+      this.$store.dispatch('cluster/promptModal', {
+        component:      'CreateFolderModal',
+        modalWidth:     '600px',
+        resources:      [this.datasetVersion],
+        componentProps: {
+          saveCb: () => {
+            this.$emit('fetchFiles', this.currentPath);
+          },
+          currentPath: this.currentPath,
+        },
+      });
+    },
+
+    async fetchFiles(targetFilePath) {
+      this.currentPath = targetFilePath;
+      this.$emit('fetchFiles', targetFilePath);
+    },
+
+    async onUpload(options) {
+      const { file } = options;
+
+      try {
+        this.uploading = true;
+
+        const formData = new FormData();
+
+        formData.append('file', file);
+        formData.append('data', JSON.stringify({
+          targetDirectory: this.currentPath,
+          relativePath:    '',
+        }));
+
+        await this.uploadFile(formData);
+
+        message.success('Upload Success');
+        this.$emit('fetchFiles');
+      } catch (err) {
+        message.error(`Upload Fail: ${ err }`);
+      } finally {
+        this.uploading = false;
+        this.uploadStatus = '';
+        this.percent = 0;
+      }
+    },
+
+    async onFolderUpload(options) {
+      const { file } = options;
+
+      try {
+        this.uploading = true;
+
+        const relativePath = file.webkitRelativePath || '';
+        const pathArray = relativePath.split('/');
+
+        pathArray.pop();
+
+        const formData = new FormData();
+
+        formData.append('file', file);
+        formData.append('data', JSON.stringify({
+          targetDirectory: this.currentPath,
+          relativePaths:   pathArray,
+        }));
+
+        await this.uploadFile(formData);
+
+        message.success('Upload Success');
+        this.$emit('fetchFiles');
+      } catch (err) {
+        message.error(`Upload Fail: ${ err }`);
+      } finally {
+        this.uploading = false;
+        this.uploadStatus = '';
+        this.percent = 0;
+      }
+    },
+
+    onBack() {
+      const parentPath = this.currentPath.split('/').slice(0, -2).join('/');
+
+      this.currentPath = parentPath || '';
+      this.$emit('fetchFiles', parentPath);
+    },
+
+    switchVersion() {
+      this.$emit('fetchFiles', '', this.selectedVersion);
+    },
+  },
 };
 </script>
 

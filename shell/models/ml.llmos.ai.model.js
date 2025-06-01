@@ -64,15 +64,6 @@ export default class ModelRegistry extends SteveModel {
     };
   }
 
-  get displayTags() {
-    return (this.spec.modelCard.metadata.tags || [])
-      .filter((tag) => {
-        if (tag.endsWith('k') || tag.endsWith('K')) {
-          return true;
-        }
-      });
-  }
-
   get availableActions() {
     const out = super._availableActions;
 

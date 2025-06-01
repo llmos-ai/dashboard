@@ -1,151 +1,155 @@
-<script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+<script>
 import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
-
 import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
-
 import { CSRF } from '@shell/config/cookies';
-
 import FileItem from './FileItem';
 
-const store = useStore();
-
-const props = defineProps({
-  files: {
-    type:    Array,
-    default: () => ([]),
-  },
-
-  resource: {
-    type:     Object,
-    required: true,
-  },
-});
-
-const emit = defineEmits(['fetchFiles']);
-
-const downloading = ref(false);
-const uploading = ref(false);
-const currentPath = ref('');
-
-const {
-  percent,
-  uploadStatus,
-  uploadFile,
-} = useFileList({ props });
-
-const onCreateFolder = async() => {
-  store.dispatch('cluster/promptModal', {
-    component:      'CreateFolderModal',
-    modalWidth:     '600px',
-    resources:      [props.resource],
-    componentProps: {
-      saveCb: () => {
-        emit('fetchFiles', currentPath.value);
-      },
-      currentPath: currentPath.value,
-    },
-  });
-};
-
-const onDownload = async() => {
-  downloading.value = true;
-
-  const inStore = store.getters['currentProduct'].inStore;
-  const res = await props.resource.doAction('download', {}, { responseType: 'blob' });
-
-  const fileName = `${ props.resource.metadata.name }.zip`;
-
-  const url = window.URL.createObjectURL(res.data);
-  const link = document.createElement('a');
-
-  link.href = url;
-  link.download = fileName;
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  window.URL.revokeObjectURL(url);
-
-  downloading.value = false;
-};
-
-const fetchFiles = async(targetFilePath) => {
-  currentPath.value = targetFilePath;
-  emit('fetchFiles', targetFilePath);
-};
-
-const onFolderUpload = async(options) => {
-  const { file } = options;
-
-  try {
-    uploading.value = true;
-
-    const relativePath = file.webkitRelativePath || '';
-    const pathArray = relativePath.split('/');
-
-    pathArray.pop();
-
-    const formData = new FormData();
-
-    formData.append('file', file);
-    formData.append('data', JSON.stringify({
-      targetDirectory: currentPath.value,
-      relativePaths:   pathArray,
-    }));
-
-    await uploadFile(formData);
-    emit('fetchFiles');
-  } catch (err) {
-    message.error(`Upload Fail: ${ err }`);
-  } finally {
-    uploading.value = false;
-    uploadStatus.value = '';
-    percent.value = 0;
-  }
-};
-
-const onUpload = async(options) => {
-  const { file } = options;
-
-  try {
-    uploading.value = true;
-
-    const formData = new FormData();
-
-    formData.append('file', file);
-    formData.append('data', JSON.stringify({
-      targetDirectory: currentPath.value,
-      relativePath:    '',
-    }));
-
-    await uploadFile(formData);
-    emit('fetchFiles');
-  } catch (err) {
-    message.error(`Upload Fail: ${ err }`);
-  } finally {
-    uploading.value = false;
-    uploadStatus.value = '';
-    percent.value = 0;
-  }
-};
-
-const onBack = () => {
-  const parentPath = currentPath.value.split('/').slice(0, -2).join('/');
-
-  currentPath.value = parentPath || '';
-  emit('fetchFiles', parentPath);
-};
-</script>
-
-<script>
 export default {
-  setup() {
+  name: 'FileList',
 
-  }
+  components: {
+    DownOutlined,
+    FileItem
+  },
+
+  props: {
+    files: {
+      type:    Array,
+      default: () => ([]),
+    },
+
+    resource: {
+      type:     Object,
+      required: true,
+    },
+  },
+
+  emits: ['fetchFiles'],
+
+  data() {
+    return {
+      downloading: false,
+      uploading: false,
+      currentPath: '',
+      percent: 0,
+      uploadStatus: '',
+    };
+  },
+
+  created() {
+    const { percent, uploadStatus, uploadFile } = useFileList({ props: { resource: this.resource } });
+    this.uploadFile = uploadFile;
+    this.percent = percent;
+    this.uploadStatus = uploadStatus;
+  },
+
+  methods: {
+    async onCreateFolder() {
+      this.$store.dispatch('cluster/promptModal', {
+        component:      'CreateFolderModal',
+        modalWidth:     '600px',
+        resources:      [this.resource],
+        componentProps: {
+          saveCb: () => {
+            this.$emit('fetchFiles', this.currentPath);
+          },
+          currentPath: this.currentPath,
+        },
+      });
+    },
+
+    async onDownload() {
+      this.downloading = true;
+
+      const inStore = this.$store.getters['currentProduct'].inStore;
+      const res = await this.resource.doAction('download', {}, { responseType: 'blob' });
+
+      const fileName = `${ this.resource.metadata.name }.zip`;
+
+      const url = window.URL.createObjectURL(res.data);
+      const link = document.createElement('a');
+
+      link.href = url;
+      link.download = fileName;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(url);
+
+      this.downloading = false;
+    },
+
+    async fetchFiles(targetFilePath) {
+      this.currentPath = targetFilePath;
+      this.$emit('fetchFiles', targetFilePath);
+    },
+
+    async onFolderUpload(options) {
+      const { file } = options;
+
+      try {
+        this.uploading = true;
+
+        const relativePath = file.webkitRelativePath || '';
+        const pathArray = relativePath.split('/');
+
+        pathArray.pop();
+
+        const formData = new FormData();
+
+        formData.append('file', file);
+        formData.append('data', JSON.stringify({
+          targetDirectory: this.currentPath,
+          relativePaths:   pathArray,
+        }));
+
+        await this.uploadFile(formData);
+        this.$emit('fetchFiles');
+      } catch (err) {
+        message.error(`Upload Fail: ${ err }`);
+      } finally {
+        this.uploading = false;
+        this.uploadStatus = '';
+        this.percent = 0;
+      }
+    },
+
+    async onUpload(options) {
+      const { file } = options;
+
+      try {
+        this.uploading = true;
+
+        const formData = new FormData();
+
+        formData.append('file', file);
+        formData.append('data', JSON.stringify({
+          targetDirectory: this.currentPath,
+          relativePath:    '',
+        }));
+
+        await this.uploadFile(formData);
+        this.$emit('fetchFiles');
+      } catch (err) {
+        message.error(`Upload Fail: ${ err }`);
+      } finally {
+        this.uploading = false;
+        this.uploadStatus = '';
+        this.percent = 0;
+      }
+    },
+
+    onBack() {
+      const parentPath = this.currentPath.split('/').slice(0, -2).join('/');
+
+      this.currentPath = parentPath || '';
+      this.$emit('fetchFiles', parentPath);
+    },
+  },
 };
 </script>
 
