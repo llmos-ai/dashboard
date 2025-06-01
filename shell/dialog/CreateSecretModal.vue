@@ -1,4 +1,5 @@
 <script>
+import { ref } from 'vue';
 import { useStore } from 'vuex';
 import Banner from '@shell/components/Banner/Banner.vue';
 import { SECRET, DEFAULT_WORKSPACE } from '@shell/config/types';
