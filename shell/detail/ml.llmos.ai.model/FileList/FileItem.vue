@@ -1,107 +1,111 @@
-<script setup>
-import { defineProps, computed } from 'vue';
+<script>
 import { useStore } from 'vuex';
-
 import { useI18n } from '@shell/composables/useI18n';
 import { useFileItem } from '@shell/detail/ml.llmos.ai.model/FileList/useFileItem';
-
 import { FileTextTwoTone, FolderTwoTone } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
 import { Modal, message } from 'ant-design-vue';
-
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
 
-const store = useStore();
-const { t } = useI18n(store);
-
-const props = defineProps({
-  file: {
-    type:    Object,
-    default: () => ({}),
-  },
-
-  resource: {
-    type:     Object,
-    required: true,
-  },
-});
-
-const emit = defineEmits(['fetchFiles']);
-
-const isFile = computed(() => {
-  return props.file.Size !== 0;
-});
-
-const fileSize = computed(() => {
-  return isFile.value ? formatSi(props.file.Size, {
-    increment: 1024,
-    addSuffix: true,
-    suffix:    'B',
-  }) : '';
-});
-
-const lastModified = computed(() => {
-  const now = dayjs();
-  const out = diffFrom(dayjs(props.file.LastModified), now, (key, args) => t(key, args));
-
-  return isFile.value ? `${ out.string } ago` : '';
-});
-
-const currentPath = computed(() => {
-  return props.file.Path ? props.file.Path.replace(`models/${ props.resource.id }/`, '') : '';
-});
-
-const { currentFolder } = useFileItem({
-  props: {
-    isFile,
-    currentPath,
-  }
-});
-
-const removeFile = async(file) => {
-  Modal.confirm({
-    title: t('fileItem.deleteConfirm'),
-    async onOk() {
-      await props.resource.doAction('remove', { targetFilePath: currentPath.value });
-
-      message.success(t('fileItem.deleteSuccess'));
-
-      emit('fetchFiles', currentFolder.value);
-    },
-  });
-};
-
-const onRowClick = () => {
-  if (isFile.value) {
-    props.resource.doAction('download', { targetFilePath: currentPath.value });
-  } else {
-    emit('fetchFiles', currentPath.value);
-  }
-};
-
-</script>
-
-<script>
 export default {
-  setup() {
+  name: 'FileItem',
 
+  components: {
+    FileTextTwoTone,
+    FolderTwoTone
+  },
+
+  props: {
+    file: {
+      type: Object,
+      default: () => ({}),
+    },
+
+    resource: {
+      type: Object,
+      required: true,
+    },
+  },
+
+  emits: ['fetchFiles'],
+
+  setup(props, { emit }) {
+    const store = useStore();
+    const { t } = useI18n(store);
+
+    const isFile = computed(() => {
+      return props.file.Size !== 0;
+    });
+
+    const fileSize = computed(() => {
+      return isFile.value ? formatSi(props.file.Size, {
+        increment: 1024,
+        addSuffix: true,
+        suffix: 'B',
+      }) : '';
+    });
+
+    const lastModified = computed(() => {
+      const now = dayjs();
+      const out = diffFrom(dayjs(props.file.LastModified), now, (key, args) => t(key, args));
+
+      return isFile.value ? `${out.string} ago` : '';
+    });
+
+    const currentPath = computed(() => {
+      return props.file.Path ? props.file.Path.replace(`models/${props.resource.id}/`, '') : '';
+    });
+
+    const { currentFolder } = useFileItem({
+      props: {
+        isFile,
+        currentPath,
+      }
+    });
+
+    const removeFile = async(file) => {
+      Modal.confirm({
+        title: t('fileItem.deleteConfirm'),
+        async onOk() {
+          await props.resource.doAction('remove', { targetFilePath: currentPath.value });
+
+          message.success(t('fileItem.deleteSuccess'));
+
+          emit('fetchFiles', currentFolder.value);
+        },
+      });
+    };
+
+    const onRowClick = () => {
+      if (isFile.value) {
+        props.resource.doAction('download', { targetFilePath: currentPath.value });
+      } else {
+        emit('fetchFiles', currentPath.value);
+      }
+    };
+
+    return {
+      t,
+      isFile,
+      fileSize,
+      lastModified,
+      currentPath,
+      removeFile,
+      onRowClick
+    };
   }
 };
 </script>
 
 <template>
-  <div
-    class="file-item"
-  >
+  <div class="file-item">
     <div class="file-icon">
       <FileTextTwoTone v-if="isFile" />
       <FolderTwoTone v-else />
     </div>
 
-    <a-row
-      class="file-info"
-    >
+    <a-row class="file-info">
       <a-col
         class="file-name"
         :span="12"

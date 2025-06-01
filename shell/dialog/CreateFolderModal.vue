@@ -1,80 +1,81 @@
-<script setup>
-import {
-  ref, defineProps, computed, reactive, defineEmits
-} from 'vue';
+<script>
 import { message } from 'ant-design-vue';
-
 import Banner from '@shell/components/Banner/Banner.vue';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
 
-const props = defineProps({
-  resources: {
-    type:     Array,
-    required: true,
-  },
-
-  beforeClose: {
-    type:    Function,
-    default: () => {},
-  },
-
-  saveCb: {
-    type:    Function,
-    default: () => {},
-  },
-
-  currentPath: {
-    type:    String,
-    default: '',
-  },
-});
-
-const errors = ref([]);
-
-const value = reactive({ targetDirectory: '' });
-
-const emit = defineEmits(['close']);
-
-const canSave = computed(() => {
-  const out = (
-    !!value?.targetDirectory
-  );
-
-  return out;
-});
-
-const resource = computed(() => {
-  return props.resources[0] || {};
-});
-
-const close = () => {
-  props.beforeClose();
-  emit('close');
-};
-
-const save = async() => {
-  errors.value = [];
-
-  try {
-    const res = await resource.value.doAction('createDirectory', { targetDirectory: `${ props.currentPath }/${ value.targetDirectory }` });
-
-    if (res._status === 204) {
-      message.success('Folder Created');
-    }
-
-    props.saveCb(res);
-
-    emit('close');
-  } catch (e) {
-    errors.value.push(e.message);
-  }
-};
-</script>
-
-<script>
 export default {
-  setup() {
+  name: 'CreateFolderModal',
 
+  components: {
+    Banner,
+    LabeledInput
+  },
+
+  props: {
+    resources: {
+      type: Array,
+      required: true,
+    },
+
+    beforeClose: {
+      type: Function,
+      default: () => {},
+    },
+
+    saveCb: {
+      type: Function,
+      default: () => {},
+    },
+
+    currentPath: {
+      type: String,
+      default: '',
+    },
+  },
+
+  emits: ['close'],
+
+  data() {
+    return {
+      errors: [],
+      value: {
+        targetDirectory: ''
+      }
+    };
+  },
+
+  computed: {
+    canSave() {
+      return !!this.value?.targetDirectory;
+    },
+
+    resource() {
+      return this.resources[0] || {};
+    }
+  },
+
+  methods: {
+    close() {
+      this.beforeClose();
+      this.$emit('close');
+    },
+
+    async save() {
+      this.errors = [];
+
+      try {
+        const res = await this.resource.doAction('createDirectory', { targetDirectory: `${this.currentPath}/${this.value.targetDirectory}` });
+
+        if (res._status === 204) {
+          message.success('Folder Created');
+        }
+
+        this.saveCb(res);
+        this.$emit('close');
+      } catch (e) {
+        this.errors.push(e.message);
+      }
+    }
   }
 };
 </script>
