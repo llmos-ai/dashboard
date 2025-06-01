@@ -1,5 +1,5 @@
-<script setup>
-import { ref, defineProps, computed, reactive } from 'vue';
+<script>
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { message } from 'ant-design-vue';
 
@@ -9,157 +9,173 @@ import LabelValue from '@shell/components/LabelValue';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { useI18n } from '@shell/composables/useI18n';
 
-const store = useStore();
+export default {
+  name: 'CreateDatasetVersionModal',
 
-const { t } = useI18n(store);
-
-const props = defineProps({
-  resources: {
-    type:     Array,
-    required: true,
+  components: {
+    Banner,
+    LabelValue,
+    LabeledSelect
   },
 
-  onAdd: {
-    type:    Function,
-    default: () => {},
+  props: {
+    resources: {
+      type:     Array,
+      required: true,
+    },
+
+    onAdd: {
+      type:    Function,
+      default: () => {},
+    },
+
+    projectId: {
+      type:    String,
+      default: null,
+    },
+
+    saveInModal: {
+      type:    Boolean,
+      default: false,
+    },
+
+    beforeClose: {
+      type:    Function,
+      default: () => {},
+    },
+
+    saveCb: {
+      type:    Function,
+      default: () => {},
+    },
+
+    datasetId: {
+      type:    String,
+      default: '',
+    },
   },
 
-  projectId: {
-    type:    String,
-    default: null,
-  },
+  emits: ['close'],
 
-  saveInModal: {
-    type:    Boolean,
-    default: false,
-  },
+  setup(props, { emit }) {
+    const store = useStore();
+    const { t } = useI18n(store);
 
-  beforeClose: {
-    type:    Function,
-    default: () => {},
-  },
+    const errors = ref([]);
 
-  saveCb: {
-    type:    Function,
-    default: () => {},
-  },
-
-  datasetId: {
-    type:    String,
-    default: '',
-  },
-});
-
-const errors = ref([]);
-
-const emit = defineEmits(['close']);
-
-const value = reactive({
-  metadata: {
-    name:      '',
-    namespace: DEFAULT_WORKSPACE,
-  },
-  spec: {
-    dataset:           props.datasetId,
-    version:           '',
-    enableFastLoading: true
-  },
-});
-
-const canSave = computed(() => {
-  const out = value.spec.enableFastLoading ? !!value?.spec?.version : true;
-
-  return out;
-});
-
-const inStore = computed(() => {
-  const inStore = store.getters['currentStore'](value.type);
-
-  return inStore;
-});
-
-const dataset = computed(() => {
-  const dataset = store.getters[`${ inStore.value }/byId`](LLMOS.DATASET, props.datasetId);
-
-  return dataset || {};
-});
-
-const datasetVersions = computed(() => {
-  return dataset.value.datasetVersions || [];
-});
-
-const datasetVersionOptions = computed(() => {
-  return datasetVersions.value.map((version) => {
-    const names = (version.metadata.name || '').split('-');
-
-    return {
-      label: names[0],
-      value: version.spec.version,
-    };
-  });
-});
-
-const latestDatasetVersion = computed(() => {
-  return datasetVersions.value?.[0] || {};
-});
-
-const latestVersion = computed(() => {
-  const versionStr = latestDatasetVersion.value?.metadata?.name || '';
-  const match = versionStr.match(/^v(\d+)/);
-  const currentMax = match ? parseInt(match[1]) : 0;
-
-  return `v${ currentMax + 1 }`;
-});
-
-const schema = computed(() => {
-  return store.getters[`${ inStore.value }/schemaFor`](LLMOS.DATASET_VERSION);
-});
-
-value.spec.version = datasetVersions.value?.[0]?.spec.version;
-
-const close = () => {
-  props.beforeClose();
-  emit('close');
-};
-
-const save = async() => {
-  errors.value = [];
-
-  try {
-    const url = schema.value.linkFor('collection');
-
-    const model = await store.dispatch(`${ inStore.value }/create`, {
+    const value = reactive({
       metadata: {
-        generateName: `${ latestVersion.value }-`,
-        namespace:    latestDatasetVersion.value.metadata.namespace,
+        name:      '',
+        namespace: DEFAULT_WORKSPACE,
       },
       spec: {
-        dataset:           latestDatasetVersion.value.spec.dataset,
-        version:           `${ latestVersion.value }.0.0`,
-        enableFastLoading: value.spec.enableFastLoading,
-        copyFrom:          {
-          namespace: latestDatasetVersion.value.metadata.namespace,
-          dataset:   latestDatasetVersion.value.spec.dataset,
-          version:   value.spec.version,
-        },
+        dataset:           props.datasetId,
+        version:           '',
+        enableFastLoading: true
       },
     });
 
-    await model.save({ url });
+    const canSave = computed(() => {
+      const out = value.spec.enableFastLoading ? !!value?.spec?.version : true;
 
-    message.success(t('createDatasetVersionModal.success'));
+      return out;
+    });
 
-    emit('close');
-  } catch (e) {
-    errors.value.push(e.message);
-  }
-};
-</script>
+    const inStore = computed(() => {
+      const inStore = store.getters['currentStore'](value.type);
 
-<script>
-export default {
-  setup() {
+      return inStore;
+    });
 
+    const dataset = computed(() => {
+      const dataset = store.getters[`${ inStore.value }/byId`](LLMOS.DATASET, props.datasetId);
+
+      return dataset || {};
+    });
+
+    const datasetVersions = computed(() => {
+      return dataset.value.datasetVersions || [];
+    });
+
+    const datasetVersionOptions = computed(() => {
+      return datasetVersions.value.map((version) => {
+        const names = (version.metadata.name || '').split('-');
+
+        return {
+          label: names[0],
+          value: version.spec.version,
+        };
+      });
+    });
+
+    const latestDatasetVersion = computed(() => {
+      return datasetVersions.value?.[0] || {};
+    });
+
+    const latestVersion = computed(() => {
+      const versionStr = latestDatasetVersion.value?.metadata?.name || '';
+      const match = versionStr.match(/^v(\d+)/);
+      const currentMax = match ? parseInt(match[1]) : 0;
+
+      return `v${ currentMax + 1 }`;
+    });
+
+    const schema = computed(() => {
+      return store.getters[`${ inStore.value }/schemaFor`](LLMOS.DATASET_VERSION);
+    });
+
+    value.spec.version = datasetVersions.value?.[0]?.spec.version;
+
+    const close = () => {
+      props.beforeClose();
+      emit('close');
+    };
+
+    const save = async() => {
+      errors.value = [];
+
+      try {
+        const url = schema.value.linkFor('collection');
+
+        const model = await store.dispatch(`${ inStore.value }/create`, {
+          metadata: {
+            generateName: `${ latestVersion.value }-`,
+            namespace:    latestDatasetVersion.value.metadata.namespace,
+          },
+          spec: {
+            dataset:           latestDatasetVersion.value.spec.dataset,
+            version:           `${ latestVersion.value }.0.0`,
+            enableFastLoading: value.spec.enableFastLoading,
+            copyFrom:          {
+              namespace: latestDatasetVersion.value.metadata.namespace,
+              dataset:   latestDatasetVersion.value.spec.dataset,
+              version:   value.spec.version,
+            },
+          },
+        });
+
+        await model.save({ url });
+
+        message.success(t('createDatasetVersionModal.success'));
+
+        emit('close');
+      } catch (e) {
+        errors.value.push(e.message);
+      }
+    };
+
+    return {
+      errors,
+      value,
+      canSave,
+      dataset,
+      datasetVersions,
+      datasetVersionOptions,
+      latestVersion,
+      t,
+      close,
+      save
+    };
   }
 };
 </script>

@@ -1,127 +1,134 @@
-<script setup>
-import { ref, defineProps, computed, reactive } from 'vue';
+<script>
 import { useStore } from 'vuex';
-
 import Banner from '@shell/components/Banner/Banner.vue';
 import { SECRET, DEFAULT_WORKSPACE } from '@shell/config/types';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
-
 import { SECRET_TYPES } from '@shell/config/secret';
-
 import { base64Encode } from '@shell/utils/crypto';
 
-const store = useStore();
+export default {
+  name: 'CreateSecretModal',
 
-const props = defineProps({
-  resources: {
-    type:     Array,
-    required: true,
+  components: {
+    Banner,
+    LabeledInput,
+    NameNsDescription
   },
 
-  onAdd: {
-    type:    Function,
-    default: () => {},
+  props: {
+    resources: {
+      type: Array,
+      required: true,
+    },
+
+    onAdd: {
+      type: Function,
+      default: () => {},
+    },
+
+    projectId: {
+      type: String,
+      default: null,
+    },
+
+    saveInModal: {
+      type: Boolean,
+      default: false,
+    },
+
+    beforeClose: {
+      type: Function,
+      default: () => {},
+    },
+
+    saveCb: {
+      type: Function,
+      default: () => {},
+    },
   },
 
-  projectId: {
-    type:    String,
-    default: null,
-  },
+  emits: ['close'],
 
-  saveInModal: {
-    type:    Boolean,
-    default: false,
-  },
+  setup(props, { emit }) {
+    const store = useStore();
 
-  beforeClose: {
-    type:    Function,
-    default: () => {},
-  },
+    const errors = ref([]);
 
-  saveCb: {
-    type:    Function,
-    default: () => {},
-  },
-});
-
-const errors = ref([]);
-
-const value = reactive({
-  metadata: {
-    name:      '',
-    namespace: DEFAULT_WORKSPACE,
-  },
-  type: SECRET_TYPES.OPAQUE,
-  data: {
-    accessKeyID:     '',
-    accessKeySecret: ''
-  },
-});
-
-const emit = defineEmits(['close']);
-
-const canSave = computed(() => {
-  const out = (
-    !!value?.metadata?.name &&
-    !!value?.metadata?.namespace &&
-    !!value?.data?.accessKeyID &&
-    !!value?.data?.accessKeySecret
-  );
-
-  return out;
-});
-
-const inStore = computed(() => {
-  const inStore = store.getters['currentStore'](value.type);
-
-  return inStore;
-});
-
-const schema = computed(() => {
-  return store.getters[`${ inStore.value }/schemaFor`](SECRET);
-});
-
-const close = () => {
-  props.beforeClose();
-  emit('close');
-};
-
-const save = async() => {
-  errors.value = [];
-
-  try {
-    const url = schema.value.linkFor('collection');
-
-    const model = await store.dispatch(`${ inStore.value }/create`, {
-      ...value,
+    const value = reactive({
+      metadata: {
+        name: '',
+        namespace: DEFAULT_WORKSPACE,
+      },
+      type: SECRET_TYPES.OPAQUE,
       data: {
-        ...value.data,
-        accessKeyID:     base64Encode(value.data.accessKeyID),
-        accessKeySecret: base64Encode(value.data.accessKeySecret),
+        accessKeyID: '',
+        accessKeySecret: ''
       },
     });
 
-    Object.assign(model, {
-      type:  SECRET_TYPES.OPAQUE,
-      _type: SECRET_TYPES.OPAQUE,
+    const canSave = computed(() => {
+      const out = (
+        !!value?.metadata?.name &&
+        !!value?.metadata?.namespace &&
+        !!value?.data?.accessKeyID &&
+        !!value?.data?.accessKeySecret
+      );
+
+      return out;
     });
 
-    const res = await model.save({ url });
+    const inStore = computed(() => {
+      return store.getters['currentStore'](value.type);
+    });
 
-    props.saveCb(res);
+    const schema = computed(() => {
+      return store.getters[`${inStore.value}/schemaFor`](SECRET);
+    });
 
-    emit('close');
-  } catch (e) {
-    errors.value.push(e.message);
-  }
-};
-</script>
+    const close = () => {
+      props.beforeClose();
+      emit('close');
+    };
 
-<script>
-export default {
-  setup() {
+    const save = async() => {
+      errors.value = [];
 
+      try {
+        const url = schema.value.linkFor('collection');
+
+        const model = await store.dispatch(`${inStore.value}/create`, {
+          ...value,
+          data: {
+            ...value.data,
+            accessKeyID: base64Encode(value.data.accessKeyID),
+            accessKeySecret: base64Encode(value.data.accessKeySecret),
+          },
+        });
+
+        Object.assign(model, {
+          type: SECRET_TYPES.OPAQUE,
+          _type: SECRET_TYPES.OPAQUE,
+        });
+
+        const res = await model.save({ url });
+
+        props.saveCb(res);
+
+        emit('close');
+      } catch (e) {
+        errors.value.push(e.message);
+      }
+    };
+
+    return {
+      t,
+      errors,
+      value,
+      canSave,
+      close,
+      save
+    };
   }
 };
 </script>

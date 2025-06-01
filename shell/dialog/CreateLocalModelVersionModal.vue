@@ -1,173 +1,176 @@
-<script setup>
-import { ref, defineProps, computed, reactive, onMounted } from 'vue';
+<script>
 import { useStore } from 'vuex';
 import { message } from 'ant-design-vue';
-
 import Banner from '@shell/components/Banner/Banner.vue';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
-
 import { LLMOS, DEFAULT_WORKSPACE } from '@shell/config/types';
 import LabelValue from '@shell/components/LabelValue';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { useI18n } from '@shell/composables/useI18n';
-
 import { allHash } from '@shell/utils/promise';
 
-const store = useStore();
+export default {
+  name: 'CreateLocalModelVersionModal',
 
-const { t } = useI18n(store);
-
-const props = defineProps({
-  resources: {
-    type:     Array,
-    required: true,
+  components: {
+    Banner,
+    LabeledInput,
+    LabelValue,
+    LabeledSelect
   },
 
-  onAdd: {
-    type:    Function,
-    default: () => {},
+  props: {
+    resources: {
+      type: Array,
+      required: true,
+    },
+
+    onAdd: {
+      type: Function,
+      default: () => {},
+    },
+
+    projectId: {
+      type: String,
+      default: null,
+    },
+
+    saveInModal: {
+      type: Boolean,
+      default: false,
+    },
+
+    beforeClose: {
+      type: Function,
+      default: () => {},
+    },
+
+    saveCb: {
+      type: Function,
+      default: () => {},
+    },
+
+    modelId: {
+      type: String,
+      default: '',
+    },
   },
 
-  projectId: {
-    type:    String,
-    default: null,
-  },
+  emits: ['close'],
 
-  saveInModal: {
-    type:    Boolean,
-    default: false,
-  },
+  setup(props, { emit }) {
+    const store = useStore();
+    const { t } = useI18n(store);
 
-  beforeClose: {
-    type:    Function,
-    default: () => {},
-  },
+    const errors = ref([]);
 
-  saveCb: {
-    type:    Function,
-    default: () => {},
-  },
-
-  modelId: {
-    type:    String,
-    default: '',
-  },
-});
-
-const errors = ref([]);
-
-const emit = defineEmits(['close']);
-
-const value = reactive({
-  metadata: {
-    name:      '',
-    namespace: DEFAULT_WORKSPACE,
-  },
-  spec: {
-    dataset:           props.datasetId,
-    version:           '',
-    enableFastLoading: true
-  },
-});
-
-const canSave = computed(() => {
-  const out = !!value.metadata.name;
-
-  return out;
-});
-
-const inStore = computed(() => {
-  const inStore = store.getters['currentStore'](value.type);
-
-  return inStore;
-});
-
-onMounted(async() => {
-  await allHash({
-    localModels: await store.dispatch(`${ inStore.value }/findAll`, { type: LLMOS.LOCAL_MODEL }),
-  });
-});
-
-const model = computed(() => {
-  const model = store.getters[`${ inStore.value }/byId`](LLMOS.MODEL, props.modelId);
-
-  return model || {};
-});
-
-const localModel = computed(() => {
-  const localModel = store.getters[`${ inStore.value }/byId`](LLMOS.LOCAL_MODEL, `${model.value.id}-local`);
-
-  return localModel || {};
-});
-
-const schema = computed(() => {
-  return store.getters[`${ inStore.value }/schemaFor`](LLMOS.DATASET_VERSION);
-});
-
-const close = () => {
-  props.beforeClose();
-  emit('close');
-};
-
-const createLocalModel = async() => {
-  const name = model.value.metadata?.name
-
-  if (!localModel.value.id) {
-    const resource = await store.dispatch(`${ inStore.value }/create`, {
-      type:     LLMOS.LOCAL_MODEL,
+    const value = reactive({
       metadata: {
-        name,
-        namespace: model.value.metadata?.namespace,
+        name: '',
+        namespace: DEFAULT_WORKSPACE,
       },
       spec: {
-        registry:  model.value.spec?.registry,
-        modelName: `${ model.value.id }`
+        dataset: props.datasetId,
+        version: '',
+        enableFastLoading: true
       },
     });
 
-    return await resource.save();
-  } else {
-    return localModel.value;
-  }
-}
-
-const save = async() => {
-  errors.value = [];
-
-  try {
-    const newLocalModel = await createLocalModel();
-    const localModelName = newLocalModel?.metadata?.name
-
-    const localModelVersion = await store.dispatch(`${ inStore.value }/create`, {
-      type:     LLMOS.LOCAL_MODEL_VERSION,
-      metadata: {
-        name:      `${localModelName}-${value.metadata.name}`,
-        namespace: model.value.metadata?.namespace,
-      },
-      spec: { localModel: localModelName },
+    const canSave = computed(() => {
+      return !!value.metadata.name;
     });
 
-    await localModelVersion.save();
+    const inStore = computed(() => {
+      return store.getters['currentStore'](value.type);
+    });
 
-    const patchData = { spec: { defaultVersion: localModelVersion?.id } };
+    const model = computed(() => {
+      const model = store.getters[`${inStore.value}/byId`](LLMOS.MODEL, props.modelId);
+      return model || {};
+    });
 
-    newLocalModel.patch(patchData, {
-      headers: {
-        'content-type': 'application/merge-patch+json',
-      },
-    }, true, true);
+    const localModel = computed(() => {
+      const localModel = store.getters[`${inStore.value}/byId`](LLMOS.LOCAL_MODEL, `${model.value.id}-local`);
+      return localModel || {};
+    });
 
-    emit('close');
-  } catch (err) {
-    message.error(`Cache Fail: ${ err.message || err }`);
-  }
-};
-</script>
+    const schema = computed(() => {
+      return store.getters[`${inStore.value}/schemaFor`](LLMOS.DATASET_VERSION);
+    });
 
-<script>
-export default {
-  setup() {
+    onMounted(async() => {
+      await allHash({
+        localModels: await store.dispatch(`${inStore.value}/findAll`, { type: LLMOS.LOCAL_MODEL }),
+      });
+    });
 
+    const close = () => {
+      props.beforeClose();
+      emit('close');
+    };
+
+    const createLocalModel = async() => {
+      const name = model.value.metadata?.name;
+
+      if (!localModel.value.id) {
+        const resource = await store.dispatch(`${inStore.value}/create`, {
+          type: LLMOS.LOCAL_MODEL,
+          metadata: {
+            name,
+            namespace: model.value.metadata?.namespace,
+          },
+          spec: {
+            registry: model.value.spec?.registry,
+            modelName: `${model.value.id}`
+          },
+        });
+
+        return await resource.save();
+      } else {
+        return localModel.value;
+      }
+    };
+
+    const save = async() => {
+      errors.value = [];
+
+      try {
+        const newLocalModel = await createLocalModel();
+        const localModelName = newLocalModel?.metadata?.name;
+
+        const localModelVersion = await store.dispatch(`${inStore.value}/create`, {
+          type: LLMOS.LOCAL_MODEL_VERSION,
+          metadata: {
+            name: `${localModelName}-${value.metadata.name}`,
+            namespace: model.value.metadata?.namespace,
+          },
+          spec: { localModel: localModelName },
+        });
+
+        await localModelVersion.save();
+
+        const patchData = { spec: { defaultVersion: localModelVersion?.id } };
+
+        newLocalModel.patch(patchData, {
+          headers: {
+            'content-type': 'application/merge-patch+json',
+          },
+        }, true, true);
+
+        emit('close');
+      } catch (err) {
+        message.error(`Cache Fail: ${err.message || err}`);
+      }
+    };
+
+    return {
+      t,
+      errors,
+      value,
+      canSave,
+      close,
+      save
+    };
   }
 };
 </script>
