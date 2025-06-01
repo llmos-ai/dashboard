@@ -20,6 +20,14 @@ defineProps({
 });
 </script>
 
+<script>
+export default {
+  setup() {
+
+  }
+};
+</script>
+
 <template>
   <router-link :to="to">
     <a-button
