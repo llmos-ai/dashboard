@@ -6897,6 +6897,11 @@ createLocalModelVersionModal:
     label: Version Name
     placeholder: e.g. v1
 
+knowledgeBase:
+  title: Knowledge Base
+  objectCount:
+    label: Total Documents
+
 apps:
   manage:
     label: Application Management
