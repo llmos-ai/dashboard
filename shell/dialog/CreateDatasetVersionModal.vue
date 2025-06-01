@@ -1,5 +1,5 @@
 <script>
-import { computed, ref } from 'vue';
+import { computed, ref, reactive } from 'vue';
 import { useStore } from 'vuex';
 import { message } from 'ant-design-vue';
 
@@ -172,7 +172,6 @@ export default {
       datasetVersions,
       datasetVersionOptions,
       latestVersion,
-      t,
       close,
       save
     };

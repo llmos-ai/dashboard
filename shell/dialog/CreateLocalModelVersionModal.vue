@@ -1,5 +1,6 @@
 <script>
-import { useStore, ref } from 'vuex';
+import { ref, reactive, computed } from 'vue'
+import { useStore } from 'vuex';
 import { message } from 'ant-design-vue';
 import Banner from '@shell/components/Banner/Banner.vue';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
@@ -164,7 +165,6 @@ export default {
     };
 
     return {
-      t,
       errors,
       value,
       canSave,
