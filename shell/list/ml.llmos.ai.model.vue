@@ -290,15 +290,6 @@ export default {
                 :show-tooltip="false"
               />
             </div>
-            <div class="tags mt-5">
-              <a-tag
-                v-for="tag in row.displayTags"
-                :key="tag"
-                color="blue"
-              >
-                {{ tag }}
-              </a-tag>
-            </div>
           </div>
           <div class="action">
             <ActionMenu
