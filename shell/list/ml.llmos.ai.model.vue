@@ -306,7 +306,7 @@ export default {
             />
           </div>
           <div class="description mt-10">
-            {{ row.spec.modelCard.description }}
+            {{ row.spec.modelCard?.description }}
           </div>
         </div>
       </template>
