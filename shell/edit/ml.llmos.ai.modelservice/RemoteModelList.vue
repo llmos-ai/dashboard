@@ -62,7 +62,7 @@ const {
   isFetching: loading,
   execute,
 } = useFetch(
-  () => `/proxy?url=${ encodeURIComponent(apiConfig.value.listUrl) }`,
+  () => `/proxy/models?url=${ encodeURIComponent(apiConfig.value.listUrl) }`,
   {
     async beforeFetch({ url, options, cancel }) {
       options.method = apiConfig.value.method;
@@ -135,7 +135,7 @@ const handleItemClick = (item) => {
 const readmeUrl = computed(() => {
   if (!activeItem.value.id) return '';
 
-  return `/proxy?url=${ encodeURIComponent(apiConfig.value.detailUrl(activeItem.value.id)) }`;
+  return `/proxy/models?url=${ encodeURIComponent(apiConfig.value.detailUrl(activeItem.value.id)) }`;
 });
 
 const debouncedReadmeUrl = debouncedRef(readmeUrl, 500);
