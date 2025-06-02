@@ -1,7 +1,5 @@
 import { DSL } from '@shell/store/type-map';
-import {
-  LLMOS,
-} from '@shell/config/types';
+import { LLMOS } from '@shell/config/types';
 
 export const NAME = 'apps';
 
@@ -41,19 +39,19 @@ export function init(store) {
     icon:       'folder',
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.DATASET  }
+      params: { resource: LLMOS.DATASET }
     },
   });
 
   configureType('apps.dataset', {
-    location:   {
+    location: {
       name:   `c-cluster-product-resource`,
       params: { resource: LLMOS.DATASET }
     },
     resource:       LLMOS.DATASET,
     resourceDetail: 'apps.dataset',
     resourceEdit:   'apps.dataset',
-    isCreatable: true,
+    isCreatable:    true,
   });
 
   virtualType({

@@ -162,20 +162,18 @@ export function init(store) {
     namespaced: true,
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.LOCAL_MODEL  }
+      params: { resource: LLMOS.LOCAL_MODEL }
     },
     exact:  false,
     weight: 89,
   });
 
-  configureType(LLMOS.LOCAL_MODEL, {
-    isEditable: false,
-  });
+  configureType(LLMOS.LOCAL_MODEL, { isEditable: false });
 
   configureType(LLMOS.LOCAL_MODEL_VERSION, {
-    isCreatable: false, 
-    isEditable: false,
-    listGroups: [
+    isCreatable: false,
+    isEditable:  false,
+    listGroups:  [
       {
         icon:       'icon-cluster',
         value:      'role',

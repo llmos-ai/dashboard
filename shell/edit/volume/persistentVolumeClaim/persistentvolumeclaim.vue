@@ -53,7 +53,6 @@ export default {
     },
   },
   async fetch() {
-    console.log(this.value, 'value')
     const hash = await allHash({
       storageClasses:    this.$store.dispatch('cluster/findAll', { type: STORAGE_CLASS }),
       persistentVolumes: this.$store.dispatch('cluster/findAll', { type: PV }),

@@ -1,11 +1,9 @@
 <script>
-import { Modal, message } from 'ant-design-vue';
-
-import { getAllSchemaAPI, deleteClassAPI, createObjectAPI, getAllObjectAPI } from '@/shell/config/weaviate';
+import { getAllSchemaAPI, getAllObjectAPI } from '@/shell/config/weaviate';
 import ResourceTable from '@shell/components/ResourceTable';
 import ButtonLink from '@shell/components/ButtonLink';
 
-import { NAME, AGE } from '@shell/config/table-headers';
+import { NAME } from '@shell/config/table-headers';
 import { allHash } from '@shell/utils/promise';
 
 import { proxyClassModel } from './proxyClassModel';
@@ -23,14 +21,11 @@ export default {
       classes: [],
       objects: [],
       schema:  {},
-      headers: [
-
-      ],
     };
   },
 
   async fetch() {
-    this.fetchList()
+    this.fetchList();
   },
 
   computed: {
@@ -48,19 +43,19 @@ export default {
           value: 'class',
         },
         {
-          name:          'objectCount',
-          label:         '文档数',
-          value:         'objectCount',
+          name:  'objectCount',
+          label: '文档数',
+          value: 'objectCount',
         },
         {
-          name:          'characterCount',
-          label:         '字符数',
-          value:         'characterCount',
+          name:  'characterCount',
+          label: '字符数',
+          value: 'characterCount',
         },
         {
-          name:          'application',
-          label:         '关联应用数',
-          value:         'application',
+          name:  'application',
+          label: '关联应用数',
+          value: 'application',
         },
       ];
     },
@@ -76,10 +71,10 @@ export default {
           ...proxyClassModel({
             objects: this.objects,
             item,
-            ctx: this,
+            ctx:     this,
           }),
         };
-      })
+      });
     }
   },
 
@@ -94,7 +89,7 @@ export default {
           `${ this.inStore }/request`,
           { url: getAllObjectAPI }
         ),
-      }) 
+      });
 
       this.classes = hash.classes.classes || [];
       this.objects = hash.objects.objects || [];

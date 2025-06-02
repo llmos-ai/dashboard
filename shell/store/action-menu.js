@@ -29,7 +29,6 @@ export const getters = {
 
   optionsArray(state) {
     let selected = state.resources;
-    console.log(state, 'state')
 
     if ( !selected ) {
       return [];

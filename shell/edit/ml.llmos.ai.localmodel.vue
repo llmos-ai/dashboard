@@ -6,9 +6,7 @@ import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 
 import CruResource from '@shell/components/CruResource';
-import NameNsDescription from '@shell/components/form/NameNsDescription';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
-import { LabeledInput } from '@shell/components/form/LabeledInput';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 
@@ -16,19 +14,14 @@ import { LLMOS } from '@shell/config/types';
 
 import { allHash } from '@shell/utils/promise';
 import { set } from '@shell/utils/object';
-import { LICENSES, LANGUAGES, ML_FEATURES } from '@shell/utils/dictionary';
-
-const S3 = 'S3';
 
 export default {
   name: 'Dataset',
 
   components: {
     CruResource,
-    NameNsDescription,
     Tab,
     LabeledSelect,
-    LabeledInput,
     ResourceTabs,
   },
 
@@ -49,9 +42,9 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const hash = await allHash({ 
-      models: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.MODEL }),
-      localModels: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.LOCAL_MODEL }),
+    const hash = await allHash({
+      models:             this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.MODEL }),
+      localModels:        this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.LOCAL_MODEL }),
       localModelVersions: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
     });
 
@@ -59,12 +52,12 @@ export default {
   },
 
   data() {
-    const resource = { spec: {  } };
+    const resource = { spec: { } };
 
     Object.assign(resource, this.value);
 
     return {
-      errors:     [],
+      errors: [],
       models: [],
       resource,
     };
@@ -85,8 +78,8 @@ export default {
 
       const out = Object.keys(map).reduce((out, namespace) => {
         const groupOption = {
-          kind: 'group',
-          label: `${this.t('nameNsDescription.namespace.label')}: ${namespace}`,
+          kind:  'group',
+          label: `${ this.t('nameNsDescription.namespace.label') }: ${ namespace }`,
         };
 
         return [
@@ -113,14 +106,14 @@ export default {
     hasLocalModel() {
       const localModel = this.$store.getters[`${ this.inStore }/byId`](LLMOS.LOCAL_MODEL, this.resource.spec.modelName) || {};
 
-      return !!localModel.id
+      return !!localModel.id;
     },
   },
 
   methods: {
     async willSave() {
       const model = this.selectedModel;
-      const name = model.metadata?.name
+      const name = model.metadata?.name;
 
       Object.assign(this.value, {
         metadata: {
@@ -139,12 +132,12 @@ export default {
 
       try {
         const newLocalModel = this.value;
-        const localModelName = newLocalModel?.metadata?.name
+        const localModelName = newLocalModel?.metadata?.name;
 
         const localModelVersion = await this.$store.dispatch(`${ this.inStore }/create`, {
           type:     LLMOS.LOCAL_MODEL_VERSION,
           metadata: {
-            name:      `${localModelName}-${newLocalModel.nextVersion}`,
+            name:      `${ localModelName }-${ newLocalModel.nextVersion }`,
             namespace: newLocalModel.metadata?.namespace,
           },
           spec: { localModel: localModelName },
@@ -152,7 +145,7 @@ export default {
 
         await localModelVersion.save();
 
-        message.success(`Local Model ${localModelName} Version ${newLocalModel.nextVersion} created successfully`);
+        message.success(`Local Model ${ localModelName } Version ${ newLocalModel.nextVersion } created successfully`);
       } catch (e) {
         errors.push(e.message);
       }

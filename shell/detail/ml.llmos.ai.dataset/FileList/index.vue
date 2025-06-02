@@ -38,12 +38,12 @@ export default {
 
   data() {
     return {
-      downloading: false,
-      uploading: false,
-      currentPath: '',
+      downloading:     false,
+      uploading:       false,
+      currentPath:     '',
       selectedVersion: '',
-      percent: 0,
-      uploadStatus: '',
+      percent:         0,
+      uploadStatus:    '',
     };
   },
 
@@ -61,6 +61,7 @@ export default {
   created() {
     this.selectedVersion = (this.datesetVersionOptions[0] || {}).value;
     const { percent, uploadStatus, uploadFile } = useFileList({ props: { resource: this.datasetVersion } });
+
     this.uploadFile = uploadFile;
     this.percent = percent;
     this.uploadStatus = uploadStatus;

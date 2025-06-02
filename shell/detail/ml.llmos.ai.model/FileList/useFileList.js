@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useStore } from 'vuex';
 
 import { CSRF } from '@shell/config/cookies';
@@ -10,7 +10,7 @@ export const useFileList = ({ props = {} }) => {
   const uploadStatus = ref('');
 
   const uploadFile = (formData) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
         const csrf = store.$cookies.get(CSRF, { parseJSON: false });
 
@@ -46,6 +46,7 @@ export const useFileList = ({ props = {} }) => {
                 percent.value = Math.floor((eventData.readSize / eventData.totalSize) * 100);
                 uploadStatus.value = `正在上传: ${ eventData.destPath }`;
               } catch (e) {
+                // eslint-disable-next-line no-console
                 console.error('Failed to parse SSE data:', e);
               }
             }

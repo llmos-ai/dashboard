@@ -1,9 +1,7 @@
 <script>
-import { useStore } from 'vuex';
 import { DownOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
-import { CSRF } from '@shell/config/cookies';
 import FileItem from './FileItem';
 
 export default {
@@ -30,16 +28,17 @@ export default {
 
   data() {
     return {
-      downloading: false,
-      uploading: false,
-      currentPath: '',
-      percent: 0,
+      downloading:  false,
+      uploading:    false,
+      currentPath:  '',
+      percent:      0,
       uploadStatus: '',
     };
   },
 
   created() {
     const { percent, uploadStatus, uploadFile } = useFileList({ props: { resource: this.resource } });
+
     this.uploadFile = uploadFile;
     this.percent = percent;
     this.uploadStatus = uploadStatus;
@@ -63,7 +62,6 @@ export default {
     async onDownload() {
       this.downloading = true;
 
-      const inStore = this.$store.getters['currentProduct'].inStore;
       const res = await this.resource.doAction('download', {}, { responseType: 'blob' });
 
       const fileName = `${ this.resource.metadata.name }.zip`;

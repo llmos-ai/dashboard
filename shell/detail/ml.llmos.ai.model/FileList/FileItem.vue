@@ -1,4 +1,5 @@
 <script>
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
 import { useFileItem } from '@shell/detail/ml.llmos.ai.model/FileList/useFileItem';
@@ -18,12 +19,12 @@ export default {
 
   props: {
     file: {
-      type: Object,
+      type:    Object,
       default: () => ({}),
     },
 
     resource: {
-      type: Object,
+      type:     Object,
       required: true,
     },
   },
@@ -42,7 +43,7 @@ export default {
       return isFile.value ? formatSi(props.file.Size, {
         increment: 1024,
         addSuffix: true,
-        suffix: 'B',
+        suffix:    'B',
       }) : '';
     });
 
@@ -50,11 +51,11 @@ export default {
       const now = dayjs();
       const out = diffFrom(dayjs(props.file.LastModified), now, (key, args) => t(key, args));
 
-      return isFile.value ? `${out.string} ago` : '';
+      return isFile.value ? `${ out.string } ago` : '';
     });
 
     const currentPath = computed(() => {
-      return props.file.Path ? props.file.Path.replace(`models/${props.resource.id}/`, '') : '';
+      return props.file.Path ? props.file.Path.replace(`models/${ props.resource.id }/`, '') : '';
     });
 
     const { currentFolder } = useFileItem({

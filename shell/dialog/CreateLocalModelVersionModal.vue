@@ -1,13 +1,10 @@
 <script>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { message } from 'ant-design-vue';
 import Banner from '@shell/components/Banner/Banner.vue';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
 import { LLMOS, DEFAULT_WORKSPACE } from '@shell/config/types';
-import LabelValue from '@shell/components/LabelValue';
-import LabeledSelect from '@shell/components/form/LabeledSelect';
-import { useI18n } from '@shell/composables/useI18n';
 import { allHash } from '@shell/utils/promise';
 
 export default {
@@ -16,43 +13,41 @@ export default {
   components: {
     Banner,
     LabeledInput,
-    LabelValue,
-    LabeledSelect
   },
 
   props: {
     resources: {
-      type: Array,
+      type:     Array,
       required: true,
     },
 
     onAdd: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
 
     projectId: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     saveInModal: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     beforeClose: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
 
     saveCb: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
 
     modelId: {
-      type: String,
+      type:    String,
       default: '',
     },
   },
@@ -61,18 +56,17 @@ export default {
 
   setup(props, { emit }) {
     const store = useStore();
-    const { t } = useI18n(store);
 
     const errors = ref([]);
 
     const value = reactive({
       metadata: {
-        name: '',
+        name:      '',
         namespace: DEFAULT_WORKSPACE,
       },
       spec: {
-        dataset: props.datasetId,
-        version: '',
+        dataset:           props.datasetId,
+        version:           '',
         enableFastLoading: true
       },
     });
@@ -86,23 +80,19 @@ export default {
     });
 
     const model = computed(() => {
-      const model = store.getters[`${inStore.value}/byId`](LLMOS.MODEL, props.modelId);
+      const model = store.getters[`${ inStore.value }/byId`](LLMOS.MODEL, props.modelId);
+
       return model || {};
     });
 
     const localModel = computed(() => {
-      const localModel = store.getters[`${inStore.value}/byId`](LLMOS.LOCAL_MODEL, `${model.value.id}-local`);
+      const localModel = store.getters[`${ inStore.value }/byId`](LLMOS.LOCAL_MODEL, `${ model.value.id }-local`);
+
       return localModel || {};
     });
 
-    const schema = computed(() => {
-      return store.getters[`${inStore.value}/schemaFor`](LLMOS.DATASET_VERSION);
-    });
-
     onMounted(async() => {
-      await allHash({
-        localModels: await store.dispatch(`${inStore.value}/findAll`, { type: LLMOS.LOCAL_MODEL }),
-      });
+      await allHash({ localModels: await store.dispatch(`${ inStore.value }/findAll`, { type: LLMOS.LOCAL_MODEL }) });
     });
 
     const close = () => {
@@ -114,15 +104,15 @@ export default {
       const name = model.value.metadata?.name;
 
       if (!localModel.value.id) {
-        const resource = await store.dispatch(`${inStore.value}/create`, {
-          type: LLMOS.LOCAL_MODEL,
+        const resource = await store.dispatch(`${ inStore.value }/create`, {
+          type:     LLMOS.LOCAL_MODEL,
           metadata: {
             name,
             namespace: model.value.metadata?.namespace,
           },
           spec: {
-            registry: model.value.spec?.registry,
-            modelName: `${model.value.id}`
+            registry:  model.value.spec?.registry,
+            modelName: `${ model.value.id }`
           },
         });
 
@@ -139,10 +129,10 @@ export default {
         const newLocalModel = await createLocalModel();
         const localModelName = newLocalModel?.metadata?.name;
 
-        const localModelVersion = await store.dispatch(`${inStore.value}/create`, {
-          type: LLMOS.LOCAL_MODEL_VERSION,
+        const localModelVersion = await store.dispatch(`${ inStore.value }/create`, {
+          type:     LLMOS.LOCAL_MODEL_VERSION,
           metadata: {
-            name: `${localModelName}-${value.metadata.name}`,
+            name:      `${ localModelName }-${ value.metadata.name }`,
             namespace: model.value.metadata?.namespace,
           },
           spec: { localModel: localModelName },
@@ -152,15 +142,11 @@ export default {
 
         const patchData = { spec: { defaultVersion: localModelVersion?.id } };
 
-        newLocalModel.patch(patchData, {
-          headers: {
-            'content-type': 'application/merge-patch+json',
-          },
-        }, true, true);
+        newLocalModel.patch(patchData, { headers: { 'content-type': 'application/merge-patch+json' } }, true, true);
 
         emit('close');
       } catch (err) {
-        message.error(`Cache Fail: ${err.message || err}`);
+        message.error(`Cache Fail: ${ err.message || err }`);
       }
     };
 
@@ -200,7 +186,7 @@ export default {
         />
       </div>
     </div>
-    
+
     <template #actions>
       <a-button
         @click="close"

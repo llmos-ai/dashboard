@@ -1,12 +1,8 @@
 import { message } from 'ant-design-vue';
 
 import SteveModel from '@shell/plugins/steve/steve-class';
-
-import { REGISTRY } from '@shell/config/labels-annotations';
 import { LLMOS } from '@shell/config/types';
-
 import { set } from '@shell/utils/object';
-import { escapeHtml } from '@shell/utils/string';
 
 export default class LocalModelVersion extends SteveModel {
   applyDefaults() {
@@ -17,47 +13,45 @@ export default class LocalModelVersion extends SteveModel {
         labels:      {},
         annotations: {},
       },
-      spec: {
-      },
+      spec: {},
     };
 
     this.metadata = value.metadata;
     set(this, 'spec', this.spec || value.spec);
   }
 
-  get localModelVersions() {    
+  get localModelVersions() {
     return this.$getters['all'](LLMOS.LOCAL_MODEL_VERSION)
-      .filter(version => 
-        version.metadata.namespace === this.metadata.namespace && 
+      .filter((version) => version.metadata.namespace === this.metadata.namespace &&
         version.spec?.localModel === this.metadata.name
       );
   }
 
   get localModelVersionOptions() {
     return this.localModelVersions.map((version) => ({
-      label: (version.metadata.name).replace(`${this.metadata.name}-`, ''),
+      label: (version.metadata.name).replace(`${ this.metadata.name }-`, ''),
       value: version.id,
-      age: version.creationTimestamp,
-    })).sort((a={}, b={}) => {
+      age:   version.creationTimestamp,
+    })).sort((a = {}, b = {}) => {
       const aVersion = parseInt((a.label || '').replace(`v`, ''));
       const bVersion = parseInt((b.label || '').replace(`v`, ''));
 
       return bVersion - aVersion;
-    })
+    });
   }
 
   get latestLocalModelVersion() {
     const version = this.localModelVersionOptions[0] || {};
 
-    return version.label || 'v0'
+    return version.label || 'v0';
   }
 
   get nextVersion() {
-    const latestVersionNumber = this.latestLocalModelVersion.replace('v', '')
+    const latestVersionNumber = this.latestLocalModelVersion.replace('v', '');
 
     const nextVersionNumber = Number(latestVersionNumber) + 1;
 
-    return `v${nextVersionNumber}`;
+    return `v${ nextVersionNumber }`;
   }
 
   get availableActions() {
@@ -78,12 +72,12 @@ export default class LocalModelVersion extends SteveModel {
   async fetchOrigin() {
     try {
       const newLocalModel = this;
-      const localModelName = newLocalModel?.metadata?.name
+      const localModelName = newLocalModel?.metadata?.name;
 
       const localModelVersion = await this.$dispatch(`create`, {
         type:     LLMOS.LOCAL_MODEL_VERSION,
         metadata: {
-          name:      `${localModelName}-${newLocalModel.nextVersion}`,
+          name:      `${ localModelName }-${ newLocalModel.nextVersion }`,
           namespace: this.metadata?.namespace,
         },
         spec: { localModel: localModelName },
@@ -91,13 +85,13 @@ export default class LocalModelVersion extends SteveModel {
 
       await localModelVersion.save();
 
-      message.success(`Local Model ${localModelName} Version ${newLocalModel.nextVersion} created successfully`);
+      message.success(`Local Model ${ localModelName } Version ${ newLocalModel.nextVersion } created successfully`);
     } catch (err) {
       message.error(`${ err.message || err }`);
     }
   }
 
   get defaultLocalModelVersion() {
-    return this.$getters['byId'](LLMOS.LOCAL_MODEL_VERSION, this.spec.defaultVersion) || {}
+    return this.$getters['byId'](LLMOS.LOCAL_MODEL_VERSION, this.spec.defaultVersion) || {};
   }
 }

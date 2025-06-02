@@ -80,13 +80,13 @@ export default class ModelRegistry extends SteveModel {
   }
 
   get localModel() {
-    const localModel = this.$getters[`byId`](LLMOS_TYPES.LOCAL_MODEL, `${this.id}`);
+    const localModel = this.$getters[`byId`](LLMOS_TYPES.LOCAL_MODEL, `${ this.id }`);
 
     return localModel || {};
   }
 
   async createLocalModel() {
-    const name = this.metadata?.name
+    const name = this.metadata?.name;
 
     if (!this.localModel.id) {
       const resource = await this.$dispatch(`create`, {
@@ -110,12 +110,12 @@ export default class ModelRegistry extends SteveModel {
   async cache() {
     try {
       const newLocalModel = await this.createLocalModel();
-      const localModelName = newLocalModel?.metadata?.name
+      const localModelName = newLocalModel?.metadata?.name;
 
       const localModelVersion = await this.$dispatch(`create`, {
         type:     LLMOS_TYPES.LOCAL_MODEL_VERSION,
         metadata: {
-          name:      `${localModelName}-${newLocalModel.nextVersion}`,
+          name:      `${ localModelName }-${ newLocalModel.nextVersion }`,
           namespace: this.metadata?.namespace,
         },
         spec: { localModel: localModelName },
@@ -123,7 +123,7 @@ export default class ModelRegistry extends SteveModel {
 
       await localModelVersion.save();
 
-      message.success(`Local Model ${localModelName} Version ${newLocalModel.nextVersion} created successfully`);
+      message.success(`Local Model ${ localModelName } Version ${ newLocalModel.nextVersion } created successfully`);
     } catch (err) {
       message.error(`${ err.message || err }`);
     }

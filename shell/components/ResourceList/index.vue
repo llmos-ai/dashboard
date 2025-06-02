@@ -216,7 +216,6 @@ export default {
 
     const resource = this.$route.params.resource;
 
-    console.log('resource', resource);
     const hasListComponent =
       this.$store.getters['type-map/hasCustomList'](resource);
 

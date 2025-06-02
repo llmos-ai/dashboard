@@ -13,22 +13,22 @@ export default {
 
   props: {
     resources: {
-      type: Array,
+      type:     Array,
       required: true,
     },
 
     beforeClose: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
 
     saveCb: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
 
     currentPath: {
-      type: String,
+      type:    String,
       default: '',
     },
   },
@@ -38,9 +38,7 @@ export default {
   data() {
     return {
       errors: [],
-      value: {
-        targetDirectory: ''
-      }
+      value:  { targetDirectory: '' }
     };
   },
 
@@ -64,7 +62,7 @@ export default {
       this.errors = [];
 
       try {
-        const res = await this.resource.doAction('createDirectory', { targetDirectory: `${this.currentPath}/${this.value.targetDirectory}` });
+        const res = await this.resource.doAction('createDirectory', { targetDirectory: `${ this.currentPath }/${ this.value.targetDirectory }` });
 
         if (res._status === 204) {
           message.success('Folder Created');
