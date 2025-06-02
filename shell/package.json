@@ -156,6 +156,7 @@
     "yarn": "1.22.18"
   },
   "resolutions": {
+    "vue-loader": "16.8.1",
     "ejs": "^3.1.7",
     "json5": ">=2.2.2",
     "d3-color": ">=3.1.0",
@@ -175,7 +176,6 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.4",
-    "@types/lodash-es": "^4",
-    "vue-loader": "^17.4.2"
+    "@types/lodash-es": "^4"
   }
 }
