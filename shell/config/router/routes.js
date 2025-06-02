@@ -169,6 +169,12 @@ export default [
         meta:      { product: 'apps' }
       },
       {
+        path:      '/c/:cluster/apps/knowledgeBase/:id',
+        component: () => interopDefault(import('@shell/pages/c/_cluster/apps/knowledgeBase/_id.vue')),
+        name:      'c-cluster-apps-knowledgeBase-id',
+        meta:      { product: 'apps' }
+      },
+      {
         path:      '/c/:cluster/apps/knowledgeBase/create',
         component: () => interopDefault(import('@shell/pages/c/_cluster/apps/knowledgeBase/create/index.vue')),
         name:      'c-cluster-apps-knowledgeBase-create',

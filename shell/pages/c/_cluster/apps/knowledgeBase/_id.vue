@@ -1,10 +1,15 @@
 <script>
-import { getAllSchemaAPI, createObjectAPI } from '@/shell/config/weaviate';
+import { getAllSchemaAPI, deleteClassAPI, createObjectAPI, getAllObjectAPI } from '@/shell/config/weaviate';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
 import CruResourceFooter from '@shell/components/CruResourceFooter';
 import AsyncButton from '@shell/components/AsyncButton';
+import ResourceTable from '@shell/components/ResourceTable';
+
+import { NAME, AGE } from '@shell/config/table-headers';
+import { findBy } from '@shell/utils/array';
+import { allHash } from '@shell/utils/promise';
 
 export default {
   layout: 'plain',
@@ -15,12 +20,17 @@ export default {
     LabeledInput,
     CruResourceFooter,
     AsyncButton,
+    ResourceTable,
   },
 
   data() {
     return {
+      className: '',
       classes: [],
       objects: [],
+      schema: {},
+      value: {},
+      mode: 'detail',
     };
   },
 
@@ -38,8 +48,37 @@ export default {
       };
     },
 
-    canSave() {
-      return !!this.value.className;
+    resource() {
+      const id = this.$route.params.id;
+      
+      const out = findBy(this.classes, 'class', id) || {};
+      console.log('out', out)
+      console.log('out', out)
+      return out
+    },
+
+    inStore() {
+      return this.$store.getters['currentProduct'].inStore;
+    },
+
+
+    headers() {
+      return [
+        {
+          ...NAME,
+          value: 'properties.name',
+        },
+        {
+          name:          '分段模式',
+          label:         '分段模式',
+          value:         '分段模式',
+        },
+        {
+          name:          '字符数',
+          label:         '字符数',
+          value:         '字符数',
+        },
+      ];
     },
   },
 
@@ -75,6 +114,22 @@ export default {
     confirmCancel() {
       this.$router.push(this.location);
     },
+
+    async fetchList() {
+      const hash = await allHash({
+        classes: this.$store.dispatch(
+          `${ this.inStore }/request`,
+          { url: getAllSchemaAPI }
+        ),
+        objects: this.$store.dispatch(
+          `${ this.inStore }/request`,
+          { url: getAllObjectAPI }
+        ),
+      }) 
+
+      this.classes = hash.classes.classes || [];
+      this.objects = hash.objects.objects || [];
+    },
   }
 };
 </script>
@@ -93,12 +148,7 @@ export default {
               >
                 Knowledge Base: 
               </router-link>
-              <t
-                class="masthead-resource-title"
-                :k="'resourceDetail.header.create'"
-                :escapehtml="false"
-                :subtype="''"
-              />
+              {{ resource.class }}
             </h1>
           </div>
         </div>
@@ -107,16 +157,25 @@ export default {
 
     <div class="create-resource-container cru__form">
       <div class="resource-container cru__content">
-        <div class="row mb-10">
-          <div class="col span-6">
-            <LabeledInput
-              v-model:value="value.className"
-              label="Name"
-              placeholder="Please input Name"
-              required
+        <ResourceTabs
+          :value="value"
+          :needConditions="false"
+          :needEvents="false"
+          :needRelated="false"
+        >
+          <Tab
+            name="files"
+            label="Documents"
+          >
+            <ResourceTable
+              :loading="loading"
+              :schema="schema"
+              :rows="objects"
+              :headers="headers"
+              default-sort-by="age"
             />
-          </div>
-        </div>
+          </Tab>
+        </ResourceTabs>
       </div>
 
       <CruResourceFooter
@@ -125,48 +184,8 @@ export default {
         :is-form="true"
         :show-cancel="true"
         @cancel-confirmed="confirmCancel"
-      >
-        <template
-          #default
-        >
-          <div>
-            <a-space>
-              <AsyncButton
-                ref="save"
-                type="primary"
-                :disabled="!canSave"
-                :mode="mode"
-                @click="clickSave($event)"
-              />
-            </a-space>
-          </div>
-        </template>
-      </CruResourceFooter>
-    </div>
-
-    <!-- <ResourceTabs
-      :value="value"
-      class="mt-15"
-      :need-conditions="true"
-      :need-events="false"
-      :need-related="false"
-      :side-tabs="true"
-      :mode="mode"
-    >
-      <Tab
-        name="basic"
-        :label="t('generic.tabs.basic')"
-        :weight="2"
-      >
-        <div class="row mb-10">
-          <div class="col span-12">
-            
-          </div>
-        </div>
-      </Tab>
-    </ResourceTabs> -->
-
-    
+      />
+    </div>    
   </section>
 </template>
 
