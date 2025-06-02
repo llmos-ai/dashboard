@@ -3,7 +3,11 @@ module.exports = function(api) {
   const presets = [
     [
       '@vue/cli-plugin-babel/preset',
-      { useBuiltIns: false }
+      {
+        useBuiltIns: false,
+        // 添加对script setup的支持
+        jsx:         false
+      }
     ],
     [
       '@babel/preset-env',
@@ -18,7 +22,11 @@ module.exports = function(api) {
     }
   };
 
-  const plugins = ['@babel/plugin-transform-nullish-coalescing-operator'];
+  const plugins = [
+    '@babel/plugin-transform-nullish-coalescing-operator',
+    // 添加对Vue 3 Composition API的支持
+    '@vue/babel-plugin-jsx'
+  ];
 
   if (process.env.NODE_ENV === 'test') {
     plugins.push('transform-require-context');
