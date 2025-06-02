@@ -177,6 +177,6 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.4",
     "@types/lodash-es": "^4",
-    "vue-loader": "^16.8.1"
+    "vue-loader": "^17.4.2"
   }
 }
