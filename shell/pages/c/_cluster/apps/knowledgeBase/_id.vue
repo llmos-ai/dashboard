@@ -1,66 +1,58 @@
 <script>
-import { getAllSchemaAPI, deleteClassAPI, createObjectAPI, getAllObjectAPI } from '@/shell/config/weaviate';
+import { getAllSchemaAPI, getAllObjectAPI } from '@/shell/config/weaviate';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
-import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
 import CruResourceFooter from '@shell/components/CruResourceFooter';
-import AsyncButton from '@shell/components/AsyncButton';
 import ResourceTable from '@shell/components/ResourceTable';
 
-import { NAME, AGE } from '@shell/config/table-headers';
+import { NAME } from '@shell/config/table-headers';
 import { findBy } from '@shell/utils/array';
 import { allHash } from '@shell/utils/promise';
 
 export default {
   layout: 'plain',
 
-  components: { 
-    Tab, 
+  components: {
+    Tab,
     ResourceTabs,
-    LabeledInput,
     CruResourceFooter,
-    AsyncButton,
     ResourceTable,
   },
 
   data() {
     return {
       className: '',
-      classes: [],
-      objects: [],
-      schema: {},
-      value: {},
-      mode: 'detail',
+      classes:   [],
+      objects:   [],
+      schema:    {},
+      value:     {},
+      mode:      'detail',
     };
   },
 
   async fetch() {
-    this.fetchList()
+    this.fetchList();
   },
 
   computed: {
     location() {
       return {
-        name: 'c-cluster-apps-knowledgeBase',
-        params: {
-          cluster: 'local',
-        },
+        name:   'c-cluster-apps-knowledgeBase',
+        params: { cluster: 'local' },
       };
     },
 
     resource() {
       const id = this.$route.params.id;
-      
+
       const out = findBy(this.classes, 'class', id) || {};
-      console.log('out', out)
-      console.log('out', out)
-      return out
+
+      return out;
     },
 
     inStore() {
       return this.$store.getters['currentProduct'].inStore;
     },
-
 
     headers() {
       return [
@@ -69,14 +61,14 @@ export default {
           value: 'properties.name',
         },
         {
-          name:          '分段模式',
-          label:         '分段模式',
-          value:         '分段模式',
+          name:  '分段模式',
+          label: '分段模式',
+          value: '分段模式',
         },
         {
-          name:          '字符数',
-          label:         '字符数',
-          value:         '字符数',
+          name:  '字符数',
+          label: '字符数',
+          value: '字符数',
         },
       ];
     },
@@ -88,24 +80,22 @@ export default {
 
       try {
         await this.$store.dispatch(
-          `${inStore}/request`,
+          `${ inStore }/request`,
           {
-            url: getAllSchemaAPI,
+            url:    getAllSchemaAPI,
             method: 'POST',
-            data: {
-              class: this.value.className,
-            }
+            data:   { class: this.value.className }
           }
         );
         this.$message.success('创建成功');
 
         buttonDone(true);
 
-        this.confirmCancel()
+        this.confirmCancel();
 
-        return 
+        return;
       } catch (error) {
-        this.$message.error('创建失败：' + error?.error?.[0]?.message);
+        this.$message.error(`创建失败：${ error?.error?.[0]?.message }`);
 
         buttonDone(false);
       }
@@ -125,7 +115,7 @@ export default {
           `${ this.inStore }/request`,
           { url: getAllObjectAPI }
         ),
-      }) 
+      });
 
       this.classes = hash.classes.classes || [];
       this.objects = hash.objects.objects || [];
@@ -146,7 +136,7 @@ export default {
                 role="link"
                 class="masthead-resource-list-link"
               >
-                Knowledge Base: 
+                Knowledge Base:
               </router-link>
               {{ resource.class }}
             </h1>
@@ -185,7 +175,7 @@ export default {
         :show-cancel="true"
         @cancel-confirmed="confirmCancel"
       />
-    </div>    
+    </div>
   </section>
 </template>
 

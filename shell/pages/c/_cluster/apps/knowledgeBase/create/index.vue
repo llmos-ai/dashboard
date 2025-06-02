@@ -1,7 +1,5 @@
 <script>
-import { getAllSchemaAPI, createObjectAPI } from '@/shell/config/weaviate';
-import Tab from '@shell/components/Tabbed/Tab';
-import ResourceTabs from '@shell/components/form/ResourceTabs';
+import { getAllSchemaAPI } from '@/shell/config/weaviate';
 import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput.vue';
 import CruResourceFooter from '@shell/components/CruResourceFooter';
 import AsyncButton from '@shell/components/AsyncButton';
@@ -9,9 +7,7 @@ import AsyncButton from '@shell/components/AsyncButton';
 export default {
   layout: 'plain',
 
-  components: { 
-    Tab, 
-    ResourceTabs,
+  components: {
     LabeledInput,
     CruResourceFooter,
     AsyncButton,
@@ -25,16 +21,14 @@ export default {
   },
 
   async fetch() {
-    this.fetchList()
+    this.fetchList();
   },
 
   computed: {
     location() {
       return {
-        name: 'c-cluster-apps-knowledgeBase',
-        params: {
-          cluster: 'local',
-        },
+        name:   'c-cluster-apps-knowledgeBase',
+        params: { cluster: 'local' },
       };
     },
 
@@ -49,24 +43,22 @@ export default {
 
       try {
         await this.$store.dispatch(
-          `${inStore}/request`,
+          `${ inStore }/request`,
           {
-            url: getAllSchemaAPI,
+            url:    getAllSchemaAPI,
             method: 'POST',
-            data: {
-              class: this.value.className,
-            }
+            data:   { class: this.value.className }
           }
         );
         this.$message.success('创建成功');
 
         buttonDone(true);
 
-        this.confirmCancel()
+        this.confirmCancel();
 
-        return 
+        return;
       } catch (error) {
-        this.$message.error('创建失败：' + error?.error?.[0]?.message);
+        this.$message.error(`创建失败：${ error?.error?.[0]?.message }`);
 
         buttonDone(false);
       }
@@ -91,7 +83,7 @@ export default {
                 role="link"
                 class="masthead-resource-list-link"
               >
-                Knowledge Base: 
+                Knowledge Base:
               </router-link>
               <t
                 class="masthead-resource-title"
@@ -160,13 +152,11 @@ export default {
       >
         <div class="row mb-10">
           <div class="col span-12">
-            
+
           </div>
         </div>
       </Tab>
     </ResourceTabs> -->
-
-    
   </section>
 </template>
 

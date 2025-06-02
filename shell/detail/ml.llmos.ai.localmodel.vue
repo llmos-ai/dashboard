@@ -9,7 +9,7 @@ import CreateEditView from '@shell/mixins/create-edit-view';
 import { allHash } from '@shell/utils/promise';
 import { LLMOS } from '@shell/config/types';
 
-import { NAME, STATE, NAMESPACE, AGE, STORAGE_CLASS_DEFAULT } from '@shell/config/table-headers';
+import { NAME, STATE, AGE, STORAGE_CLASS_DEFAULT } from '@shell/config/table-headers';
 
 export default {
   components: {
@@ -38,15 +38,13 @@ export default {
   },
 
   async fetch() {
-    await allHash({ 
-      localModelVersions: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
-    });
+    await allHash({ localModelVersions: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }) });
   },
 
   computed: {
     headers() {
       const VOLUME_SNAPSHOT = {
-        name: 'status.volumeSnapshot',
+        name:  'status.volumeSnapshot',
         label: this.t('localModel.volumeSnapshot.label')
       };
 
@@ -70,13 +68,11 @@ export default {
     },
 
     schema() {
-      return this.$store.getters['cluster/schemaFor'](LLMOS.LOCAL_MODEL_VERSION)
+      return this.$store.getters['cluster/schemaFor'](LLMOS.LOCAL_MODEL_VERSION);
     },
   },
 
-  methods: {
-    
-  }
+  methods: {}
 };
 </script>
 

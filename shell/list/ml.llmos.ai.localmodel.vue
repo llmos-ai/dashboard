@@ -30,10 +30,8 @@ export default {
   },
 
   async fetch() {
-    const inStore = this.$store.getters['currentProduct'].inStore;
-
     await allHash({
-      resource:        await this.$fetchType(this.resource),
+      resource:           await this.$fetchType(this.resource),
       localModelVersions: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
     });
   },

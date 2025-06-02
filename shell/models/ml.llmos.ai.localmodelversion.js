@@ -1,9 +1,6 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
 
-import { REGISTRY } from '@shell/config/labels-annotations';
 import { LLMOS, PVC } from '@shell/config/types';
-
-import { set } from '@shell/utils/object';
 import { escapeHtml } from '@shell/utils/string';
 
 export default class LocalModelVersion extends SteveModel {
@@ -12,24 +9,16 @@ export default class LocalModelVersion extends SteveModel {
   }
 
   setDefault() {
-    const data = { 
-      spec: {
-        defaultVersion: this.id,
-      } 
-    };
+    const data = { spec: { defaultVersion: this.id } };
 
-    return this.localModel.patch(data, {
-      headers: {
-        'content-type': 'application/merge-patch+json',
-      },
-    }, true, true);
+    return this.localModel.patch(data, { headers: { 'content-type': 'application/merge-patch+json' } }, true, true);
   }
 
   get localModel() {
     const localModel = this.spec?.localModel;
     const namespace = this.metadata?.namespace;
 
-    return this.$getters['byId'](LLMOS.LOCAL_MODEL, `${ namespace }/${ localModel }`)
+    return this.$getters['byId'](LLMOS.LOCAL_MODEL, `${ namespace }/${ localModel }`);
   }
 
   get _availableActions() {
@@ -48,11 +37,11 @@ export default class LocalModelVersion extends SteveModel {
   }
 
   get volumeClaims() {
-    return this.$getters['byId'](PVC, this.id) || {}
+    return this.$getters['byId'](PVC, this.id) || {};
   }
 
   get groupByModel() {
-    const name = `${this.metadata.namespace}/${this.spec?.localModel}` || this.$rootGetters['i18n/t']('generic.none');
+    const name = `${ this.metadata.namespace }/${ this.spec?.localModel }` || this.$rootGetters['i18n/t']('generic.none');
 
     return this.$rootGetters['i18n/t']('resourceTable.groupLabel.model', { name: escapeHtml(name) });
   }

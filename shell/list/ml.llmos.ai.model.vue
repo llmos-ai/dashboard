@@ -166,9 +166,9 @@ export default {
   },
 
   async fetch() {
-    await allHash({ 
-      models: this.$fetchType(this.resource),
-      localModels: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL }),
+    await allHash({
+      models:             this.$fetchType(this.resource),
+      localModels:        this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL }),
       localModelVersions: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
     });
   },

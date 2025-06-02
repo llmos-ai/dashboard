@@ -19,32 +19,32 @@ export default {
 
   props: {
     resources: {
-      type: Array,
+      type:     Array,
       required: true,
     },
 
     onAdd: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
 
     projectId: {
-      type: String,
+      type:    String,
       default: null,
     },
 
     saveInModal: {
-      type: Boolean,
+      type:    Boolean,
       default: false,
     },
 
     beforeClose: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
 
     saveCb: {
-      type: Function,
+      type:    Function,
       default: () => {},
     },
   },
@@ -58,12 +58,12 @@ export default {
 
     const value = reactive({
       metadata: {
-        name: '',
+        name:      '',
         namespace: DEFAULT_WORKSPACE,
       },
       type: SECRET_TYPES.OPAQUE,
       data: {
-        accessKeyID: '',
+        accessKeyID:     '',
         accessKeySecret: ''
       },
     });
@@ -84,7 +84,7 @@ export default {
     });
 
     const schema = computed(() => {
-      return store.getters[`${inStore.value}/schemaFor`](SECRET);
+      return store.getters[`${ inStore.value }/schemaFor`](SECRET);
     });
 
     const close = () => {
@@ -98,17 +98,17 @@ export default {
       try {
         const url = schema.value.linkFor('collection');
 
-        const model = await store.dispatch(`${inStore.value}/create`, {
+        const model = await store.dispatch(`${ inStore.value }/create`, {
           ...value,
           data: {
             ...value.data,
-            accessKeyID: base64Encode(value.data.accessKeyID),
+            accessKeyID:     base64Encode(value.data.accessKeyID),
             accessKeySecret: base64Encode(value.data.accessKeySecret),
           },
         });
 
         Object.assign(model, {
-          type: SECRET_TYPES.OPAQUE,
+          type:  SECRET_TYPES.OPAQUE,
           _type: SECRET_TYPES.OPAQUE,
         });
 

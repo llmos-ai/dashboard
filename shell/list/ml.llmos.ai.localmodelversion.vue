@@ -1,19 +1,19 @@
 <script>
 import ResourceTable from '@shell/components/ResourceTable';
-import LiveData from '@shell/components/formatter/LiveDate';
 import ActionMenu from '@shell/components/ActionMenuShell.vue';
 
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import { allHash } from '@shell/utils/promise';
 import { LLMOS } from '@shell/config/types';
-import { NAME, STATE, NAMESPACE, AGE, STORAGE_CLASS_DEFAULT } from '@shell/config/table-headers';
+import {
+  NAME, STATE, NAMESPACE, AGE, STORAGE_CLASS_DEFAULT
+} from '@shell/config/table-headers';
 
 export default {
   name: 'LocalModelVersionList',
 
-  components: { 
+  components: {
     ResourceTable,
-    LiveData, 
     ActionMenu,
   },
 
@@ -40,7 +40,7 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     await allHash({
-      resource:        await this.$fetchType(this.resource),
+      resource:    await this.$fetchType(this.resource),
       localModels: await this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.LOCAL_MODEL }),
     });
   },
@@ -53,7 +53,7 @@ export default {
       };
 
       const VOLUME_SNAPSHOT = {
-        name: 'status.volumeSnapshot',
+        name:  'status.volumeSnapshot',
         label: this.t('localModel.volumeSnapshot.label')
       };
 
@@ -87,7 +87,6 @@ export default {
     },
 
     showActions(e, group) {
-      console.log('showActions', group);
       const row = group.rows[0];
 
       this.$store.commit(`action-menu/show`, {
@@ -111,7 +110,10 @@ export default {
     <template #group-by="group">
       <div class="group-bar">
         <div class="group-tab">
-          <div v-clean-html="templateLabel(group.group)" class="project-name" />
+          <div
+            v-clean-html="templateLabel(group.group)"
+            class="project-name"
+          />
         </div>
 
         <div class="right">
@@ -122,7 +124,7 @@ export default {
         </div>
       </div>
     </template>
-  </ResourceTable>  
+  </ResourceTable>
 </template>
 
 <style lang="scss" scoped>

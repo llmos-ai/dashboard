@@ -4,7 +4,7 @@ import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkload from '@shell/mixins/llmos/ml-workload';
 import { MANAGEMENT, PVC } from '@shell/config/types';
 import { mergeEnvs } from '@shell/utils/merge';
-import { REGISTRY as REGISTRY_ANNOTATIONS } from '@shell/config/labels-annotations'
+import { REGISTRY as REGISTRY_ANNOTATIONS } from '@shell/config/labels-annotations';
 import { SETTING } from '@shell/config/settings';
 import { allHash } from '@shell/utils/promise';
 import RemoteModelList from '@shell/edit/ml.llmos.ai.modelservice/RemoteModelList.vue';
@@ -16,8 +16,10 @@ import ArgumentVars from './components/ArgumentVars.vue';
 export default {
   name:       'EditModelService',
   mixins:     [CreateEditView, FormValidation, LLMOSWorkload, LabeledSelect],
-  components: { RemoteModelList, ArgumentVars, LocalModelList },
-  props:      {
+  components: {
+    RemoteModelList, ArgumentVars, LocalModelList
+  },
+  props: {
     value: {
       type:     Object,
       required: true,
@@ -44,7 +46,7 @@ export default {
         MANAGEMENT.SETTING,
         SETTING.MODEL_SERVICE_DEFAULT_IMAGE
       ),
-      settings: this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }),
+      settings:     this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }),
       volumeClaims: this.$store.dispatch(`${ inStore }/findAll`, { type: PVC }),
     });
 
@@ -233,42 +235,36 @@ export default {
       this.spec.model = item.id;
     },
 
-    async updateLocalModelInfo(localModelVersion={}) {
-      const volumeClaims = localModelVersion.volumeClaims
-      this.spec.model = `${localModelVersion.metadata.namespace}/${localModelVersion.spec.localModel}`;
+    async updateLocalModelInfo(localModelVersion = {}) {
+      const volumeClaims = localModelVersion.volumeClaims;
 
-      const volumeClaimTemplate = this.spec.volumeClaimTemplates[0]
-      const containerTemplate = this.spec.template.spec.containers[0]
-      const volumeMounts = containerTemplate.volumeMounts[0];
+      this.spec.model = `${ localModelVersion.metadata.namespace }/${ localModelVersion.spec.localModel }`;
+
+      const volumeClaimTemplate = this.spec.volumeClaimTemplates[0];
+      const containerTemplate = this.spec.template.spec.containers[0];
 
       Object.assign(containerTemplate, {
         volumeMounts: [{
-          name: volumeClaims?.spec?.volumeName,
+          name:      volumeClaims?.spec?.volumeName,
           mountPath: '/root/.cache',
         }]
-      })
+      });
 
       const pvc = await this.$store.dispatch('cluster/create', {
         metadata: {
-          name: volumeClaims?.spec?.volumeName,
-          namespace: volumeClaims?.metadata?.namespace,
-          annotations: {
-            [REGISTRY_ANNOTATIONS.IS_LOCAL_MODEL]: 'true',
-          },
+          name:        volumeClaims?.spec?.volumeName,
+          namespace:   volumeClaims?.metadata?.namespace,
+          annotations: { [REGISTRY_ANNOTATIONS.IS_LOCAL_MODEL]: 'true' },
         },
         spec: {
           storageClassName: volumeClaims?.spec?.storageClassName,
-          resources: {
-            requests: {
-              storage: volumeClaims?.spec?.resources?.requests?.storage,
-            }
-          },
-          accessModes: ['ReadWriteOnce'],
+          resources:        { requests: { storage: volumeClaims?.spec?.resources?.requests?.storage } },
+          accessModes:      ['ReadWriteOnce'],
         },
         type: PVC,
       });
 
-      Object.assign(volumeClaimTemplate, pvc)
+      Object.assign(volumeClaimTemplate, pvc);
     },
 
     updateModelRegistry() {

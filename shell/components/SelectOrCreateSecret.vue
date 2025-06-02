@@ -9,9 +9,7 @@ import LabeledSelect from '@shell/components/form/LabeledSelect';
 export default {
   name: 'SelectOrCreateSecret',
 
-  components: {
-    LabeledSelect
-  },
+  components: { LabeledSelect },
 
   props: {
     value: {

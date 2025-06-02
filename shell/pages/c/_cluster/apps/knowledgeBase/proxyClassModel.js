@@ -1,25 +1,25 @@
 import { Modal, message } from 'ant-design-vue';
 
-import { getAllSchemaAPI, deleteClassAPI, createObjectAPI, getAllObjectAPI } from '@/shell/config/weaviate';
+import { deleteClassAPI, createObjectAPI } from '@/shell/config/weaviate';
 
 export function proxyClassModel({
   objects = [],
   item = {},
   ctx = {},
 }) {
-  const id = item.class
+  const id = item.class;
 
   const model = {
     objectCount: (objects.filter((obj) => obj.class === item.class) || []).length,
 
     availableActions: [
       {
-        action:     'insert',
-        label:      'Add Document',
-        icon:       'icon icon-copy',
-        bulkable:   false,
-        enabled:    true,
-        weight:     10, // Delete always goes last
+        action:   'insert',
+        label:    'Add Document',
+        icon:     'icon icon-copy',
+        bulkable: false,
+        enabled:  true,
+        weight:   10, // Delete always goes last
       },
       {
         action:     'promptRemove',
@@ -33,17 +33,17 @@ export function proxyClassModel({
       },
     ],
 
-    promptRemove: async () => {
+    promptRemove: async() => {
       Modal.confirm({
         title: 'Are you sure you want to delete this Knowledge Base?',
-        onOk: async () => {
+        onOk:  async() => {
           const res = await ctx.$store.dispatch(
             `${ ctx.inStore }/request`,
-            { 
-              url: deleteClassAPI(item.class),
-              method: 'DELETE', 
+            {
+              url:    deleteClassAPI(item.class),
+              method: 'DELETE',
             }
-          )
+          );
 
           if (res._status === 200) {
             message.success('Knowledge Base deleted successfully');
@@ -53,14 +53,14 @@ export function proxyClassModel({
       });
     },
 
-    insert: async () => {
+    insert: async() => {
       const res = await ctx.$store.dispatch(
         `${ ctx.inStore }/request`,
-        { 
-          url: createObjectAPI,
-          method: 'POST', 
-          data: {
-            class: item.class,
+        {
+          url:    createObjectAPI,
+          method: 'POST',
+          data:   {
+            class:      item.class,
             properties: {
               text: '显示器周围如果存在强电场或强磁场的话，也会导致电脑屏幕抖动或者闪烁。主要看看你的显示器周围有没有放一些其它家电之类的，比如电视机，冰箱，电磁炉……，如果有的话请讲这些电器远离显示器即可。',
               name: '显示器',
@@ -68,7 +68,7 @@ export function proxyClassModel({
             vector: [0.1, 0.2, 0.3],
           }
         }
-      )
+      );
 
       if (res._status === 200) {
         message.success('Insert successfully');
@@ -78,14 +78,14 @@ export function proxyClassModel({
 
     detailLocation: {
       name:   `c-cluster-apps-knowledgeBase-id`,
-      params: { 
+      params: {
         cluster: 'local',
-        id, 
+        id,
       }
     },
 
     id,
-  }
+  };
 
-  return model || {}
+  return model || {};
 }

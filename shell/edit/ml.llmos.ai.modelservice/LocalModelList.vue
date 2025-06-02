@@ -1,18 +1,12 @@
 <script setup>
-import { ref, computed, watch, watchEffect, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import {
   FolderOutlined,
-  HeartOutlined,
-  DownloadOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons-vue';
 import LiveDate from '@shell/components/formatter/LiveDate.vue';
-import dayjs from 'dayjs';
-import { addUnit } from '@shell/utils/units';
-import { useFetch, debouncedRef } from '@vueuse/core';
 import MarkedView from '@shell/components/MarkedView';
-import { message } from 'ant-design-vue';
 
 import { allHash } from '@shell/utils/promise';
 import { LLMOS } from '@shell/config/types';
@@ -44,14 +38,15 @@ onMounted(async() => {
   loading.value = true;
 
   const res = await allHash({
-    localModels: await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL }),
+    localModels:        await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL }),
     localModelVersions: await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
   });
 
-  const localModel = res.localModels[0] || {}
-  activeItem.value = localModel
+  const localModel = res.localModels[0] || {};
 
-  const defaultVersion = localModel.defaultLocalModelVersion
+  activeItem.value = localModel;
+
+  const defaultVersion = localModel.defaultLocalModelVersion;
 
   emits('update:item', defaultVersion);
   activeVersion.value = defaultVersion.id;
@@ -69,10 +64,6 @@ const formatDataSource = computed(() => {
   });
 });
 
-const removeFrontMatter = (markdown) => {
-  return markdown?.replace(/^---\n[\s\S]*?\n---\n/, '') || '';
-};
-
 // click choose logic
 
 const handleItemClick = (item) => {
@@ -83,6 +74,7 @@ const handleItemClick = (item) => {
   activeItem.value = item;
 
   const version = item.defaultLocalModelVersion || {};
+
   emits('update:item', version);
   activeVersion.value = version.id;
 };
@@ -91,17 +83,18 @@ const onVersionClick = (version) => {
   activeVersion.value = version.value;
 
   const selectedVersion = store.getters[`cluster/byId`](LLMOS.LOCAL_MODEL_VERSION, version.value) || {};
+
   emits('update:item', selectedVersion);
 };
 
 const formatReadme = computed(() => {
-  let readmeJson = '';
+  const readmeJson = '';
 
-  try {
-    readmeJson = JSON.parse(readme.value);
-  } catch (err) {
-    return '';
-  }
+  // try {
+  //   readmeJson = JSON.parse(readme.value);
+  // } catch (err) {
+  //   return '';
+  // }
 
   return readmeJson?.Data?.ReadMeContent;
 });
@@ -124,7 +117,12 @@ const toggleExpand = (itemId) => {
 
 <template>
   <a-row :gutter="16">
-    <a-col :sm="10" :lg="10" :xl="9" :xxl="6">
+    <a-col
+      :sm="10"
+      :lg="10"
+      :xl="9"
+      :xxl="6"
+    >
       <div class="flex flex-col h-full">
         <a-input
           v-model:value="search"
@@ -155,7 +153,10 @@ const toggleExpand = (itemId) => {
                         </div>
                         <div class="footer flex items-center space-x-1">
                           <span class="text-xs w-[80px] flex items-center justify-start">
-                            <LiveDate :add-suffix="true" :value="item.creationTimestamp" />
+                            <LiveDate
+                              :add-suffix="true"
+                              :value="item.creationTimestamp"
+                            />
                           </span>
                           <div class="ml-auto flex items-center">
                             <a-button
@@ -174,9 +175,12 @@ const toggleExpand = (itemId) => {
                       </template>
                     </a-list-item-meta>
                   </a-list-item>
-                  
+
                   <!-- 版本子列表 -->
-                  <div v-if="expandedItems.has(item.id)" class="ml-4">
+                  <div
+                    v-if="expandedItems.has(item.id)"
+                    class="ml-4"
+                  >
                     <a-list
                       :data-source="item.localModelVersionOptions"
                       :split="false"
@@ -189,9 +193,14 @@ const toggleExpand = (itemId) => {
                           :class="{ 'bg-gray-100': activeVersion === version.value }"
                           @click="onVersionClick(version)"
                         >
-                          <div class="text-sm">{{ version.label }}</div>
+                          <div class="text-sm">
+                            {{ version.label }}
+                          </div>
                           <div class="text-xs text-gray-500">
-                            <LiveDate :add-suffix="true" :value="version.age" />
+                            <LiveDate
+                              :add-suffix="true"
+                              :value="version.age"
+                            />
                           </div>
                         </a-list-item>
                       </template>
