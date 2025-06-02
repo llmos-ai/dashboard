@@ -211,7 +211,6 @@
     "ts-jest": "27.1.5",
     "typescript": "5.6.3",
     "vue": "^3.5.13",
-    "vue-loader": "^17.4.2",
     "webpack-bundle-analyzer": "4.5.0",
     "webpack-virtual-modules": "0.4.3",
     "worker-loader": "3.0.8",
@@ -220,6 +219,7 @@
     "yarn": "1.22.18"
   },
   "resolutions": {
+    "vue-loader": "16.8.1",
     "ejs": "^3.1.7",
     "json5": ">=2.2.2",
     "d3-color": ">=3.1.0",
