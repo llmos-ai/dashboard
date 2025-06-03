@@ -181,6 +181,12 @@ export default [
         meta:      { product: 'apps' }
       },
       {
+        path:      '/c/:cluster/apps/knowledgeBase/:class/document/:id',
+        component: () => interopDefault(import('@shell/pages/c/_cluster/apps/document/_id.vue')),
+        name:      'c-cluster-apps-knowledgeBase-class-document-id',
+        meta:      { product: 'apps' }
+      },
+      {
         path:      '/c/:cluster/llmos/tools',
         component: () => interopDefault(
           import('@shell/pages/c/_cluster/llmos/tools/index.vue')

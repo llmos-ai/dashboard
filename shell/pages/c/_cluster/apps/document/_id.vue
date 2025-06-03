@@ -1,13 +1,10 @@
 <script>
-import { groupBy } from 'lodash';
-
 import { getAllSchemaAPI, getAllObjectAPI } from '@/shell/config/weaviate';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import CruResourceFooter from '@shell/components/CruResourceFooter';
 import ResourceTable from '@shell/components/ResourceTable';
 
-import { NAME } from '@shell/config/table-headers';
 import { findBy } from '@shell/utils/array';
 import { allHash } from '@shell/utils/promise';
 
@@ -38,9 +35,14 @@ export default {
 
   computed: {
     location() {
+      const className = this.$route.params.class;
+
       return {
-        name:   'c-cluster-apps-knowledgeBase',
-        params: { cluster: 'local' },
+        name:   'c-cluster-apps-knowledgeBase-id',
+        params: {
+          cluster: 'local',
+          id:      className,
+        },
       };
     },
 
@@ -59,40 +61,23 @@ export default {
     headers() {
       return [
         {
-          ...NAME,
-          value: 'name',
-        },
-        {
-          name:  '分段模式',
-          label: '分段模式',
-          value: '分段模式',
-        },
-        {
-          name:  '字符数',
-          label: '字符数',
-          value: '字符数',
+          name:  'text',
+          label: 'Text',
+          value: 'properties.text',
         },
       ];
     },
 
     rows() {
-      const out = this.objects.filter((item) => item.class === this.resource.class);
-      const map = groupBy(out, 'properties.document');
+      const document = this.$route.params.id;
 
-      return Object.keys(map).map((key) => {
-        return {
-          name:           key,
-          id:             key,
-          detailLocation: {
-            name:   `c-cluster-apps-knowledgeBase-class-document-id`,
-            params: {
-              cluster: 'local',
-              id:      key,
-              class:   this.resource.class
-            },
-          },
-        };
-      });
+      const out = this.objects.filter((item) => item?.properties?.document === document);
+
+      return out;
+    },
+
+    displayName() {
+      return this.$route.params.id;
     },
   },
 
@@ -160,9 +145,9 @@ export default {
                 role="link"
                 class="masthead-resource-list-link"
               >
-                Knowledge Base:
+                Document:
               </router-link>
-              {{ resource.class }}
+              {{ displayName }}
             </h1>
           </div>
         </div>
@@ -179,7 +164,7 @@ export default {
         >
           <Tab
             name="files"
-            label="Documents"
+            label="分段"
           >
             <ResourceTable
               :loading="loading"
