@@ -17,6 +17,7 @@ export default {
     return {
       classes: [],
       objects: [],
+      value:   {},
     };
   },
 
@@ -58,7 +59,9 @@ export default {
 
         return;
       } catch (error) {
-        this.$message.error(`创建失败：${ error?.error?.[0]?.message }`);
+        const message = error?.error?.[0]?.message;
+
+        this.$message.error(`创建失败：${ message }`);
 
         buttonDone(false);
       }

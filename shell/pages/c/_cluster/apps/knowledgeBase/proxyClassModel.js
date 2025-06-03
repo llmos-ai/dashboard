@@ -1,6 +1,7 @@
 import { Modal, message } from 'ant-design-vue';
 
 import { deleteClassAPI, createObjectAPI } from '@/shell/config/weaviate';
+import { uniq } from '@shell/utils/array';
 
 export function proxyClassModel({
   objects = [],
@@ -10,7 +11,7 @@ export function proxyClassModel({
   const id = item.class;
 
   const model = {
-    objectCount: (objects.filter((obj) => obj.class === item.class) || []).length,
+    objectCount: uniq(objects.filter((obj) => obj.class === item.class).map((obj) => obj.properties?.document) || []).length,
 
     availableActions: [
       {
@@ -62,8 +63,10 @@ export function proxyClassModel({
           data:   {
             class:      item.class,
             properties: {
-              text: '显示器周围如果存在强电场或强磁场的话，也会导致电脑屏幕抖动或者闪烁。主要看看你的显示器周围有没有放一些其它家电之类的，比如电视机，冰箱，电磁炉……，如果有的话请讲这些电器远离显示器即可。',
-              name: '显示器',
+              text:     `办理和其他前期工作进展。`,
+              keywords: '背景 必要性 建设背景',
+              document: '文档2',
+              index:    1,
             },
             vector: [0.1, 0.2, 0.3],
           }
