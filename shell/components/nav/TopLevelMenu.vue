@@ -32,6 +32,7 @@ export default {
       showPinClusters:        false,
       searchActive:           false,
       viewContainerDashboard: false,
+      selectedKeys:           [],
     };
   },
 
@@ -49,11 +50,6 @@ export default {
       'currentCluster',
       'currentProduct',
     ]),
-
-    showAccountAndApiKeyLink() {
-      // TODO: why is this here?
-      return this.isMgmt;
-    },
 
     showPreferencesLink() {
       return (
@@ -141,12 +137,7 @@ export default {
               }
             },
           ]
-        },
-        // {
-        //   key:   'about',
-        //   icon:  'icon-info-circle',
-        //   label: this.t('about.title'),
-        // }
+        }
       ];
 
       return items;
@@ -361,46 +352,21 @@ export default {
 
     productFromRoute() {
       return getProductFromRoute(this.$route);
-    },
-    selectedKeys() {
-      const isParamsMatch = (itemParams = {}, routeParams = {}) => {
-        const itemKeys = Object.keys(itemParams);
-        const routeKeys = Object.keys(routeParams);
-
-        if (itemKeys.length !== routeKeys.length) return false;
-
-        return itemKeys.every(
-          (key) => itemParams[key] === routeParams[key]
-        );
-      };
-
-      const findKeyByRoute = (items) => {
-        for (const item of items) {
-          if (
-            item.to &&
-            item.to.name === this.$route.name &&
-            (!item.to.params || isParamsMatch(item.to.params, this.$route.params))
-          ) {
-            return item.key;
-          }
-          if (item.children) {
-            const childKey = findKeyByRoute(item.children);
-
-            if (childKey) return childKey;
-          }
-        }
-
-        return null;
-      };
-      const key = findKeyByRoute(this.menuItems);
-
-      return key ? [key] : [];
-    },
+    }
   },
 
   watch: {
+
     $route() {
       this.shown = false;
+      this.updateSelectedKeys();
+    },
+
+    menuItems: {
+      handler() {
+        this.updateSelectedKeys();
+      },
+      immediate: true,
     },
   },
 
@@ -435,6 +401,62 @@ export default {
       // for remaining main nav items, check if curr product matches route product is enough
       return this.productFromRoute === obj?.value;
     },
+
+    updateSelectedKeys() {
+      const isParamsMatch = (itemParams = {}, routeParams = {}) => {
+        const itemKeys = Object.keys(itemParams);
+
+        return itemKeys.every(
+          (key) => itemParams[key] === routeParams[key]
+        );
+      };
+
+      const isRouteMatch = (item, route) => {
+        if (!item.to) return false;
+
+        if (item.to.name === route.name) {
+          if (!item.to.params) return true;
+
+          return isParamsMatch(item.to.params, route.params);
+        }
+
+        if (item.to.name && route.name) {
+          try {
+            const itemRoute = this.$router.resolve(item.to);
+            const currentPath = route.path;
+            const itemPath = itemRoute.path;
+
+            if (currentPath.startsWith(itemPath) || itemPath.startsWith(currentPath)) {
+              return isParamsMatch(item.to.params || {}, route.params);
+            }
+          } catch (e) {
+            return false;
+          }
+        }
+
+        return false;
+      };
+
+      const findKeyByRoute = (items) => {
+        for (const item of items) {
+          if (isRouteMatch(item, this.$route)) {
+            return item.key;
+          }
+
+          if (item.children) {
+            const childKey = findKeyByRoute(item.children);
+
+            if (childKey) return childKey;
+          }
+        }
+
+        return null;
+      };
+
+      const key = findKeyByRoute(this.menuItems);
+
+      this.selectedKeys = key ? [key] : this.selectedKeys;
+    }
   },
 };
 </script>
