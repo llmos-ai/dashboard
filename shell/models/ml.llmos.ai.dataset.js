@@ -22,7 +22,7 @@ export default class Dataset extends SteveModel {
   }
 
   get availableActions() {
-    const out = super._availableActions;
+    let out = super._availableActions;
 
     const newVersion = {
       action:  'newVersion',
@@ -31,7 +31,18 @@ export default class Dataset extends SteveModel {
       label:   this.t('datasetCard.actions.newVersion'),
     };
 
-    out.unshift(newVersion);
+    const deleteVersion = {
+      action:  'deleteVersion',
+      enabled: true,
+      icon:    'icon icon-trash',
+      label:   this.t('datasetCard.actions.deleteVersion'),
+    };
+
+    out = [
+      newVersion,
+      deleteVersion,
+      ...out
+    ];
 
     return out;
   }
@@ -39,6 +50,14 @@ export default class Dataset extends SteveModel {
   async newVersion() {
     this.$dispatch('promptModal', {
       component:      'CreateDatasetVersionModal',
+      modalWidth:     '600px',
+      componentProps: { datasetId: this.id },
+    });
+  }
+
+  async deleteVersion() {
+    this.$dispatch('promptModal', {
+      component:      'DeleteDatasetVersionModal',
       modalWidth:     '600px',
       componentProps: { datasetId: this.id },
     });

@@ -6841,8 +6841,11 @@ datasetCard:
     label: Features
   authors:
     label: Authors
+  version:
+    label: Version
   actions:
     newVersion: New Version
+    deleteVersion: Delete Version
 
 createFolderModal:
   title: Create Folder
@@ -6868,11 +6871,15 @@ createDatasetVersionModal:
       desc: "The new version will be empty and needs to import content separately"
   success: Create successfully
 
+deleteDatasetVersionModal:
+  title: Delete Dataset Version
+  success: Delete successfully
+
 fileList:
   back: "Back"
   createFolder: "Create Folder"
   download: "Download"
-  addFile: "Add File"
+  addFile: "Upload File"
   uploadFolder: "Upload Folder"
 
 fileItem:
