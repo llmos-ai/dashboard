@@ -3672,6 +3672,7 @@ resourceTable:
     node: 按节点分组
     role: 按角色分组
     cluster: 按集群分组
+    model: 按模型分组 
   groupLabel:
     cluster: '<span>集群：</span> {name}'
     notInACluster: 不在集群中
@@ -3686,6 +3687,7 @@ resourceTable:
     notInANodePool: '不在节点池中'
     nodePool: '<span>节点池：</span> {name}'
     node: '<span>节点：</span> {name}'
+    model: "<span>本地模型: </span> {name}"
 
 resourceTabs:
   conditions:
@@ -6476,6 +6478,75 @@ createSecretModal:
     label: Access Key Secret
     placeholder: e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
+modelCard:
+  registry:
+    label: 模型仓库
+  license:
+    label: 许可证
+  tags:
+    label: 模型标签
+  datasets:
+    label: 数据集
+  language:
+    label: 语言
+  framework:
+    label: 框架
+  baseModel:
+    label: 基础模型
+  description:
+    label: 模型描述
+  requiredResources:
+    label: 必需资源
+  cpu:
+    label: CPU
+  gpu:
+    label: GPU
+  empty: 没有可用模型
+  actions: 
+    cache: 
+      label: 创建本地模型
+      success: 本地模型创建成功
+
+LabeledTag:
+  addLabel: 添加标签
+  title: 标签
+
+labelSelect:
+  noOptions:
+    empty: 无选项
+labeledSelect:
+  startTyping: 开始输入以定义条目
+  pressEnter: 按下回车键添加 "{input}"
+
+datasetCard:
+  registry:
+    label: 模型仓库
+  license:
+    label: 许可证
+  tags:
+    label: 模型标签
+  language:
+    label: 语言
+  description:
+    label: 数据集描述
+  splitTypes:
+    label: 拆分类型
+  features:
+    label: 特性
+  authors:
+    label: 作者
+  version:
+    label: 版本
+  actions:
+    newVersion: 新版本
+    deleteVersion: 删除版本
+
+createFolderModal:
+  title: 创建文件夹
+  targetDirectory:
+    label: 文件夹名称
+    placeholder: 例如：folder/subfolder
+
 createDatasetVersionModal:
   title: 创建数据集版本
   enableFastLoading:
@@ -6494,6 +6565,10 @@ createDatasetVersionModal:
       desc: "新版本内容为空，需要另外导入内容"
   success: 创建成功
 
+deleteDatasetVersionModal:
+  title: 删除数据集版本
+  success: 删除成功
+
 fileList:
   back: "返回"
   createFolder: "创建文件夹"
@@ -6505,6 +6580,28 @@ fileItem:
   deleteConfirm: "确定要删除这个文件吗？"
   deleteSuccess: "文件删除成功"
   remove: "删除"
+
+localModel:
+  localModel:
+    label: 模型
+  volumeSnapshot:
+    label: 卷快照
+  modelName:
+    label: 模型名称
+  actions:
+    fetchOrigin:
+      label: 同步模型
+
+createLocalModelVersionModal:
+  title: 缓存模型
+  name:
+    label: 版本名称
+    placeholder: 例如：v1
+
+knowledgeBase:
+  title: 知识库
+  objectCount:
+    label: 总文档数
 
 apps:
   manage:
