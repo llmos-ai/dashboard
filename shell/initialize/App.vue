@@ -64,6 +64,7 @@ export default {
       :theme="{
         token: {
           colorPrimary: '#5D8BE3',
+          colorBgContainerDisabled: '#dcdee7'
         },
       }"
     >

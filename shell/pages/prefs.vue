@@ -184,13 +184,13 @@ export default {
         data-testid="prefs__themeOptions"
         :options="themeOptions"
       />
-      <div class="mt-10">
+      <!-- <div class="mt-10">
         <t
           k="prefs.theme.autoDetail"
           :pm="pm"
           :am="am"
         />
-      </div>
+      </div> -->
     </div>
     <!-- Login landing page -->
     <div class="mt-10 mb-10">
