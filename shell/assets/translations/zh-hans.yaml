@@ -6621,6 +6621,8 @@ knowledgeBase:
   tabs:
     documents: 文档
     chunk: 分段
+  actions:
+    hitTest: 命中测试
 
 applicationData:
   documentCount:
