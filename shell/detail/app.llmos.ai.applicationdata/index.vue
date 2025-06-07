@@ -29,37 +29,24 @@ export default {
 
   data() {
     return {
-      files:   [],
       loading: false,
     };
   },
 
-  async fetch() {
-    await this.fetchFiles();
+  computed: {
+    files() {
+      return (this.value?.status?.preprocessedFiles || []).map(f => {
+        return {
+          ...f,
+          ...(f.sourceFile || {}),
+        }
+      });
+    }
   },
-
-  computed: {},
 
   methods: {
     async fetchFiles(targetFilePath) {
-      this.loading = true;
-
-      const hash = await allHash({ files: this.value.doAction('list', { targetFilePath }) });
-
-      this.loading = false;
-
-      const files = hash.files || [];
-
-      this.files = files.sort((a, b) => {
-        if (a.Size === 0 && b.Size !== 0) {
-          return -1;
-        }
-        if (a.Size !== 0 && b.Size === 0) {
-          return 1;
-        }
-
-        return a.Name.localeCompare(b.Name);
-      });
+      console.log('fetchFiles', targetFilePath);
     }
   }
 };

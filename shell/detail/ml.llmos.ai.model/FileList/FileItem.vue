@@ -40,7 +40,8 @@ export default {
     });
 
     const fileSize = computed(() => {
-      return isFile.value ? formatSi(props.file.Size, {
+      const size = props.file.Size || props.file.size || 0;
+      return isFile.value ? formatSi(size, {
         increment: 1024,
         addSuffix: true,
         suffix:    'B',
@@ -48,8 +49,9 @@ export default {
     });
 
     const lastModified = computed(() => {
+      const time = props.file.LastModified || props.file.lastModified;
       const now = dayjs();
-      const out = diffFrom(dayjs(props.file.LastModified), now, (key, args) => t(key, args));
+      const out = diffFrom(dayjs(time), now, (key, args) => t(key, args));
 
       return isFile.value ? `${ out.string } ago` : '';
     });
@@ -80,7 +82,7 @@ export default {
 
     const onRowClick = () => {
       if (isFile.value) {
-        props.resource.doAction('download', { targetFilePath: currentPath.value });
+        const res = props.resource.doAction('download', { targetFilePath: currentPath.value });
       } else {
         emit('fetchFiles', currentPath.value);
       }
@@ -112,10 +114,16 @@ export default {
         :span="12"
       >
         <span
+          v-if="isFile"
+        >
+          {{ file.Name || file.name }}
+        </span>
+        <span 
+          v-else
           class="hand"
           @click="onRowClick"
         >
-          {{ file.Name }}
+          {{ file.Name || file.name }}
         </span>
       </a-col>
       <a-col
