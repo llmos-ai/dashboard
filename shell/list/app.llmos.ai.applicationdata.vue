@@ -6,7 +6,7 @@ import { LLMOS } from '@shell/config/types';
 import { NAME, STATE, NAMESPACE, AGE } from '@shell/config/table-headers';
 
 export default {
-  name: 'ModelRegistryList',
+  name: 'ApplicationDataList',
 
   components: { ResourceTable },
 
@@ -34,7 +34,6 @@ export default {
 
     await allHash({
       resource:        await this.$fetchType(this.resource),
-      datasetVersions: await this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET_VERSION }),
     });
   },
 
@@ -45,10 +44,16 @@ export default {
         label: this.t('datasetCard.registry.label')
       };
 
+      const DOCUMENT_COUNT = {
+        name:  'documentCount',
+        label: this.t('applicationData.documentCount.label')
+      };
+
       const headers = [
         STATE,
         NAME,
         NAMESPACE,
+        DOCUMENT_COUNT,
         REGISTRY,
         AGE,
       ];

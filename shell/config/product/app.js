@@ -1,5 +1,5 @@
 import { DSL } from '@shell/store/type-map';
-import { LLMOS, MANAGEMENT } from '@shell/config/types';
+import { LLMOS, MANAGEMENT, APP } from '@shell/config/types';
 import { SETTING } from '@shell/config/settings';
 
 export const NAME = 'apps';
@@ -33,26 +33,19 @@ export function init(store) {
   });
 
   virtualType({
-    labelKey:   'apps.data.label',
-    name:       'apps.dataset',
+    labelKey:   `typeLabel."${ APP.APPLICATION_DATA }"`,
+    name:       APP.APPLICATION_DATA,
     namespaced: false,
     weight:     98,
     icon:       'folder',
     route:      {
       name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.DATASET }
+      params: { resource: APP.APPLICATION_DATA }
     },
   });
 
-  configureType('apps.dataset', {
-    location: {
-      name:   `c-cluster-product-resource`,
-      params: { resource: LLMOS.DATASET }
-    },
-    resource:       LLMOS.DATASET,
-    resourceDetail: 'apps.dataset',
-    resourceEdit:   'apps.dataset',
-    isCreatable:    true,
+  configureType(APP.APPLICATION_DATA , {
+    isEditable: false,
   });
 
   virtualType({
@@ -94,7 +87,7 @@ export function init(store) {
 
   basicType([
     'app-manage',
-    'apps.dataset',
+    APP.APPLICATION_DATA,
     'app-knowledge',
     'app-trace'
   ]);

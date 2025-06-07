@@ -112,6 +112,10 @@ export const LLMOS = {
   LOCAL_MODEL_VERSION: 'ml.llmos.ai.localmodelversion',
 };
 
+export const APP = {
+  APPLICATION_DATA: 'app.llmos.ai.applicationdata',
+}
+
 export const ML_WORKLOAD = 'ml_workload';
 export const ML_WORKLOAD_TYPES = {
   RAY_CLUSTER:   'ray.io.raycluster',
