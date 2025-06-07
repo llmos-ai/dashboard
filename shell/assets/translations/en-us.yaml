@@ -6927,6 +6927,8 @@ knowledgeBase:
   tabs:
     documents: Documents
     chunk: Chunks
+  actions:
+    hitTest: Hit Test
 
 applicationData:
   documentCount:

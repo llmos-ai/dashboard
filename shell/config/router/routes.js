@@ -174,6 +174,12 @@ export default [
         meta:      { product: 'apps' }
       },
       {
+        path:      '/c/:cluster/:product/:resource/:namespace/:id/hit',
+        component: () => interopDefault(import('@shell/pages/c/_cluster/apps/document/hitTest.vue')),
+        name:      'c-cluster-product-resource-namespace-id-hit',
+        meta:      { product: 'apps' }
+      },
+      {
         path:      '/c/:cluster/llmos/tools',
         component: () => interopDefault(
           import('@shell/pages/c/_cluster/llmos/tools/index.vue')
