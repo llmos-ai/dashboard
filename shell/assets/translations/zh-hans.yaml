@@ -5773,7 +5773,7 @@ typeLabel:
       one { 数据集 }
       other { 数据集 }
     }
-  ml.llmos.ai.localmodelversion: |-
+  ml.llmos.ai.localmodel: |-
     {count, plural,
       one { 本地模型 }
       other { 本地模型 }
@@ -6573,7 +6573,7 @@ fileList:
   back: "返回"
   createFolder: "创建文件夹"
   download: "下载"
-  addFile: "添加文件"
+  addFile: "上传文件"
   uploadFolder: "上传文件夹"
 
 fileItem:
