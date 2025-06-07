@@ -6924,6 +6924,9 @@ knowledgeBase:
     label: Data Center
   steps:
     selectData: Select Data
+  tabs:
+    documents: Documents
+    chunk: Chunks
 
 applicationData:
   documentCount:

@@ -6618,6 +6618,9 @@ knowledgeBase:
     label: 数据中心
   steps:
     selectData: 选择数据
+  tabs:
+    documents: 文档
+    chunk: 分段
 
 applicationData:
   documentCount:

@@ -7,6 +7,7 @@ import ResourceTable from '@shell/components/ResourceTable';
 
 import { findBy } from '@shell/utils/array';
 import { allHash } from '@shell/utils/promise';
+import { APP } from '@shell/config/types';
 
 export default {
   layout: 'plain',
@@ -38,9 +39,10 @@ export default {
       const className = this.$route.params.class;
 
       return {
-        name:   'c-cluster-apps-knowledgeBase-id',
+        name:   'c-cluster-product-resource-namespace-id',
         params: {
           cluster: 'local',
+          resource: APP.KNOWLEDGE_BASE,
           id:      className,
         },
       };
