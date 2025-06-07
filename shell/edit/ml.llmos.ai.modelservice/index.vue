@@ -12,6 +12,7 @@ import LocalModelList from '@shell/edit/ml.llmos.ai.modelservice/LocalModelList'
 import { _CREATE } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import ArgumentVars from './components/ArgumentVars.vue';
+import { contentQuotesLinter } from 'ant-design-vue/es/_util/cssinjs/linters';
 
 export default {
   name:       'EditModelService',
@@ -132,7 +133,7 @@ export default {
     },
 
     showConfig() {
-      return this.current === 1 || this.isEdit;
+      return this.current === 1 || this.isEdit || this.isView;
     },
 
     validationPassed() {
@@ -400,6 +401,7 @@ export default {
               <ArgumentVars
                 v-model="container.args"
                 class="w-full"
+                :disabled="isView"
               />
             </a-col>
           </a-row>

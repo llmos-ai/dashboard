@@ -61,7 +61,8 @@ export const PINNED_CLUSTERS = create('pinned-clusters', [], { parseJSON });
 export const GROUP_RESOURCES = create('group-by', 'namespace');
 export const DIFF = create('diff', 'unified', { options: ['unified', 'split'] });
 export const THEME = create('theme', 'auto', {
-  options:     ['light', 'auto', 'dark'],
+  // options:     ['light', 'auto', 'dark'],
+  options:     ['light'],
   asCookie,
   parseJSON,
   mangleRead:  (x) => x.replace(/^ui-/, ''),

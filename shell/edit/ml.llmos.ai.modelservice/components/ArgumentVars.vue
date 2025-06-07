@@ -11,17 +11,19 @@
       >
         <a-auto-complete
           v-model:value="model[idx]"
-          class="w-full"
+          class="w-full "
           size="large"
           :placeholder="t('generic.placeholder', { text: '--dtype=half' }, true)"
           :label="t('workload.container.command.args')"
           :options="vllmOptions(idx)"
           :filter-option="filterArgsOption"
+          :disabled="isView || disabled"
           @update:value="val => onUpdate(val, idx)"
         />
         <a-button
           type="link"
           class="ml-2"
+          :disabled="isView || disabled"
           @click="removeArg(idx)"
         >
           {{ t('generic.remove') }}
@@ -30,6 +32,7 @@
       <a-button
         class="mt-10"
         type="primary"
+        :disabled="isView || disabled"
         @click="addArg"
       >
         添加参数
@@ -40,12 +43,27 @@
 
 <script setup>
 import { VLLM_CONFIG } from '@shell/config/vllm-config';
+import { computed } from 'vue';
+import { _VIEW } from '@shell/config/query-params';
 
 const model = defineModel({
   type:     Array,
   required: true,
   default:  () => []
 });
+
+const props = defineProps({
+  mode: {
+    default: null,
+    type:    String
+  },
+  disabled: {
+    default: false,
+    type:    Boolean
+  }
+});
+
+const isView = computed(() => props.mode === _VIEW);
 
 const emit = defineEmits(['update:modelValue']);
 
