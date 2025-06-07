@@ -114,6 +114,7 @@ export const LLMOS = {
 
 export const APP = {
   APPLICATION_DATA: 'app.llmos.ai.applicationdata',
+  KNOWLEDGE_BASE:   'app.llmos.ai.knowledgebase',
 }
 
 export const ML_WORKLOAD = 'ml_workload';

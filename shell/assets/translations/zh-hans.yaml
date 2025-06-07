@@ -5783,6 +5783,11 @@ typeLabel:
       one { 数据中心 }
       other { 数据中心 }
     }
+  app.llmos.ai.knowledgebase: |-
+    {count, plural,
+      one { 知识库 }
+      other { 知识库 }
+    }
   chat: |-
     {count, plural,
       one { 对话 }
@@ -6607,6 +6612,12 @@ knowledgeBase:
   title: 知识库
   objectCount:
     label: 文档数
+  embeddingModel:
+    label: Embedding模型
+  dataCenter:
+    label: 数据中心
+  steps:
+    selectData: 选择数据
 
 applicationData:
   documentCount:

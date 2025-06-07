@@ -6091,6 +6091,11 @@ typeLabel:
       one { Data Center }
       other { Data Center }
     }
+  app.llmos.ai.knowledgebase: |-
+    {count, plural,
+      one { Knowledge Base }
+      other { Knowledge Bases }
+    }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
     {count, plural,
@@ -6913,6 +6918,12 @@ knowledgeBase:
   title: Knowledge Base
   objectCount:
     label: Total Documents
+  embeddingModel:
+    label: Embedding Model
+  dataCenter:
+    label: Data Center
+  steps:
+    selectData: Select Data
 
 applicationData:
   documentCount:
