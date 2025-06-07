@@ -27,6 +27,11 @@ export default {
       type:    Boolean,
       default: true,
     },
+
+    mode: {
+      type:    String,
+      default: 'create',
+    },
   },
 
   emits: ['fetchFiles'],
@@ -38,6 +43,7 @@ export default {
       currentPath:  '',
       percent:      0,
       uploadStatus: '',
+      checkedFiles: [],
     };
   },
 
@@ -47,6 +53,12 @@ export default {
     this.uploadFile = uploadFile;
     this.percent = percent;
     this.uploadStatus = uploadStatus;
+  },
+
+  computed: {
+    isView() {
+      return this.mode === 'view';
+    },
   },
 
   methods: {
@@ -152,12 +164,25 @@ export default {
       this.currentPath = parentPath || '';
       this.$emit('fetchFiles', parentPath);
     },
+
+    onChecked({file, checked}) {      
+      if (checked) {
+        this.checkedFiles.push(file);
+      } else {
+        this.checkedFiles = this.checkedFiles.filter(f => f.uid !== file.uid);
+      }
+
+      this.$emit('checked', this.checkedFiles);
+    },
   },
 };
 </script>
 
 <template>
-  <div class="row">
+  <div 
+    v-if="!isView"
+    class="row" 
+  >
     <div class="col span-12">
       <div 
         v-if="hasFolder"
@@ -237,6 +262,42 @@ export default {
       </div>
     </div>
   </div>
+  <div class="file-item">
+    <a-row class="file-info pl-45">
+      <a-col
+        class="file-name"
+        :span="12"
+      >
+        <span>
+          文件名称
+        </span>
+      </a-col>
+      <a-col
+        class="file-size"
+        :span="4"
+      >
+        文件大小
+      </a-col>
+      <a-col
+        class="file-date"
+        :span="isView ? 8 : 4"
+      >
+        上传时间
+      </a-col>
+      <a-col
+        :span="4"
+        class="file-action"
+        v-if="!isView"
+      >
+        <span
+          class="hand text-error"
+          @click="removeFile(file)"
+        >
+          {{ t('fileItem.remove') }}
+        </span>
+      </a-col>
+    </a-row>
+  </div>
   <div class="file-list mt-10">
     <div
       v-if="uploadStatus"
@@ -261,14 +322,17 @@ export default {
         :description="null"
       />
     </div>
-    <FileItem
-      v-for="file in files"
-      v-else
-      :key="file.Name"
-      :file="file"
-      :resource="resource"
-      @fetchFiles="fetchFiles"
-    />
+    <div v-else>
+      <FileItem
+        v-for="file in files"
+        :key="file.Name"
+        :file="file"
+        :resource="resource"
+        @fetchFiles="fetchFiles"
+        :mode="mode"
+        @checked="onChecked"
+      />
+    </div>
   </div>
 </template>
 
@@ -277,9 +341,35 @@ export default {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
   min-height: 50vh;
+  max-height: 58vh;
+  overflow-y: auto;
 }
 
 .btn-text {
   color: #fff;
+}
+
+.file-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+
+  .file-size {
+    margin-right: 16px;
+  }
+}
+
+.file-date {
+  text-align: end;
+}
+
+.file-size {
+  text-align: left;
 }
 </style>

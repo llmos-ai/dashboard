@@ -1,5 +1,5 @@
 <script>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
 import { useFileItem } from '@shell/detail/ml.llmos.ai.model/FileList/useFileItem';
@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { Modal, message } from 'ant-design-vue';
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
+import { emit } from 'process';
 
 export default {
   name: 'FileItem',
@@ -27,13 +28,20 @@ export default {
       type:     Object,
       required: true,
     },
+
+    mode: {
+      type:    String,
+      default: 'create',
+    },
   },
 
-  emits: ['fetchFiles'],
+  emits: ['fetchFiles', 'checked'],
 
   setup(props, { emit }) {
     const store = useStore();
     const { t } = useI18n(store);
+
+    const checked = ref(false);
 
     const isFile = computed(() => {
       return props.file.Size !== 0;
@@ -58,6 +66,10 @@ export default {
 
     const currentPath = computed(() => {
       return props.file.Path ? props.file.Path.replace(`models/${ props.resource.id }/`, '') : '';
+    });
+
+    const isView = computed(() => {
+      return props.mode === 'view';
     });
 
     const { currentFolder } = useFileItem({
@@ -88,6 +100,11 @@ export default {
       }
     };
 
+    const onChecked = (e) => {
+      checked.value = e.target.checked;
+      emit('checked', { file: props.file, checked: checked.value });
+    };
+
     return {
       t,
       isFile,
@@ -95,7 +112,10 @@ export default {
       lastModified,
       currentPath,
       removeFile,
-      onRowClick
+      onRowClick,
+      isView,
+      checked,
+      onChecked,
     };
   }
 };
@@ -103,7 +123,13 @@ export default {
 
 <template>
   <div class="file-item">
-    <div class="file-icon">
+    <a-checkbox 
+      v-model:checked="checked"
+      v-if="isView"
+      @change="onChecked"
+    />
+
+    <div class="file-icon ml-10">
       <FileTextTwoTone v-if="isFile" />
       <FolderTwoTone v-else />
     </div>
@@ -134,13 +160,14 @@ export default {
       </a-col>
       <a-col
         class="file-date"
-        :span="4"
+        :span="isView ? 8 : 4"
       >
         {{ lastModified }}
       </a-col>
       <a-col
         :span="4"
         class="file-action"
+        v-if="!isView"
       >
         <span
           class="hand text-error"

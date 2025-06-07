@@ -97,10 +97,6 @@ export default {
     inStore() {
       return this.$store.getters['currentProduct'].inStore;
     },
-
-    versionSchema() {
-      return this.$store.getters[`${ this.inStore }/schemaFor`](LLMOS.DATASET_VERSION);
-    },
   },
 
   methods: {
