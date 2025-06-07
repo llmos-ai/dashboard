@@ -114,6 +114,12 @@ export default {
         :span="12"
       >
         <span
+          v-if="isFile"
+        >
+          {{ file.Name }}
+        </span>
+        <span 
+          v-else
           class="hand"
           @click="onRowClick"
         >
