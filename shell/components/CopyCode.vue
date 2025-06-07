@@ -60,14 +60,15 @@ export default {
 </script>
 
 <template>
-  <a-typography-text
+  <a-typography-paragraph>
     v-clean-tooltip="tooltip"
-    code
     class="copy block"
     @click.stop.prevent="clicked"
-  >
-    <slot />
-  </a-typography-text>
+    >
+    <code class="block">
+      <slot />
+    </code>
+  </a-typography-paragraph>
 </template>
 
 <style lang="scss" scoped>
