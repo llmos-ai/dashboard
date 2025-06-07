@@ -22,6 +22,11 @@ export default {
       type:     Object,
       required: true,
     },
+
+    hasFolder: {
+      type:    Boolean,
+      default: true,
+    },
   },
 
   emits: ['fetchFiles'],
@@ -154,7 +159,10 @@ export default {
 <template>
   <div class="row">
     <div class="col span-12">
-      <div class="pull-left">
+      <div 
+        v-if="hasFolder"
+        class="pull-left" 
+      >
         <a-button
           type="primary"
           @click="onBack"
@@ -166,6 +174,7 @@ export default {
       <div class="pull-right">
         <a-space>
           <a-button
+            v-if="hasFolder"
             type="primary"
             @click="onCreateFolder"
           >
@@ -179,6 +188,7 @@ export default {
             {{ t('fileList.download') }}
           </a-button>
           <a-dropdown-button
+            v-if="hasFolder"
             type="primary"
             :loading="uploading"
           >
@@ -209,6 +219,20 @@ export default {
               <DownOutlined @click.prevent />
             </template>
           </a-dropdown-button>
+          <a-button
+            v-else
+            type="primary"
+            :loading="uploading"
+          >
+            <a-upload
+              :customRequest="onUpload"
+              :showUploadList="false"
+            >
+              <span class="btn-text p-0">
+                {{ t('fileList.addFile') }}
+              </span>
+            </a-upload>
+          </a-button>
         </a-space>
       </div>
     </div>

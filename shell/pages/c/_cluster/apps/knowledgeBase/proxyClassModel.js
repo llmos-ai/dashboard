@@ -15,6 +15,14 @@ export function proxyClassModel({
 
     availableActions: [
       {
+        action:   'test',
+        label:    '命中测试',
+        icon:     'icon icon-copy',
+        bulkable: false,
+        enabled:  true,
+        weight:   20, // Delete always goes last
+      },
+      {
         action:   'insert',
         label:    'Add Document',
         icon:     'icon icon-copy',

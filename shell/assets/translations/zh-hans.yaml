@@ -5778,6 +5778,11 @@ typeLabel:
       one { 本地模型 }
       other { 本地模型 }
     }
+  app.llmos.ai.applicationdata: |-
+    {count, plural,
+      one { 数据中心 }
+      other { 数据中心 }
+    }
   chat: |-
     {count, plural,
       one { 对话 }
@@ -6520,7 +6525,7 @@ labeledSelect:
 
 datasetCard:
   registry:
-    label: 模型仓库
+    label: 仓库
   license:
     label: 许可证
   tags:
@@ -6601,7 +6606,11 @@ createLocalModelVersionModal:
 knowledgeBase:
   title: 知识库
   objectCount:
-    label: 总文档数
+    label: 文档数
+
+applicationData:
+  documentCount:
+    label: 文档数
 
 apps:
   manage:

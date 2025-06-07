@@ -6086,6 +6086,11 @@ typeLabel:
       one { Local Model }
       other { Local Models }
     }
+  app.llmos.ai.applicationdata: |-
+    {count, plural,
+      one { Data Center }
+      other { Data Center }
+    }
   # Ceph Types
   ceph.rook.io.cephcluster: |-
     {count, plural,
@@ -6907,6 +6912,10 @@ createLocalModelVersionModal:
 knowledgeBase:
   title: Knowledge Base
   objectCount:
+    label: Total Documents
+
+applicationData:
+  documentCount:
     label: Total Documents
 
 apps:
