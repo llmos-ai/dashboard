@@ -5,6 +5,11 @@ export const VLLM_CONFIG = [
     options: ['auto', 'generate', 'embedding', 'embed', 'classify', 'score', 'reward', 'transcription']
   },
   {
+    label:   '--tool-call-parser',
+    value:   '--tool-call-parser',
+    options: ['hermes', 'mistral', 'llama3_json', 'internlm', 'pythonic']
+  },
+  {
     label:   '--tokenizer',
     value:   '--tokenizer',
     options: []
@@ -127,6 +132,11 @@ export const VLLM_CONFIG = [
   {
     label:   '--data-parallel-size',
     value:   '--data-parallel-size',
+    options: []
+  },
+  {
+    label:   '--enable-auto-tool-choice',
+    value:   '--enable-auto-tool-choice',
     options: []
   },
   {
