@@ -163,27 +163,9 @@ export default [
         meta:      { product: 'apps' }
       },
       {
-        path:      '/c/:cluster/apps/knowledgeBase',
-        component: () => interopDefault(import('@shell/pages/c/_cluster/apps/knowledgeBase/index.vue')),
-        name:      'c-cluster-apps-knowledgeBase',
-        meta:      { product: 'apps' }
-      },
-      {
-        path:      '/c/:cluster/apps/knowledgeBase/:id',
-        component: () => interopDefault(import('@shell/pages/c/_cluster/apps/knowledgeBase/_id.vue')),
-        name:      'c-cluster-apps-knowledgeBase-id',
-        meta:      { product: 'apps' }
-      },
-      {
-        path:      '/c/:cluster/apps/knowledgeBase/create',
-        component: () => interopDefault(import('@shell/pages/c/_cluster/apps/knowledgeBase/create/index.vue')),
-        name:      'c-cluster-apps-knowledgeBase-create',
-        meta:      { product: 'apps' }
-      },
-      {
-        path:      '/c/:cluster/apps/knowledgeBase/:class/document/:id',
+        path:      '/c/:cluster/:product/:resource/:namespace/:class/document/:id',
         component: () => interopDefault(import('@shell/pages/c/_cluster/apps/document/_id.vue')),
-        name:      'c-cluster-apps-knowledgeBase-class-document-id',
+        name:      'c-cluster-product-resource-namespace-class-document-id',
         meta:      { product: 'apps' }
       }, {
         path:      '/c/:cluster/apps/trace',
