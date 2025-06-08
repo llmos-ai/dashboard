@@ -118,7 +118,7 @@ export default {
         >
           {{ file.Name }}
         </span>
-        <span 
+        <span
           v-else
           class="hand"
           @click="onRowClick"

@@ -8,7 +8,6 @@ import dayjs from 'dayjs';
 import { Modal, message } from 'ant-design-vue';
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
-import { emit } from 'process';
 
 export default {
   name: 'FileItem',
@@ -49,6 +48,7 @@ export default {
 
     const fileSize = computed(() => {
       const size = props.file.Size || props.file.size || 0;
+
       return isFile.value ? formatSi(size, {
         increment: 1024,
         addSuffix: true,
@@ -94,7 +94,7 @@ export default {
 
     const onRowClick = () => {
       if (isFile.value) {
-        const res = props.resource.doAction('download', { targetFilePath: currentPath.value });
+        props.resource.doAction('download', { targetFilePath: currentPath.value });
       } else {
         emit('fetchFiles', currentPath.value);
       }
@@ -123,9 +123,9 @@ export default {
 
 <template>
   <div class="file-item">
-    <a-checkbox 
-      v-model:checked="checked"
+    <a-checkbox
       v-if="isView"
+      v-model:checked="checked"
       @change="onChecked"
     />
 
@@ -144,7 +144,7 @@ export default {
         >
           {{ file.Name || file.name }}
         </span>
-        <span 
+        <span
           v-else
           class="hand"
           @click="onRowClick"
@@ -165,9 +165,9 @@ export default {
         {{ lastModified }}
       </a-col>
       <a-col
+        v-if="!isView"
         :span="4"
         class="file-action"
-        v-if="!isView"
       >
         <span
           class="hand text-error"

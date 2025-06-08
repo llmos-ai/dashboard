@@ -5,18 +5,12 @@ import FormValidation from '@shell/mixins/form-validation';
 import CruResource from '@shell/components/CruResource';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
-import { LabeledInput } from '@shell/components/form/LabeledInput';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import FileList from '@shell/detail/ml.llmos.ai.model/FileList';
 
-import { LLMOS, ML_WORKLOAD_TYPES, APP } from '@shell/config/types';
-
+import { ML_WORKLOAD_TYPES, APP } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
-import { LICENSES, LANGUAGES, ML_FEATURES } from '@shell/utils/dictionary';
-import { files } from 'jszip';
-
-const S3 = 'S3';
 
 export default {
   name: 'Dataset',
@@ -26,7 +20,6 @@ export default {
     NameNsDescription,
     Tab,
     LabeledSelect,
-    LabeledInput,
     ResourceTabs,
     FileList,
   },
@@ -48,29 +41,29 @@ export default {
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
-    const hash = await allHash({ 
-      models: this.$store.dispatch(`${ inStore }/findAll`, { type: ML_WORKLOAD_TYPES.MODEL_SERVICE }),
+    await allHash({
+      models:      this.$store.dispatch(`${ inStore }/findAll`, { type: ML_WORKLOAD_TYPES.MODEL_SERVICE }),
       dataCenters: this.$store.dispatch(`${ inStore }/findAll`, { type: APP.APPLICATION_DATA }),
     });
   },
 
   data() {
-    const resource = { spec: {
-      files: [],
-    } };
+    const resource = { spec: { files: [] } };
 
     Object.assign(resource, this.value);
+
+    const step = this.$route.query.step;
 
     return {
       errors:     [],
       registries: [],
       resource,
-      current:    0,
-      items: [
-        { title: this.t('generic.tabs.basic') }, 
+      current:    step ? Number(step) : 0,
+      items:      [
+        { title: this.t('generic.tabs.basic') },
         { title: this.t('knowledgeBase.steps.selectData') },
       ],
-      checkedFiles: [],
+      checkedFiles:       [],
       selectedDataCenter: '',
     };
   },
@@ -91,7 +84,7 @@ export default {
     },
 
     modelOptions() {
-      const models = this.$store.getters[`${this.inStore}/all`](ML_WORKLOAD_TYPES.MODEL_SERVICE);
+      const models = this.$store.getters[`${ this.inStore }/all`](ML_WORKLOAD_TYPES.MODEL_SERVICE);
 
       const out = models.map((m) => ({
         label: m.id,
@@ -109,11 +102,11 @@ export default {
       return (
         !this.value.metadata.name ||
         !this.resource.spec?.embeddingModel
-      )
+      );
     },
 
     dataCenterOptions() {
-      const dataCenters = this.$store.getters[`${this.inStore}/all`](APP.APPLICATION_DATA);
+      const dataCenters = this.$store.getters[`${ this.inStore }/all`](APP.APPLICATION_DATA);
 
       return dataCenters.map((dc) => ({
         label: dc.id,
@@ -122,14 +115,14 @@ export default {
     },
 
     files() {
-      const dataCenter = this.$store.getters[`${this.inStore}/byId`](APP.APPLICATION_DATA, this.selectedDataCenter) || {};
+      const dataCenter = this.$store.getters[`${ this.inStore }/byId`](APP.APPLICATION_DATA, this.selectedDataCenter) || {};
 
-      const out = (dataCenter?.status?.preprocessedFiles || []).map(f => {
+      const out = (dataCenter?.status?.preprocessedFiles || []).map((f) => {
         return {
           ...f,
           ...(f.sourceFile || {}),
-        }
-      })
+        };
+      });
 
       return out;
     },
@@ -138,12 +131,19 @@ export default {
   methods: {
     willSave() {
       Object.assign(this.value, this.resource);
-      this.value.spec.files = this.checkedFiles.map(f => {
+
+      const checkedFiles = this.checkedFiles.map((f) => {
         return {
           category: this.selectedDataCenter,
-          uid: f.uid,
-        }
+          uid:      f.uid,
+        };
       });
+
+      if (this.mode === 'edit') {
+        this.value.spec.files = this.value.spec.files.concat(checkedFiles);
+      } else {
+        this.value.spec.files = checkedFiles;
+      }
     },
 
     next() {
@@ -158,7 +158,7 @@ export default {
       this.checkedFiles = fileList;
     },
   },
-}
+};
 </script>
 
 <template>
@@ -171,7 +171,6 @@ export default {
     :validation-passed="validationPassed"
     @finish="save"
   >
-
     <a-steps
       v-if="isCreate"
       :current="current"
@@ -237,9 +236,10 @@ export default {
               <FileList
                 :files="files"
                 :resource="value"
-                @fetchFiles="fetchFiles"
                 :hasFolder="false"
                 mode="view"
+                :showHeader="true"
+                @fetchFiles="fetchFiles"
                 @checked="onFileChecked"
               />
             </div>

@@ -1,5 +1,4 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
-import { LLMOS } from '@shell/config/types';
 import { set } from '@shell/utils/object';
 
 export default class Dataset extends SteveModel {
@@ -11,9 +10,7 @@ export default class Dataset extends SteveModel {
         labels:      {},
         annotations: {},
       },
-      spec: {
-        registry:    this.t('modelRegistry.useDefault'),
-      },
+      spec: { registry: this.t('modelRegistry.useDefault') },
     };
 
     this.metadata = value.metadata;

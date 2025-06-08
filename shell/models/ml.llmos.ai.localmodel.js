@@ -92,6 +92,6 @@ export default class LocalModelVersion extends SteveModel {
   }
 
   get defaultLocalModelVersion() {
-    return this.$getters['byId'](LLMOS.LOCAL_MODEL_VERSION, this.spec.defaultVersion) || {};
+    return this.$getters['byId'](LLMOS.LOCAL_MODEL_VERSION, `${ this.metadata.namespace }/${ this.spec.defaultVersion }`) || {};
   }
 }

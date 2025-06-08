@@ -5,16 +5,12 @@ import FormValidation from '@shell/mixins/form-validation';
 import CruResource from '@shell/components/CruResource';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
-import { LabeledInput } from '@shell/components/form/LabeledInput';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 
 import { LLMOS } from '@shell/config/types';
 
 import { allHash } from '@shell/utils/promise';
-import { LICENSES, LANGUAGES, ML_FEATURES } from '@shell/utils/dictionary';
-
-const S3 = 'S3';
 
 export default {
   name: 'Dataset',
@@ -24,7 +20,6 @@ export default {
     NameNsDescription,
     Tab,
     LabeledSelect,
-    LabeledInput,
     ResourceTabs,
   },
 

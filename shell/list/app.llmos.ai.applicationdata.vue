@@ -2,7 +2,6 @@
 import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import { allHash } from '@shell/utils/promise';
-import { LLMOS } from '@shell/config/types';
 import { NAME, STATE, NAMESPACE, AGE } from '@shell/config/table-headers';
 
 export default {
@@ -30,11 +29,7 @@ export default {
   },
 
   async fetch() {
-    const inStore = this.$store.getters['currentProduct'].inStore;
-
-    await allHash({
-      resource:        await this.$fetchType(this.resource),
-    });
+    await allHash({ resource: await this.$fetchType(this.resource) });
   },
 
   computed: {
