@@ -6,8 +6,6 @@ import FileList from '@shell/detail/ml.llmos.ai.model/FileList';
 
 import CreateEditView from '@shell/mixins/create-edit-view';
 
-import { allHash } from '@shell/utils/promise';
-
 export default {
   components: {
     ResourceTabs,
@@ -28,25 +26,23 @@ export default {
   },
 
   data() {
-    return {
-      loading: false,
-    };
+    return { loading: false };
   },
 
   computed: {
     files() {
-      return (this.value?.status?.preprocessedFiles || []).map(f => {
+      return (this.value?.status?.preprocessedFiles || []).map((f) => {
         return {
           ...f,
           ...(f.sourceFile || {}),
-        }
+        };
       });
     }
   },
 
   methods: {
     async fetchFiles(targetFilePath) {
-      console.log('fetchFiles', targetFilePath);
+
     }
   }
 };
@@ -69,8 +65,8 @@ export default {
         <FileList
           :files="files"
           :resource="value"
-          @fetchFiles="fetchFiles"
           :hasFolder="false"
+          @fetchFiles="fetchFiles"
         />
       </a-spin>
     </Tab>

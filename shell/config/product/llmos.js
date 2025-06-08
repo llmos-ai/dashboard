@@ -139,7 +139,6 @@ export function init(store) {
     ML_WORKLOAD_TYPES.RAY_CLUSTER,
     ML_WORKLOAD_TYPES.NOTEBOOK,
     ML_WORKLOAD_TYPES.MODEL_SERVICE,
-    LLMOS.LOCAL_MODEL,
   ]);
 
   virtualType({
@@ -412,12 +411,8 @@ export function init(store) {
   });
 
   basicType(
-    [
-      LLMOS.MODEL,
-      LLMOS.DATASET,
-      LLMOS.REGISTRY,
-    ],
-    'registry',
+    [LLMOS.MODEL, LLMOS.LOCAL_MODEL, LLMOS.DATASET, LLMOS.REGISTRY],
+    'registry'
   );
 
   basicType(

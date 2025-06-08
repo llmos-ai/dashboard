@@ -10,9 +10,9 @@ import ResourceTable from '@shell/components/ResourceTable';
 import CreateEditView from '@shell/mixins/create-edit-view';
 
 import { allHash } from '@shell/utils/promise';
-import { LLMOS, APP } from '@shell/config/types';
+import { LLMOS } from '@shell/config/types';
 
-import { NAME, STATE, AGE, STORAGE_CLASS_DEFAULT } from '@shell/config/table-headers';
+import { NAME } from '@shell/config/table-headers';
 
 export default {
   components: {
@@ -62,13 +62,10 @@ export default {
     rows() {
       const id = this.$route.params.id;
       const namespace = this.$route.params.namespace;
-      const className = `${namespace}/${id}`;
-      console.log('className', className);
+      const className = `${ namespace }/${ id }`;
 
       const out = this.objects.filter((item) => item.class === className);
       const map = groupBy(out, 'properties.document');
-
-      console.log('map', map);
 
       return Object.keys(map).map((key) => {
         return {
@@ -79,7 +76,7 @@ export default {
             params: {
               cluster: 'local',
               product: 'apps',
-              namespace: namespace,
+              namespace,
               class:   id,
               id:      key,
             },

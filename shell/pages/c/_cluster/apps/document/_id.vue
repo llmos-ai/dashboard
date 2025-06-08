@@ -41,9 +41,9 @@ export default {
       return {
         name:   'c-cluster-product-resource-namespace-id',
         params: {
-          cluster: 'local',
+          cluster:  'local',
           resource: APP.KNOWLEDGE_BASE,
-          id:      className,
+          id:       className,
         },
       };
     },

@@ -1,5 +1,6 @@
+import { _EDIT, MODE, STEP } from '@shell/config/query-params';
 import SteveModel from '@shell/plugins/steve/steve-class';
-import { LLMOS, APP } from '@shell/config/types';
+import { APP } from '@shell/config/types';
 import { set } from '@shell/utils/object';
 
 export default class Dataset extends SteveModel {
@@ -13,7 +14,7 @@ export default class Dataset extends SteveModel {
       },
       spec: {
         embeddingModel: '',
-        files: [],
+        files:          [],
       },
     };
 
@@ -28,24 +29,47 @@ export default class Dataset extends SteveModel {
   get _availableActions() {
     const out = super._availableActions;
 
-    out.unshift({
+    const IMPORT_DATA = {
+      action:  'importData',
+      enabled: true,
+      icon:    'icon icon-fw icon-copy',
+      label:   this.t('knowledgeBase.actions.importData'),
+    };
+
+    const HIT_TEST = {
       action:  'hitTest',
       enabled: true,
       icon:    'icon icon-fw icon-checkmark',
       label:   this.t('knowledgeBase.actions.hitTest'),
-    });
+    };
 
-    return out;
+    return [IMPORT_DATA, HIT_TEST, ...out];
   }
 
   hitTest() {
     this.currentRouter().push({
       name:   'c-cluster-product-resource-namespace-id-hit',
       params: {
-        cluster: 'local',
-        resource: APP.KNOWLEDGE_BASE,
+        cluster:   'local',
+        resource:  APP.KNOWLEDGE_BASE,
         namespace: this.metadata.namespace,
-        id: this.metadata.name,
+        id:        this.metadata.name,
+      },
+    });
+  }
+
+  importData() {
+    this.currentRouter().push({
+      name:   'c-cluster-product-resource-namespace-id',
+      params: {
+        cluster:   'local',
+        resource:  APP.KNOWLEDGE_BASE,
+        namespace: this.metadata.namespace,
+        id:        this.metadata.name,
+      },
+      query: {
+        [MODE]: _EDIT,
+        [STEP]: '1',
       },
     });
   }

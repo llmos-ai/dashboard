@@ -5780,8 +5780,8 @@ typeLabel:
     }
   app.llmos.ai.applicationdata: |-
     {count, plural,
-      one { 数据中心 }
-      other { 数据中心 }
+      one { 应用数据 }
+      other { 应用数据 }
     }
   app.llmos.ai.knowledgebase: |-
     {count, plural,
@@ -6615,7 +6615,7 @@ knowledgeBase:
   embeddingModel:
     label: Embedding模型
   dataCenter:
-    label: 数据中心
+    label: 应用数据
   steps:
     selectData: 选择数据
   tabs:
@@ -6623,6 +6623,7 @@ knowledgeBase:
     chunk: 分段
   actions:
     hitTest: 命中测试
+    importData: 导入数据
 
 applicationData:
   documentCount:

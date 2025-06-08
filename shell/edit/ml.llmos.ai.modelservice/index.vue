@@ -241,7 +241,11 @@ export default {
     async updateLocalModelInfo(localModelVersion = {}) {
       const volumeClaims = localModelVersion.volumeClaims;
 
-      this.spec.model = `${ localModelVersion.metadata.namespace }/${ localModelVersion.spec.localModel }`;
+      const namespace = localModelVersion?.metadata?.namespace;
+      const localModel = localModelVersion?.spec?.localModel;
+      const volumeSnapshotName = localModelVersion?.status?.volumeSnapshot;
+
+      this.spec.model = `${ namespace }/${ localModel }`;
 
       const volumeClaimTemplate = this.spec.volumeClaimTemplates[0];
       const containerTemplate = this.spec.template.spec.containers[0];
@@ -255,7 +259,7 @@ export default {
 
       const pvc = await this.$store.dispatch('cluster/create', {
         metadata: {
-          name:        volumeClaims?.spec?.volumeName,
+          name:        volumeSnapshotName,
           namespace:   volumeClaims?.metadata?.namespace,
           annotations: { [REGISTRY_ANNOTATIONS.IS_LOCAL_MODEL]: 'true' },
         },

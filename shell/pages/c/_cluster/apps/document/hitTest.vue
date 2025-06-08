@@ -1,9 +1,5 @@
 <script>
 import { getAllSchemaAPI, getAllObjectAPI } from '@/shell/config/weaviate';
-import Tab from '@shell/components/Tabbed/Tab';
-import ResourceTabs from '@shell/components/form/ResourceTabs';
-import CruResourceFooter from '@shell/components/CruResourceFooter';
-import ResourceTable from '@shell/components/ResourceTable';
 
 import { findBy } from '@shell/utils/array';
 import { allHash } from '@shell/utils/promise';
@@ -12,46 +8,39 @@ import { APP } from '@shell/config/types';
 export default {
   layout: 'plain',
 
-  components: {
-    Tab,
-    ResourceTabs,
-    CruResourceFooter,
-    ResourceTable,
-  },
-
   data() {
     return {
-      className: '',
-      classes:   [],
-      objects:   [],
-      schema:    {},
-      value:     {},
-      mode:      'detail',
+      className:           '',
+      classes:             [],
+      objects:             [],
+      schema:              {},
+      value:               {},
+      mode:                'detail',
       similarityThreshold: 0.01,
-      inputText: '',
-      results: [
+      inputText:           '',
+      results:             [
         {
-          id: 1,
-          title: '创建1',
-          content: '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
+          id:         1,
+          title:      '创建1',
+          content:    '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
           similarity: '7%'
         },
         {
-          id: 2,
-          title: '创建2',
-          content: '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
+          id:         2,
+          title:      '创建2',
+          content:    '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
           similarity: '7%'
         },
         {
-          id: 3,
-          title: '创建3',
-          content: '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
+          id:         3,
+          title:      '创建3',
+          content:    '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
           similarity: '7%'
         },
         {
-          id: 4,
-          title: '创建4',
-          content: '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
+          id:         4,
+          title:      '创建4',
+          content:    '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
           similarity: '7%'
         },
       ],
@@ -69,9 +58,9 @@ export default {
       return {
         name:   'c-cluster-product-resource-namespace-id',
         params: {
-          cluster: 'local',
+          cluster:  'local',
           resource: APP.KNOWLEDGE_BASE,
-          id:      className,
+          id:       className,
         },
       };
     },
@@ -159,15 +148,12 @@ export default {
       this.classes = hash.classes.classes || [];
       this.objects = hash.objects.objects || [];
     },
-    
+
     search() {
       // 这里可以添加实际的搜索逻辑
-      console.log('搜索:', this.inputText);
+      // console.log('搜索:', this.inputText);
     },
-    
-    updateThreshold(value) {
-      this.similarityThreshold = value;
-    }
+
   }
 };
 </script>
@@ -189,35 +175,33 @@ export default {
               {{ displayName }}
             </h1>
           </div>
+          <div
+            class="subheader"
+          >
+            <span>
+              命中测试
+            </span>
+          </div>
         </div>
       </header>
     </div>
-    
+
     <div class="hit-test-container">
       <div class="left-panel">
         <div class="config-section">
-          <div class="section-header">数据配置参数</div>
+          <div class="section-header">
+            数据配置参数
+          </div>
           <div class="threshold-config">
             <div class="threshold-label">
-              相似度阈值 
-              <i class="icon icon-info" />
-            </div>
-            <div class="threshold-input-wrapper">
-              <input 
-                type="text" 
-                v-model="similarityThreshold" 
-                class="threshold-input"
-              />
+              相似度阈值
             </div>
             <div class="threshold-slider-wrapper">
-              <input 
-                type="range" 
-                min="0.01" 
-                max="1" 
-                step="0.01" 
-                v-model="similarityThreshold"
-                class="threshold-slider"
-                @input="updateThreshold"
+              <a-slider
+                v-model:value="similarityThreshold"
+                :min="0.01"
+                :max="1"
+                :step="0.01"
               />
               <div class="range-labels">
                 <span>0.01</span>
@@ -227,42 +211,68 @@ export default {
           </div>
         </div>
       </div>
-      
+
       <div class="right-panel">
         <div class="input-section">
-          <div class="section-header">输入</div>
+          <div class="section-header">
+            输入
+          </div>
           <div class="input-content">
-            <textarea 
-              v-model="inputText" 
+            <textarea
+              v-model="inputText"
               placeholder="请输入文本"
               class="input-textarea"
-            ></textarea>
+            />
             <div class="input-actions">
               <div class="action-icons">
                 <i class="icon icon-refresh" />
                 <i class="icon icon-copy" />
               </div>
-              <button class="submit-btn" @click="search">提交</button>
+              <button
+                class="submit-btn"
+                @click="search"
+              >
+                提交
+              </button>
             </div>
           </div>
         </div>
-        
+
         <div class="results-section">
-          <div class="section-header">召回结果</div>
+          <div class="section-header">
+            召回结果
+          </div>
           <div class="results-content">
-            <div v-if="results.length === 0" class="empty-results">
+            <div
+              v-if="results.length === 0"
+              class="empty-results"
+            >
               <div class="empty-icon">
-                <img src="/img/generic-empty.svg" alt="无结果" />
+                <img
+                  src="/img/generic-empty.svg"
+                  alt="无结果"
+                >
               </div>
-              <div class="empty-text">无召回结果</div>
+              <div class="empty-text">
+                无召回结果
+              </div>
             </div>
-            <div v-else class="results-list">
-              <div v-for="result in results" :key="result.id" class="result-item">
+            <div
+              v-else
+              class="results-list"
+            >
+              <div
+                v-for="result in results"
+                :key="result.id"
+                class="result-item"
+              >
                 <div class="result-header">
                   <span class="result-title">{{ result.title }}</span>
                   <span class="result-similarity">相似度：{{ result.similarity }}</span>
                 </div>
-                <div class="result-content">{{ result.content }}</div>
+                <div class="result-content">
+                  {{ result.content }}
+                </div>
               </div>
             </div>
           </div>
@@ -301,8 +311,6 @@ $logo: 60px;
 $logo-space: 100px;
 
 .title {
-  margin-top: 20px;
-
   &.with-description {
     margin-top: 0;
   }
@@ -402,6 +410,20 @@ HEADER {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
+.subheader {
+  display: flex;
+  flex-direction: row;
+  color: var(--input-label);
+  & > * {
+    margin: 5px 20px 5px 0px;
+  }
+
+  .live-data {
+    color: var(--body-text);
+    margin-left: 3px;
+  }
+}
+
 // 新的样式设计
 .hit-test-container {
   display: flex;
@@ -476,7 +498,7 @@ HEADER {
   background: #e5e5e5;
   outline: none;
   -webkit-appearance: none;
-  
+
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -486,7 +508,7 @@ HEADER {
     background: #4285f4;
     cursor: pointer;
   }
-  
+
   &::-moz-range-thumb {
     width: 16px;
     height: 16px;
@@ -522,7 +544,7 @@ HEADER {
   resize: vertical;
   font-size: 13px;
   line-height: 1.4;
-  
+
   &::placeholder {
     color: #9ca3af;
   }
@@ -538,13 +560,13 @@ HEADER {
 .action-icons {
   display: flex;
   gap: 8px;
-  
+
   .icon {
     width: 20px;
     height: 20px;
     cursor: pointer;
     color: #6b7280;
-    
+
     &:hover {
       color: #4285f4;
     }
@@ -559,7 +581,7 @@ HEADER {
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  
+
   &:hover {
     background-color: #3367d6;
   }

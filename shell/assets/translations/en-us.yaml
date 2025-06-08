@@ -6088,8 +6088,8 @@ typeLabel:
     }
   app.llmos.ai.applicationdata: |-
     {count, plural,
-      one { Data Center }
-      other { Data Center }
+      one { Application Data }
+      other { Application Data }
     }
   app.llmos.ai.knowledgebase: |-
     {count, plural,
@@ -6921,7 +6921,7 @@ knowledgeBase:
   embeddingModel:
     label: Embedding Model
   dataCenter:
-    label: Data Center
+    label: Application Data
   steps:
     selectData: Select Data
   tabs:
@@ -6929,6 +6929,7 @@ knowledgeBase:
     chunk: Chunks
   actions:
     hitTest: Hit Test
+    importData: Import Data
 
 applicationData:
   documentCount:

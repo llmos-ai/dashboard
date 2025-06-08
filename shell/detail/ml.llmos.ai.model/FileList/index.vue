@@ -28,6 +28,11 @@ export default {
       default: true,
     },
 
+    showHeader: {
+      type:    Boolean,
+      default: false,
+    },
+
     mode: {
       type:    String,
       default: 'create',
@@ -165,11 +170,11 @@ export default {
       this.$emit('fetchFiles', parentPath);
     },
 
-    onChecked({file, checked}) {      
+    onChecked({ file, checked }) {
       if (checked) {
         this.checkedFiles.push(file);
       } else {
-        this.checkedFiles = this.checkedFiles.filter(f => f.uid !== file.uid);
+        this.checkedFiles = this.checkedFiles.filter((f) => f.uid !== file.uid);
       }
 
       this.$emit('checked', this.checkedFiles);
@@ -179,14 +184,14 @@ export default {
 </script>
 
 <template>
-  <div 
+  <div
     v-if="!isView"
-    class="row" 
+    class="row"
   >
     <div class="col span-12">
-      <div 
+      <div
         v-if="hasFolder"
-        class="pull-left" 
+        class="pull-left"
       >
         <a-button
           type="primary"
@@ -206,6 +211,7 @@ export default {
             {{ t('fileList.createFolder') }}
           </a-button>
           <a-button
+            v-if="hasFolder"
             type="primary"
             :loading="downloading"
             @click="onDownload"
@@ -262,7 +268,10 @@ export default {
       </div>
     </div>
   </div>
-  <div class="file-item">
+  <div
+    v-if="showHeader"
+    class="file-item"
+  >
     <a-row class="file-info pl-45">
       <a-col
         class="file-name"
@@ -285,9 +294,9 @@ export default {
         上传时间
       </a-col>
       <a-col
+        v-if="!isView"
         :span="4"
         class="file-action"
-        v-if="!isView"
       >
         <span
           class="hand text-error"
@@ -328,8 +337,8 @@ export default {
         :key="file.Name"
         :file="file"
         :resource="resource"
-        @fetchFiles="fetchFiles"
         :mode="mode"
+        @fetchFiles="fetchFiles"
         @checked="onChecked"
       />
     </div>

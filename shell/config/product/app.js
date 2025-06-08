@@ -44,13 +44,48 @@ export function init(store) {
     },
   });
 
-  configureType(APP.APPLICATION_DATA , {
-    isEditable: false,
-  });
+  configureType(APP.APPLICATION_DATA, { isEditable: false });
 
   virtualType({
     labelKey: `typeLabel."${APP.KNOWLEDGE_BASE}"`,
     name: APP.KNOWLEDGE_BASE,
+    namespaced: false,
+    weight: 96,
+    icon: "folder",
+    route: {
+      name: `c-cluster-product-resource`,
+      params: { resource: APP.KNOWLEDGE_BASE },
+    },
+  });
+
+  virtualType({
+    labelKey:        'apps.trace.label',
+    name:            'app-trace',
+    namespaced:      false,
+    weight:          90,
+    icon:            'folder',
+    openInNewWindow: true,
+    getRedirectUrl:  (store) => {
+      // 从 store 中获取 server-url 设置
+      const serverUrl = store.getters['management/byId'](MANAGEMENT.SETTING, SETTING.SERVER_URL);
+      const serverUrlValue = serverUrl?.value || serverUrl?.default || '';
+
+      const url = new URL(serverUrlValue);
+
+      url.protocol = 'http:';
+      url.port = '8090';
+
+      return url.toString();
+    },
+    route: {
+      name:   `c-cluster-apps-trace`,
+      params: { cluster: 'local' }
+    },
+  });
+
+  virtualType({
+    labelKey:   `typeLabel."${ APP.KNOWLEDGE_BASE }"`,
+    name:       APP.KNOWLEDGE_BASE,
     namespaced: false,
     weight: 96,
     icon: "folder",
@@ -109,6 +144,8 @@ export function init(store) {
       params: { cluster: 'local' }
     },
   });
+
+  configureType(APP.KNOWLEDGE_BASE, { isEditable: false });
 
   basicType([
     'app-manage',

@@ -5,13 +5,21 @@ import { escapeHtml } from '@shell/utils/string';
 
 export default class LocalModelVersion extends SteveModel {
   get isDefault() {
-    return this.localModel?.spec?.defaultVersion === this.id;
+    return this.localModel?.spec?.defaultVersion === this.metadata.name;
   }
 
   setDefault() {
-    const data = { spec: { defaultVersion: this.id } };
+    const data = { spec: { defaultVersion: this.metadata.name } };
 
-    return this.localModel.patch(data, { headers: { 'content-type': 'application/merge-patch+json' } }, true, true);
+    return this.localModel.patch(
+      data,
+      {
+        // url:     this.localModel.linkFor('patch'),
+        headers: { 'content-type': 'application/merge-patch+json' },
+      },
+      true,
+      true
+    );
   }
 
   get localModel() {
