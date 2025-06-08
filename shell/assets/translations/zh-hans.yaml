@@ -6624,6 +6624,16 @@ knowledgeBase:
   actions:
     hitTest: 命中测试
     importData: 导入数据
+  hitTest:
+    topK:
+      label: Top K
+      tooltip: 用于筛选与用户问题相似度最高的文本片段。系统同时会根据选用模型上下文窗口大小动态调整分段数量。
+    threshold:
+      label: 相似度阈值
+      tooltip: 用于设置文本片段筛选的相似度阅值。
+    panel:
+      dataConfig:
+        label: 数据配置参数
 
 applicationData:
   documentCount:

@@ -6930,6 +6930,16 @@ knowledgeBase:
   actions:
     hitTest: Hit Test
     importData: Import Data
+  hitTest:
+    topK:
+      label: Top K
+      tooltip: It is used to filter the text segments that are most similar to the user's problem. The system also dynamically adjusts the number of segments according to the size of the chosen model context window.
+    threshold:
+      label: Score Threshold
+      tooltip: Used to set the similarity read value for text fragment filtering.
+    panel:
+      dataConfig:
+        label: Data Configuration
 
 applicationData:
   documentCount:
