@@ -1,12 +1,18 @@
 <script>
 import { getAllSchemaAPI, getAllObjectAPI } from '@/shell/config/weaviate';
 
+import SliderInput from '@shell/components/SliderInput';
+
 import { findBy } from '@shell/utils/array';
 import { allHash } from '@shell/utils/promise';
 import { APP } from '@shell/config/types';
 
 export default {
   layout: 'plain',
+
+  components: {
+    SliderInput,
+  },
 
   data() {
     return {
@@ -16,7 +22,8 @@ export default {
       schema:              {},
       value:               {},
       mode:                'detail',
-      similarityThreshold: 0.01,
+      similarityThreshold: 0.2,
+      topK:                2,
       inputText:           '',
       results:             [
         {
@@ -149,9 +156,8 @@ export default {
       this.objects = hash.objects.objects || [];
     },
 
-    search() {
-      // 这里可以添加实际的搜索逻辑
-      // console.log('搜索:', this.inputText);
+    submit() {
+
     },
 
   }
@@ -190,24 +196,28 @@ export default {
       <div class="left-panel">
         <div class="config-section">
           <div class="section-header">
-            数据配置参数
+             {{ t('knowledgeBase.hitTest.panel.dataConfig.label') }}
           </div>
           <div class="threshold-config">
-            <div class="threshold-label">
-              相似度阈值
-            </div>
-            <div class="threshold-slider-wrapper">
-              <a-slider
-                v-model:value="similarityThreshold"
-                :min="0.01"
-                :max="1"
-                :step="0.01"
-              />
-              <div class="range-labels">
-                <span>0.01</span>
-                <span>1</span>
-              </div>
-            </div>
+            <SliderInput
+              :label="t('knowledgeBase.hitTest.threshold.label')"
+              v-model:value="similarityThreshold"
+              :interval="0.01"
+              :min="0.01"
+              :max="1"
+              :defaultValue="0.2"
+              :description="t('knowledgeBase.hitTest.threshold.tooltip')"
+            />
+
+            <SliderInput
+              :label="t('knowledgeBase.hitTest.topK.label')"
+              v-model:value="topK"
+              :interval="1"
+              :min="1"
+              :max="10"
+              :defaultValue="2"
+              :description="t('knowledgeBase.hitTest.topK.tooltip')"
+            />
           </div>
         </div>
       </div>
@@ -224,13 +234,10 @@ export default {
               class="input-textarea"
             />
             <div class="input-actions">
-              <div class="action-icons">
-                <i class="icon icon-refresh" />
-                <i class="icon icon-copy" />
-              </div>
+              <div class="action-icons" />
               <button
                 class="submit-btn"
-                @click="search"
+                @click="submit"
               >
                 提交
               </button>
@@ -247,15 +254,7 @@ export default {
               v-if="results.length === 0"
               class="empty-results"
             >
-              <div class="empty-icon">
-                <img
-                  src="/img/generic-empty.svg"
-                  alt="无结果"
-                >
-              </div>
-              <div class="empty-text">
-                无召回结果
-              </div>
+              <a-empty />
             </div>
             <div
               v-else
@@ -424,17 +423,20 @@ HEADER {
   }
 }
 
-// 新的样式设计
 .hit-test-container {
   display: flex;
   gap: 20px;
   padding: 0;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 210px);
 }
 
 .left-panel {
   width: 300px;
-  flex-shrink: 0;
+  flex-shrink: 0
+}
+
+.config-section {
+  height: calc(100vh - 210px);
 }
 
 .right-panel {
@@ -464,67 +466,6 @@ HEADER {
 
 .threshold-config {
   padding: 16px;
-}
-
-.threshold-label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 8px;
-}
-
-.threshold-input-wrapper {
-  margin-bottom: 12px;
-}
-
-.threshold-input {
-  width: 100%;
-  padding: 6px 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 13px;
-}
-
-.threshold-slider-wrapper {
-  position: relative;
-}
-
-.threshold-slider {
-  width: 100%;
-  height: 4px;
-  border-radius: 2px;
-  background: #e5e5e5;
-  outline: none;
-  -webkit-appearance: none;
-
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #4285f4;
-    cursor: pointer;
-  }
-
-  &::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #4285f4;
-    cursor: pointer;
-    border: none;
-  }
-}
-
-.range-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-  font-size: 11px;
-  color: #999;
 }
 
 .input-section {

@@ -6,7 +6,7 @@ const model = defineModel({
   default: 0,
 });
 
-defineProps({
+const props = defineProps({
   min: {
     type:    Number,
     default: 0,
@@ -27,9 +27,16 @@ defineProps({
     type:    String,
     default: '',
   },
+
+  defaultValue: {
+    type:    Number,
+    default: 0,
+  },
 });
 
 const emit = defineEmits(['change']);
+
+model.value = props.defaultValue
 
 const updateValue = (value) => {
   model.value = value;
