@@ -5783,7 +5783,7 @@ typeLabel:
       one { 应用数据 }
       other { 应用数据 }
     }
-  app.llmos.ai.knowledgebase: |-
+  app.llmos.ai.knownledgebase: |-
     {count, plural,
       one { 知识库 }
       other { 知识库 }
