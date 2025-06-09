@@ -59,7 +59,6 @@ export default {
 
   created() {
     this.registerBeforeHook(this.willSave, 'willSave');
-    this.registerAfterHook(this.afterSave, 'afterSave');
   },
 
   computed: {
