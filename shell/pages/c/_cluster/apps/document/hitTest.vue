@@ -225,7 +225,7 @@ export default {
       <div class="right-panel">
         <div class="input-section">
           <div class="section-header">
-            输入
+            {{ t('knowledgeBase.hitTest.panel.input.label')  }}
           </div>
           <div class="input-content">
             <textarea
@@ -247,7 +247,7 @@ export default {
 
         <div class="results-section">
           <div class="section-header">
-            召回结果
+            {{ t('knowledgeBase.hitTest.panel.result.label')  }}
           </div>
           <div class="results-content">
             <div

@@ -134,8 +134,8 @@ export default {
 
       const checkedFiles = this.checkedFiles.map((f) => {
         return {
-          category: this.selectedDataCenter,
-          uid:      f.uid,
+          applicationDataName: f.applicationDataName,
+          uid:                 f.uid,
         };
       });
 
@@ -155,7 +155,12 @@ export default {
     },
 
     onFileChecked(fileList) {
-      this.checkedFiles = fileList;
+      this.checkedFiles = fileList.map(f => {
+        return {
+          ...f,
+          applicationDataName: this.selectedDataCenter,
+        }
+      });
     },
   },
 };

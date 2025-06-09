@@ -6634,6 +6634,10 @@ knowledgeBase:
     panel:
       dataConfig:
         label: 数据配置参数
+      input:
+        label: 输入
+      result:
+        label: 测试结果
 
 applicationData:
   documentCount:
