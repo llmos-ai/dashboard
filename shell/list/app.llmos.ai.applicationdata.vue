@@ -47,7 +47,6 @@ export default {
       const headers = [
         STATE,
         NAME,
-        NAMESPACE,
         DOCUMENT_COUNT,
         REGISTRY,
         AGE,
@@ -67,6 +66,6 @@ export default {
     :headers="headers"
     :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
     :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
-    groupable
+    :groupable="false"
   />
 </template>

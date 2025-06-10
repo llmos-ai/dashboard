@@ -86,7 +86,7 @@ export default {
     modelOptions() {
       const models = this.$store.getters[`${ this.inStore }/all`](ML_WORKLOAD_TYPES.MODEL_SERVICE);
 
-      const out = models.map((m) => ({
+      const out = models.filter((model) => model.isRunning).map((m) => ({
         label: m.id,
         value: m.id,
       }));

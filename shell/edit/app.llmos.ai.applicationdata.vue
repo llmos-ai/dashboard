@@ -96,6 +96,7 @@ export default {
   methods: {
     willSave() {
       Object.assign(this.value, this.resource);
+      this.value.metadata.namespace = 'default'
 
       if (this.resource.spec.registry === this.t('modelRegistry.useDefault')) {
         const defaultRegistry = this.registries.find((registry) => registry.isDefault) || {};
@@ -119,7 +120,7 @@ export default {
   >
     <NameNsDescription
       :value="value"
-      :namespaced="true"
+      :namespaced="false"
       :mode="mode"
       descriptionHidden
     />
