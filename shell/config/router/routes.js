@@ -185,6 +185,11 @@ export default [
         component: () => interopDefault(import('@shell/pages/c/_cluster/apps/document/_id.vue')),
         name:      'c-cluster-apps-knowledgeBase-class-document-id',
         meta:      { product: 'apps' }
+      }, {
+        path:      '/c/:cluster/apps/trace',
+        component: () => interopDefault(import('@shell/pages/c/_cluster/apps/trace/index.vue')),
+        name:      'c-cluster-apps-trace',
+        meta:      { product: 'apps' }
       },
       {
         path:      '/c/:cluster/llmos/tools',

@@ -12,7 +12,6 @@ import LocalModelList from '@shell/edit/ml.llmos.ai.modelservice/LocalModelList'
 import { _CREATE } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import ArgumentVars from './components/ArgumentVars.vue';
-import { contentQuotesLinter } from 'ant-design-vue/es/_util/cssinjs/linters';
 
 export default {
   name:       'EditModelService',
@@ -155,6 +154,9 @@ export default {
       } else {
         return false;
       }
+    },
+    isHuggingFace() {
+      return this.spec.modelRegistry === 'huggingface';
     },
   },
 
@@ -406,33 +408,35 @@ export default {
             </a-col>
           </a-row>
 
-          <h3>{{ t("modelService.huggingFaceToken") }}</h3>
-          <a-row
-            :gutter="[16]"
-            class="mb-[16px]"
-          >
-            <a-col :span="12">
-              <ValueFromResource
-                v-model:value="hfToken"
-                :value="hfToken"
-                default-type="secretKeyRef"
-                :all-secrets="namespacedSecrets"
-                :mode="mode"
-                :loading="isLoadingSecondaryResources"
-                @update:value="update"
-              />
-            </a-col>
+          <template v-if="isHuggingFace">
+            <h3>{{ t("modelService.huggingFaceToken") }}</h3>
+            <a-row
+              :gutter="[16]"
+              class="mb-[16px]"
+            >
+              <a-col :span="12">
+                <ValueFromResource
+                  v-model:value="hfToken"
+                  :value="hfToken"
+                  default-type="secretKeyRef"
+                  :all-secrets="namespacedSecrets"
+                  :mode="mode"
+                  :loading="isLoadingSecondaryResources"
+                  @update:value="update"
+                />
+              </a-col>
 
-            <a-col :span="12">
-              <LabeledInput
-                v-model:value="hfEndpoint.value"
-                :localized-label="true"
-                :mode="mode"
-                class="mb-20"
-                :label="t('modelService.hf.endpoint')"
-              />
-            </a-col>
-          </a-row>
+              <a-col :span="12">
+                <LabeledInput
+                  v-model:value="hfEndpoint.value"
+                  :localized-label="true"
+                  :mode="mode"
+                  class="mb-20"
+                  :label="t('modelService.hf.endpoint')"
+                />
+              </a-col>
+            </a-row>
+          </template>
 
           <div class="row">
             <div class="col span-12">

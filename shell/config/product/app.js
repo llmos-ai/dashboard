@@ -66,9 +66,22 @@ export function init(store) {
     },
   });
 
+  virtualType({
+    labelKey:   'apps.trace.label',
+    name:       'app-trace',
+    namespaced: false,
+    weight:     90,
+    icon:       'folder',
+    route:      {
+      name:   `c-cluster-apps-trace`,
+      params: { cluster: 'local' }
+    },
+  });
+
   basicType([
     'app-manage',
     'apps.dataset',
-    'app-knowledge'
+    'app-knowledge',
+    'app-trace'
   ]);
 }
