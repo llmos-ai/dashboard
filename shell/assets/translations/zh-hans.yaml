@@ -6610,3 +6610,5 @@ apps:
     label: 应用数据
   knowledge:
     label: 知识库
+  trace:
+    label: 应用观测

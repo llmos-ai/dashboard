@@ -6916,3 +6916,5 @@ apps:
     label: Data Center
   knowledge:
     label: Knowledge Base
+  trace:
+    label: Application Trace
