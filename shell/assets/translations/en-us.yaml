@@ -6086,12 +6086,12 @@ typeLabel:
       one { Local Model }
       other { Local Models }
     }
-  app.llmos.ai.applicationdata: |-
+  agent.llmos.ai.datacollection: |-
     {count, plural,
       one { Application Data }
       other { Application Data }
     }
-  app.llmos.ai.knownledgebase: |-
+  agent.llmos.ai.knownledgebase: |-
     {count, plural,
       one { Knowledge Base }
       other { Knowledge Bases }
