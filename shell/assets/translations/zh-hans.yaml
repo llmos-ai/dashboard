@@ -5778,12 +5778,12 @@ typeLabel:
       one { 本地模型 }
       other { 本地模型 }
     }
-  app.llmos.ai.applicationdata: |-
+  agent.llmos.ai.datacollection: |-
     {count, plural,
       one { 应用数据 }
       other { 应用数据 }
     }
-  app.llmos.ai.knownledgebase: |-
+  agent.llmos.ai.knownledgebase: |-
     {count, plural,
       one { 知识库 }
       other { 知识库 }
