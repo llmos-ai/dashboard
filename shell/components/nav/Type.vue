@@ -74,6 +74,11 @@ export default {
       }
 
       return typeFullPath === pageFullPath;
+    },
+
+    // 判断是否需要在新窗口打开链接
+    shouldOpenInNewWindow() {
+      return this.type.openInNewWindow;
     }
 
   },
@@ -92,6 +97,29 @@ export default {
           this.$emit('selected');
         }
       }
+    },
+
+    handleClick(event, navigate) {
+      this.selectType();
+
+      // 如果需要在新窗口打开
+      if (this.shouldOpenInNewWindow) {
+        event.preventDefault();
+
+        // 检查是否有自定义的getRedirectUrl函数
+        if (typeof this.type.getRedirectUrl === 'function') {
+          const redirectUrl = this.type.getRedirectUrl(this.$store);
+
+          window.open(redirectUrl, '_blank');
+        } else {
+          window.open(this.$router.resolve(this.type.route).href, '_blank');
+        }
+
+        return;
+      }
+
+      // 否则正常导航
+      navigate(event);
     }
   }
 };
@@ -122,7 +150,7 @@ export default {
         :aria-label="type.labelKey ? t(type.labelKey) : (type.labelDisplay || type.label)"
         :href="href"
         class="type-link"
-        @click="selectType(); navigate($event);"
+        @click="handleClick($event, navigate)"
         @mouseenter="setNear(true)"
         @mouseleave="setNear(false)"
       >

@@ -775,14 +775,17 @@ export const getters = {
         }
 
         group.children.push({
+          // TODO: think: use ...typeObj instead?
           label,
           labelDisplay,
-          mode:         typeObj.mode,
-          exact:        typeObj.exact || false,
-          'exact-path': typeObj['exact-path'] || false,
+          mode:            typeObj.mode,
+          exact:           typeObj.exact || false,
+          'exact-path':    typeObj['exact-path'] || false,
+          openInNewWindow: typeObj.openInNewWindow || false,
+          getRedirectUrl:  typeObj.getRedirectUrl || null,
           namespaced,
           route,
-          name:         typeObj.name,
+          name:            typeObj.name,
           weight:
             typeObj.weight ||
             getters.typeWeightFor(typeObj.schema?.id || label, isBasic),

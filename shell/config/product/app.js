@@ -1,5 +1,6 @@
 import { DSL } from '@shell/store/type-map';
-import { LLMOS } from '@shell/config/types';
+import { LLMOS, MANAGEMENT } from '@shell/config/types';
+import { SETTING } from '@shell/config/settings';
 
 export const NAME = 'apps';
 
@@ -67,12 +68,25 @@ export function init(store) {
   });
 
   virtualType({
-    labelKey:   'apps.trace.label',
-    name:       'app-trace',
-    namespaced: false,
-    weight:     90,
-    icon:       'folder',
-    route:      {
+    labelKey:        'apps.trace.label',
+    name:            'app-trace',
+    namespaced:      false,
+    weight:          90,
+    icon:            'folder',
+    openInNewWindow: true,
+    getRedirectUrl:  (store) => {
+      // 从 store 中获取 server-url 设置
+      const serverUrl = store.getters['management/byId'](MANAGEMENT.SETTING, SETTING.SERVER_URL);
+      const serverUrlValue = serverUrl?.value || serverUrl?.default || '';
+
+      const url = new URL(serverUrlValue);
+
+      url.protocol = 'http:';
+      url.port = '8090';
+
+      return url.toString();
+    },
+    route: {
       name:   `c-cluster-apps-trace`,
       params: { cluster: 'local' }
     },
