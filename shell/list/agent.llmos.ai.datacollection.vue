@@ -2,7 +2,7 @@
 import ResourceTable from '@shell/components/ResourceTable';
 import ResourceFetch from '@shell/mixins/resource-fetch';
 import { allHash } from '@shell/utils/promise';
-import { NAME, STATE, NAMESPACE, AGE } from '@shell/config/table-headers';
+import { NAME, STATE, AGE } from '@shell/config/table-headers';
 
 export default {
   name: 'ApplicationDataList',
