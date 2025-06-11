@@ -426,6 +426,7 @@ export default {
 
 <style lang="scss" scoped>
   .side-nav {
+    padding-top: 2px;
     display: flex;
     flex-direction: column;
     .nav {

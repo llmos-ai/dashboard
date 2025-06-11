@@ -462,7 +462,7 @@ export default {
 </script>
 
 <template>
-  <div class="pb-[4px]">
+  <div>
     <a-menu
       :selectedKeys="selectedKeys"
       mode="horizontal"

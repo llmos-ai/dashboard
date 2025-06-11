@@ -12,6 +12,10 @@ export default {
     dark: {
       type:    Boolean,
       default: false
+    },
+    showText: {
+      type:    Boolean,
+      default: true
     }
   },
   data() {
@@ -96,7 +100,7 @@ export default {
       v-bind="$attrs"
       :src="pathToBrandedImage"
     >
-    <span>{{ getPL }}</span>
+    <span v-if="showText">{{ getPL }}</span>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -106,7 +110,7 @@ export default {
   gap: 0px;
 
   img {
-    max-height: 40px;
+    max-height: 32px;
     width: auto;
     max-width: 200px;
   }
