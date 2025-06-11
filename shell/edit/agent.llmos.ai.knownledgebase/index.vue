@@ -133,7 +133,7 @@ export default {
 
       const checkedFiles = this.checkedFiles.map((f) => {
         return {
-          applicationDataName: f.applicationDataName,
+          dataCollectionName: f.dataCollectionName,
           uid:                 f.uid,
         };
       });
@@ -157,7 +157,7 @@ export default {
       this.checkedFiles = fileList.map((f) => {
         return {
           ...f,
-          applicationDataName: this.selectedDataCenter,
+          dataCollectionName: this.selectedDataCenter,
         };
       });
     },

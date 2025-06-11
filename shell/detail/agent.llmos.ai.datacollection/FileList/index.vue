@@ -175,6 +175,17 @@ export default {
       this.$emit('fetchFiles', parentPath);
     },
 
+    // onChecked({ file, checked }) {
+    //   console.log(checked, 'checked')
+    //   const isChecked = this.checkedFiles.find((f) => f.uid === file.uid);
+    //   console.log(isChecked, 'isChecked')
+    //   if (checked && !isChecked) {
+    //     this.checkedFiles.push(file);
+    //   } else if (!checked && isChecked) {
+    //     this.checkedFiles = this.checkedFiles.filter((f) => f.uid !== file.uid);
+    //   }
+    // },
+
     onChecked({ file, checked }) {
       if (checked) {
         this.checkedFiles.push(file);
@@ -339,7 +350,7 @@ export default {
     <div v-else>
       <FileItem
         v-for="file in files"
-        :key="file.Name"
+        :key="file.uid"
         :file="file"
         :resource="resource"
         :mode="mode"
