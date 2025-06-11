@@ -1,9 +1,6 @@
 <script>
-import { getAllSchemaAPI, getAllObjectAPI } from '@/shell/config/weaviate';
-
 import SliderInput from '@shell/components/SliderInput';
 
-import { findBy } from '@shell/utils/array';
 import { allHash } from '@shell/utils/promise';
 import { APP } from '@shell/config/types';
 
@@ -23,32 +20,8 @@ export default {
       similarityThreshold: 0.2,
       topK:                2,
       inputText:           '',
-      results:             [
-        {
-          id:         1,
-          title:      '创建1',
-          content:    '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
-          similarity: '7%'
-        },
-        {
-          id:         2,
-          title:      '创建2',
-          content:    '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
-          similarity: '7%'
-        },
-        {
-          id:         3,
-          title:      '创建3',
-          content:    '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
-          similarity: '7%'
-        },
-        {
-          id:         4,
-          title:      '创建4',
-          content:    '广州市政府公布了关于进一步睦邻ighbors的若干措施的通知，其中包括了多项具体措施，旨在为企业提供更好的发展环境。',
-          similarity: '7%'
-        },
-      ],
+      results:             [],
+      submitting:          false,
     };
   },
 
@@ -72,8 +45,8 @@ export default {
 
     resource() {
       const id = this.$route.params.id;
-
-      const out = findBy(this.classes, 'class', id) || {};
+      const namespace = this.$route.params.namespace;
+      const out = this.$store.getters['cluster/byId'](APP.KNOWLEDGE_BASE, `${ namespace }/${ id }`);
 
       return out;
     },
@@ -103,35 +76,32 @@ export default {
     displayName() {
       return this.$route.params.id;
     },
+
+    canSubmit() {
+      return this.inputText;
+    },
   },
 
   methods: {
-    async clickSave(buttonDone) {
-      const inStore = this.$store.getters['currentProduct'].inStore;
-
+    async submit(buttonDone) {
       try {
-        await this.$store.dispatch(
-          `${ inStore }/request`,
-          {
-            url:    getAllSchemaAPI,
-            method: 'POST',
-            data:   { class: this.value.className }
-          }
-        );
-        this.$message.success('创建成功');
+        this.submitting = true;
 
-        buttonDone(true);
+        const res = await this.resource.doAction('search', {
+          query: this.inputText,
+          limit: this.topK,
+        });
 
-        this.confirmCancel();
-
-        return;
+        this.results = res.Results.sort((b, a) => {
+          return a.distance - b.distance;
+        });
       } catch (error) {
         const message = error?.error?.[0]?.message;
 
-        this.$message.error(`创建失败：${ message }`);
-
-        buttonDone(false);
+        this.$message.error(`测试失败：${ message }`);
       }
+
+      this.submitting = false;
     },
 
     confirmCancel() {
@@ -139,25 +109,12 @@ export default {
     },
 
     async fetchList() {
-      const hash = await allHash({
-        classes: this.$store.dispatch(
-          `${ this.inStore }/request`,
-          { url: getAllSchemaAPI }
-        ),
-        objects: this.$store.dispatch(
-          `${ this.inStore }/request`,
-          { url: getAllObjectAPI }
-        ),
-      });
-
-      this.classes = hash.classes.classes || [];
-      this.objects = hash.objects.objects || [];
+      await allHash({ knowledgeBase: this.$store.dispatch('cluster/findAll', { type: APP.KNOWLEDGE_BASE }) });
     },
 
-    submit() {
-
+    percentFormatted(value) {
+      return `${ (value * 100).toFixed(2) }%`;
     },
-
   }
 };
 </script>
@@ -205,6 +162,7 @@ export default {
               :max="1"
               :defaultValue="0.2"
               :description="t('knowledgeBase.hitTest.threshold.tooltip')"
+              @change="update"
             />
 
             <SliderInput
@@ -215,6 +173,7 @@ export default {
               :max="10"
               :defaultValue="2"
               :description="t('knowledgeBase.hitTest.topK.tooltip')"
+              @change="update"
             />
           </div>
         </div>
@@ -233,12 +192,15 @@ export default {
             />
             <div class="input-actions">
               <div class="action-icons" />
-              <button
+              <a-button
                 class="submit-btn"
+                :loading="submitting"
+                :disabled="!canSubmit"
+                type="primary"
                 @click="submit"
               >
                 提交
-              </button>
+              </a-button>
             </div>
           </div>
         </div>
@@ -265,7 +227,10 @@ export default {
               >
                 <div class="result-header">
                   <span class="result-title">{{ result.title }}</span>
-                  <span class="result-similarity">相似度：{{ result.similarity }}</span>
+                  <span class="result-similarity">
+                    相似度：
+                    {{ percentFormatted(result.distance) }}
+                  </span>
                 </div>
                 <div class="result-content">
                   {{ result.content }}
@@ -509,20 +474,6 @@ HEADER {
     &:hover {
       color: #4285f4;
     }
-  }
-}
-
-.submit-btn {
-  padding: 6px 16px;
-  background-color: #4285f4;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-
-  &:hover {
-    background-color: #3367d6;
   }
 }
 

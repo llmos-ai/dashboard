@@ -6091,7 +6091,7 @@ typeLabel:
       one { Application Data }
       other { Application Data }
     }
-  agent.llmos.ai.knownledgebase: |-
+  agent.llmos.ai.knowledgebase: |-
     {count, plural,
       one { Knowledge Base }
       other { Knowledge Bases }
@@ -6922,6 +6922,13 @@ knowledgeBase:
     label: Embedding Model
   dataCenter:
     label: Application Data
+  chunkingConfig:
+    size:
+      label: Chunk Size
+      placeholder: e.g. 1000
+    overlap:
+      label: Overlap
+      placeholder: e.g. 200
   steps:
     selectData: Select Data
   tabs:

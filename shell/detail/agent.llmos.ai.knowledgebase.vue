@@ -62,9 +62,8 @@ export default {
     rows() {
       const id = this.$route.params.id;
       const namespace = this.$route.params.namespace;
-      const className = `${ namespace }/${ id }`;
 
-      const out = this.value.status.parsedFiles || []
+      const out = this.value.status.parsedFiles || [];
 
       const map = groupBy(out, 'file.name');
 

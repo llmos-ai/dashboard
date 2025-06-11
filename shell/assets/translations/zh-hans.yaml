@@ -5783,7 +5783,7 @@ typeLabel:
       one { 应用数据 }
       other { 应用数据 }
     }
-  agent.llmos.ai.knownledgebase: |-
+  agent.llmos.ai.knowledgebase: |-
     {count, plural,
       one { 知识库 }
       other { 知识库 }
@@ -6616,6 +6616,13 @@ knowledgeBase:
     label: Embedding模型
   dataCenter:
     label: 应用数据
+  chunkingConfig:
+    size:
+      label: 分段大小
+      placeholder: e.g. 1000
+    overlap:
+      label: Overlap
+      placeholder: e.g. 200
   steps:
     selectData: 选择数据
   tabs:

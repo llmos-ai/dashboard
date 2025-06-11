@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 
 const model = defineModel({
@@ -36,10 +37,17 @@ const props = defineProps({
 
 const emit = defineEmits(['change']);
 
-model.value = props.defaultValue;
+onMounted(() => {
+  if (props.defaultValue) {
+    model.value = props.defaultValue;
+    emit('update:value', props.defaultValue);
+  }
+});
 
 const updateValue = (value) => {
   model.value = value;
+
+  emit('update:value', value);
   emit('change');
 };
 </script>

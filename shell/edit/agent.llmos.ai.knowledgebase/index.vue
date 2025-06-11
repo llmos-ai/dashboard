@@ -5,6 +5,7 @@ import FormValidation from '@shell/mixins/form-validation';
 import CruResource from '@shell/components/CruResource';
 import NameNsDescription from '@shell/components/form/NameNsDescription';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
+import LabeledInput from '@shell/components/form/LabeledInput/LabeledInput';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import FileList from '@shell/detail/agent.llmos.ai.datacollection/FileList';
@@ -22,6 +23,7 @@ export default {
     LabeledSelect,
     ResourceTabs,
     FileList,
+    LabeledInput,
   },
 
   mixins: [CreateEditView, FormValidation],
@@ -48,7 +50,12 @@ export default {
   },
 
   data() {
-    const resource = { spec: { files: [] } };
+    const resource = {
+      spec: {
+        files:          [],
+        chunkingConfig: {},
+      }
+    };
 
     Object.assign(resource, this.value);
 
@@ -114,7 +121,7 @@ export default {
     },
 
     files() {
-      const dataCenter = this.$store.getters[`${ this.inStore }/byId`](APP.APPLICATION_DATA, `default/${this.selectedDataCenter}`) || {};
+      const dataCenter = this.$store.getters[`${ this.inStore }/byId`](APP.APPLICATION_DATA, `default/${ this.selectedDataCenter }`) || {};
 
       const out = (dataCenter?.status?.preprocessedFiles || []).map((f) => {
         return {
@@ -134,7 +141,7 @@ export default {
       const checkedFiles = this.checkedFiles.map((f) => {
         return {
           dataCollectionName: f.dataCollectionName,
-          uid:                 f.uid,
+          uid:                f.uid,
         };
       });
 
@@ -142,6 +149,14 @@ export default {
         this.value.spec.files = this.value.spec.files.concat(checkedFiles);
       } else {
         this.value.spec.files = checkedFiles;
+      }
+
+      if (this.value.spec.chunkingConfig.size) {
+        this.value.spec.chunkingConfig.size = Number(this.value.spec.chunkingConfig.size);
+      }
+
+      if (this.value.spec.chunkingConfig.overlap) {
+        this.value.spec.chunkingConfig.overlap = Number(this.value.spec.chunkingConfig.overlap);
       }
     },
 
@@ -160,12 +175,12 @@ export default {
       });
 
       this.checkedFiles = [
-        ...this.checkedFiles, 
-        ...newArr.map(a => {
+        ...this.checkedFiles,
+        ...newArr.map((a) => {
           return {
             ...a,
             dataCollectionName: this.selectedDataCenter,
-          }
+          };
         }),
       ];
     },
@@ -214,7 +229,7 @@ export default {
           :weight="2"
         >
           <div class="row mb-10">
-            <div class="col span-12">
+            <div class="col span-6">
               <LabeledSelect
                 v-model:value="resource.spec.embeddingModel"
                 :options="modelOptions"
@@ -222,6 +237,26 @@ export default {
                 :multiple="false"
                 label-key="knowledgeBase.embeddingModel.label"
                 required
+                :placeholder="t('chat.selectModel')"
+              />
+            </div>
+            <div class="col span-6">
+              <LabeledInput
+                v-model:value="resource.spec.chunkingConfig.size"
+                :mode="mode"
+                label-key="knowledgeBase.chunkingConfig.size.label"
+                :placeholder="t('knowledgeBase.chunkingConfig.size.placeholder')"
+              />
+            </div>
+          </div>
+
+          <div class="row mb-10">
+            <div class="col span-6">
+              <LabeledInput
+                v-model:value="resource.spec.chunkingConfig.overlap"
+                :mode="mode"
+                label-key="knowledgeBase.chunkingConfig.overlap.label"
+                :placeholder="t('knowledgeBase.chunkingConfig.overlap.placeholder')"
               />
             </div>
           </div>
@@ -252,9 +287,9 @@ export default {
                 :hasFolder="false"
                 mode="view"
                 :showHeader="false"
+                :checkedFiles="checkedFiles"
                 @fetchFiles="fetchFiles"
                 @checked="onFileChecked"
-                :checkedFiles="checkedFiles"
               />
             </div>
           </div>

@@ -63,9 +63,9 @@ export default {
     headers() {
       return [
         {
-          name:  'text',
+          name:  'content',
           label: 'Text',
-          value: 'properties.text',
+          value: 'properties.content',
         },
       ];
     },

@@ -15,6 +15,7 @@ export default class Dataset extends SteveModel {
       spec: {
         embeddingModel: '',
         files:          [],
+        chunkingConfig: {},
       },
     };
 
