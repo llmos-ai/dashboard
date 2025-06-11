@@ -4,14 +4,12 @@ import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
 import { useFileItem } from '@shell/detail/ml.llmos.ai.model/FileList/useFileItem';
 import { FileTextTwoTone, FolderTwoTone } from '@ant-design/icons-vue';
-import { BadgeState } from '@shell/components/BadgeState';
 
 import dayjs from 'dayjs';
 import { Modal, message } from 'ant-design-vue';
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
 import { findBy } from '@shell/utils/array';
-import { colorForState, stateDisplay, STATES_ENUM } from '@shell/plugins/dashboard-store/resource-class';
 
 export default {
   name: 'FileItem',
@@ -19,7 +17,6 @@ export default {
   components: {
     FileTextTwoTone,
     FolderTwoTone,
-    BadgeState,
   },
 
   props: {
@@ -153,10 +150,14 @@ export default {
     <a-checkbox
       v-if="isView"
       v-model:checked="checked"
+      :disabled="stateDisplay === 'Not Ready'"
       @change="onChecked"
     />
 
-    <a-tag :color="stateBackground" class="ml-10">
+    <a-tag
+      :color="stateBackground"
+      class="ml-10"
+    >
       {{ stateDisplay }}
     </a-tag>
 

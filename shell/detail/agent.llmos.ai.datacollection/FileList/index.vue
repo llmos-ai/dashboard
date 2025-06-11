@@ -37,11 +37,6 @@ export default {
       type:    String,
       default: 'create',
     },
-
-    checkedFiles: {
-      type:    Array,
-      default: () => ([]),
-    },
   },
 
   emits: ['fetchFiles'],
@@ -174,17 +169,6 @@ export default {
       this.currentPath = parentPath || '';
       this.$emit('fetchFiles', parentPath);
     },
-
-    // onChecked({ file, checked }) {
-    //   console.log(checked, 'checked')
-    //   const isChecked = this.checkedFiles.find((f) => f.uid === file.uid);
-    //   console.log(isChecked, 'isChecked')
-    //   if (checked && !isChecked) {
-    //     this.checkedFiles.push(file);
-    //   } else if (!checked && isChecked) {
-    //     this.checkedFiles = this.checkedFiles.filter((f) => f.uid !== file.uid);
-    //   }
-    // },
 
     onChecked({ file, checked }) {
       const isChecked = this.checkedFiles.find((f) => f.uid === file.uid);
