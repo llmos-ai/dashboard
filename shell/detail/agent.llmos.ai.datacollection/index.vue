@@ -2,7 +2,7 @@
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import Tab from '@shell/components/Tabbed/Tab';
 import Loading from '@shell/components/Loading';
-import FileList from '@shell/detail/ml.llmos.ai.model/FileList';
+import FileList from './FileList';
 
 import CreateEditView from '@shell/mixins/create-edit-view';
 
