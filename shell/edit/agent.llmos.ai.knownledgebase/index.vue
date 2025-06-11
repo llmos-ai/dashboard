@@ -154,12 +154,20 @@ export default {
     },
 
     onFileChecked(fileList) {
-      this.checkedFiles = fileList.map((f) => {
-        return {
-          ...f,
-          dataCollectionName: this.selectedDataCenter,
-        };
+      const uidArr = this.checkedFiles.map((f) => f.uid);
+      const newArr = fileList.filter((f) => {
+        return !uidArr.includes(f.uid);
       });
+
+      this.checkedFiles = [
+        ...this.checkedFiles, 
+        ...newArr.map(a => {
+          return {
+            ...a,
+            dataCollectionName: this.selectedDataCenter,
+          }
+        }),
+      ];
     },
   },
 };
