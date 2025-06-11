@@ -155,11 +155,11 @@ export default {
     },
 
     onFileChecked(fileList) {
-      this.checkedFiles = fileList.map(f => {
+      this.checkedFiles = fileList.map((f) => {
         return {
           ...f,
           applicationDataName: this.selectedDataCenter,
-        }
+        };
       });
     },
   },

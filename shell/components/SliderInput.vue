@@ -36,7 +36,7 @@ const props = defineProps({
 
 const emit = defineEmits(['change']);
 
-model.value = props.defaultValue
+model.value = props.defaultValue;
 
 const updateValue = (value) => {
   model.value = value;

@@ -10,9 +10,7 @@ import { APP } from '@shell/config/types';
 export default {
   layout: 'plain',
 
-  components: {
-    SliderInput,
-  },
+  components: { SliderInput },
 
   data() {
     return {
@@ -196,12 +194,12 @@ export default {
       <div class="left-panel">
         <div class="config-section">
           <div class="section-header">
-             {{ t('knowledgeBase.hitTest.panel.dataConfig.label') }}
+            {{ t('knowledgeBase.hitTest.panel.dataConfig.label') }}
           </div>
           <div class="threshold-config">
             <SliderInput
-              :label="t('knowledgeBase.hitTest.threshold.label')"
               v-model:value="similarityThreshold"
+              :label="t('knowledgeBase.hitTest.threshold.label')"
               :interval="0.01"
               :min="0.01"
               :max="1"
@@ -210,8 +208,8 @@ export default {
             />
 
             <SliderInput
-              :label="t('knowledgeBase.hitTest.topK.label')"
               v-model:value="topK"
+              :label="t('knowledgeBase.hitTest.topK.label')"
               :interval="1"
               :min="1"
               :max="10"
@@ -225,7 +223,7 @@ export default {
       <div class="right-panel">
         <div class="input-section">
           <div class="section-header">
-            {{ t('knowledgeBase.hitTest.panel.input.label')  }}
+            {{ t('knowledgeBase.hitTest.panel.input.label') }}
           </div>
           <div class="input-content">
             <textarea
@@ -247,7 +245,7 @@ export default {
 
         <div class="results-section">
           <div class="section-header">
-            {{ t('knowledgeBase.hitTest.panel.result.label')  }}
+            {{ t('knowledgeBase.hitTest.panel.result.label') }}
           </div>
           <div class="results-content">
             <div
