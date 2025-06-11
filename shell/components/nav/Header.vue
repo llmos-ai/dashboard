@@ -355,13 +355,14 @@ export default {
 <template>
   <header
     ref="header"
-    class="!flex flex-col bg-[#fafafa]"
+    class="!flex flex-col bg-[#fafafa] justify-between"
     data-testid="header"
   >
     <div class="flex items-center h-[45px] pt-[10px]">
       <BrandImage
-        class="side-menu-logo-img pl-[4px]"
-        file-name="logo.png"
+        class="side-menu-logo-img pl-[4px] ml-[3px]"
+        file-name="logo-horizontal.png"
+        :showText="false"
       />
 
       <div class="grow-1" />
@@ -563,10 +564,10 @@ export default {
         </div>
       </div>
     </div>
-    <div class="grow-1 first-nav bg-[#fafafa]">
+    <div>
       <TopLevelMenu
         v-if="showTopLevelMenu"
-        class="!bg-[#fafafa]"
+        class="!bg-[#fafafa] h-[46px]"
       />
     </div>
   </header>
