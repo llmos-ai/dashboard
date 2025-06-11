@@ -312,7 +312,7 @@ const getFlowIconType = (flowName) => {
 // 获取流程图标颜色样式
 const getFlowIconClass = (flowName) => {
   const colors = [
-    'text-blue-500',
+    'white',
     'text-green-500',
     'text-cyan-500',
     'text-purple-500',
