@@ -115,6 +115,14 @@ export default {
     percentFormatted(value) {
       return `${ (value * 100).toFixed(2) }%`;
     },
+
+    onResultClick(result) {
+      this.$store.dispatch('cluster/promptModal', {
+        component:      'TextViewerModal',
+        modalWidth:     '1000px',
+        componentProps: { content: result.content }
+      });
+    },
   }
 };
 </script>
@@ -223,10 +231,13 @@ export default {
               <div
                 v-for="result in results"
                 :key="result.id"
-                class="result-item"
+                class="result-item hand"
+                @click="onResultClick(result)"
               >
                 <div class="result-header">
-                  <span class="result-title">{{ result.title }}</span>
+                  <span class="result-title">
+                    {{ result.title }}
+                  </span>
                   <span class="result-similarity">
                     相似度：
                     {{ percentFormatted(result.distance) }}
