@@ -7,7 +7,7 @@ import NameNsDescription from '@shell/components/form/NameNsDescription';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
-import FileList from '@shell/detail/ml.llmos.ai.model/FileList';
+import FileList from '@shell/detail/agent.llmos.ai.datacollection/FileList';
 
 import { ML_WORKLOAD_TYPES, APP } from '@shell/config/types';
 import { allHash } from '@shell/utils/promise';
@@ -70,7 +70,6 @@ export default {
 
   created() {
     this.registerBeforeHook(this.willSave, 'willSave');
-    this.registerAfterHook(this.afterSave, 'afterSave');
   },
 
   computed: {
@@ -109,13 +108,13 @@ export default {
       const dataCenters = this.$store.getters[`${ this.inStore }/all`](APP.APPLICATION_DATA);
 
       return dataCenters.map((dc) => ({
-        label: dc.id,
-        value: dc.id,
+        label: dc.metadata.name,
+        value: dc.metadata.name,
       }));
     },
 
     files() {
-      const dataCenter = this.$store.getters[`${ this.inStore }/byId`](APP.APPLICATION_DATA, this.selectedDataCenter) || {};
+      const dataCenter = this.$store.getters[`${ this.inStore }/byId`](APP.APPLICATION_DATA, `default/${this.selectedDataCenter}`) || {};
 
       const out = (dataCenter?.status?.preprocessedFiles || []).map((f) => {
         return {
@@ -235,6 +234,7 @@ export default {
                 :options="dataCenterOptions"
                 class="ml-10"
                 placeholder="Select Data Center"
+                @change="onDataCenterChange"
               />
             </div>
             <div class="panel-content">
@@ -243,9 +243,10 @@ export default {
                 :resource="value"
                 :hasFolder="false"
                 mode="view"
-                :showHeader="true"
+                :showHeader="false"
                 @fetchFiles="fetchFiles"
                 @checked="onFileChecked"
+                :checkedFiles="checkedFiles"
               />
             </div>
           </div>
