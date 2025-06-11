@@ -59,7 +59,7 @@ export default {
   >
     <Tab
       name="files"
-      label="Files"
+      label="文件"
     >
       <a-spin :spinning="loading">
         <FileList
