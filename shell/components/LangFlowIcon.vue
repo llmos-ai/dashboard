@@ -11,7 +11,7 @@ const props = defineProps({
   },
   color: {
     type:    String,
-    default: '#3010fe'
+    default: '#5d8be3'
   },
   size: {
     type:    [String, Number],
@@ -33,7 +33,7 @@ const getContrastColor = (hexColor) => {
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
 
   // 根据亮度返回对比色
-  return brightness > 128 ? '#000000' : '#ffffff';
+  return brightness > 128 ? '#ffffff' : '#000000';
 };
 
 // 计算图标颜色
