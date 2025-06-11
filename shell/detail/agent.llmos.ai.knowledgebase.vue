@@ -63,7 +63,7 @@ export default {
       const id = this.$route.params.id;
       const namespace = this.$route.params.namespace;
 
-      const out = this.value.status.parsedFiles || [];
+      const out = this.value?.status?.parsedFiles || [];
 
       const map = groupBy(out, 'file.name');
 
@@ -81,6 +81,7 @@ export default {
               id:      key,
             },
           },
+          parsedFile: map[key],
         };
       });
     },
