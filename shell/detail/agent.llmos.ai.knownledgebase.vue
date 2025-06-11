@@ -64,8 +64,9 @@ export default {
       const namespace = this.$route.params.namespace;
       const className = `${ namespace }/${ id }`;
 
-      const out = this.objects.filter((item) => item.class === className);
-      const map = groupBy(out, 'properties.document');
+      const out = this.value.status.parsedFiles || []
+
+      const map = groupBy(out, 'file.name');
 
       return Object.keys(map).map((key) => {
         return {

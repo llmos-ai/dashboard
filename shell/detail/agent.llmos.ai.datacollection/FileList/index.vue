@@ -187,8 +187,12 @@ export default {
     // },
 
     onChecked({ file, checked }) {
+      const isChecked = this.checkedFiles.find((f) => f.uid === file.uid);
+
       if (checked) {
-        this.checkedFiles.push(file);
+        if (!isChecked) {
+          this.checkedFiles.push(file);
+        }
       } else {
         this.checkedFiles = this.checkedFiles.filter((f) => f.uid !== file.uid);
       }
