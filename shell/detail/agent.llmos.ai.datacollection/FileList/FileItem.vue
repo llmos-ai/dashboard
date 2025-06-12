@@ -86,9 +86,15 @@ export default {
 
     const stateDisplay = computed(() => {
       const readyCondition = findBy(props.file.conditions, 'type', 'ready') || {};
+      const insertObjectCondition = findBy(props.file.conditions, 'type', 'insertObject') || {};
+      const deleteObjectCondition = findBy(props.file.conditions, 'type', 'deleteObject') || {};
 
       if (readyCondition.status === 'True') {
         return 'Ready';
+      } else if (insertObjectCondition.status === 'True') {
+        return 'Inserting';
+      } else if (deleteObjectCondition.status === 'True') {
+        return 'Deleting';
       } else {
         return 'Not Ready';
       }
@@ -150,7 +156,7 @@ export default {
     <a-checkbox
       v-if="isView"
       v-model:checked="checked"
-      :disabled="stateDisplay === 'Not Ready'"
+      :disabled="stateDisplay !== 'Ready'"
       @change="onChecked"
     />
 
