@@ -73,7 +73,7 @@ export default {
       return [
         {
           name:  'content',
-          label: 'Content',
+          label: '内容',
           value: 'content',
           width: '200px',
         },
@@ -188,7 +188,10 @@ export default {
               <template
                 #col:content="{row}"
               >
-                <td class="content-cell-multiline">
+                <td 
+                  class="content-cell-multiline"
+                  @click="row.view()"
+                >
                   <div
                     class="content-text-multiline"
                     :title="row.content"
@@ -199,7 +202,6 @@ export default {
               </template>
             </ResourceTable>
             
-            <!-- 添加分页组件 -->
             <div class="pagination-container">
               <a-pagination
                 v-model:current="pagination.current"
@@ -210,6 +212,7 @@ export default {
                 :show-total="pagination.showTotal"
                 @change="onPageChange"
                 @show-size-change="onShowSizeChange"
+                size="small"
               />
             </div>
           </Tab>

@@ -6909,6 +6909,8 @@ localModel:
   actions:
     fetchOrigin:
       label: Fetch Origin Model
+    createVersion:
+      success: "Local Model {localModelName} Version {version} created successfully"
 
 createLocalModelVersionModal:
   title: Cache Model

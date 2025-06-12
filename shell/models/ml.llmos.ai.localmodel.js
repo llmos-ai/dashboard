@@ -85,7 +85,12 @@ export default class LocalModelVersion extends SteveModel {
 
       await localModelVersion.save();
 
-      message.success(`Local Model ${ localModelName } Version ${ newLocalModel.nextVersion } created successfully`);
+      message.success(
+        this.t("localModel.actions.createVersion.success", {
+          localModelName,
+          version: newLocalModel.nextVersion,
+        })
+      );
     } catch (err) {
       message.error(`${ err.message || err }`);
     }

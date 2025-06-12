@@ -1,7 +1,6 @@
 <script>
 import { groupBy } from 'lodash';
 
-import { getAllSchemaAPI, getAllObjectAPI } from '@/shell/config/weaviate';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import Tab from '@shell/components/Tabbed/Tab';
 import Loading from '@shell/components/Loading';
@@ -36,25 +35,11 @@ export default {
     return {
       files:   [],
       loading: false,
-      classes: [],
-      objects: [],
     };
   },
 
   async fetch() {
-    const hash = await allHash({
-      classes: this.$store.dispatch(
-        `${ this.inStore }/request`,
-        { url: getAllSchemaAPI }
-      ),
-      objects: this.$store.dispatch(
-        `${ this.inStore }/request`,
-        { url: getAllObjectAPI }
-      ),
-    });
 
-    this.classes = hash.classes.classes || [];
-    this.objects = hash.objects.objects || [];
   },
 
   computed: {
