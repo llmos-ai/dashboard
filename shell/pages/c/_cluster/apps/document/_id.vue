@@ -131,6 +131,7 @@ export default {
       const res = await this.resource.doAction('listObjects', {
         offset: (page - 1) * pageSize,
         limit:  pageSize,
+        uid:    this.$route.params.id,
       });
     
       this.objects = res.objects;
