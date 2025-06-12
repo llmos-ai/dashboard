@@ -6631,6 +6631,7 @@ knowledgeBase:
   actions:
     hitTest: 命中测试
     importData: 导入数据
+    view: 查看
   hitTest:
     topK:
       label: Top K

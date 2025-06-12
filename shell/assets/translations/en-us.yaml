@@ -6937,6 +6937,7 @@ knowledgeBase:
   actions:
     hitTest: Hit Test
     importData: Import Data
+    view: View
   hitTest:
     topK:
       label: Top K

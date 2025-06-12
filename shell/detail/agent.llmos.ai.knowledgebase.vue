@@ -10,7 +10,6 @@ import ResourceTable from '@shell/components/ResourceTable';
 import CreateEditView from '@shell/mixins/create-edit-view';
 
 import { allHash } from '@shell/utils/promise';
-import { LLMOS } from '@shell/config/types';
 
 import { NAME } from '@shell/config/table-headers';
 
@@ -108,10 +107,6 @@ export default {
     inStore() {
       return this.$store.getters['currentProduct'].inStore;
     },
-
-    schema() {
-      return this.$store.getters['cluster/schemaFor'](LLMOS.LOCAL_MODEL_VERSION);
-    },
   },
 
   methods: {}
@@ -137,6 +132,7 @@ export default {
         :rows="rows"
         :headers="headers"
         default-sort-by="age"
+        :groupable="false"
       />
     </Tab>
   </ResourceTabs>
