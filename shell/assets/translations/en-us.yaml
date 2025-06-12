@@ -153,6 +153,8 @@ nav:
   takeSnapshot: Take Snapshot
   seeAllClusters: See all clusters
   seeAllClustersCollapsed: See all
+  quickAccess: Quick Access
+  others: Others
   group:
     cluster: Cluster
     inUse: More Resources
