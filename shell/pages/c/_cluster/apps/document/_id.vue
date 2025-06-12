@@ -26,11 +26,21 @@ export default {
       value:     {},
       mode:      'detail',
       loading:   false,
+      // 添加分页相关数据
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true,
+        showQuickJumper: true,
+        showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+        pageSizeOptions: ['10', '20', '50', '100']
+      }
     };
   },
 
   async fetch() {
-    this.fetchList();
+    this.fetchList(1, this.pagination.pageSize);
   },
 
   computed: {
@@ -103,18 +113,31 @@ export default {
       this.$router.push(this.location);
     },
 
-    async fetchList() {
+    // 页码改变时的回调
+    onPageChange(page, pageSize) {
+      this.fetchList(page, pageSize);
+    },
+    
+    // 页面大小改变时的回调
+    onShowSizeChange(current, size) {
+      this.fetchList(1, size); // 改变页面大小时回到第一页
+    },
+    
+    async fetchList(page = 1, pageSize = 10) {
       this.loading = true;
-
+    
       await allHash({ knowledgeBase: this.$store.dispatch('cluster/findAll', { type: APP.KNOWLEDGE_BASE }) });
-
+    
       const res = await this.resource.doAction('listObjects', {
-        offset: 0,
-        limit:  10,
+        offset: (page - 1) * pageSize,
+        limit:  pageSize,
       });
-
+    
       this.objects = res.objects;
-
+      this.pagination.total = res.total || res.objects.length;
+      this.pagination.current = page;
+      this.pagination.pageSize = pageSize;
+    
       this.loading = false;
     },
   }
@@ -175,6 +198,20 @@ export default {
                 </td>
               </template>
             </ResourceTable>
+            
+            <!-- 添加分页组件 -->
+            <div class="pagination-container">
+              <a-pagination
+                v-model:current="pagination.current"
+                v-model:page-size="pagination.pageSize"
+                :total="pagination.total"
+                :show-size-changer="false"
+                :show-quick-jumper="pagination.showQuickJumper"
+                :show-total="pagination.showTotal"
+                @change="onPageChange"
+                @show-size-change="onShowSizeChange"
+              />
+            </div>
           </Tab>
         </ResourceTabs>
       </div>
@@ -198,21 +235,29 @@ export default {
 
 <style lang="scss" scoped>
 .content-cell-multiline {
-  max-width: 100%; // 使用父容器的最大宽度
-  width: 100%;     // 占满可用宽度
-
+  max-width: 100%;
+  width: 100%;
+  
   .content-text-multiline {
     display: -webkit-box;
-    -webkit-line-clamp: 2; // 显示2行
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.4;
-    max-height: calc(1.4em * 2); // 2行的高度
+    max-height: calc(1.4em * 2);
     cursor: pointer;
-    word-break: break-word; // 在单词边界换行
-    white-space: normal;    // 允许换行
+    word-break: break-word;
+    white-space: normal;
   }
+}
+
+// 添加分页样式
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding: 16px 0;
 }
 
 .cru-resource-yaml-container {
