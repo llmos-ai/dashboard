@@ -1,11 +1,9 @@
 <script>
-import { getAllSchemaAPI, getAllObjectAPI } from '@/shell/config/weaviate';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
 import CruResourceFooter from '@shell/components/CruResourceFooter';
 import ResourceTable from '@shell/components/ResourceTable';
 
-import { findBy } from '@shell/utils/array';
 import { allHash } from '@shell/utils/promise';
 import { APP } from '@shell/config/types';
 
@@ -27,6 +25,7 @@ export default {
       schema:    {},
       value:     {},
       mode:      'detail',
+      loading:   false,
     };
   },
 
@@ -49,9 +48,9 @@ export default {
     },
 
     resource() {
-      const id = this.$route.params.id;
-
-      const out = findBy(this.classes, 'class', id) || {};
+      const className = this.$route.params.class;
+      const namespace = this.$route.params.namespace;
+      const out = this.$store.getters['cluster/byId'](APP.KNOWLEDGE_BASE, `${ namespace }/${ className }`);
 
       return out;
     },
@@ -64,18 +63,34 @@ export default {
       return [
         {
           name:  'content',
-          label: 'Text',
-          value: 'properties.content',
+          label: 'Content',
+          value: 'content',
+          width: '200px',
         },
       ];
     },
 
     rows() {
-      const document = this.$route.params.id;
+      return this.objects.map((item) => {
+        return {
+          ...item,
+          availableActions: [
+            {
+              action: 'view',
+              label:  this.t('knowledgeBase.actions.view'),
+              icon:   'icon icon-file',
+            },
+          ],
 
-      const out = this.objects.filter((item) => item?.properties?.document === document);
-
-      return out;
+          view: () => {
+            this.$store.dispatch('cluster/promptModal', {
+              component:      'TextViewerModal',
+              modalWidth:     '1000px',
+              componentProps: { content: item.content }
+            });
+          },
+        };
+      });
     },
 
     displayName() {
@@ -84,52 +99,23 @@ export default {
   },
 
   methods: {
-    async clickSave(buttonDone) {
-      const inStore = this.$store.getters['currentProduct'].inStore;
-
-      try {
-        await this.$store.dispatch(
-          `${ inStore }/request`,
-          {
-            url:    getAllSchemaAPI,
-            method: 'POST',
-            data:   { class: this.value.className }
-          }
-        );
-        this.$message.success('创建成功');
-
-        buttonDone(true);
-
-        this.confirmCancel();
-
-        return;
-      } catch (error) {
-        const message = error?.error?.[0]?.message;
-
-        this.$message.error(`创建失败：${ message }`);
-
-        buttonDone(false);
-      }
-    },
-
     confirmCancel() {
       this.$router.push(this.location);
     },
 
     async fetchList() {
-      const hash = await allHash({
-        classes: this.$store.dispatch(
-          `${ this.inStore }/request`,
-          { url: getAllSchemaAPI }
-        ),
-        objects: this.$store.dispatch(
-          `${ this.inStore }/request`,
-          { url: getAllObjectAPI }
-        ),
+      this.loading = true;
+
+      await allHash({ knowledgeBase: this.$store.dispatch('cluster/findAll', { type: APP.KNOWLEDGE_BASE }) });
+
+      const res = await this.resource.doAction('listObjects', {
+        offset: 0,
+        limit:  10,
       });
 
-      this.classes = hash.classes.classes || [];
-      this.objects = hash.objects.objects || [];
+      this.objects = res.objects;
+
+      this.loading = false;
     },
   }
 };
@@ -174,7 +160,21 @@ export default {
               :rows="rows"
               :headers="headers"
               default-sort-by="age"
-            />
+              :tableActions="false"
+            >
+              <template
+                #col:content="{row}"
+              >
+                <td class="content-cell-multiline">
+                  <div
+                    class="content-text-multiline"
+                    :title="row.content"
+                  >
+                    {{ row.content }}
+                  </div>
+                </td>
+              </template>
+            </ResourceTable>
           </Tab>
         </ResourceTabs>
       </div>
@@ -197,6 +197,24 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.content-cell-multiline {
+  max-width: 100%; // 使用父容器的最大宽度
+  width: 100%;     // 占满可用宽度
+
+  .content-text-multiline {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; // 显示2行
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    max-height: calc(1.4em * 2); // 2行的高度
+    cursor: pointer;
+    word-break: break-word; // 在单词边界换行
+    white-space: normal;    // 允许换行
+  }
+}
+
 .cru-resource-yaml-container {
   .resource-yaml {
     .yaml-editor {
