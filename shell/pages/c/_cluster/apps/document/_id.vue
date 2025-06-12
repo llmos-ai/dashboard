@@ -19,21 +19,21 @@ export default {
 
   data() {
     return {
-      className: '',
-      classes:   [],
-      objects:   [],
-      schema:    {},
-      value:     {},
-      mode:      'detail',
-      loading:   false,
+      className:  '',
+      classes:    [],
+      objects:    [],
+      schema:     {},
+      value:      {},
+      mode:       'detail',
+      loading:    false,
       // 添加分页相关数据
       pagination: {
-        current: 1,
-        pageSize: 10,
-        total: 0,
+        current:         1,
+        pageSize:        10,
+        total:           0,
         showSizeChanger: true,
         showQuickJumper: true,
-        showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+        showTotal:       (total, range) => `第 ${ range[0] }-${ range[1] } 条，共 ${ total } 条`,
         pageSizeOptions: ['10', '20', '50', '100']
       }
     };
@@ -104,7 +104,9 @@ export default {
     },
 
     displayName() {
-      return this.$route.params.id;
+      const object = this.objects?.[0] || {};
+
+      return object.document || '';
     },
   },
 
@@ -117,28 +119,28 @@ export default {
     onPageChange(page, pageSize) {
       this.fetchList(page, pageSize);
     },
-    
+
     // 页面大小改变时的回调
     onShowSizeChange(current, size) {
       this.fetchList(1, size); // 改变页面大小时回到第一页
     },
-    
+
     async fetchList(page = 1, pageSize = 10) {
       this.loading = true;
-    
+
       await allHash({ knowledgeBase: this.$store.dispatch('cluster/findAll', { type: APP.KNOWLEDGE_BASE }) });
-    
+
       const res = await this.resource.doAction('listObjects', {
         offset: (page - 1) * pageSize,
         limit:  pageSize,
         uid:    this.$route.params.id,
       });
-    
+
       this.objects = res.objects;
       this.pagination.total = res.total || res.objects.length;
       this.pagination.current = page;
       this.pagination.pageSize = pageSize;
-    
+
       this.loading = false;
     },
   }
@@ -189,7 +191,7 @@ export default {
               <template
                 #col:content="{row}"
               >
-                <td 
+                <td
                   class="content-cell-multiline"
                   @click="row.view()"
                 >
@@ -202,7 +204,7 @@ export default {
                 </td>
               </template>
             </ResourceTable>
-            
+
             <div class="pagination-container">
               <a-pagination
                 v-model:current="pagination.current"
@@ -211,9 +213,9 @@ export default {
                 :show-size-changer="false"
                 :show-quick-jumper="pagination.showQuickJumper"
                 :show-total="pagination.showTotal"
+                size="small"
                 @change="onPageChange"
                 @show-size-change="onShowSizeChange"
-                size="small"
               />
             </div>
           </Tab>
@@ -241,7 +243,7 @@ export default {
 .content-cell-multiline {
   max-width: 100%;
   width: 100%;
-  
+
   .content-text-multiline {
     display: -webkit-box;
     -webkit-line-clamp: 2;

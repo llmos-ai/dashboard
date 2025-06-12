@@ -8,8 +8,6 @@ import ResourceTable from '@shell/components/ResourceTable';
 
 import CreateEditView from '@shell/mixins/create-edit-view';
 
-import { allHash } from '@shell/utils/promise';
-
 import { NAME } from '@shell/config/table-headers';
 
 export default {
@@ -49,9 +47,11 @@ export default {
 
       const out = this.value?.status?.parsedFiles || [];
 
-      const map = groupBy(out, 'file.name');
+      const map = groupBy(out, 'uid');
 
       return Object.keys(map).map((key) => {
+        const parsedFile = map[key]?.[0];
+
         return {
           name:           key,
           id:             key,
@@ -65,7 +65,7 @@ export default {
               id:      key,
             },
           },
-          parsedFile: map[key],
+          parsedFile,
         };
       });
     },
@@ -74,7 +74,7 @@ export default {
       return [
         {
           ...NAME,
-          value: 'name',
+          value: 'parsedFile.file.name',
         },
         {
           name:  '分段模式',
