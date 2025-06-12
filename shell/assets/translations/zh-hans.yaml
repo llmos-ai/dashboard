@@ -150,6 +150,8 @@ nav:
   rotateEncryptionKeys: 轮换加密密钥
   saveAsRKETemplate: 保存为 RKE 模板
   takeSnapshot: 拍摄快照
+  quickAccess: 快速访问
+  others: 其它
   group:
     cluster: 集群
     inUse: 更多资源

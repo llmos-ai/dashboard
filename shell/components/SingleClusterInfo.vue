@@ -429,7 +429,7 @@ export default {
     </div>
 
     <div class="home-dashboard-info">
-      <h4>Quick Access</h4>
+      <h4>{{ t('nav.quickAccess') }}</h4>
       <div class="resource-gauges mb-20">
         <ResourceSummary
           v-if="canAccessMLCluster"
@@ -448,7 +448,7 @@ export default {
         />
       </div>
 
-      <h3>Others</h3>
+      <h4>{{ t('nav.others') }}</h4>
       <div class="resource-gauges mb-20">
         <ResourceSummary
           v-if="canAccessNodes"
