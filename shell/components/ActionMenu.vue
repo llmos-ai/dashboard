@@ -274,14 +274,16 @@ export default {
           :data-testid="componentTestid + '-' + i + '-item'"
           @click="execute(opt, $event)"
         >
-          <IconOrSvg
-            v-if="opt.icon || opt.svg"
-            :icon="opt.icon"
-            :src="opt.svg"
-            class="icon"
-            color="header"
-          />
-          <span v-clean-html="opt.label" />
+          <div class="flex align-center">
+            <IconOrSvg
+              v-if="opt.icon || opt.svg"
+              :icon="opt.icon"
+              :src="opt.svg"
+              class="icon pr-[8px]"
+              color="header"
+            />
+            <span v-clean-html="opt.label" />
+          </div>
         </a-menu-item>
       </template>
 
@@ -307,8 +309,22 @@ export default {
   left: 0;
   z-index: z-index("dropdownContent");
   min-width: 145px;
-
   color: var(--dropdown-text);
+
+  :deep(.ant-menu-item) {
+    padding: 5px 12px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    margin: 2px 4px;
+
+    .ant-menu-title-content {
+      height: 22px;
+      line-height: 22px;
+      display: flex;
+      align-items: center;
+    }
+  }
 }
 
 .background {
