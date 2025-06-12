@@ -6603,6 +6603,8 @@ localModel:
   actions:
     fetchOrigin:
       label: 同步模型
+    createVersion:
+      success: "本地模型 {localModelName} 版本 {version} 创建成功"
 
 createLocalModelVersionModal:
   title: 缓存模型
