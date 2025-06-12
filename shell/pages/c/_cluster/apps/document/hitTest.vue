@@ -11,17 +11,17 @@ export default {
 
   data() {
     return {
-      className:           '',
-      classes:             [],
-      objects:             [],
-      schema:              {},
-      value:               {},
-      mode:                'detail',
-      similarityThreshold: 0.2,
-      topK:                2,
-      inputText:           '',
-      results:             [],
-      submitting:          false,
+      className:  '',
+      classes:    [],
+      objects:    [],
+      schema:     {},
+      value:      {},
+      mode:       'detail',
+      threshold:  0.2,
+      topK:       2,
+      inputText:  '',
+      results:    [],
+      submitting: false,
     };
   },
 
@@ -88,8 +88,9 @@ export default {
         this.submitting = true;
 
         const res = await this.resource.doAction('search', {
-          query: this.inputText,
-          limit: this.topK,
+          query:     this.inputText,
+          limit:     this.topK,
+          threshold: this.threshold,
         });
 
         this.results = res.Results.sort((b, a) => {
@@ -163,7 +164,7 @@ export default {
           </div>
           <div class="threshold-config">
             <SliderInput
-              v-model:value="similarityThreshold"
+              v-model:value="threshold"
               :label="t('knowledgeBase.hitTest.threshold.label')"
               :interval="0.01"
               :min="0.01"
