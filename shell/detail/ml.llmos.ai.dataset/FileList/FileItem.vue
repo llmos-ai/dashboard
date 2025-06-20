@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { Modal, message } from 'ant-design-vue';
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
+import { _VIEW } from '@shell/config/query-params';
 
 export default {
   name: 'FileItem',
@@ -60,8 +61,13 @@ export default {
       return props.file.Path ? props.file.Path.replace(prefix, '') : '';
     });
 
-    const { currentFolder } = useFileItem({
+    const {
+      currentFolder,
+      fileType,
+      fileName,
+    } = useFileItem({
       props: {
+        ...props,
         isFile,
         currentPath,
       }
@@ -80,9 +86,25 @@ export default {
       });
     };
 
-    const onRowClick = () => {
+    const onRowClick = async() => {
       if (isFile.value) {
-        props.resource.doAction('download', { targetFilePath: currentPath.value });
+        store.dispatch('cluster/promptModal', {
+          component:      'TextViewerModal',
+          modalWidth:     '1000px',
+          componentProps: {
+            contentFunc: async() => {
+              const res = await props.resource.doAction('download', { targetFilePath: currentPath.value }, { responseType: 'blob' });
+
+              const out = await res.data.text();
+
+              return out;
+            },
+            language: fileType.value,
+            readOnly: true,
+            mode:     _VIEW,
+            title:    fileName.value,
+          },
+        });
       } else {
         emit('fetchFiles', currentPath.value);
       }
@@ -114,12 +136,6 @@ export default {
         :span="12"
       >
         <span
-          v-if="isFile"
-        >
-          {{ file.Name }}
-        </span>
-        <span
-          v-else
           class="hand"
           @click="onRowClick"
         >
