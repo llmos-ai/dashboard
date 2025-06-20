@@ -6550,7 +6550,7 @@ datasetCard:
   version:
     label: 版本
   actions:
-    newVersion: 新版本
+    newVersion: 创建新版本
     deleteVersion: 删除版本
 
 createFolderModal:

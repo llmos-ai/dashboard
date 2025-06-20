@@ -1,6 +1,12 @@
 <script>
+import CodeMirror from '@shell/components/CodeMirror';
+
+import { _EDIT } from '@shell/config/query-params';
+
 export default {
   name: 'TextViewer',
+
+  components: { CodeMirror },
 
   props: {
     title: {
@@ -18,7 +24,7 @@ export default {
       default: 'text',
     },
 
-    readonly: {
+    readOnly: {
       type:    Boolean,
       default: true,
     },
@@ -32,9 +38,42 @@ export default {
       type:    Function,
       default: () => {},
     },
+
+    contentFunc: {
+      type:    Function,
+      default: () => {},
+    },
+
+    mode: {
+      type:    String,
+      default: _EDIT,
+    },
   },
 
   emits: ['close'],
+
+  data() {
+    return {
+      contentDisplay: '',
+      loading:        false,
+    };
+  },
+
+  async fetch() {
+    this.loading = true;
+
+    try {
+      if (this.contentFunc) {
+        this.contentDisplay = await this.contentFunc.apply(this);
+      } else {
+        this.contentDisplay = this.content;
+      }
+    } catch (err) {
+      this.$message.error(err);
+    }
+
+    this.loading = false;
+  },
 
   methods: {
     close() {
@@ -51,6 +90,7 @@ export default {
     :show-highlight-border="false"
     :sticky="true"
     class="text-viewer-modal"
+    :loading="loading"
   >
     <div class="text-viewer-content">
       <div
@@ -60,18 +100,20 @@ export default {
         <pre
           v-if="language === 'text' || !language"
           class="text-content"
-        >{{ content }}</pre>
+        >
+          {{ contentDisplay }}
+        </pre>
 
-        <code-mirror
+        <CodeMirror
           v-else
-          :value="content"
+          :value="contentDisplay"
           :options="{
             mode: language,
-            theme: 'default',
-            lineNumbers: true,
-            readOnly: readonly,
+            lineNumbers: false,
+            readOnly,
             lineWrapping: true,
           }"
+          :mode="mode"
         />
       </div>
     </div>
