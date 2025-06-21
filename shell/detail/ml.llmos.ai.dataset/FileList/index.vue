@@ -1,15 +1,18 @@
 <script>
-import { DownOutlined } from '@ant-design/icons-vue';
+import { DownOutlined, SwapOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
 import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
+import ProgressModal from '@shell/components/ProgressModal';
 
 import FileItem from './FileItem';
 
 export default {
   components: {
     DownOutlined,
-    FileItem
+    FileItem,
+    SwapOutlined,
+    ProgressModal,
   },
 
   props: {
@@ -44,6 +47,8 @@ export default {
       selectedVersion: '',
       percent:         0,
       uploadStatus:    '',
+      showModal: false,
+      uploadFileList: [],
     };
   },
 
@@ -60,11 +65,12 @@ export default {
 
   created() {
     this.selectedVersion = (this.datesetVersionOptions[0] || {}).value;
-    const { percent, uploadStatus, uploadFile } = useFileList({ props: { resource: this.datasetVersion } });
+    const { percent, uploadStatus, uploadFile, fileList } = useFileList({ props: { resource: this.datasetVersion } });
 
     this.uploadFile = uploadFile;
     this.percent = percent;
     this.uploadStatus = uploadStatus;
+    this.uploadFileList = fileList;
   },
 
   methods: {
@@ -100,6 +106,10 @@ export default {
           currentPath: this.currentPath,
         },
       });
+    },
+
+    onShowFileProgressModal() {
+      this.showModal = true;
     },
 
     async fetchFiles(targetFilePath) {
@@ -246,23 +256,22 @@ export default {
               <DownOutlined @click.prevent />
             </template>
           </a-dropdown-button>
+
+          <a-button 
+            type="primary" 
+          >
+            <template #icon>
+              <SwapOutlined 
+                :rotate="90"
+                @click="onShowFileProgressModal"
+              />
+            </template>
+          </a-button>
         </a-space>
       </div>
     </div>
   </div>
   <div class="file-list mt-10">
-    <div
-      v-if="uploadStatus"
-      class="upload-progress mb-5"
-    >
-      <div class="mb-5">
-        {{ uploadStatus }}
-      </div>
-      <a-progress
-        :percent="percent"
-        :status="percent === 100 ? 'success' : 'active'"
-      />
-    </div>
     <div
       v-if="files.length === 0"
       class="file-empty"
@@ -283,6 +292,13 @@ export default {
       @fetchFiles="fetchFiles"
     />
   </div>
+
+  <ProgressModal
+    v-model:visible="showModal"
+    :file-list="uploadFileList"
+    :on-cancel-all="cancelAllUploads"
+    @close="onProgressModalClose"
+  />
 </template>
 
 <style lang="scss" scoped>

@@ -8,6 +8,8 @@ export const useFileList = ({ props = {} }) => {
 
   const percent = ref(0);
   const uploadStatus = ref('');
+  const destPath = ref("");
+  const fileList = ref([]);
 
   const uploadFile = (formData) => {
     return new Promise((resolve, reject) => {
@@ -45,8 +47,21 @@ export const useFileList = ({ props = {} }) => {
                 try {
                   const eventData = JSON.parse(line.slice(5));
 
+                  console.log(eventData, "eventData");
+
                   percent.value = Math.floor((eventData.readSize / eventData.totalSize) * 100);
                   uploadStatus.value = `正在上传: ${ eventData.destPath }`;
+                  destPath.value = eventData.destPath;
+
+                  const isUploaded = fileList.value.find((item) => item.destPath === eventData.destPath);
+
+                  if (!isUploaded) {
+                    fileList.value.push(eventData);
+                  } else {
+                    const index = fileList.value.findIndex((item) => item.destPath === eventData.destPath);
+
+                    fileList.value[index] = eventData;
+                  }
                 } catch (e) {
                   // eslint-disable-next-line no-console
                   console.error('Failed to parse SSE data:', e);
@@ -68,5 +83,7 @@ export const useFileList = ({ props = {} }) => {
     percent,
     uploadStatus,
     uploadFile,
+    destPath,
+    fileList,
   };
 };
