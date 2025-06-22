@@ -8,7 +8,7 @@ export const useFileList = ({ props = {} }) => {
 
   const percent = ref(0);
   const uploadStatus = ref('');
-  const destPath = ref("");
+  const destPath = ref('');
   const fileList = ref([]);
 
   const uploadFile = (formData) => {
@@ -46,8 +46,6 @@ export const useFileList = ({ props = {} }) => {
               if (line.startsWith('data:')) {
                 try {
                   const eventData = JSON.parse(line.slice(5));
-
-                  console.log(eventData, "eventData");
 
                   percent.value = Math.floor((eventData.readSize / eventData.totalSize) * 100);
                   uploadStatus.value = `正在上传: ${ eventData.destPath }`;

@@ -3,7 +3,7 @@ import { DownOutlined, SwapOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
 import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
-import ProgressModal from '@shell/components/ProgressModal';
+import ProgressList from '@shell/components/ProgressList';
 
 import FileItem from './FileItem';
 
@@ -12,7 +12,7 @@ export default {
     DownOutlined,
     FileItem,
     SwapOutlined,
-    ProgressModal,
+    ProgressList,
   },
 
   props: {
@@ -47,8 +47,8 @@ export default {
       selectedVersion: '',
       percent:         0,
       uploadStatus:    '',
-      showModal: false,
-      uploadFileList: [],
+      showModal:       false,
+      uploadFileList:  [],
     };
   },
 
@@ -65,7 +65,9 @@ export default {
 
   created() {
     this.selectedVersion = (this.datesetVersionOptions[0] || {}).value;
-    const { percent, uploadStatus, uploadFile, fileList } = useFileList({ props: { resource: this.datasetVersion } });
+    const {
+      percent, uploadStatus, uploadFile, fileList
+    } = useFileList({ props: { resource: this.datasetVersion } });
 
     this.uploadFile = uploadFile;
     this.percent = percent;
@@ -186,6 +188,10 @@ export default {
     switchVersion() {
       this.$emit('fetchFiles', '', this.selectedVersion);
     },
+
+    close() {
+      this.showModal = false;
+    },
   },
 };
 </script>
@@ -257,13 +263,13 @@ export default {
             </template>
           </a-dropdown-button>
 
-          <a-button 
-            type="primary" 
+          <a-button
+            type="primary"
+            @click="onShowFileProgressModal"
           >
             <template #icon>
-              <SwapOutlined 
+              <SwapOutlined
                 :rotate="90"
-                @click="onShowFileProgressModal"
               />
             </template>
           </a-button>
@@ -293,12 +299,27 @@ export default {
     />
   </div>
 
-  <ProgressModal
+  <a-modal
     v-model:visible="showModal"
-    :file-list="uploadFileList"
-    :on-cancel-all="cancelAllUploads"
-    @close="onProgressModalClose"
-  />
+    title="文件上传进度"
+    :closable="false"
+    :maskClosable="false"
+    width="600px"
+    centered
+  >
+    <ProgressList
+      :file-list="uploadFileList"
+    />
+
+    <template #footer>
+      <a-button
+        type="primary"
+        @click="close"
+      >
+        关闭
+      </a-button>
+    </template>
+  </a-modal>
 </template>
 
 <style lang="scss" scoped>
