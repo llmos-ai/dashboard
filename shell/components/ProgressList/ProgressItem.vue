@@ -21,6 +21,10 @@ const percent = computed(() => {
   return Math.floor((props.file.readSize / props.file.totalSize) * 100);
 });
 
+const isCompleted = computed(() => {
+  return percent.value === 100;
+});
+
 // 判断文件是否错误
 const isFileError = (file) => {
   return file.uploadStatus && file.uploadStatus.includes('error');
@@ -79,17 +83,6 @@ const getFileStatusText = (file) => {
     return '上传完成';
   }
 };
-
-// 获取文件进度条样式
-const getFileProgressClass = (file) => {
-  if (percent.value < 100) {
-    return 'uploading';
-  } else if (isFileError(file)) {
-    return 'error';
-  } else {
-    return 'completed';
-  }
-};
 </script>
 
 <template>
@@ -115,32 +108,17 @@ const getFileProgressClass = (file) => {
       </div>
     </div>
 
-    <div class="file-progress">
-      <div class="progress-bar small">
-        <div
-          class="progress-fill"
-          :style="{ width: percent + '%' }"
-          :class="getFileProgressClass(file)"
-        />
-      </div>
-      <div class="progress-percentage">
-        {{ percent }}%
-      </div>
-    </div>
-
-    <!-- 状态描述 -->
-    <div
-      v-if="file.uploadStatus"
-      class="file-description"
-    >
-      {{ file.uploadStatus }}
-    </div>
+    <a-progress
+      v-if="!isCompleted"
+      :percent="percent"
+      size="small"
+    />
   </div>
 </template>
 
 <style scoped>
 .file-item {
-  padding: 12px;
+  padding: 8px;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
   margin-bottom: 8px;
