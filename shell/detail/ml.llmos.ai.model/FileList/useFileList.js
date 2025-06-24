@@ -6,14 +6,11 @@ import { CSRF } from '@shell/config/cookies';
 export const useFileList = ({ props = {} }) => {
   const store = useStore();
 
-  const percent = ref(0);
-  const uploadStatus = ref('');
-  const destPath = ref('');
   const fileList = ref([]);
+  const maxConcurrent = ref(1);
 
   const uploadFile = (formData) => {
     return new Promise((resolve, reject) => {
-      // 将异步逻辑包裹在独立async函数中
       const processUpload = async() => {
         try {
           const csrf = store.$cookies.get(CSRF, { parseJSON: false });
@@ -47,14 +44,10 @@ export const useFileList = ({ props = {} }) => {
                 try {
                   const eventData = JSON.parse(line.slice(5));
 
-                  percent.value = Math.floor((eventData.readSize / eventData.totalSize) * 100);
-                  uploadStatus.value = `正在上传: ${ eventData.destPath }`;
-                  destPath.value = eventData.destPath;
-
                   const isUploaded = fileList.value.find((item) => item.destPath === eventData.destPath);
 
                   if (!isUploaded) {
-                    fileList.value.push(eventData);
+                    fileList.value.unshift(eventData);
                   } else {
                     const index = fileList.value.findIndex((item) => item.destPath === eventData.destPath);
 
@@ -72,16 +65,12 @@ export const useFileList = ({ props = {} }) => {
         }
       };
 
-      // 执行异步处理函数
       processUpload();
     });
   };
 
   return {
-    percent,
-    uploadStatus,
     uploadFile,
-    destPath,
     fileList,
   };
 };

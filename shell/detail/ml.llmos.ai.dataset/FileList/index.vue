@@ -45,8 +45,6 @@ export default {
       uploading:       false,
       currentPath:     '',
       selectedVersion: '',
-      percent:         0,
-      uploadStatus:    '',
       showModal:       false,
       uploadFileList:  [],
     };
@@ -65,13 +63,9 @@ export default {
 
   created() {
     this.selectedVersion = (this.datesetVersionOptions[0] || {}).value;
-    const {
-      percent, uploadStatus, uploadFile, fileList
-    } = useFileList({ props: { resource: this.datasetVersion } });
+    const { uploadFile, fileList } = useFileList({ props: { resource: this.datasetVersion } });
 
     this.uploadFile = uploadFile;
-    this.percent = percent;
-    this.uploadStatus = uploadStatus;
     this.uploadFileList = fileList;
   },
 
@@ -141,8 +135,6 @@ export default {
         message.error(`Upload Fail: ${ err }`);
       } finally {
         this.uploading = false;
-        this.uploadStatus = '';
-        this.percent = 0;
       }
     },
 
@@ -173,8 +165,6 @@ export default {
         message.error(`Upload Fail: ${ err }`);
       } finally {
         this.uploading = false;
-        this.uploadStatus = '';
-        this.percent = 0;
       }
     },
 
@@ -233,7 +223,6 @@ export default {
           </a-button>
           <a-dropdown-button
             type="primary"
-            :loading="uploading"
           >
             <a-upload
               :customRequest="onUpload"
@@ -263,16 +252,21 @@ export default {
             </template>
           </a-dropdown-button>
 
-          <a-button
-            type="primary"
-            @click="onShowFileProgressModal"
+          <a-badge
+            :count="uploadFileList.length"
+            color="blue"
           >
-            <template #icon>
-              <SwapOutlined
-                :rotate="90"
-              />
-            </template>
-          </a-button>
+            <a-button
+              type="primary"
+              @click="onShowFileProgressModal"
+            >
+              <template #icon>
+                <SwapOutlined
+                  :rotate="90"
+                />
+              </template>
+            </a-button>
+          </a-badge>
         </a-space>
       </div>
     </div>
