@@ -34,11 +34,10 @@ export default {
       const className = this.$route.params.class;
 
       return {
-        name:   'c-cluster-product-resource-namespace-id',
+        name:   'c-cluster-product-resource',
         params: {
           cluster:  'local',
           resource: APP.KNOWLEDGE_BASE,
-          id:       className,
         },
       };
     },
