@@ -1,86 +1,124 @@
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeMount } from 'vue';
+import { message } from 'ant-design-vue';
+
 import CodeMirror from '@shell/components/CodeMirror';
 
 import { _EDIT } from '@shell/config/query-params';
+import { modeInfo } from '@shell/config/code-mirror-modes'
 
-export default {
-  name: 'TextViewer',
-
-  components: { CodeMirror },
-
-  props: {
-    title: {
-      type:    String,
-      default: 'Text Viewer',
-    },
-
-    content: {
-      type:    String,
-      default: '',
-    },
-
-    language: {
-      type:    String,
-      default: 'text',
-    },
-
-    readOnly: {
-      type:    Boolean,
-      default: true,
-    },
-
-    maxHeight: {
-      type:    String,
-      default: '400px',
-    },
-
-    beforeClose: {
-      type:    Function,
-      default: () => {},
-    },
-
-    contentFunc: {
-      type:    Function,
-      default: () => {},
-    },
-
-    mode: {
-      type:    String,
-      default: _EDIT,
-    },
+const props = defineProps({
+  title: {
+    type:    String,
+    default: 'Text Viewer',
   },
 
-  emits: ['close'],
-
-  data() {
-    return {
-      contentDisplay: '',
-      loading:        false,
-    };
+  content: {
+    type:    String,
+    default: '',
   },
 
-  async fetch() {
-    this.loading = true;
+  language: {
+    type:    String,
+    default: 'text',
+  },
 
-    try {
-      if (this.contentFunc) {
-        this.contentDisplay = await this.contentFunc.apply(this);
-      } else {
-        this.contentDisplay = this.content;
-      }
-    } catch (err) {
-      this.$message.error(err);
+  readOnly: {
+    type:    Boolean,
+    default: true,
+  },
+
+  maxHeight: {
+    type:    String,
+    default: '400px',
+  },
+
+  beforeClose: {
+    type:    Function,
+    default: () => {},
+  },
+
+  contentFunc: {
+    type:    Function,
+    default: () => {},
+  },
+
+  mode: {
+    type:    String,
+    default: _EDIT,
+  },
+})
+
+const emit = defineEmits(['close']);
+
+const contentDisplay = ref('');
+const loading = ref(false);
+const downloading = ref(false);
+
+onBeforeMount(async () => {
+  loading.value = true;
+
+  try {
+    if (props.contentFunc) {
+      contentDisplay.value = await props.contentFunc.apply(this);
+    } else {
+      contentDisplay.value = props.content;
     }
+  } catch (err) {
+    message.error(err);
+  }
 
-    this.loading = false;
-  },
+  loading.value = false;
+})
 
-  methods: {
-    close() {
-      this.beforeClose();
-      this.$emit('close');
-    },
-  },
+const canCodeMirrorRender = computed(() => {
+  let exts = []
+
+  modeInfo.map(m => {
+    exts = [...exts, ...(m.ext || [])]
+  });
+
+  if (exts.includes(props.language)) {
+    return true
+  } else {
+    return false
+  }
+})
+
+const close = () => {
+  props.beforeClose();
+  emit('close');
+};
+
+const downloadFile = async () => {
+  if (!props.title || !contentDisplay.value) {
+    return;
+  }
+
+  downloading.value = true;
+
+  try {
+    // 创建Blob对象
+    const blob = new Blob([contentDisplay.value], { type: 'text/plain;charset=utf-8' });
+    
+    // 创建下载链接
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = props.title;
+    
+    // 触发下载
+    document.body.appendChild(link);
+    link.click();
+    
+    // 清理
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('下载文件失败:', error);
+  } finally {
+    downloading.value = false;
+  }
 };
 </script>
 
@@ -105,7 +143,7 @@ export default {
         </pre>
 
         <CodeMirror
-          v-else
+          v-else-if="canCodeMirrorRender"
           :value="contentDisplay"
           :options="{
             mode: language,
@@ -115,6 +153,25 @@ export default {
           }"
           :mode="mode"
         />
+
+        <div
+          v-else
+          class="unsupported-preview"
+        >
+          <div class="unsupported-message">
+            <i class="icon icon-file-text" />
+            <p>当前文件暂不支持预览</p>
+            <p class="file-info">{{ title }}</p>
+            <a-button
+              v-if="false"
+              type="primary"
+              :loading="downloading"
+              @click="downloadFile"
+            >
+              下载文件
+            </a-button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -154,6 +211,47 @@ export default {
         line-height: 1.4;
         white-space: pre-wrap;
         word-wrap: break-word;
+      }
+
+      .unsupported-preview {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 200px;
+        background-color: #fafafa;
+        
+        .unsupported-message {
+          text-align: center;
+          color: #666;
+          
+          .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ccc;
+            
+            &.icon-download {
+              font-size: 14px;
+              margin-right: 8px;
+              margin-bottom: 0;
+            }
+          }
+          
+          p {
+            margin: 8px 0;
+            font-size: 14px;
+            
+            &.file-info {
+              font-size: 12px;
+              color: #999;
+              word-break: break-all;
+              margin-bottom: 16px;
+            }
+          }
+          
+          .ant-btn {
+            margin-top: 8px;
+          }
+        }
       }
     }
   }
