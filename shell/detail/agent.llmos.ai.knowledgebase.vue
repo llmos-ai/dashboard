@@ -1,8 +1,6 @@
 <script>
 import { groupBy } from 'lodash';
 
-import ResourceTabs from '@shell/components/form/ResourceTabs';
-import Tab from '@shell/components/Tabbed/Tab';
 import Loading from '@shell/components/Loading';
 import ResourceTable from '@shell/components/ResourceTable';
 

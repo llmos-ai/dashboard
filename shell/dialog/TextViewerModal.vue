@@ -1,11 +1,11 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeMount } from 'vue';
+import { ref, computed, onBeforeMount } from 'vue';
 import { message } from 'ant-design-vue';
 
 import CodeMirror from '@shell/components/CodeMirror';
 
 import { _EDIT } from '@shell/config/query-params';
-import { modeInfo } from '@shell/config/code-mirror-modes'
+import { modeInfo } from '@shell/config/code-mirror-modes';
 
 const props = defineProps({
   title: {
@@ -47,7 +47,7 @@ const props = defineProps({
     type:    String,
     default: _EDIT,
   },
-})
+});
 
 const emit = defineEmits(['close']);
 
@@ -55,7 +55,7 @@ const contentDisplay = ref('');
 const loading = ref(false);
 const downloading = ref(false);
 
-onBeforeMount(async () => {
+onBeforeMount(async() => {
   loading.value = true;
 
   try {
@@ -69,28 +69,28 @@ onBeforeMount(async () => {
   }
 
   loading.value = false;
-})
+});
 
 const canCodeMirrorRender = computed(() => {
-  let exts = []
+  let exts = [];
 
-  modeInfo.map(m => {
-    exts = [...exts, ...(m.ext || [])]
+  modeInfo.map((m) => {
+    exts = [...exts, ...(m.ext || [])];
   });
 
   if (exts.includes(props.language)) {
-    return true
+    return true;
   } else {
-    return false
+    return false;
   }
-})
+});
 
 const close = () => {
   props.beforeClose();
   emit('close');
 };
 
-const downloadFile = async () => {
+const downloadFile = async() => {
   if (!props.title || !contentDisplay.value) {
     return;
   }
@@ -100,22 +100,23 @@ const downloadFile = async () => {
   try {
     // 创建Blob对象
     const blob = new Blob([contentDisplay.value], { type: 'text/plain;charset=utf-8' });
-    
+
     // 创建下载链接
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
+
     link.href = url;
     link.download = props.title;
-    
+
     // 触发下载
     document.body.appendChild(link);
     link.click();
-    
+
     // 清理
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('下载文件失败:', error);
+    message.error('下载文件失败:', error);
   } finally {
     downloading.value = false;
   }
@@ -161,7 +162,9 @@ const downloadFile = async () => {
           <div class="unsupported-message">
             <i class="icon icon-file-text" />
             <p>当前文件暂不支持预览</p>
-            <p class="file-info">{{ title }}</p>
+            <p class="file-info">
+              {{ title }}
+            </p>
             <a-button
               v-if="false"
               type="primary"
@@ -219,27 +222,27 @@ const downloadFile = async () => {
         justify-content: center;
         min-height: 200px;
         background-color: #fafafa;
-        
+
         .unsupported-message {
           text-align: center;
           color: #666;
-          
+
           .icon {
             font-size: 48px;
             margin-bottom: 16px;
             color: #ccc;
-            
+
             &.icon-download {
               font-size: 14px;
               margin-right: 8px;
               margin-bottom: 0;
             }
           }
-          
+
           p {
             margin: 8px 0;
             font-size: 14px;
-            
+
             &.file-info {
               font-size: 12px;
               color: #999;
@@ -247,7 +250,7 @@ const downloadFile = async () => {
               margin-bottom: 16px;
             }
           }
-          
+
           .ant-btn {
             margin-top: 8px;
           }
