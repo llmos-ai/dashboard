@@ -3,6 +3,7 @@ import { message } from 'ant-design-vue';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { LLMOS } from '@shell/config/types';
 import { set } from '@shell/utils/object';
+import { matchModelString } from '@shell/utils/ai-model';
 
 export default class LocalModelVersion extends SteveModel {
   applyDefaults() {
@@ -21,23 +22,25 @@ export default class LocalModelVersion extends SteveModel {
   }
 
   get localModelVersions() {
-    return this.$getters['all'](LLMOS.LOCAL_MODEL_VERSION)
-      .filter((version) => version.metadata.namespace === this.metadata.namespace &&
+    return this.$getters['all'](LLMOS.LOCAL_MODEL_VERSION).filter(
+      (version) => version.metadata.namespace === this.metadata.namespace &&
         version.spec?.localModel === this.metadata.name
-      );
+    );
   }
 
   get localModelVersionOptions() {
-    return this.localModelVersions.map((version) => ({
-      label: (version.metadata.name).replace(`${ this.metadata.name }-`, ''),
-      value: version.id,
-      age:   version.creationTimestamp,
-    })).sort((a = {}, b = {}) => {
-      const aVersion = parseInt((a.label || '').replace(`v`, ''));
-      const bVersion = parseInt((b.label || '').replace(`v`, ''));
+    return this.localModelVersions
+      .map((version) => ({
+        label: version.metadata.name.replace(`${ this.metadata.name }-`, ''),
+        value: version.id,
+        age:   version.creationTimestamp,
+      }))
+      .sort((a = {}, b = {}) => {
+        const aVersion = parseInt((a.label || '').replace(`v`, ''));
+        const bVersion = parseInt((b.label || '').replace(`v`, ''));
 
-      return bVersion - aVersion;
-    });
+        return bVersion - aVersion;
+      });
   }
 
   get latestLocalModelVersion() {
@@ -97,6 +100,30 @@ export default class LocalModelVersion extends SteveModel {
   }
 
   get defaultLocalModelVersion() {
-    return this.$getters['byId'](LLMOS.LOCAL_MODEL_VERSION, `${ this.metadata.namespace }/${ this.spec.defaultVersion }`) || {};
+    return (
+      this.$getters['byId'](
+        LLMOS.LOCAL_MODEL_VERSION,
+        `${ this.metadata.namespace }/${ this.spec.defaultVersion }`
+      ) || {}
+    );
+  }
+
+  get icon() {
+    const icon = matchModelString(this.metadata.name);
+    const baseIcon = matchModelString(this.spec.modelCard.metadata.baseModel);
+
+    return icon || baseIcon || '';
+  }
+
+  get iconUrl() {
+    try {
+      return require(`~shell/assets/images/model-providers/${ this.icon }-color.svg`);
+    } catch (err) {
+      try {
+        return require(`~shell/assets/images/model-providers/${ this.icon }.svg`);
+      } catch (err) {
+        return require(`~shell/assets/images/model-providers/ai-folder.svg`);
+      }
+    }
   }
 }

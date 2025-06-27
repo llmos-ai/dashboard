@@ -7,7 +7,7 @@ export const useFileList = ({ props = {} }) => {
   const store = useStore();
 
   const fileList = ref([]);
-  const maxConcurrent = ref(1);
+  // const maxConcurrent = ref(1);
 
   const uploadFile = (formData) => {
     return new Promise((resolve, reject) => {
