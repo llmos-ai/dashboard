@@ -189,68 +189,12 @@ export default {
         class="mb-10"
         justify="flex-end"
       >
-        <div
-          v-if="false"
-          class="filter-label"
-        >
-          Model Filter
-        </div>
+        <span />
         <a-input
           v-model:value="searchQuery"
           :aria-label="t('sortableTable.searchLabel')"
           :placeholder="t('sortableTable.search')"
           :style="{ width: '200px' }"
-        />
-      </a-flex>
-
-      <a-flex
-        v-if="false"
-        gap="32"
-        class="mb-5"
-      >
-        <span class="tag-label">
-          Provider
-        </span>
-        <a-radio-group
-          v-model:value="selectedProvider"
-          :options="providerOptions"
-          optionType="button"
-          size="small"
-          class="custom-radio-group"
-        />
-      </a-flex>
-
-      <a-flex
-        v-if="false"
-        gap="32"
-        class="mb-5"
-      >
-        <span class="tag-label">
-          Type
-        </span>
-        <a-radio-group
-          v-model:value="selectedType"
-          :options="typeOptions"
-          optionType="button"
-          size="small"
-          class="custom-radio-group"
-        />
-      </a-flex>
-
-      <a-flex
-        v-if="false"
-        gap="32"
-        class="mb-5"
-      >
-        <span class="tag-label">
-          Tags
-        </span>
-        <a-radio-group
-          v-model:value="selectedTag"
-          :options="contextOptions"
-          optionType="button"
-          size="small"
-          class="custom-radio-group"
         />
       </a-flex>
     </div>

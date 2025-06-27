@@ -8,7 +8,7 @@ import { SelectOutlined } from '@ant-design/icons-vue';
 export default {
   name: 'ApplicationDataList',
 
-  components: { 
+  components: {
     ResourceTable,
     SelectOutlined,
   },
@@ -45,14 +45,14 @@ export default {
 
       const IMPORT_DATA = {
         name:  'importData',
-        icon:    'icon icon-fw icon-copy',
-        label:   this.t('knowledgeBase.actions.importData'),
+        icon:  'icon icon-fw icon-copy',
+        label: this.t('knowledgeBase.actions.importData'),
       };
 
       const HIT_TEST = {
         name:  'hitTest',
-        icon:    'icon icon-fw icon-checkmark',
-        label:   this.t('knowledgeBase.actions.hitTest'),
+        icon:  'icon icon-fw icon-checkmark',
+        label: this.t('knowledgeBase.actions.hitTest'),
       };
 
       const headers = [
@@ -83,7 +83,7 @@ export default {
   >
     <template #col:importData="{row}">
       <td>
-        <a-button 
+        <a-button
           type="link"
           @click.prevent="row.importData()"
         >
@@ -93,11 +93,11 @@ export default {
     </template>
     <template #col:hitTest="{row}">
       <td>
-        <a-button 
+        <a-button
           type="link"
           @click.prevent="row.hitTest()"
         >
-          <SelectOutlined  />
+          <SelectOutlined />
         </a-button>
       </td>
     </template>

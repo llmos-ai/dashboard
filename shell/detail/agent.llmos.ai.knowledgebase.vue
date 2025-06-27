@@ -12,8 +12,6 @@ import { NAME } from '@shell/config/table-headers';
 
 export default {
   components: {
-    ResourceTabs,
-    Tab,
     Loading,
     ResourceTable,
   },
@@ -76,16 +74,6 @@ export default {
           ...NAME,
           value: 'parsedFile.file.name',
         },
-        {
-          name:  '分段模式',
-          label: '分段模式',
-          value: '分段模式',
-        },
-        {
-          name:  '字符数',
-          label: '字符数',
-          value: '字符数',
-        },
       ];
     },
 
@@ -100,25 +88,13 @@ export default {
 
 <template>
   <Loading v-if="$fetchState.pending" />
-  <ResourceTabs
+  <ResourceTable
     v-else
-    :value="value"
-    :needConditions="false"
-    :needEvents="false"
-    :needRelated="false"
-  >
-    <Tab
-      name="files"
-      :label="t('knowledgeBase.tabs.documents')"
-    >
-      <ResourceTable
-        :loading="loading"
-        :schema="schema"
-        :rows="rows"
-        :headers="headers"
-        default-sort-by="age"
-        :groupable="false"
-      />
-    </Tab>
-  </ResourceTabs>
+    :loading="loading"
+    :schema="schema"
+    :rows="rows"
+    :headers="headers"
+    default-sort-by="age"
+    :groupable="false"
+  />
 </template>

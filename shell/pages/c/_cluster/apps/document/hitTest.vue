@@ -31,8 +31,6 @@ export default {
 
   computed: {
     location() {
-      const className = this.$route.params.class;
-
       return {
         name:   'c-cluster-product-resource',
         params: {
