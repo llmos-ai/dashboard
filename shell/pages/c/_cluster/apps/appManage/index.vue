@@ -257,9 +257,6 @@ import {
   ReloadOutlined,
   MoreOutlined,
   SearchOutlined,
-  UnorderedListOutlined,
-  AppstoreOutlined,
-  PlusOutlined,
   EditOutlined,
   DownloadOutlined,
   DeleteOutlined
@@ -360,7 +357,7 @@ const loadProjectFlows = async(projectId) => {
 };
 
 const {
-  data: projectsData, error, loading, execute: refetchProjects
+  data: loading, execute: refetchProjects
 } = useFetch('/proxy/apps/api/v1/projects/', {
   immediate:  true,
   afterFetch: async(data) => {
