@@ -303,7 +303,7 @@ export const modeInfo = [
     name:  'JSON',
     mimes: ['application/json', 'application/x-json'],
     mode:  'javascript',
-    ext:   ['json', 'map'],
+    ext:   ['json', 'map', 'jsonl'],
     alias: ['json5'],
   },
   {

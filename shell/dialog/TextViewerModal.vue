@@ -18,7 +18,7 @@ const props = defineProps({
     default: '',
   },
 
-  language: {
+  fileType: {
     type:    String,
     default: 'text',
   },
@@ -78,11 +78,25 @@ const canCodeMirrorRender = computed(() => {
     exts = [...exts, ...(m.ext || [])];
   });
 
-  if (exts.includes(props.language)) {
+  if (exts.includes(props.fileType)) {
     return true;
   } else {
     return false;
   }
+});
+
+const languageMode = computed(() => {
+  const mode = modeInfo.find((m) => {
+    const extendNames = m.ext || [];
+
+    if (extendNames.includes(props.fileType)) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  return mode?.mode || 'yaml';
 });
 
 const close = () => {
@@ -137,7 +151,7 @@ const downloadFile = async() => {
         :style="{ maxHeight: maxHeight }"
       >
         <pre
-          v-if="language === 'text' || !language"
+          v-if="fileType === 'text' || !fileType"
           class="text-content"
         >
           {{ contentDisplay }}
@@ -147,7 +161,7 @@ const downloadFile = async() => {
           v-else-if="canCodeMirrorRender"
           :value="contentDisplay"
           :options="{
-            mode: language,
+            mode: languageMode,
             lineNumbers: false,
             readOnly,
             lineWrapping: true,
