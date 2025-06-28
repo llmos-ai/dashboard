@@ -99,7 +99,7 @@ export default {
 
               return out;
             },
-            language: fileType.value,
+            fileType: fileType.value,
             readOnly: true,
             mode:     _VIEW,
             title:    fileName.value,
