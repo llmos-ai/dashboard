@@ -3,7 +3,6 @@ import { message } from 'ant-design-vue';
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { LLMOS } from '@shell/config/types';
 import { set } from '@shell/utils/object';
-import { matchModelString } from '@shell/utils/ai-model';
 
 export default class LocalModelVersion extends SteveModel {
   applyDefaults() {
@@ -108,22 +107,11 @@ export default class LocalModelVersion extends SteveModel {
     );
   }
 
-  get icon() {
-    const icon = matchModelString(this.metadata.name);
-    const baseIcon = matchModelString(this.spec.modelCard.metadata.baseModel);
-
-    return icon || baseIcon || '';
+  get model() {
+    return this.$getters['byId'](LLMOS.MODEL, this.id) || {};
   }
 
   get iconUrl() {
-    try {
-      return require(`~shell/assets/images/model-providers/${ this.icon }-color.svg`);
-    } catch (err) {
-      try {
-        return require(`~shell/assets/images/model-providers/${ this.icon }.svg`);
-      } catch (err) {
-        return require(`~shell/assets/images/model-providers/ai-folder.svg`);
-      }
-    }
+    return this.model.iconUrl;
   }
 }
