@@ -14,7 +14,7 @@ const props = defineProps({
 });
 
 const fileName = computed(() => {
-  return props.file.destPath.split('/').pop();
+  return (props.file.destPath || '').split('/').pop();
 });
 
 const percent = computed(() => {

@@ -1,188 +1,122 @@
-<script>
+<script setup>
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import { useI18n } from '@shell/composables/useI18n';
 import { DownOutlined, SwapOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
 
 import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
 import ProgressList from '@shell/components/ProgressList';
 
 import FileItem from './FileItem';
 
-export default {
-  components: {
-    DownOutlined,
-    FileItem,
-    SwapOutlined,
-    ProgressList,
+const props = defineProps({
+  files: {
+    type:    Array,
+    default: () => ([]),
   },
 
-  props: {
-    files: {
-      type:    Array,
-      default: () => ([]),
-    },
-
-    resource: {
-      type:     Object,
-      required: true,
-    },
-
-    datasetVersions: {
-      type:    Array,
-      default: () => ([]),
-    },
-
-    datasetVersion: {
-      type:    Object,
-      default: () => ({}),
-    },
+  resource: {
+    type:     Object,
+    required: true,
   },
 
-  emits: ['fetchFiles'],
+  datasetVersions: {
+    type:    Array,
+    default: () => ([]),
+  },
 
-  data() {
+  datasetVersion: {
+    type:    Object,
+    default: () => ({}),
+  },
+});
+
+const emit = defineEmits(['fetchFiles']);
+
+const store = useStore();
+const { t } = useI18n(store);
+
+const downloading = ref(false);
+const selectedVersion = ref('');
+
+const {
+  fileList,
+  showModal,
+  currentPath,
+  onUpload,
+  onFolderUpload,
+} = useFileList({
+  props: { resource: props.datasetVersion },
+  emit,
+});
+
+const datesetVersionOptions = computed(() => {
+  return props.resource.datasetVersions.map((version) => {
     return {
-      downloading:     false,
-      uploading:       false,
-      currentPath:     '',
-      selectedVersion: '',
-      showModal:       false,
-      uploadFileList:  [],
+      value: version.spec.version,
+      label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
     };
-  },
+  });
+});
 
-  computed: {
-    datesetVersionOptions() {
-      return this.resource.datasetVersions.map((version) => {
-        return {
-          value: version.spec.version,
-          label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
-        };
-      });
+selectedVersion.value = (datesetVersionOptions.value[0] || {}).value;
+
+const onDownload = async() => {
+  downloading.value = true;
+
+  const res = await props.datasetVersion.doAction('download', {}, { responseType: 'blob' });
+  const fileName = `${ props.datasetVersion.metadata.name }.zip`;
+  const url = window.URL.createObjectURL(res.data);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = fileName;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  window.URL.revokeObjectURL(url);
+
+  downloading.value = false;
+};
+
+const onCreateFolder = async() => {
+  store.dispatch('cluster/promptModal', {
+    component:      'CreateFolderModal',
+    modalWidth:     '600px',
+    resources:      [props.datasetVersion],
+    componentProps: {
+      saveCb: () => {
+        emit('fetchFiles', currentPath.value);
+      },
+      currentPath: currentPath.value,
     },
-  },
+  });
+};
 
-  created() {
-    this.selectedVersion = (this.datesetVersionOptions[0] || {}).value;
-    const { uploadFile, fileList } = useFileList({ props: { resource: this.datasetVersion } });
+const onShowFileProgressModal = () => {
+  showModal.value = true;
+};
 
-    this.uploadFile = uploadFile;
-    this.uploadFileList = fileList;
-  },
+const fetchFiles = async(targetFilePath) => {
+  currentPath.value = targetFilePath;
+  emit('fetchFiles', targetFilePath);
+};
 
-  methods: {
-    async onDownload() {
-      this.downloading = true;
+const onBack = () => {
+  const parentPath = currentPath.value.split('/').slice(0, -2).join('/');
 
-      const res = await this.datasetVersion.doAction('download', {}, { responseType: 'blob' });
-      const fileName = `${ this.datasetVersion.metadata.name }.zip`;
-      const url = window.URL.createObjectURL(res.data);
-      const link = document.createElement('a');
+  currentPath.value = parentPath || '';
+  emit('fetchFiles', parentPath);
+};
 
-      link.href = url;
-      link.download = fileName;
+const switchVersion = () => {
+  emit('fetchFiles', '', selectedVersion.value);
+};
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      window.URL.revokeObjectURL(url);
-
-      this.downloading = false;
-    },
-
-    async onCreateFolder() {
-      this.$store.dispatch('cluster/promptModal', {
-        component:      'CreateFolderModal',
-        modalWidth:     '600px',
-        resources:      [this.datasetVersion],
-        componentProps: {
-          saveCb: () => {
-            this.$emit('fetchFiles', this.currentPath);
-          },
-          currentPath: this.currentPath,
-        },
-      });
-    },
-
-    onShowFileProgressModal() {
-      this.showModal = true;
-    },
-
-    async fetchFiles(targetFilePath) {
-      this.currentPath = targetFilePath;
-      this.$emit('fetchFiles', targetFilePath);
-    },
-
-    async onUpload(options) {
-      const { file } = options;
-
-      try {
-        this.uploading = true;
-
-        const formData = new FormData();
-
-        formData.append('file', file);
-        formData.append('data', JSON.stringify({
-          targetDirectory: this.currentPath,
-          relativePath:    '',
-        }));
-
-        await this.uploadFile(formData);
-
-        message.success('Upload Success');
-        this.$emit('fetchFiles');
-      } catch (err) {
-        message.error(`Upload Fail: ${ err }`);
-      } finally {
-        this.uploading = false;
-      }
-    },
-
-    async onFolderUpload(options) {
-      const { file } = options;
-
-      try {
-        this.uploading = true;
-
-        const relativePath = file.webkitRelativePath || '';
-        const pathArray = relativePath.split('/');
-
-        pathArray.pop();
-
-        const formData = new FormData();
-
-        formData.append('file', file);
-        formData.append('data', JSON.stringify({
-          targetDirectory: this.currentPath,
-          relativePaths:   pathArray,
-        }));
-
-        await this.uploadFile(formData);
-
-        message.success('Upload Success');
-        this.$emit('fetchFiles');
-      } catch (err) {
-        message.error(`Upload Fail: ${ err }`);
-      } finally {
-        this.uploading = false;
-      }
-    },
-
-    onBack() {
-      const parentPath = this.currentPath.split('/').slice(0, -2).join('/');
-
-      this.currentPath = parentPath || '';
-      this.$emit('fetchFiles', parentPath);
-    },
-
-    switchVersion() {
-      this.$emit('fetchFiles', '', this.selectedVersion);
-    },
-
-    close() {
-      this.showModal = false;
-    },
-  },
+const close = () => {
+  showModal.value = false;
 };
 </script>
 
@@ -253,7 +187,7 @@ export default {
           </a-dropdown-button>
 
           <a-badge
-            :count="uploadFileList.length"
+            :count="fileList.length"
             color="blue"
           >
             <a-button
@@ -302,7 +236,7 @@ export default {
     centered
   >
     <ProgressList
-      :file-list="uploadFileList"
+      :file-list="fileList"
     />
 
     <template #footer>

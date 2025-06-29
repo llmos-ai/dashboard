@@ -1,4 +1,4 @@
-<script>
+<script setup>
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
@@ -11,143 +11,117 @@ import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
 import { findBy } from '@shell/utils/array';
 
-export default {
-  name: 'FileItem',
-
-  components: {
-    FileTextTwoTone,
-    FolderTwoTone,
+const props = defineProps({
+  file: {
+    type:    Object,
+    default: () => ({}),
   },
 
-  props: {
-    file: {
-      type:    Object,
-      default: () => ({}),
-    },
-
-    resource: {
-      type:     Object,
-      required: true,
-    },
-
-    mode: {
-      type:    String,
-      default: 'create',
-    },
+  resource: {
+    type:     Object,
+    required: true,
   },
 
-  emits: ['fetchFiles', 'onChecked'],
+  mode: {
+    type:    String,
+    default: 'create',
+  },
+});
 
-  setup(props, { emit }) {
-    const store = useStore();
-    const { t } = useI18n(store);
+const emit = defineEmits(['fetchFiles', 'onChecked']);
 
-    const checked = ref(false);
+const store = useStore();
+const { t } = useI18n(store);
 
-    const isFile = computed(() => {
-      return props.file.Size !== 0;
-    });
+const checked = ref(false);
 
-    const fileSize = computed(() => {
-      const size = props.file.Size || props.file.size || 0;
+const isFile = computed(() => {
+  return props.file.Size !== 0;
+});
 
-      return isFile.value ? formatSi(size, {
-        increment: 1024,
-        addSuffix: true,
-        suffix:    'B',
-      }) : '';
-    });
+const fileSize = computed(() => {
+  const size = props.file.Size || props.file.size || 0;
 
-    const lastModified = computed(() => {
-      const time = props.file.LastModified || props.file.lastModified;
-      const now = dayjs();
-      const out = diffFrom(dayjs(time), now, (key, args) => t(key, args));
+  return isFile.value ? formatSi(size, {
+    increment: 1024,
+    addSuffix: true,
+    suffix:    'B',
+  }) : '';
+});
 
-      return isFile.value ? `${ out.string } ago` : '';
-    });
+const lastModified = computed(() => {
+  const time = props.file.LastModified || props.file.lastModified;
+  const now = dayjs();
+  const out = diffFrom(dayjs(time), now, (key, args) => t(key, args));
 
-    const currentPath = computed(() => {
-      return props.file.path ? props.file.path.replace(`datacollections/${ props.resource.id }/sourceFiles/`, '') : '';
-    });
+  return isFile.value ? `${ out.string } ago` : '';
+});
 
-    const isView = computed(() => {
-      return props.mode === 'view';
-    });
+const currentPath = computed(() => {
+  return props.file.path ? props.file.path.replace(`datacollections/${ props.resource.id }/sourceFiles/`, '') : '';
+});
 
-    const stateBackground = computed(() => {
-      const readyCondition = findBy(props.file.conditions, 'type', 'ready') || {};
+const isView = computed(() => {
+  return props.mode === 'view';
+});
 
-      if (readyCondition.status === 'True') {
-        return 'green';
-      } else {
-        return 'orange';
-      }
-    });
+// const stateBackground = computed(() => {
+//   const readyCondition = findBy(props.file.conditions, 'type', 'ready') || {};
 
-    const stateDisplay = computed(() => {
-      const readyCondition = findBy(props.file.conditions, 'type', 'ready') || {};
-      const insertObjectCondition = findBy(props.file.conditions, 'type', 'insertObject') || {};
-      const deleteObjectCondition = findBy(props.file.conditions, 'type', 'deleteObject') || {};
+//   if (readyCondition.status === 'True') {
+//     return 'green';
+//   } else {
+//     return 'orange';
+//   }
+// });
 
-      if (readyCondition.status === 'True') {
-        return 'Ready';
-      } else if (insertObjectCondition.status === 'True') {
-        return 'Inserting';
-      } else if (deleteObjectCondition.status === 'True') {
-        return 'Deleting';
-      } else {
-        return 'Not Ready';
-      }
-    });
+const stateDisplay = computed(() => {
+  const readyCondition = findBy(props.file.conditions, 'type', 'ready') || {};
+  const insertObjectCondition = findBy(props.file.conditions, 'type', 'insertObject') || {};
+  const deleteObjectCondition = findBy(props.file.conditions, 'type', 'deleteObject') || {};
 
-    const { currentFolder } = useFileItem({
-      props: {
-        isFile,
-        currentPath,
-      }
-    });
-
-    const removeFile = async(file) => {
-      Modal.confirm({
-        title: t('fileItem.deleteConfirm'),
-        async onOk() {
-          await props.resource.doAction('remove', { targetFilePath: currentPath.value });
-
-          message.success(t('fileItem.deleteSuccess'));
-
-          emit('fetchFiles', currentFolder.value);
-        },
-      });
-    };
-
-    const onRowClick = () => {
-      if (isFile.value) {
-        props.resource.doAction('download', { targetFilePath: currentPath.value });
-      } else {
-        emit('fetchFiles', currentPath.value);
-      }
-    };
-
-    const onChecked = (e) => {
-      checked.value = e.target.checked;
-      emit('onChecked', { file: props.file, checked: checked.value });
-    };
-
-    return {
-      t,
-      isFile,
-      fileSize,
-      lastModified,
-      currentPath,
-      removeFile,
-      onRowClick,
-      isView,
-      checked,
-      onChecked,
-      stateBackground,
-      stateDisplay,
-    };
+  if (readyCondition.status === 'True') {
+    return 'Ready';
+  } else if (insertObjectCondition.status === 'True') {
+    return 'Inserting';
+  } else if (deleteObjectCondition.status === 'True') {
+    return 'Deleting';
+  } else {
+    return 'Not Ready';
   }
+});
+
+const { currentFolder } = useFileItem({
+  props: {
+    isFile,
+    currentPath,
+  }
+});
+
+const removeFile = async(file) => {
+  Modal.confirm({
+    title: t('fileItem.deleteConfirm'),
+    async onOk() {
+      await props.resource.doAction('remove', { targetFilePath: currentPath.value });
+
+      message.success(t('fileItem.deleteSuccess'));
+
+      emit('fetchFiles', currentFolder.value);
+    },
+  });
+};
+
+const onRowClick = () => {
+  if (isFile.value) {
+    props.resource.doAction('download', { targetFilePath: currentPath.value });
+  } else {
+    emit('fetchFiles', currentPath.value);
+  }
+};
+
+const onChecked = (e) => {
+  checked.value = e.target.checked;
+  emit('onChecked', { file: props.file, checked: checked.value });
 };
 </script>
 
@@ -159,13 +133,6 @@ export default {
       :disabled="stateDisplay !== 'Ready'"
       @change="onChecked"
     />
-
-    <a-tag
-      :color="stateBackground"
-      class="ml-10"
-    >
-      {{ stateDisplay }}
-    </a-tag>
 
     <div class="file-icon ml-5">
       <FileTextTwoTone v-if="isFile" />
