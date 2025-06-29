@@ -146,9 +146,9 @@ export default {
       });
 
       if (this.mode === 'edit') {
-        this.value.spec.files = this.value.spec.files.concat(checkedFiles);
+        this.value.spec.importingFiles = this.value.spec.files.concat(checkedFiles);
       } else {
-        this.value.spec.files = checkedFiles;
+        this.value.spec.importingFiles = checkedFiles;
       }
 
       if (this.value.spec.chunkingConfig.size) {

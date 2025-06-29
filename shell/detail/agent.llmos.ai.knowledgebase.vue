@@ -41,7 +41,7 @@ export default {
       const id = this.$route.params.id;
       const namespace = this.$route.params.namespace;
 
-      const out = this.value?.status?.parsedFiles || [];
+      const out = this.value?.status?.importedFiles || [];
 
       const map = groupBy(out, 'uid');
 

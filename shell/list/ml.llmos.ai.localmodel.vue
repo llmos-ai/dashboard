@@ -49,6 +49,7 @@ export default {
     await allHash({
       resource:           await this.$fetchType(this.resource),
       localModelVersions: this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
+      models:             this.$store.dispatch(`${ this.inStore }/findAll`, { type: LLMOS.MODEL }),
     });
   },
 
