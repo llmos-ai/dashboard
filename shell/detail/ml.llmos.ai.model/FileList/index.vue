@@ -1,9 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
 import { DownOutlined, SwapOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
 import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
 
 import FileItem from './FileItem';
@@ -42,8 +41,6 @@ const store = useStore();
 const { t } = useI18n(store);
 
 const downloading = ref(false);
-const percent = ref(0);
-const uploadStatus = ref('');
 const checkedFiles = ref([]);
 
 const {
