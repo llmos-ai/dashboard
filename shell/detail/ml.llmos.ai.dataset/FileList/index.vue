@@ -117,6 +117,8 @@ const switchVersion = () => {
 
 const close = () => {
   showModal.value = false;
+
+  emit('fetchFiles', currentPath.value);
 };
 </script>
 
