@@ -205,6 +205,7 @@ const close = () => {
             <a-upload
               :customRequest="onUpload"
               :showUploadList="false"
+              accept=".markdown, .md, .txt, .json"
             >
               <span class="btn-text p-0">
                 {{ t('fileList.addFile') }}
