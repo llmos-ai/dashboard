@@ -1,189 +1,132 @@
-<script>
-import { DownOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
+<script setup>
+import { computed, ref } from 'vue';
+import { useStore } from 'vuex';
+import { useI18n } from '@shell/composables/useI18n';
+import { DownOutlined, SwapOutlined } from '@ant-design/icons-vue';
 import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
+
 import FileItem from './FileItem';
+import ProgressList from '@shell/components/ProgressList';
 
-export default {
-  name: 'FileList',
-
-  components: {
-    DownOutlined,
-    FileItem
+const props = defineProps({
+  files: {
+    type:    Array,
+    default: () => ([]),
   },
 
-  props: {
-    files: {
-      type:    Array,
-      default: () => ([]),
-    },
-
-    resource: {
-      type:     Object,
-      required: true,
-    },
-
-    hasFolder: {
-      type:    Boolean,
-      default: true,
-    },
-
-    showHeader: {
-      type:    Boolean,
-      default: false,
-    },
-
-    mode: {
-      type:    String,
-      default: 'create',
-    },
+  resource: {
+    type:     Object,
+    required: true,
   },
 
-  emits: ['fetchFiles'],
-
-  data() {
-    return {
-      downloading:  false,
-      uploading:    false,
-      currentPath:  '',
-      percent:      0,
-      uploadStatus: '',
-      checkedFiles: [],
-    };
+  hasFolder: {
+    type:    Boolean,
+    default: true,
   },
 
-  created() {
-    const { percent, uploadStatus, uploadFile } = useFileList({ props: { resource: this.resource } });
-
-    this.uploadFile = uploadFile;
-    this.percent = percent;
-    this.uploadStatus = uploadStatus;
+  showHeader: {
+    type:    Boolean,
+    default: false,
   },
 
-  computed: {
-    isView() {
-      return this.mode === 'view';
-    },
+  mode: {
+    type:    String,
+    default: 'create',
   },
+});
 
-  methods: {
-    async onCreateFolder() {
-      this.$store.dispatch('cluster/promptModal', {
-        component:      'CreateFolderModal',
-        modalWidth:     '600px',
-        resources:      [this.resource],
-        componentProps: {
-          saveCb: () => {
-            this.$emit('fetchFiles', this.currentPath);
-          },
-          currentPath: this.currentPath,
-        },
-      });
+const emit = defineEmits(['fetchFiles', 'checked']);
+
+const store = useStore();
+const { t } = useI18n(store);
+
+// Reactive data
+const downloading = ref(false);
+const checkedFiles = ref([]);
+
+const {
+  fileList,
+  showModal,
+  currentPath,
+  onUpload,
+  onFolderUpload,
+} = useFileList({
+  props: { resource: props.resource },
+  emit,
+});
+
+// Computed properties
+const isView = computed(() => {
+  return props.mode === 'view';
+});
+
+// Methods
+const onCreateFolder = async() => {
+  store.dispatch('cluster/promptModal', {
+    component:      'CreateFolderModal',
+    modalWidth:     '600px',
+    resources:      [props.resource],
+    componentProps: {
+      saveCb: () => {
+        emit('fetchFiles', currentPath.value);
+      },
+      currentPath: currentPath.value,
     },
+  });
+};
 
-    async onDownload() {
-      this.downloading = true;
+const onDownload = async() => {
+  downloading.value = true;
 
-      const res = await this.resource.doAction('download', {}, { responseType: 'blob' });
+  const res = await props.resource.doAction('download', {}, { responseType: 'blob' });
 
-      const fileName = `${ this.resource.metadata.name }.zip`;
+  const fileName = `${ props.resource.metadata.name }.zip`;
 
-      const url = window.URL.createObjectURL(res.data);
-      const link = document.createElement('a');
+  const url = window.URL.createObjectURL(res.data);
+  const link = document.createElement('a');
 
-      link.href = url;
-      link.download = fileName;
+  link.href = url;
+  link.download = fileName;
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
-      window.URL.revokeObjectURL(url);
+  downloading.value = false;
+};
 
-      this.downloading = false;
-    },
+const fetchFiles = async(targetFilePath) => {
+  currentPath.value = targetFilePath;
+  emit('fetchFiles', targetFilePath);
+};
 
-    async fetchFiles(targetFilePath) {
-      this.currentPath = targetFilePath;
-      this.$emit('fetchFiles', targetFilePath);
-    },
+const onBack = () => {
+  const parentPath = currentPath.value.split('/').slice(0, -2).join('/');
 
-    async onFolderUpload(options) {
-      const { file } = options;
+  currentPath.value = parentPath || '';
+  emit('fetchFiles', parentPath);
+};
 
-      try {
-        this.uploading = true;
+const onChecked = ({ file, checked }) => {
+  const isChecked = checkedFiles.value.find((f) => f.uid === file.uid);
 
-        const relativePath = file.webkitRelativePath || '';
-        const pathArray = relativePath.split('/');
+  if (checked) {
+    if (!isChecked) {
+      checkedFiles.value.push(file);
+    }
+  } else {
+    checkedFiles.value = checkedFiles.value.filter((f) => f.uid !== file.uid);
+  }
 
-        pathArray.pop();
+  emit('checked', checkedFiles.value);
+};
 
-        const formData = new FormData();
+const onShowFileProgressModal = () => {
+  showModal.value = true;
+};
 
-        formData.append('file', file);
-        formData.append('data', JSON.stringify({
-          targetDirectory: this.currentPath,
-          relativePaths:   pathArray,
-        }));
-
-        await this.uploadFile(formData);
-        this.$emit('fetchFiles');
-      } catch (err) {
-        message.error(`Upload Fail: ${ err }`);
-      } finally {
-        this.uploading = false;
-        this.uploadStatus = '';
-        this.percent = 0;
-      }
-    },
-
-    async onUpload(options) {
-      const { file } = options;
-
-      try {
-        this.uploading = true;
-
-        const formData = new FormData();
-
-        formData.append('file', file);
-        formData.append('data', JSON.stringify({
-          targetDirectory: this.currentPath,
-          relativePath:    '',
-        }));
-
-        await this.uploadFile(formData);
-        this.$emit('fetchFiles');
-      } catch (err) {
-        message.error(`Upload Fail: ${ err }`);
-      } finally {
-        this.uploading = false;
-        this.uploadStatus = '';
-        this.percent = 0;
-      }
-    },
-
-    onBack() {
-      const parentPath = this.currentPath.split('/').slice(0, -2).join('/');
-
-      this.currentPath = parentPath || '';
-      this.$emit('fetchFiles', parentPath);
-    },
-
-    onChecked({ file, checked }) {
-      const isChecked = this.checkedFiles.find((f) => f.uid === file.uid);
-
-      if (checked) {
-        if (!isChecked) {
-          this.checkedFiles.push(file);
-        }
-      } else {
-        this.checkedFiles = this.checkedFiles.filter((f) => f.uid !== file.uid);
-      }
-
-      this.$emit('checked', this.checkedFiles);
-    },
-  },
+const close = () => {
+  showModal.value = false;
 };
 </script>
 
@@ -225,7 +168,6 @@ export default {
           <a-dropdown-button
             v-if="hasFolder"
             type="primary"
-            :loading="uploading"
           >
             <a-upload
               :customRequest="onUpload"
@@ -257,7 +199,6 @@ export default {
           <a-button
             v-else
             type="primary"
-            :loading="uploading"
           >
             <a-upload
               :customRequest="onUpload"
@@ -268,6 +209,22 @@ export default {
               </span>
             </a-upload>
           </a-button>
+
+          <a-badge
+            :count="fileList.length"
+            color="blue"
+          >
+            <a-button
+              type="primary"
+              @click="onShowFileProgressModal"
+            >
+              <template #icon>
+                <SwapOutlined
+                  :rotate="90"
+                />
+              </template>
+            </a-button>
+          </a-badge>
         </a-space>
       </div>
     </div>
@@ -313,18 +270,6 @@ export default {
   </div>
   <div class="file-list mt-10">
     <div
-      v-if="uploadStatus"
-      class="upload-progress mb-5"
-    >
-      <div class="mb-5">
-        {{ uploadStatus }}
-      </div>
-      <a-progress
-        :percent="percent"
-        :status="percent === 100 ? 'success' : 'active'"
-      />
-    </div>
-    <div
       v-if="files.length === 0"
       class="file-empty"
     >
@@ -347,6 +292,28 @@ export default {
       />
     </div>
   </div>
+
+  <a-modal
+    v-model:visible="showModal"
+    title="文件上传进度"
+    :closable="false"
+    :maskClosable="false"
+    width="600px"
+    centered
+  >
+    <ProgressList
+      :file-list="fileList"
+    />
+
+    <template #footer>
+      <a-button
+        type="primary"
+        @click="close"
+      >
+        关闭
+      </a-button>
+    </template>
+  </a-modal>
 </template>
 
 <style lang="scss" scoped>

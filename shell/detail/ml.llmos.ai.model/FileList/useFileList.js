@@ -1,12 +1,18 @@
 import { ref } from 'vue';
 import { useStore } from 'vuex';
+import { message } from 'ant-design-vue';
 
 import { CSRF } from '@shell/config/cookies';
 
-export const useFileList = ({ props = {} }) => {
+export const useFileList = ({ props = {}, emit }) => {
   const store = useStore();
 
+  // const emit = defineEmits(["fetchFiles", "checked"]);
+
   const fileList = ref([]);
+  const showModal = ref(false);
+  const uploading = ref(false);
+  const currentPath = ref('');
   // const maxConcurrent = ref(1);
 
   const uploadFile = (formData) => {
@@ -44,12 +50,16 @@ export const useFileList = ({ props = {} }) => {
                 try {
                   const eventData = JSON.parse(line.slice(5));
 
-                  const isUploaded = fileList.value.find((item) => item.destPath === eventData.destPath);
+                  const isUploaded = fileList.value.find(
+                    (item) => item.destPath === eventData.destPath
+                  );
 
                   if (!isUploaded) {
                     fileList.value.unshift(eventData);
                   } else {
-                    const index = fileList.value.findIndex((item) => item.destPath === eventData.destPath);
+                    const index = fileList.value.findIndex(
+                      (item) => item.destPath === eventData.destPath
+                    );
 
                     fileList.value[index] = eventData;
                   }
@@ -69,8 +79,74 @@ export const useFileList = ({ props = {} }) => {
     });
   };
 
+  const onUpload = async(options) => {
+    showModal.value = true;
+
+    const { file } = options;
+
+    try {
+      uploading.value = true;
+
+      const formData = new FormData();
+
+      formData.append('file', file);
+      formData.append(
+        'data',
+        JSON.stringify({
+          targetDirectory: currentPath.value,
+          relativePath:    '',
+        })
+      );
+
+      await uploadFile(formData);
+      emit('fetchFiles');
+    } catch (err) {
+      message.error(`Upload Fail: ${ err }`);
+    } finally {
+      uploading.value = false;
+    }
+  };
+
+  const onFolderUpload = async(options) => {
+    showModal.value = true;
+
+    const { file } = options;
+
+    try {
+      uploading.value = true;
+
+      const relativePath = file.webkitRelativePath || '';
+      const pathArray = relativePath.split('/');
+
+      pathArray.pop();
+
+      const formData = new FormData();
+
+      formData.append('file', file);
+      formData.append(
+        'data',
+        JSON.stringify({
+          targetDirectory: currentPath.value,
+          relativePaths:   pathArray,
+        })
+      );
+
+      await uploadFile(formData);
+      emit('fetchFiles');
+    } catch (err) {
+      message.error(`Upload Fail: ${ err }`);
+    } finally {
+      uploading.value = false;
+    }
+  };
+
   return {
     uploadFile,
     fileList,
+    showModal,
+    currentPath,
+    uploading,
+    onUpload,
+    onFolderUpload,
   };
 };

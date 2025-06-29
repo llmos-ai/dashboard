@@ -123,7 +123,7 @@ export default {
     files() {
       const dataCenter = this.$store.getters[`${ this.inStore }/byId`](APP.APPLICATION_DATA, `default/${ this.selectedDataCenter }`) || {};
 
-      const out = (dataCenter?.status?.preprocessedFiles || []).map((f) => {
+      const out = (dataCenter?.status?.files || []).map((f) => {
         return {
           ...f,
           ...(f.sourceFile || {}),

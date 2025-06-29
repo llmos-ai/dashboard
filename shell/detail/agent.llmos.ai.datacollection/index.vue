@@ -31,7 +31,7 @@ export default {
 
   computed: {
     files() {
-      return (this.value?.status?.preprocessedFiles || []).map((f) => {
+      return (this.value?.status?.files || []).map((f) => {
         return {
           ...f,
           ...(f.sourceFile || {}),
