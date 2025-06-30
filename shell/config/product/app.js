@@ -44,7 +44,9 @@ export function init(store) {
     },
   });
 
-  configureType(APP.APPLICATION_DATA, { isEditable: false });
+  configureType(APP.APPLICATION_DATA, {
+    isEditable: false,
+  });
 
   virtualType({
     labelKey:   `typeLabel."${ APP.KNOWLEDGE_BASE }"`,
@@ -58,7 +60,9 @@ export function init(store) {
     },
   });
 
-  configureType(APP.KNOWLEDGE_BASE, { isEditable: false });
+  configureType(APP.KNOWLEDGE_BASE, {
+    isEditable: false,
+  });
 
   virtualType({
     labelKey:        'apps.trace.label',

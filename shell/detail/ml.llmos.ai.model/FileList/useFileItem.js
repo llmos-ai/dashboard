@@ -26,6 +26,10 @@ export const useFileItem = ({ props = {}, emit }) => {
 
   const onRowClick = async() => {
     if (isFile.value) {
+      if (!props.resource.actions.download) {
+        return;
+      }
+
       store.dispatch('cluster/promptModal', {
         component:      'TextViewerModal',
         modalWidth:     '1000px',

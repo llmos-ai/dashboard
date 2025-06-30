@@ -3231,6 +3231,7 @@ prefs:
     themeShortcut: 使用快捷键（shift+T）来切换深色/浅色主题
     pluginDeveloper: 启用扩展开发者功能
     viewContainerDashboard: 启用容器管理页面 (仅用于开发者模式)
+    editYaml: 启用“编辑 YAML”和“查看 YAML”
   hideDesc:
     label: 隐藏所有类型描述
   helm:

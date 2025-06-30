@@ -70,7 +70,7 @@ export default {
       return [
         {
           ...NAME,
-          value: 'parsedFile.file.name',
+          value: 'parsedFile.fileInfo.name',
         },
       ];
     },
