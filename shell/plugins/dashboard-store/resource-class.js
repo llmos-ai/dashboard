@@ -8,7 +8,7 @@ import {
   AS,
   MODE,
 } from '@shell/config/query-params';
-import { VIEW_IN_API, DEV } from '@shell/store/prefs';
+import { VIEW_IN_API, DEV, CAN_YAML } from '@shell/store/prefs';
 import { addObject, addObjects, findBy, removeAt } from '@shell/utils/array';
 import CustomValidators from '@shell/utils/custom-validators';
 import { downloadFile, generateZip } from '@shell/utils/download';
@@ -1361,7 +1361,7 @@ export default class Resource {
   }
 
   get canYaml() {
-    return this.hasLink('view');
+    return this.hasLink('view') && this.$rootGetters['prefs/get'](CAN_YAML);
   }
 
   get canEditYaml() {

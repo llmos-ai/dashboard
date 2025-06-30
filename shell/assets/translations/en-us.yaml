@@ -3504,7 +3504,7 @@ prefs:
     themeShortcut: Enable Dark/Light Theme keyboard shortcut toggle (shift+T)
     pluginDeveloper: Enable Extension developer features
     viewContainerDashboard: Enable Container Dashboard View (Dev Only)
-    editYaml: Enable "YAML Edit" and "YAML View"
+    canYaml: Enable "YAML Edit" and "YAML View"
   hideDesc:
     label: Hide All Type Descriptions
   helm:

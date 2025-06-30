@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { Modal, message } from 'ant-design-vue';
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
-import { findBy } from '@shell/utils/array';
+// import { findBy } from '@shell/utils/array';
 
 const props = defineProps({
   file: {
@@ -75,21 +75,21 @@ const isView = computed(() => {
 //   }
 // });
 
-const stateDisplay = computed(() => {
-  const readyCondition = findBy(props.file.conditions, 'type', 'ready') || {};
-  const insertObjectCondition = findBy(props.file.conditions, 'type', 'insertObject') || {};
-  const deleteObjectCondition = findBy(props.file.conditions, 'type', 'deleteObject') || {};
+// const stateDisplay = computed(() => {
+//   const readyCondition = findBy(props.file.conditions, 'type', 'ready') || {};
+//   const insertObjectCondition = findBy(props.file.conditions, 'type', 'insertObject') || {};
+//   const deleteObjectCondition = findBy(props.file.conditions, 'type', 'deleteObject') || {};
 
-  if (readyCondition.status === 'True') {
-    return 'Ready';
-  } else if (insertObjectCondition.status === 'True') {
-    return 'Inserting';
-  } else if (deleteObjectCondition.status === 'True') {
-    return 'Deleting';
-  } else {
-    return 'Not Ready';
-  }
-});
+//   if (readyCondition.status === 'True') {
+//     return 'Ready';
+//   } else if (insertObjectCondition.status === 'True') {
+//     return 'Inserting';
+//   } else if (deleteObjectCondition.status === 'True') {
+//     return 'Deleting';
+//   } else {
+//     return 'Not Ready';
+//   }
+// });
 
 const {
   currentFolder,
