@@ -58,7 +58,7 @@ const lastModified = computed(() => {
 });
 
 const currentPath = computed(() => {
-  return props.file.path ? props.file.path.replace(`datacollections/${ props.resource.id }/sourceFiles/`, '') : '';
+  return props.file.path ? props.file.path.replace(`datacollections/${ props.resource.id }/`, '') : '';
 });
 
 const isView = computed(() => {
@@ -91,11 +91,16 @@ const stateDisplay = computed(() => {
   }
 });
 
-const { currentFolder } = useFileItem({
+const {
+  currentFolder,
+  onRowClick,
+} = useFileItem({
   props: {
+    ...props,
     isFile,
     currentPath,
-  }
+  },
+  emit,
 });
 
 const removeFile = async(file) => {
@@ -109,14 +114,6 @@ const removeFile = async(file) => {
       emit('fetchFiles', currentFolder.value);
     },
   });
-};
-
-const onRowClick = () => {
-  if (isFile.value) {
-    props.resource.doAction('download', { targetFilePath: currentPath.value });
-  } else {
-    emit('fetchFiles', currentPath.value);
-  }
 };
 
 const onChecked = (e) => {
@@ -145,16 +142,10 @@ const onChecked = (e) => {
         :span="12"
       >
         <span
-          v-if="isFile"
-        >
-          {{ file.Name || file.name }}
-        </span>
-        <span
-          v-else
           class="hand"
           @click="onRowClick"
         >
-          {{ file.Name || file.name }}
+          {{ file.name }}
         </span>
       </a-col>
       <a-col

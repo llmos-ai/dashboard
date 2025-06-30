@@ -1,4 +1,4 @@
-<script>
+<script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
@@ -8,118 +8,72 @@ import dayjs from 'dayjs';
 import { Modal, message } from 'ant-design-vue';
 import { formatSi } from '@shell/utils/units';
 import { diffFrom } from '@shell/utils/time';
-import { _VIEW } from '@shell/config/query-params';
 
-export default {
-  name: 'FileItem',
-
-  components: {
-    FileTextTwoTone,
-    FolderTwoTone
+const props = defineProps({
+  file: {
+    type:    Object,
+    default: () => ({}),
   },
 
+  resource: {
+    type:     Object,
+    required: true,
+  },
+});
+
+const emit = defineEmits(['fetchFiles']);
+
+const store = useStore();
+const { t } = useI18n(store);
+
+const isFile = computed(() => {
+  return props.file.Size !== 0;
+});
+
+const fileSize = computed(() => {
+  return isFile.value ? formatSi(props.file.Size, {
+    increment: 1024,
+    addSuffix: true,
+    suffix:    'B',
+  }) : '';
+});
+
+const lastModified = computed(() => {
+  const now = dayjs();
+  const out = diffFrom(dayjs(props.file.LastModified), now, (key, args) => t(key, args));
+
+  return isFile.value ? `${ out.string } ago` : '';
+});
+
+const currentPath = computed(() => {
+  const prefix = `datasets/${ props.resource.namespace }/${ props.resource.spec.dataset }/${ props.resource.spec.version }/`;
+
+  return props.file.Path ? props.file.Path.replace(prefix, '') : '';
+});
+
+const {
+  currentFolder,
+  onRowClick,
+} = useFileItem({
   props: {
-    file: {
-      type:    Object,
-      default: () => ({}),
-    },
-
-    resource: {
-      type:     Object,
-      required: true,
-    },
+    ...props,
+    isFile,
+    currentPath,
   },
+  emit,
+});
 
-  emits: ['fetchFiles'],
+const removeFile = async(file) => {
+  Modal.confirm({
+    title: t('fileItem.deleteConfirm'),
+    async onOk() {
+      await props.resource.doAction('remove', { targetFilePath: currentPath.value });
 
-  setup(props, { emit }) {
-    const store = useStore();
-    const { t } = useI18n(store);
+      message.success(t('fileItem.deleteSuccess'));
 
-    const isFile = computed(() => {
-      return props.file.Size !== 0;
-    });
-
-    const fileSize = computed(() => {
-      return isFile.value ? formatSi(props.file.Size, {
-        increment: 1024,
-        addSuffix: true,
-        suffix:    'B',
-      }) : '';
-    });
-
-    const lastModified = computed(() => {
-      const now = dayjs();
-      const out = diffFrom(dayjs(props.file.LastModified), now, (key, args) => t(key, args));
-
-      return isFile.value ? `${ out.string } ago` : '';
-    });
-
-    const currentPath = computed(() => {
-      const prefix = `datasets/${ props.resource.namespace }/${ props.resource.spec.dataset }/${ props.resource.spec.version }/`;
-
-      return props.file.Path ? props.file.Path.replace(prefix, '') : '';
-    });
-
-    const {
-      currentFolder,
-      fileType,
-      fileName,
-    } = useFileItem({
-      props: {
-        ...props,
-        isFile,
-        currentPath,
-      }
-    });
-
-    const removeFile = async(file) => {
-      Modal.confirm({
-        title: t('fileItem.deleteConfirm'),
-        async onOk() {
-          await props.resource.doAction('remove', { targetFilePath: currentPath.value });
-
-          message.success(t('fileItem.deleteSuccess'));
-
-          emit('fetchFiles', currentFolder.value);
-        },
-      });
-    };
-
-    const onRowClick = async() => {
-      if (isFile.value) {
-        store.dispatch('cluster/promptModal', {
-          component:      'TextViewerModal',
-          modalWidth:     '1000px',
-          componentProps: {
-            contentFunc: async() => {
-              const res = await props.resource.doAction('download', { targetFilePath: currentPath.value }, { responseType: 'blob' });
-
-              const out = await res.data.text();
-
-              return out;
-            },
-            fileType: fileType.value,
-            readOnly: true,
-            mode:     _VIEW,
-            title:    fileName.value,
-          },
-        });
-      } else {
-        emit('fetchFiles', currentPath.value);
-      }
-    };
-
-    return {
-      t,
-      isFile,
-      fileSize,
-      lastModified,
-      currentPath,
-      removeFile,
-      onRowClick
-    };
-  }
+      emit('fetchFiles', currentFolder.value);
+    },
+  });
 };
 </script>
 
