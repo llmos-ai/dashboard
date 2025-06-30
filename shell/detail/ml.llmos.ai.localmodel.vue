@@ -50,7 +50,10 @@ export default {
 
       const headers = [
         STATE,
-        NAME,
+        {
+          ...NAME,
+          formatter: null,
+        },
         VOLUME_SNAPSHOT,
         STORAGE_CLASS_DEFAULT,
         AGE,

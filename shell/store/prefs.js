@@ -139,6 +139,10 @@ export const _RKE1 = 'rke1';
 export const _RKE2 = 'rke2';
 export const PROVISIONER = create('provisioner', _RKE2, { options: [_RKE1, _RKE2] });
 
+export const EDIT_YAML = create('edit-yaml', false, {
+  parseJSON,
+});
+
 // Maximum number of clusters to show in the slide-in menu
 export const MENU_MAX_CLUSTERS = 10;
 // --------------------
@@ -301,6 +305,8 @@ export const actions = {
     const definition = state.definitions[key];
     let server;
 
+    console.log(opt, "opt");
+
     if (opt.val) {
       throw new Error('Use value, not val');
     }
@@ -328,7 +334,8 @@ export const actions = {
 
       try {
         server = await dispatch('loadServer', key); // There's no watch on prefs, so get before set...
-
+        console.log(server, 'server')
+        console.log(key, "key");
         if (server?.data) {
           if (definition.mangleWrite) {
             value = definition.mangleWrite(value);
@@ -463,7 +470,11 @@ export const actions = {
         { root: true }
       );
 
+      console.log(all, 'all')
+
       server = all?.[0];
+
+      return server;
     } catch (e) {
       console.error('Error loading preferences', e); // eslint-disable-line no-console
 

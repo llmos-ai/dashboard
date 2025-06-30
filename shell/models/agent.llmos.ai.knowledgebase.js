@@ -24,7 +24,7 @@ export default class Dataset extends SteveModel {
   }
 
   get documentCount() {
-    return (this.spec?.files || []).length;
+    return (this.spec?.importingFiles || []).length;
   }
 
   hitTest() {

@@ -40,7 +40,7 @@ const props = defineProps({
 
   contentFunc: {
     type:    Function,
-    default: () => {},
+    default: null,
   },
 
   mode: {
@@ -64,6 +64,9 @@ onBeforeMount(async() => {
     } else {
       contentDisplay.value = props.content;
     }
+
+    console.log(props.content, 'props.content')
+    console.log(contentDisplay.value, 'contentDisplay.value')
   } catch (err) {
     message.error(err);
   }

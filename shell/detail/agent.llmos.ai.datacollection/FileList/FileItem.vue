@@ -127,7 +127,6 @@ const onChecked = (e) => {
     <a-checkbox
       v-if="isView"
       v-model:checked="checked"
-      :disabled="stateDisplay !== 'Ready'"
       @change="onChecked"
     />
 
