@@ -1,6 +1,11 @@
 import { computed } from 'vue';
+import { useStore } from 'vuex';
 
-export const useFileItem = ({ props = {} }) => {
+import { _VIEW } from '@shell/config/query-params';
+
+export const useFileItem = ({ props = {}, emit }) => {
+  const store = useStore();
+
   const { isFile, currentPath, file = {} } = props;
 
   const currentFolder = computed(() => {
@@ -19,9 +24,32 @@ export const useFileItem = ({ props = {} }) => {
     return fileName.value.split('.').pop();
   });
 
+  const onRowClick = async() => {
+    if (isFile.value) {
+      store.dispatch('cluster/promptModal', {
+        component:      'TextViewerModal',
+        modalWidth:     '1000px',
+        componentProps: {
+          contentFunc: async() => {
+            const res = await props.resource.doAction('download', { targetFilePath: currentPath.value }, { responseType: 'blob' });
+
+            const out = await res.data.text();
+
+            return out;
+          },
+          fileType: fileType.value,
+          readOnly: true,
+          mode:     _VIEW,
+          title:    fileName.value,
+        },
+      });
+    } else {
+      emit('fetchFiles', currentPath.value);
+    }
+  };
+
   return {
     currentFolder,
-    fileType,
-    fileName,
+    onRowClick,
   };
 };
