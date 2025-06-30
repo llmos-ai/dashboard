@@ -18,7 +18,7 @@ import {
   THEME_SHORTCUT,
   PLUGIN_DEVELOPER,
   MENU_MAX_CLUSTERS,
-  EDIT_YAML,
+  CAN_YAML,
 } from '@shell/store/prefs';
 
 import LabeledSelect from '@shell/components/form/LabeledSelect';
@@ -45,7 +45,7 @@ export default {
   computed: {
     keymap:          mapPref(KEYMAP),
     viewInApi:       mapPref(VIEW_IN_API),
-    editYaml:        mapPref(EDIT_YAML),
+    canYaml:         mapPref(CAN_YAML),
     allNamespaces:   mapPref(ALL_NAMESPACES),
     themeShortcut:   mapPref(THEME_SHORTCUT),
     dateFormat:      mapPref(DATE_FORMAT),
@@ -253,9 +253,9 @@ export default {
       />
       <br>
       <Checkbox
-        v-model:value="editYaml"
-        data-testid="prefs__editYaml"
-        :label="t('prefs.advFeatures.editYaml', {}, true)"
+        v-model:value="canYaml"
+        data-testid="prefs__canYaml"
+        :label="t('prefs.advFeatures.canYaml', {}, true)"
         class="mt-10"
       />
       <br>

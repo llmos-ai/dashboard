@@ -5,7 +5,7 @@ import ButtonGroup from '@shell/components/ButtonGroup';
 import { BadgeState } from '@shell/components/BadgeState';
 import { Banner } from '@shell/components/Banner';
 import { get } from '@shell/utils/object';
-import { HIDE_SENSITIVE } from '@shell/store/prefs';
+import { HIDE_SENSITIVE, CAN_YAML } from '@shell/store/prefs';
 import {
   AS,
   _DETAIL,
@@ -315,7 +315,7 @@ export default {
         });
       }
 
-      if (this.canViewYaml) {
+      if (this.canViewYaml && this.$store.getters['prefs/get'](CAN_YAML)) {
         out.push({
           labelKey: 'resourceDetail.masthead.yaml',
           value:    _YAML,
