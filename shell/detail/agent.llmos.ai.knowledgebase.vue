@@ -1,5 +1,6 @@
 <script>
 import { groupBy } from 'lodash';
+import { Modal } from 'ant-design-vue';
 
 import Loading from '@shell/components/Loading';
 import ResourceTable from '@shell/components/ResourceTable';
@@ -51,6 +52,9 @@ export default {
         return {
           name:           key,
           id:             key,
+          mainRowKey:     'id',
+          key,
+          _key:           key,
           detailLocation: {
             name:   `c-cluster-product-resource-namespace-class-document-id`,
             params: {
@@ -62,6 +66,46 @@ export default {
             },
           },
           parsedFile,
+          availableActions: [
+            {
+              action:     'promptRemove',
+              label:      this.t('action.remove'),
+              icon:       'icon icon-trash',
+              bulkable:   true,
+              enabled:    true,
+              bulkAction: 'promptRemove',
+            },
+          ],
+          // TBD
+          promptRemove: (resources) => {
+            Modal.confirm({
+              title: this.t('fileItem.deleteConfirm'),
+              onOk:  () => {
+                if (!resources) {
+                  resources = [{ id: key }];
+                }
+
+                const files = this.value.status?.importedFiles || [];
+                const removeArr = resources.map((r) => r.id);
+                const remains = files.filter((f) => {
+                  if (removeArr.includes(f.uid)) {
+                    return false;
+                  } else {
+                    return true;
+                  }
+                });
+
+                const data = { spec: { importingFiles: remains } };
+
+                this.value.patch(
+                  data,
+                  { headers: { 'content-type': 'application/merge-patch+json' } },
+                  true,
+                  true
+                );
+              },
+            });
+          },
         };
       });
     },
@@ -94,5 +138,6 @@ export default {
     :headers="headers"
     default-sort-by="age"
     :groupable="false"
+    tableActions
   />
 </template>
