@@ -146,7 +146,7 @@ export default {
       });
 
       if (this.mode === 'edit') {
-        this.value.spec.importingFiles = this.value.spec.files.concat(checkedFiles);
+        this.value.spec.importingFiles = this.value.spec.importingFiles.concat(checkedFiles);
       } else {
         this.value.spec.importingFiles = checkedFiles;
       }
@@ -169,20 +169,7 @@ export default {
     },
 
     onFileChecked(fileList) {
-      const uidArr = this.checkedFiles.map((f) => f.uid);
-      const newArr = fileList.filter((f) => {
-        return !uidArr.includes(f.uid);
-      });
-
-      this.checkedFiles = [
-        ...this.checkedFiles,
-        ...newArr.map((a) => {
-          return {
-            ...a,
-            dataCollectionName: this.selectedDataCenter,
-          };
-        }),
-      ];
+      this.checkedFiles = fileList;
     },
   },
 };
@@ -288,6 +275,7 @@ export default {
                 mode="view"
                 :showHeader="false"
                 :checkedFiles="checkedFiles"
+                :dataCollectionName="selectedDataCenter"
                 @fetchFiles="fetchFiles"
                 @checked="onFileChecked"
               />

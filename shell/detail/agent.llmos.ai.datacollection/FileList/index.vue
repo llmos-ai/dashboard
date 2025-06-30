@@ -33,6 +33,11 @@ const props = defineProps({
     type:    String,
     default: 'create',
   },
+
+  dataCollectionName: {
+    type:    String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['fetchFiles', 'checked']);
@@ -112,7 +117,10 @@ const onChecked = ({ file, checked }) => {
 
   if (checked) {
     if (!isChecked) {
-      checkedFiles.value.push(file);
+      checkedFiles.value.push({
+        ...file,
+        dataCollectionName: props.dataCollectionName,
+      });
     }
   } else {
     checkedFiles.value = checkedFiles.value.filter((f) => f.uid !== file.uid);
