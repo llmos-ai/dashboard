@@ -77,9 +77,10 @@ export default {
     :done-route="doneRoute"
     :resource="value"
     :mode="mode"
-    :errors="errors"
+    :bannerErrors="errors"
     :apply-hooks="applyHooks"
     @finish="saveAddon"
+    @error="e=>errors = e"
   >
     <component
       :is="currentComponent"

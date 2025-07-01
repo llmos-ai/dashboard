@@ -203,7 +203,7 @@ export default {
       :validation-passed="true"
       :selected-subtype="value._type"
       :resource="value"
-      :errors="errors"
+      :bannerErrors="errors"
       :done-route="doneRoute"
       :subtypes="secretSubTypes"
       @finish="saveSecret"

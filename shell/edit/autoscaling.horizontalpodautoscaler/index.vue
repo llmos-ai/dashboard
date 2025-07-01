@@ -193,7 +193,7 @@ export default {
       :mode="mode"
       :resource="value"
       :validation-passed="true"
-      :errors="errors"
+      :bannerErrors="errors"
       @error="(e) => (errors = e)"
       @finish="save"
       @cancel="done"

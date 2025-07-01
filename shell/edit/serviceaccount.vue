@@ -91,7 +91,7 @@ export default {
     :resource="value"
     :subtypes="[]"
     :validation-passed="!!value.metadata.name"
-    :errors="errors"
+    :bannerErrors="errors"
     @error="e=>errors = e"
     @finish="save"
     @cancel="done"
