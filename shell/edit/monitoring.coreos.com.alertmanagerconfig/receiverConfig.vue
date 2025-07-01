@@ -256,7 +256,7 @@ export default {
     :resource="alertmanagerConfigResource"
     :subtypes="[]"
     :can-yaml="true"
-    :errors="errors"
+    :bannerErrors="errors"
     :cancel-event="true"
     :validation-passed="fvFormIsValid"
     @error="(e) => (errors = e)"

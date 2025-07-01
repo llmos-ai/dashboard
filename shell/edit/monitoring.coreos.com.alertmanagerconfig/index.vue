@@ -199,7 +199,7 @@ export default {
     v-else
     class="route"
     :done-route="doneRoute"
-    :errors="errors"
+    :bannerErrors="errors"
     :mode="mode"
     :resource="value"
     :subtypes="[]"

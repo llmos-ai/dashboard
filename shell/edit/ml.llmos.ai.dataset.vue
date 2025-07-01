@@ -191,10 +191,11 @@ export default {
     :done-route="doneRoute"
     :resource="value"
     :mode="mode"
-    :errors="errors"
+    :bannerErrors="errors"
     :apply-hooks="applyHooks"
     :validation-passed="validationPassed"
     @finish="save"
+    @error="e=>errors = e"
   >
     <NameNsDescription
       :value="value"

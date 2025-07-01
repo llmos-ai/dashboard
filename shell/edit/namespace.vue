@@ -124,7 +124,7 @@ export default {
     :resource="value"
     :subtypes="[]"
     :validation-passed="true"
-    :errors="errors"
+    :bannerErrors="errors"
     :apply-hooks="applyHooks"
     @error="(e) => (errors = e)"
     @finish="save"

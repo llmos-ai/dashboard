@@ -226,7 +226,7 @@ export default {
     :resource="value"
     :subtypes="[]"
     :validation-passed="true"
-    :errors="errors"
+    :bannerErrors="errors"
     @error="e=>errors = e"
     @finish="save"
     @cancel="done"

@@ -94,7 +94,7 @@ export default {
     :subtypes="[]"
     :validation-passed="validationPassed"
     :yaml-modifiers="yamlModifiers"
-    :errors="errors"
+    :bannerErrors="errors"
     @error="e=>errors = e"
     @finish="saveConfigMap"
     @cancel="done"
