@@ -83,6 +83,11 @@ export default {
       default: () => [],
     },
 
+    bannerErrors: {
+      type:    Array,
+      default: () => [],
+    },
+
     /**
      * Set of maps to convert error messages to something more user friendly and apply icons
      */
@@ -266,15 +271,15 @@ export default {
      * Prevent issues for malformed types injection
      */
     hasErrors() {
-      return this.errors?.length && Array.isArray(this.errors);
+      return this.bannerErrors?.length && Array.isArray(this.bannerErrors);
     },
 
     /**
      * Replace returned string with new picked value and icon
      */
     mappedErrors() {
-      return !this.errors ? {} : this.errorsMap ||
-            this.errors.reduce(
+      return !this.bannerErrors ? {} : this.errorsMap ||
+            this.bannerErrors.reduce(
               (acc, error) => ({
                 ...acc,
                 [error]: {
@@ -318,9 +323,9 @@ export default {
      * Dismiss given error
      */
     closeError(index) {
-      const errors = this.errors.filter((_, i) => i !== index);
+      const errors = this.bannerErrors.filter((_, i) => i !== index);
 
-      this.$emit('error', errors, this.errors[index]);
+      this.$emit('error', errors, this.bannerErrors[index]);
     },
 
     emitOrRoute() {
@@ -496,7 +501,7 @@ export default {
         class="cru__errors"
       >
         <Banner
-          v-for="(err, i) in errors"
+          v-for="(err, i) in bannerErrors"
           :key="i"
           color="error"
           :data-testid="`error-banner${i}`"

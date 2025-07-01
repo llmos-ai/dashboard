@@ -198,10 +198,11 @@ export default {
     :mode="mode"
     :resource="value"
     :validation-passed="valid"
-    :errors="errors"
+    :bannerErrors="errors"
     :can-yaml="false"
     class="create-edit"
     @finish="save"
+    @error="e=>errors = e"
   >
     <div class="credentials">
       <h2>{{ t('user.edit.credentials.label') }}</h2>
