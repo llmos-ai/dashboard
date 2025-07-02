@@ -7,7 +7,8 @@ import ResourceTable from '@shell/components/ResourceTable';
 
 import CreateEditView from '@shell/mixins/create-edit-view';
 
-import { NAME } from '@shell/config/table-headers';
+import { NAME, STATE } from '@shell/config/table-headers';
+import { findBy } from '@shell/utils/array';
 
 export default {
   components: {
@@ -112,6 +113,7 @@ export default {
 
     headers() {
       return [
+        STATE,
         {
           ...NAME,
           value: 'parsedFile.fileInfo.name',
@@ -124,7 +126,33 @@ export default {
     },
   },
 
-  methods: {}
+  methods: {
+    stateBackground(row) {
+      const readyCondition = findBy(row.status.conditions, 'type', 'ready') || {};
+
+      if (readyCondition.status === 'True') {
+        return 'green';
+      } else {
+        return 'orange';
+      }
+    },
+
+    stateDisplay(row) {
+      const readyCondition = findBy(row.status.conditions, 'type', 'ready') || {};
+      const insertObjectCondition = findBy(row.status.conditions, 'type', 'insertObject') || {};
+      const deleteObjectCondition = findBy(row.status.conditions, 'type', 'deleteObject') || {};
+
+      if (readyCondition.status === 'True') {
+        return 'Ready';
+      } else if (insertObjectCondition.status === 'True') {
+        return 'Inserting';
+      } else if (deleteObjectCondition.status === 'True') {
+        return 'Deleting';
+      } else {
+        return 'Not Ready';
+      }
+    }
+  }
 };
 </script>
 
