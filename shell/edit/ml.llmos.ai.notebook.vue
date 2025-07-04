@@ -24,6 +24,8 @@ export default {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
     this.notebookImagesSetting = await this.$store.getters[`${ inStore }/byId`](MANAGEMENT.SETTING, SETTING.DEFAULT_NOTEBOOK_IMAGES);
+
+    await this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
   },
 
   data() {
