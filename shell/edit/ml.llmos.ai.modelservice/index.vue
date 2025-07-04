@@ -50,6 +50,8 @@ export default {
       volumeClaims: this.$store.dispatch(`${ inStore }/findAll`, { type: PVC }),
     });
 
+    await this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
+
     const huggingFaceProxy = hash.settings?.find(
       (item) => item.id === SETTING.HUGGINGfACE_ENDPOINT
     );
