@@ -152,6 +152,12 @@ export default {
       }
     },
 
+    handleEnterKey() {
+      if (this.$refs.loginLocalButton) {
+        this.$refs.loginLocalButton.$el.click();
+      }
+    },
+
     async loginLocal(buttonCb) {
       try {
         await this.$store.dispatch('auth/login', {
@@ -285,7 +291,7 @@ export default {
                   :label="t('login.password')"
                   autocomplete="password"
                   htmlType="password"
-                  @keyup.enter="loginLocal"
+                  @keyup.enter="handleEnterKey"
                 />
               </div>
             </div>
