@@ -8,6 +8,7 @@ import ArrayListGrouped from '@shell/components/form/ArrayListGrouped';
 import { randomStr } from '@shell/utils/string';
 import PersistentVolumeClaim from '@shell/edit/volume/persistentVolumeClaim/persistentvolumeclaim.vue';
 import { PVC } from '@shell/config/types';
+import { uniq } from '@shell/utils/array';
 
 export default {
   name: 'Volume',
@@ -90,13 +91,13 @@ export default {
       const customVolumeTypes = require
         .context('@shell/edit/volume', false, /^.*\.vue$/)
         .keys()
-        .map((path) => path.replace(/(\.\/)|(.vue)/g, ''))
+        .map((path) => path.replace(/(\.\/)|(.vue)/g, '').split('/').findLast(() => true))
         .filter((file) => !excludedFiles.includes(file));
 
-      return [
+      return uniq([
         ...customVolumeTypes,
         ...defaultVolumeTypes
-      ]
+      ])
         .sort()
         .map((volumeType) => ({
           label:  this.t(`volume.subtypes.${ volumeType }`),
