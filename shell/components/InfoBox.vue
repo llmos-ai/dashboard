@@ -43,7 +43,7 @@ export default {
       background: var(--secondary);
       color: var(--input-text);
       display: inline-block;
-      padding: 5px 10px;
+      padding: 5px 0px;
     }
 
     .step-list {

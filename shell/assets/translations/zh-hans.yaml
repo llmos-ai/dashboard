@@ -611,7 +611,7 @@ cluster:
       linuxDetail: |-
         {step, plural,
           =0 { 在每台要注册的 Linux 主机上运行此命令。}
-          other { 步骤 2: 在每台要注册的 Linux 主机上运行此命令。}
+          other { 步骤 2: 在每台要注册的 Linux 主机上运行此命令:}
         }
       windowsDetail: 在每台要注册的 Windows 主机中的 PowerShell 上运行此命令。Windows 节点只能充当 worker。
       windowsNotReady: 在用于添加 Windows worker 的注册命令显示之前，集群必须已启动并运行 Linux ETCD，Control Plane，以及 worker 节点。

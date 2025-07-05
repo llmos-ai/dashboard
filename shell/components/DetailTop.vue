@@ -243,6 +243,7 @@ export default {
           v-for="(prop, key) in labels"
           :key="key"
           color="default"
+          class="!my-[4px]"
         >
           <i
             v-if="internalIcons[key]"
@@ -261,7 +262,7 @@ export default {
         <a
           v-if="showFilteredSystemLabels"
           href="#"
-          class="detail-top__label-button"
+          class="detail-top__label-button inline-flex items-center justify-center"
           @click.prevent="toggleLabels"
         >
           {{ t(`resourceDetail.detailTop.${showAllLabels? 'hideLabels' : 'showLabels'}`) }}
