@@ -263,19 +263,19 @@ EOF`;
         <h4 v-t="'cluster.custom.registrationCommand.saveLLMOSConfig'" />
         <CopyCode
           id="copiedConfig"
-          class="m-10"
+          class="mt-10"
         >
           <div class="llmos-config">
             {{ llmosConfigCommand }}
           </div>
         </CopyCode>
-        <hr>
+        <hr class="mb-[10px]">
       </div>
 
       <h4>{{ linuxDetailTitle }}</h4>
       <CopyCode
         id="copiedLinux"
-        class="m-10 p-10"
+        class="mb-0"
       >
         {{ linuxCommand }}
       </CopyCode>
@@ -298,10 +298,11 @@ EOF`;
     </InfoBox>
   </div>
 </template>
+
 <style lang="scss" scoped>
   #copiedConfig{
     min-width: 400px;
-    padding: 2px 10px;
+    padding: 2px 0px;
 
     .llmos-config {
       padding: 1px 5px 5px 5px;
