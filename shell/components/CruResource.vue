@@ -9,6 +9,7 @@ import AsyncButton from '@shell/components/AsyncButton';
 import { mapGetters, mapState, mapActions } from 'vuex';
 import { stringify, exceptionToErrorsArray } from '@shell/utils/error';
 import CruResourceFooter from '@shell/components/CruResourceFooter';
+import { CAN_YAML } from '@shell/store/prefs';
 
 import {
   _EDIT,
@@ -231,7 +232,8 @@ export default {
         this.canYaml &&
         (this._selectedSubtype || !this.subtypes.length) &&
         this.canEditYaml &&
-        this.mode !== _VIEW
+        this.mode !== _VIEW &&
+        this.$store.getters['prefs/get'](CAN_YAML)
       );
     },
 
