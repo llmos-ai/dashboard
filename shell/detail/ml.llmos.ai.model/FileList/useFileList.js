@@ -15,6 +15,9 @@ export const useFileList = ({ props = {}, emit }) => {
   const currentPath = ref('');
   // const maxConcurrent = ref(1);
 
+  const prefixPath =
+    props.resource.status.rootPath || props.resource.status.path;
+
   const uploadFile = (formData) => {
     return new Promise((resolve, reject) => {
       const processUpload = async() => {
@@ -83,6 +86,20 @@ export const useFileList = ({ props = {}, emit }) => {
     showModal.value = true;
 
     const { file } = options;
+
+    const destPath = currentPath.value ? 
+      `${prefixPath}/${currentPath.value}/${file.name}` :
+      `${prefixPath}/${file.name}`
+
+    const fileInfo = {
+      destPath,
+      fileName: file.name,
+      size: file.size,
+      readSize: 0,
+      totalSize: 100,
+    };
+
+    fileList.value.unshift(fileInfo);
 
     try {
       uploading.value = true;
