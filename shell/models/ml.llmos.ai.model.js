@@ -18,7 +18,7 @@ export default class ModelRegistry extends SteveModel {
       },
       spec: {
         modelCard: { metadata: {} },
-        registry:  this.t('modelRegistry.useDefault'),
+        registry:  this.hasDefaultRegistry ? this.t('modelRegistry.useDefault') : '',
       },
     };
 
@@ -127,5 +127,12 @@ export default class ModelRegistry extends SteveModel {
     } catch (err) {
       message.error(`${ err.message || err }`);
     }
+  }
+
+  get hasDefaultRegistry() {
+    const registries = this.$getters['all'](LLMOS_TYPES.REGISTRY);
+    const out = (registries || []).find((registry) => registry.isDefault);
+
+    return out?.id;
   }
 }

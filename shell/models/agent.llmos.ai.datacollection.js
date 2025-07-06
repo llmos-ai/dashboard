@@ -1,5 +1,6 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { set } from '@shell/utils/object';
+import { LLMOS } from '@shell/config/types';
 
 export default class Dataset extends SteveModel {
   applyDefaults() {
@@ -10,7 +11,7 @@ export default class Dataset extends SteveModel {
         labels:      {},
         annotations: {},
       },
-      spec: { registry: this.t('modelRegistry.useDefault') },
+      spec: { registry: this.hasDefaultRegistry ? this.t('modelRegistry.useDefault') : '' },
     };
 
     this.metadata = value.metadata;
@@ -19,5 +20,12 @@ export default class Dataset extends SteveModel {
 
   get documentCount() {
     return (this.status?.files || []).length;
+  }
+
+  get hasDefaultRegistry() {
+    const registries = this.$getters['all'](LLMOS.REGISTRY);
+    const out = (registries || []).find((registry) => registry.isDefault);
+
+    return out?.id;
   }
 }

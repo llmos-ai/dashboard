@@ -13,7 +13,7 @@ export default class Dataset extends SteveModel {
       },
       spec: {
         datasetCard: { metadata: { splitTypes: [] } },
-        registry:    this.t('modelRegistry.useDefault'),
+        registry:    this.hasDefaultRegistry ? this.t('modelRegistry.useDefault') : '',
       },
     };
 
@@ -79,5 +79,12 @@ export default class Dataset extends SteveModel {
 
   get latestDatasetVersion() {
     return this.datasetVersions?.[0] || {};
+  }
+
+  get hasDefaultRegistry() {
+    const registries = this.$getters['all'](LLMOS.REGISTRY);
+    const out = (registries || []).find((registry) => registry.isDefault);
+
+    return out?.id;
   }
 }
