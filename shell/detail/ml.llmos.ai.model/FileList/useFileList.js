@@ -87,15 +87,13 @@ export const useFileList = ({ props = {}, emit }) => {
 
     const { file } = options;
 
-    const destPath = currentPath.value ? 
-      `${prefixPath}/${currentPath.value}/${file.name}` :
-      `${prefixPath}/${file.name}`
+    const destPath = currentPath.value ? `${ prefixPath }/${ currentPath.value }/${ file.name }` : `${ prefixPath }/${ file.name }`;
 
     const fileInfo = {
       destPath,
-      fileName: file.name,
-      size: file.size,
-      readSize: 0,
+      fileName:  file.name,
+      size:      file.size,
+      readSize:  0,
       totalSize: 100,
     };
 
