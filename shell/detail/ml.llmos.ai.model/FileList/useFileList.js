@@ -23,8 +23,10 @@ export const useFileList = ({ props = {}, emit }) => {
     fileName,
     targetDirectory,
   }) => {
+    const objectName = targetDirectory ? `${targetDirectory}/${fileName}` : fileName;
+
     return await props.resource.doAction('generatePresignedURL', {
-      objectName: fileName,
+      objectName,
       operation: 'upload',
     })
   }
