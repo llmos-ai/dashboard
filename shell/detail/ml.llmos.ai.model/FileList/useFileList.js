@@ -17,6 +17,112 @@ export const useFileList = ({ props = {}, emit }) => {
 
   const prefixPath =
     props.resource.status.rootPath || props.resource.status.path;
+  const csrf = store.$cookies.get(CSRF, { parseJSON: false });
+
+  const generatePresignedURL = async({
+    fileName,
+    targetDirectory,
+  }) => {
+    return await props.resource.doAction('generatePresignedURL', {
+      objectName: fileName,
+      operation: 'upload',
+    })
+  }
+
+  const uploadS3 = async({
+    presignedURL,
+    file,
+    destPath,
+  }) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      
+      // 监听上传进度
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const uploadedBytes = event.loaded;
+          const totalBytes = event.total;
+          const progress = Math.round((uploadedBytes / totalBytes) * 100);
+
+          // 更新进度信息
+          const index = fileList.value.findIndex(
+            (item) => item.destPath === destPath
+          );
+
+          if (index !== -1) {
+            fileList.value[index] = {
+              ...fileList.value[index],
+              readSize: uploadedBytes,
+              totalSize: totalBytes,
+              progress: progress,
+              status: 'uploading'
+            };
+          }
+        }
+      });
+
+      // 监听上传完成
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // 上传成功，更新最终状态
+          const index = fileList.value.findIndex(
+            (item) => item.destPath === destPath
+          );
+
+          if (index !== -1) {
+            fileList.value[index] = {
+              ...fileList.value[index],
+              progress: 100,
+              status: 'completed'
+            };
+          }
+
+          resolve(xhr);
+        } else {
+          reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`));
+        }
+      });
+
+      // 监听上传错误
+      xhr.addEventListener('error', () => {
+        const index = fileList.value.findIndex(
+          (item) => item.destPath === destPath
+        );
+
+        if (index !== -1) {
+          fileList.value[index] = {
+            ...fileList.value[index],
+            status: 'error',
+            error: 'Upload failed'
+          };
+        }
+
+        reject(new Error('Upload failed'));
+      });
+
+      // 监听上传中断
+      xhr.addEventListener('abort', () => {
+        const index = fileList.value.findIndex(
+          (item) => item.destPath === destPath
+        );
+
+        if (index !== -1) {
+          fileList.value[index] = {
+            ...fileList.value[index],
+            status: 'error',
+            error: 'Upload aborted'
+          };
+        }
+
+        reject(new Error('Upload aborted'));
+      });
+
+      // 开始上传
+      xhr.open('PUT', presignedURL);
+      xhr.setRequestHeader('x-api-csrf', csrf);
+      xhr.send(file);
+    });
+  }
 
   const uploadFile = (formData) => {
     return new Promise((resolve, reject) => {
@@ -94,7 +200,9 @@ export const useFileList = ({ props = {}, emit }) => {
       fileName:  file.name,
       size:      file.size,
       readSize:  0,
-      totalSize: 100,
+      totalSize: file.size,
+      progress:  0,
+      status:    'pending'
     };
 
     fileList.value.unshift(fileInfo);
@@ -102,21 +210,52 @@ export const useFileList = ({ props = {}, emit }) => {
     try {
       uploading.value = true;
 
-      const formData = new FormData();
-
-      formData.append('file', file);
-      formData.append(
-        'data',
-        JSON.stringify({
-          targetDirectory: currentPath.value,
-          relativePath:    '',
-        })
+      // 更新状态为准备中
+      const index = fileList.value.findIndex(
+        (item) => item.destPath === destPath
       );
+      if (index !== -1) {
+        fileList.value[index] = {
+          ...fileList.value[index],
+          status: 'preparing'
+        };
+      }
 
-      await uploadFile(formData);
-      emit('fetchFiles');
+      const res = await generatePresignedURL({
+        fileName: file.name,
+        targetDirectory: currentPath.value,
+      });
+
+      const presignedURL = res.presignedURL;
+
+      // 更新状态为开始上传
+      if (index !== -1) {
+        fileList.value[index] = {
+          ...fileList.value[index],
+          status: 'uploading'
+        };
+      }
+
+      await uploadS3({
+        presignedURL,
+        file,
+        destPath,
+      });
     } catch (err) {
       message.error(`Upload Fail: ${ err }`);
+      
+      // 更新失败状态
+      const index = fileList.value.findIndex(
+        (item) => item.destPath === destPath
+      );
+      
+      if (index !== -1) {
+        fileList.value[index] = {
+          ...fileList.value[index],
+          status: 'error',
+          error: err.message
+        };
+      }
     } finally {
       uploading.value = false;
     }
@@ -147,7 +286,6 @@ export const useFileList = ({ props = {}, emit }) => {
       );
 
       await uploadFile(formData);
-      emit('fetchFiles');
     } catch (err) {
       message.error(`Upload Fail: ${ err }`);
     } finally {
