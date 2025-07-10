@@ -54,7 +54,6 @@ const {
   showModal,
   currentPath,
   onUpload,
-  onFolderUpload,
 } = useFileList({
   props: { resource: props.resource },
   emit,
@@ -191,7 +190,7 @@ const close = () => {
               <a-menu>
                 <a-menu-item key="uploadFolder">
                   <a-upload
-                    :customRequest="onFolderUpload"
+                    :customRequest="onUpload"
                     :showUploadList="false"
                     directory
                   >
