@@ -23,13 +23,13 @@ export const useFileList = ({ props = {}, emit }) => {
     fileName,
     targetDirectory,
   }) => {
-    const objectName = targetDirectory ? `${targetDirectory}/${fileName}` : fileName;
+    const objectName = targetDirectory ? `${ targetDirectory }/${ fileName }` : fileName;
 
     return await props.resource.doAction('generatePresignedURL', {
       objectName,
       operation: 'upload',
-    })
-  }
+    });
+  };
 
   const uploadS3 = async({
     presignedURL,
@@ -38,7 +38,7 @@ export const useFileList = ({ props = {}, emit }) => {
   }) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      
+
       // 监听上传进度
       xhr.upload.addEventListener('progress', (event) => {
         if (event.lengthComputable) {
@@ -54,10 +54,10 @@ export const useFileList = ({ props = {}, emit }) => {
           if (index !== -1) {
             fileList.value[index] = {
               ...fileList.value[index],
-              readSize: uploadedBytes,
+              readSize:  uploadedBytes,
               totalSize: totalBytes,
-              progress: progress,
-              status: 'uploading'
+              progress,
+              status:    'uploading'
             };
           }
         }
@@ -75,13 +75,13 @@ export const useFileList = ({ props = {}, emit }) => {
             fileList.value[index] = {
               ...fileList.value[index],
               progress: 100,
-              status: 'completed'
+              status:   'completed'
             };
           }
 
           resolve(xhr);
         } else {
-          reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`));
+          reject(new Error(`Upload failed: ${ xhr.status } ${ xhr.statusText }`));
         }
       });
 
@@ -95,7 +95,7 @@ export const useFileList = ({ props = {}, emit }) => {
           fileList.value[index] = {
             ...fileList.value[index],
             status: 'error',
-            error: 'Upload failed'
+            error:  'Upload failed'
           };
         }
 
@@ -112,7 +112,7 @@ export const useFileList = ({ props = {}, emit }) => {
           fileList.value[index] = {
             ...fileList.value[index],
             status: 'error',
-            error: 'Upload aborted'
+            error:  'Upload aborted'
           };
         }
 
@@ -124,7 +124,7 @@ export const useFileList = ({ props = {}, emit }) => {
       xhr.setRequestHeader('x-api-csrf', csrf);
       xhr.send(file);
     });
-  }
+  };
 
   const uploadFile = (formData) => {
     return new Promise((resolve, reject) => {
@@ -193,7 +193,10 @@ export const useFileList = ({ props = {}, emit }) => {
   const onUpload = async(options) => {
     showModal.value = true;
 
-    const { file } = options;
+    const { file = {} } = options;
+
+    const { webkitRelativePath = '' } = file;
+    const relativePath = webkitRelativePath.replace(file.name, '');
 
     const destPath = currentPath.value ? `${ prefixPath }/${ currentPath.value }/${ file.name }` : `${ prefixPath }/${ file.name }`;
 
@@ -216,6 +219,7 @@ export const useFileList = ({ props = {}, emit }) => {
       const index = fileList.value.findIndex(
         (item) => item.destPath === destPath
       );
+
       if (index !== -1) {
         fileList.value[index] = {
           ...fileList.value[index],
@@ -224,8 +228,8 @@ export const useFileList = ({ props = {}, emit }) => {
       }
 
       const res = await generatePresignedURL({
-        fileName: file.name,
-        targetDirectory: currentPath.value,
+        fileName:        file.name,
+        targetDirectory: currentPath.value ? `${ currentPath.value }/${ relativePath }` : relativePath,
       });
 
       const presignedURL = res.presignedURL;
@@ -245,51 +249,19 @@ export const useFileList = ({ props = {}, emit }) => {
       });
     } catch (err) {
       message.error(`Upload Fail: ${ err }`);
-      
+
       // 更新失败状态
       const index = fileList.value.findIndex(
         (item) => item.destPath === destPath
       );
-      
+
       if (index !== -1) {
         fileList.value[index] = {
           ...fileList.value[index],
           status: 'error',
-          error: err.message
+          error:  err.message
         };
       }
-    } finally {
-      uploading.value = false;
-    }
-  };
-
-  const onFolderUpload = async(options) => {
-    showModal.value = true;
-
-    const { file } = options;
-
-    try {
-      uploading.value = true;
-
-      const relativePath = file.webkitRelativePath || '';
-      const pathArray = relativePath.split('/');
-
-      pathArray.pop();
-
-      const formData = new FormData();
-
-      formData.append('file', file);
-      formData.append(
-        'data',
-        JSON.stringify({
-          targetDirectory: currentPath.value,
-          relativePaths:   pathArray,
-        })
-      );
-
-      await uploadFile(formData);
-    } catch (err) {
-      message.error(`Upload Fail: ${ err }`);
     } finally {
       uploading.value = false;
     }
@@ -302,6 +274,5 @@ export const useFileList = ({ props = {}, emit }) => {
     currentPath,
     uploading,
     onUpload,
-    onFolderUpload,
   };
 };
