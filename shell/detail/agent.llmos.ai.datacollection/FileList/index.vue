@@ -59,12 +59,14 @@ const {
   emit,
 });
 
-// Computed properties
 const isView = computed(() => {
   return props.mode === 'view';
 });
 
-// Methods
+const downloadCount = computed(() => {
+  return fileList.value?.length || 0;
+});
+
 const onCreateFolder = async() => {
   store.dispatch('cluster/promptModal', {
     component:      'CreateFolderModal',
@@ -221,7 +223,7 @@ const close = () => {
           </a-button>
 
           <a-badge
-            :count="fileList.length"
+            :count="downloadCount"
             color="blue"
           >
             <a-button
