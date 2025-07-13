@@ -16,18 +16,19 @@ export const useFileList = ({ props = {}, emit }) => {
   // const maxConcurrent = ref(1);
 
   const prefixPath =
-    props.resource.status.rootPath || props.resource.status.path;
+    props.resource?.rootPath || props.resource?.status?.path;
   const csrf = store.$cookies.get(CSRF, { parseJSON: false });
 
   const generatePresignedURL = async({
     fileName,
     targetDirectory,
+    operation = 'upload',
   }) => {
     const objectName = targetDirectory ? `${ targetDirectory }/${ fileName }` : fileName;
 
     return await props.resource.doAction('generatePresignedURL', {
       objectName,
-      operation: 'upload',
+      operation,
     });
   };
 
@@ -274,5 +275,6 @@ export const useFileList = ({ props = {}, emit }) => {
     currentPath,
     uploading,
     onUpload,
+    generatePresignedURL,
   };
 };
