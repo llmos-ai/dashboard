@@ -26,19 +26,19 @@ const { proxy } = getCurrentInstance();
 // Computed properties
 const datasetMountings = computed({
   get() {
-    return props.value?.spec?.datasetMountings || [];
+    return props.value?.datasetMountings || [];
   },
   set(value) {
     const updatedValue = {
       ...props.value,
-      spec: {
-        ...props.value?.spec,
-        datasetMountings: value
-      }
+      datasetMountings: value,
     };
     emit('update:value', updatedValue);
   }
 });
+
+console.log(datasetMountings.value, 'data')
+console.log(props.value, 'props.value')
 
 const datasets = computed(() => {
   const inStore = proxy.$store.getters['currentStore'](LLMOS.DATASET);
@@ -116,7 +116,6 @@ fetchData();
   <ArrayListGrouped
     v-model:value="datasetMountings"
     :mode="mode"
-    :initial-empty-row="true"
     :default-add-value="{
       datasetName: '',
       version: '',
