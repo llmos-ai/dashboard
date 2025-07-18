@@ -20,7 +20,7 @@ export default {
       default: 'create',
     },
   },
-  
+
   components: {
     Dataset,
   },
@@ -306,9 +306,8 @@ export default {
           name="dataset"
         >
           <Dataset
-            :value="value"
+            v-model:value="spec"
             :mode="mode"
-            @update:value="value = $event"
           />
         </Tab>
       </ResourceTabs>
