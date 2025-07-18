@@ -6532,6 +6532,8 @@ labeledSelect:
   pressEnter: 按下回车键添加 "{input}"
 
 datasetCard:
+  title: 数据集
+  description: 为Notebook配置数据集挂载
   registry:
     label: 仓库
   license:
@@ -6540,7 +6542,7 @@ datasetCard:
     label: 模型标签
   language:
     label: 语言
-  description:
+  datasetDescription:
     label: 数据集描述
   splitTypes:
     label: 拆分类型
@@ -6550,6 +6552,14 @@ datasetCard:
     label: 作者
   version:
     label: 版本
+    placeholder: 选择版本
+  datasetName:
+    label: 数据集名称
+    placeholder: 选择数据集
+  mountPath:
+    label: 挂载路径
+    placeholder: 例如：/home/jovyan/datasets
+  addDataset: 添加数据集
   actions:
     newVersion: 创建新版本
     deleteVersion: 删除版本
