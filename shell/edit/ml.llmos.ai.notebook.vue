@@ -4,6 +4,7 @@ import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkloadMixin from '@shell/mixins/llmos/ml-workload';
 import { MANAGEMENT } from '@shell/config/types';
 import { SETTING } from '@shell/config/settings';
+import Dataset from '@shell/components/form/Dataset'
 
 export default {
   name:   'Notebook',
@@ -19,7 +20,11 @@ export default {
       default: 'create',
     },
   },
-  components: {},
+  
+  components: {
+    Dataset,
+  },
+
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
 
@@ -293,6 +298,17 @@ export default {
             :value="podTemplateSpec"
             :nodes="allNodes"
             :loading="isLoadingSecondaryResources"
+          />
+        </Tab>
+
+        <Tab
+          :label="t('datasetCard.title')"
+          name="dataset"
+        >
+          <Dataset
+            :value="value"
+            :mode="mode"
+            @update:value="value = $event"
           />
         </Tab>
       </ResourceTabs>

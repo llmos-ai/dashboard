@@ -6838,6 +6838,8 @@ labeledSelect:
   pressEnter: Press enter to add "{input}"
 
 datasetCard:
+  title: Dataset
+  description: Configure dataset mountings for the notebook
   registry:
     label: Registry
   license:
@@ -6846,7 +6848,7 @@ datasetCard:
     label: Model Tags
   language:
     label: Language
-  description:
+  datasetDescription:
     label: Dataset Description
   splitTypes:
     label: Split Types
@@ -6856,6 +6858,14 @@ datasetCard:
     label: Authors
   version:
     label: Version
+    placeholder: Select version
+  datasetName:
+    label: Dataset Name
+    placeholder: Select dataset
+  mountPath:
+    label: Mount Path
+    placeholder: e.g. /home/jovyan/datasets
+  addDataset: Add Dataset
   actions:
     newVersion: New Version
     deleteVersion: Delete Version
