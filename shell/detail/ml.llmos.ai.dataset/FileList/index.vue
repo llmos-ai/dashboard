@@ -88,12 +88,10 @@ const onPublish = async() => {
   try {
     const isPublished = props.datasetVersion.spec?.publish;
     const data = { spec: { publish: !isPublished } };
-    
+
     await props.datasetVersion.patch(
       data,
-      {
-        headers: { 'content-type': 'application/merge-patch+json' },
-      },
+      { headers: { 'content-type': 'application/merge-patch+json' } },
       true,
       true
     );

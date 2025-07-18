@@ -4,7 +4,7 @@ import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkloadMixin from '@shell/mixins/llmos/ml-workload';
 import { MANAGEMENT } from '@shell/config/types';
 import { SETTING } from '@shell/config/settings';
-import Dataset from '@shell/components/form/Dataset'
+import Dataset from '@shell/components/form/Dataset';
 
 export default {
   name:   'Notebook',
@@ -21,9 +21,7 @@ export default {
     },
   },
 
-  components: {
-    Dataset,
-  },
+  components: { Dataset },
 
   async fetch() {
     const inStore = this.$store.getters['currentProduct'].inStore;
