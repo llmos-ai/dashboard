@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
 import { DownOutlined, SwapOutlined } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
 
 import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
 import ProgressList from '@shell/components/ProgressList';
@@ -37,6 +38,7 @@ const store = useStore();
 const { t } = useI18n(store);
 
 const downloading = ref(false);
+const publishing = ref(false);
 const selectedVersion = ref('');
 
 const {
@@ -78,6 +80,30 @@ const onDownload = async() => {
   window.URL.revokeObjectURL(url);
 
   downloading.value = false;
+};
+
+const onPublish = async() => {
+  publishing.value = true;
+
+  try {
+    const isPublished = props.datasetVersion.spec?.publish;
+    const data = { spec: { publish: !isPublished } };
+    
+    await props.datasetVersion.patch(
+      data,
+      {
+        headers: { 'content-type': 'application/merge-patch+json' },
+      },
+      true,
+      true
+    );
+
+    message.success('发布操作成功');
+  } catch (error) {
+    message.error('发布操作失败');
+  } finally {
+    publishing.value = false;
+  }
 };
 
 const onCreateFolder = async() => {
@@ -142,6 +168,13 @@ const close = () => {
         {{ '/' + currentPath }}
       </div>
       <div class="pull-right">
+        <a-button
+          :type="datasetVersion.spec?.publish ? 'default' : 'primary'"
+          :loading="publishing"
+          @click="onPublish"
+        >
+          {{ datasetVersion.spec?.publish ? '取消发布' : '发布' }}
+        </a-button>
         <a-space>
           <a-button
             type="primary"
