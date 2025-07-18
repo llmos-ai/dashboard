@@ -2,17 +2,17 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 
 import { _VIEW } from '@shell/config/query-params';
-import { useFileList } from "@shell/detail/ml.llmos.ai.model/FileList/useFileList";
+// import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
 
 export const useFileItem = ({ props = {}, emit }) => {
   const store = useStore();
 
   const { isFile, currentPath, file = {} } = props;
 
-  const { generatePresignedURL } = useFileList({
-    props: { resource: props.resource },
-    emit,
-  });
+  // const { generatePresignedURL } = useFileList({
+  //   props: { resource: props.resource },
+  //   emit,
+  // });
 
   const currentFolder = computed(() => {
     if (isFile.value) {

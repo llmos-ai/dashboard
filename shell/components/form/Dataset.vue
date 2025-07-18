@@ -33,25 +33,25 @@ const datasetMountings = computed({
       ...props.value,
       datasetMountings: value,
     };
+
     emit('update:value', updatedValue);
   }
 });
 
-console.log(datasetMountings.value, 'data')
-console.log(props.value, 'props.value')
-
 const datasets = computed(() => {
   const inStore = proxy.$store.getters['currentStore'](LLMOS.DATASET);
+
   return proxy.$store.getters[`${ inStore }/all`](LLMOS.DATASET) || [];
 });
 
 const datasetVersions = computed(() => {
   const inStore = proxy.$store.getters['currentStore'](LLMOS.DATASET_VERSION);
+
   return proxy.$store.getters[`${ inStore }/all`](LLMOS.DATASET_VERSION) || [];
 });
 
 const datasetOptions = computed(() => {
-  return datasets.value.map(dataset => ({
+  return datasets.value.map((dataset) => ({
     label: dataset.metadata.name,
     value: dataset.metadata.name
   }));
@@ -60,6 +60,7 @@ const datasetOptions = computed(() => {
 // Methods
 const onDatasetChange = (index, datasetName) => {
   const updated = [...datasetMountings.value];
+
   updated[index] = {
     ...updated[index],
     datasetName,
@@ -73,17 +74,18 @@ const getVersionOptions = (datasetName) => {
     return [];
   }
 
-  const dataset = datasets.value.find(d => d.metadata.name === datasetName);
+  const dataset = datasets.value.find((d) => d.metadata.name === datasetName);
+
   if (!dataset) {
     return [];
   }
 
   // Get versions for this dataset
-  const versions = datasetVersions.value.filter(version => {
+  const versions = datasetVersions.value.filter((version) => {
     return (version?.status?.rootPath || '').includes(`datasets/${ dataset.id }`);
   });
 
-  return versions.map(version => ({
+  return versions.map((version) => ({
     label: version.metadata.name,
     value: version.metadata.name
   })).sort((a, b) => {
@@ -99,9 +101,9 @@ const getVersionOptions = (datasetName) => {
 };
 
 // Fetch data on component mount
-const fetchData = async () => {
+const fetchData = async() => {
   const inStore = proxy.$store.getters['currentStore'](LLMOS.DATASET);
-  
+
   await Promise.all([
     proxy.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET }),
     proxy.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.DATASET_VERSION })
