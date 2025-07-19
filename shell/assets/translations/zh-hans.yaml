@@ -102,6 +102,7 @@ generic:
   enable: 启用
   disable: 禁用
   experimental: 实验功能
+  alpha: 预览
 
   deprecated: 已弃用
   placeholder: '例如：{text}'
@@ -6669,6 +6670,11 @@ applicationData:
 apps:
   manage:
     label: 应用管理
+    banner:
+      agentNotInstalled: LLMOS Agent 未安装，点击
+      here: 此处
+      toEnableNow: 立即启用。
+      enablePlugin: 启用插件
   data:
     label: 应用数据
   knowledge:

@@ -177,4 +177,11 @@ export default class ManagedAddon extends SteveModel {
       query,
     };
   }
+
+  get isAlpha() {
+    return (
+      this.metadata.labels['llmos.ai/alpha'] === 'true' ||
+      this.metadata.name === 'llmos-agents'
+    );
+  }
 }

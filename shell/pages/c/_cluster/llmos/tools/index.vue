@@ -85,8 +85,17 @@ export default {
               <h3 class="name">
                 {{ addon.formatName }}
               </h3>
-              <div class="state">
-                <BadgeStateFormatter :row="addon" />
+              <div class="flex items-center gap-2">
+                <div class="state">
+                  <BadgeStateFormatter :row="addon" />
+                </div>
+                <a-tag
+                  v-if="addon.isAlpha"
+                  color="warning"
+                  class="ml-auto"
+                >
+                  {{ t('generic.alpha') }}
+                </a-tag>
               </div>
             </router-link>
           </div>
