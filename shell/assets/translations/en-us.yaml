@@ -101,6 +101,7 @@ generic:
   enable: Enable
   disable: Disable
   experimental: Experimental
+  alpha: Alpha
 
   deprecated: Deprecated
   placeholder: "e.g. {text}"
@@ -6975,6 +6976,11 @@ applicationData:
 apps:
   manage:
     label: Application Management
+    banner:
+      agentNotInstalled: LLMOS Agent is not installed, click
+      here: here
+      toEnableNow: to enable it now.
+      enablePlugin: Enable Plugin
   data:
     label: Data Center
   knowledge:

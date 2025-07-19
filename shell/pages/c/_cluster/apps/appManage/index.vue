@@ -1,8 +1,41 @@
 <template>
-  <div class="min-h-screen p-6">
-    <header class="flex mb-[20px]">
+  <div
+    v-if="showAgentBanner && !agentAddonLoading"
+    class="min-h-screen p-6"
+  >
+    <header>
       <h1>
         应用管理
+      </h1>
+    </header>
+
+    <Banner
+      color="warning"
+      icon="icon-warning"
+      :closable="false"
+      class="mb-4 banner"
+    >
+      <div class="text-banner">
+        <span class="warning">
+          {{ t('apps.manage.banner.agentNotInstalled') }}
+          <router-link
+            :to="agentAddonLink"
+          >
+            {{ t('apps.manage.banner.here') }}
+          </router-link>
+          {{ t('apps.manage.banner.toEnableNow') }}
+        </span>
+      </div>
+    </Banner>
+  </div>
+
+  <div
+    v-else
+    class="min-h-screen p-6"
+  >
+    <header class="flex mb-[20px]">
+      <h1>
+        {{ t('apps.manage.label') }}
       </h1>
 
       <!-- 右侧按钮组 -->
@@ -252,7 +285,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import {
   ReloadOutlined,
   MoreOutlined,
@@ -263,12 +296,23 @@ import {
 } from '@ant-design/icons-vue';
 import { Modal } from 'ant-design-vue';
 import { useFetch } from '@vueuse/core';
+import { useStore } from 'vuex';
 import LangFlowIcon from '@shell/components/LangFlowIcon.vue';
+import { Banner } from '@shell/components/Banner';
+import { MANAGEMENT } from '@shell/config/types';
+import { _EDIT, ENABLED, MODE } from '@shell/config/query-params';
+import { NAME as LLMOS } from '@shell/config/product/llmos';
+import { useI18n } from '@shell/composables/useI18n';
+
+const store = useStore();
+const { t } = useI18n(store);
 
 const projectDetails = ref([]);
 const detailsLoading = ref(false);
 const searchQuery = ref('');
 const viewMode = ref('list');
+const showAgentBanner = ref(false);
+const agentAddonLoading = ref(true);
 
 // 计算过滤后的项目列表
 const filteredProjectDetails = computed(() => {
@@ -285,6 +329,25 @@ const filteredProjectDetails = computed(() => {
       )
     }
   })).filter((project) => project.data.flows.length > 0);
+});
+
+const agentAddonLink = computed(() => {
+  const query = {
+    [MODE]:    _EDIT,
+    [ENABLED]: 'true',
+  };
+
+  return {
+    name:   'c-cluster-product-resource-namespace-id',
+    params: {
+      product:   LLMOS,
+      cluster:   'local',
+      resource:  MANAGEMENT.MANAGED_ADDON,
+      namespace: 'llmos-agents',
+      id:        'llmos-agents',
+    },
+    query,
+  };
 });
 
 // 获取流程图标类型
@@ -399,6 +462,27 @@ const loadAllProjects = async(projects) => {
   }
 };
 
+// 检查llmos-agent插件状态
+const checkAgentAddonStatus = async() => {
+  try {
+    agentAddonLoading.value = true;
+
+    // 获取所有managedaddon
+    await store.dispatch('management/findAll', { type: MANAGEMENT.MANAGED_ADDON });
+    const addons = store.getters['management/all'](MANAGEMENT.MANAGED_ADDON);
+
+    // 查找llmos-agent插件
+    const agentAddon = addons.find((addon) => addon.metadata?.name === 'llmos-agents');
+
+    // 如果插件不存在或未启用，显示横幅
+    showAgentBanner.value = !agentAddon || !agentAddon.spec?.enabled;
+  } catch (error) {
+    showAgentBanner.value = true;
+  } finally {
+    agentAddonLoading.value = false;
+  }
+};
+
 const refreshProjects = async() => {
   await refetchProjects();
 };
@@ -490,6 +574,11 @@ const handleDelete = async(flowId) => {
     }
   });
 };
+
+// 组件挂载时检查插件状态
+onMounted(() => {
+  checkAgentAddonStatus();
+});
 </script>
 
 <style scoped>
