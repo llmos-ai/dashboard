@@ -6534,7 +6534,8 @@ labeledSelect:
 
 datasetCard:
   title: 数据集
-  description: 为Notebook配置数据集挂载
+  description: 
+    label: 为Notebook配置数据集挂载
   registry:
     label: 仓库
   license:
