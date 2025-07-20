@@ -6520,6 +6520,8 @@ modelCard:
     cache: 
       label: 创建本地模型
       success: 本地模型创建成功
+    generateUploadScript:
+      label: 生成上传命令
 
 LabeledTag:
   addLabel: 添加标签
@@ -6682,3 +6684,24 @@ apps:
     label: 知识库
   trace:
     label: 应用观测
+
+generateUploadScript:
+  uploadType:
+    folder: 文件夹
+    file: 文件
+  instructions:
+    title: 生成上传脚本
+    description: 使用此脚本从 notebook 环境将您的模型上传到 LLMOS 平台。
+    steps:
+      title: "使用步骤："
+      step1: "1. 复制并替换[sourceDir]或[sourceFile]为您要上传的文件夹或文件"
+      step2: "2. 在您的 notebook 终端中运行下面的脚本"
+      step3: "3. 脚本将把您指定的文件夹或文件上传到模型中"
+  script:
+    title: 上传脚本
+    tokenHidden: 为了安全，令牌已隐藏
+  actions:
+    copy: 复制脚本
+    copySuccess: 脚本已复制到剪贴板
+    close: 关闭
+  generating: 生成中...

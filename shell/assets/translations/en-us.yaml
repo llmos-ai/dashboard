@@ -186,7 +186,7 @@ nav:
     gpuManagement: GPU Management
     llmosStorage: Storage
     ceph: Ceph Management
-    registry: Registry
+    registry: Model Management
   ns:
     all: All Namespaces
     clusterLevel: Only Cluster Resources
@@ -6826,6 +6826,8 @@ modelCard:
     cache: 
       label: Create Local Model
       success: Create Local Model Successfully
+    generateUploadScript:
+      label: Generate Upload Command
 
 LabeledTag:
   addLabel: Add Tag
@@ -6988,3 +6990,24 @@ apps:
     label: Knowledge Base
   trace:
     label: Application Trace
+
+generateUploadScript:
+  uploadType:
+    folder: Folder
+    file: File
+  instructions:
+    title: Generate Upload Script
+    description: Use this script to upload your model to the LLMOS platform from a notebook environment.
+    steps:
+      title: "Steps to use:"
+      step1: "1. Copy and run the script below in your notebook terminal"
+      step2: "2. Run the script in your notebook terminal"
+      step3: "3. The script will upload your folder or file to the model"
+  script:
+    title: Upload Script
+    tokenHidden: Token is hidden for security
+  actions:
+    copy: Copy Script
+    copySuccess: Script copied to clipboard
+    close: Close
+  generating: Generating...

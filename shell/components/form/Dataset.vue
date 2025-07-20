@@ -85,7 +85,7 @@ const getVersionOptions = (datasetName) => {
     return (version?.status?.rootPath || '').includes(`datasets/${ dataset.id }`);
   });
 
-  return versions.filter(v => v.spec.publish).map((version) => ({
+  return versions.filter((v) => v.spec.publish).map((version) => ({
     label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
     value: version.spec.version
   })).sort((a, b) => {
