@@ -68,6 +68,7 @@ export default class Dataset extends SteveModel {
       .filter((d) => {
         const rootPath = d?.status?.rootPath || '';
         const expectedPath = `datasets/${ this.id }`;
+
         // 精确匹配：路径应该以 expectedPath 开头，并且后面要么是结尾，要么是 '/'
         return rootPath === expectedPath || rootPath.startsWith(`${ expectedPath }/`);
       })
@@ -81,9 +82,7 @@ export default class Dataset extends SteveModel {
         return versionB - versionA;
       });
 
-    console.log(out, "out");
-
-    return out
+    return out;
   }
 
   get latestDatasetVersion() {

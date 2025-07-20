@@ -74,7 +74,15 @@ export default class ModelRegistry extends SteveModel {
       label:   this.t('modelCard.actions.cache.label'),
     };
 
+    const generateUploadScript = {
+      action:  'generateUploadScript',
+      enabled: true,
+      icon:    'icon icon-terminal',
+      label:   this.t('modelCard.actions.generateUploadScript.label'),
+    };
+
     out.unshift(cache);
+    out.unshift(generateUploadScript);
 
     return out;
   }
@@ -127,6 +135,17 @@ export default class ModelRegistry extends SteveModel {
     } catch (err) {
       message.error(`${ err.message || err }`);
     }
+  }
+
+  async generateUploadScript() {
+    this.$dispatch('promptModal', {
+      component:      'GenerateUploadScriptModal',
+      modalWidth:     '700px',
+      componentProps: {
+        namespace: this.metadata.namespace,
+        name:      this.metadata.name
+      },
+    });
   }
 
   get hasDefaultRegistry() {
