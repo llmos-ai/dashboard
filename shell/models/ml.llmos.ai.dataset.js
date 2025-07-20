@@ -64,8 +64,13 @@ export default class Dataset extends SteveModel {
   }
 
   get datasetVersions() {
-    return (this.$getters['all'](LLMOS.DATASET_VERSION) || [])
-      .filter((d) => (d?.status?.rootPath || '').includes(`datasets/${ this.id }`))
+    const out = (this.$getters['all'](LLMOS.DATASET_VERSION) || [])
+      .filter((d) => {
+        const rootPath = d?.status?.rootPath || '';
+        const expectedPath = `datasets/${ this.id }`;
+        // 精确匹配：路径应该以 expectedPath 开头，并且后面要么是结尾，要么是 '/'
+        return rootPath === expectedPath || rootPath.startsWith(`${ expectedPath }/`);
+      })
       .sort((a, b) => {
         const matchA = (a.metadata.name || '').match(/^v(\d+)/);
         const matchB = (b.metadata.name || '').match(/^v(\d+)/);
@@ -75,6 +80,10 @@ export default class Dataset extends SteveModel {
 
         return versionB - versionA;
       });
+
+    console.log(out, "out");
+
+    return out
   }
 
   get latestDatasetVersion() {

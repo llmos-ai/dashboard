@@ -85,9 +85,9 @@ const getVersionOptions = (datasetName) => {
     return (version?.status?.rootPath || '').includes(`datasets/${ dataset.id }`);
   });
 
-  return versions.map((version) => ({
-    label: version.metadata.name,
-    value: version.metadata.name
+  return versions.filter(v => v.spec.publish).map((version) => ({
+    label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
+    value: version.spec.version
   })).sort((a, b) => {
     // Sort versions in descending order (newest first)
     const matchA = (a.value || '').match(/^v(\d+)/);
@@ -121,7 +121,7 @@ fetchData();
     :default-add-value="{
       datasetName: '',
       version: '',
-      mountPath: ''
+      mountPath: '/home/jovyan/datasets'
     }"
     :add-label="t('datasetCard.addDataset')"
   >
