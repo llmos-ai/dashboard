@@ -253,6 +253,17 @@ export default {
         </Tab>
 
         <Tab
+          :label="t('datasetCard.title')"
+          name="dataset"
+          :weight="tabWeightMap['dataset']"
+        >
+          <Dataset
+            v-model:value="spec"
+            :mode="mode"
+          />
+        </Tab>
+
+        <Tab
           :label="t('workload.container.titles.resources')"
           name="resources"
           :weight="tabWeightMap['resources']"
@@ -296,16 +307,6 @@ export default {
             :value="podTemplateSpec"
             :nodes="allNodes"
             :loading="isLoadingSecondaryResources"
-          />
-        </Tab>
-
-        <Tab
-          :label="t('datasetCard.title')"
-          name="dataset"
-        >
-          <Dataset
-            v-model:value="spec"
-            :mode="mode"
           />
         </Tab>
       </ResourceTabs>

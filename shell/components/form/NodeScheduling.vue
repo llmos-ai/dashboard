@@ -40,7 +40,7 @@ export default {
   },
 
   data() {
-    let { nodeName = '' } = this.value;
+    const { nodeName = '' } = this.value;
     const { affinity = {}, nodeSelector = {} } = this.value;
 
     const { nodeAffinity = {} } = affinity;
@@ -49,9 +49,6 @@ export default {
 
     if (this.value.nodeName) {
       selectNode = 'nodeSelector';
-    } else if (this.value?.nodeSelector?.[HOSTNAME]) {
-      selectNode = 'nodeSelector';
-      nodeName = nodeSelector[HOSTNAME];
     } else if (!isEmpty(nodeAffinity)) {
       selectNode = 'affinity';
     }
@@ -164,7 +161,7 @@ export default {
         name="selectNode"
         :options="selectNodeOptions"
         :mode="mode"
-        @input="update"
+        @update:value="update"
       />
     </div>
     <template v-if="selectNode === 'nodeSelector'">
@@ -177,7 +174,7 @@ export default {
             :mode="mode"
             :multiple="false"
             :loading="loading"
-            @input="update"
+            @update:value="update"
           />
         </div>
       </div>
@@ -186,7 +183,7 @@ export default {
       <NodeAffinity
         v-model:value="nodeAffinity"
         :mode="mode"
-        @input="update"
+        @update:value="update"
       />
     </template>
   </div>

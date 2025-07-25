@@ -11,6 +11,7 @@ import { randomStr } from '@shell/utils/string';
 import ArrayListGrouped from '@shell/components/form/ArrayListGrouped';
 
 export default {
+  emits:      ['update:value'],
   components: {
     ArrayListGrouped, MatchExpressions, LabeledSelect, LabeledInput
   },
@@ -91,6 +92,7 @@ export default {
 
   methods: {
     update() {
+      console.log('----11111 更新了');
       const out = {};
       const requiredDuringSchedulingIgnoredDuringExecution = { nodeSelectorTerms: [] };
       const preferredDuringSchedulingIgnoredDuringExecution = [] ;
@@ -138,7 +140,8 @@ export default {
         out.requiredDuringSchedulingIgnoredDuringExecution = requiredDuringSchedulingIgnoredDuringExecution;
       }
 
-      this.$emit('input', out);
+      // this.$emit('input', out);
+      this.$emit('update:value', out);
     },
 
     remove() {
@@ -216,7 +219,7 @@ export default {
               class="col span-3"
             >
               <LabeledInput
-                v-model.number="props.row.value.weight"
+                v-model:value.number="props.row.value.weight"
                 :mode="mode"
                 type="number"
                 min="1"
@@ -224,6 +227,7 @@ export default {
                 :label="t('workload.scheduling.affinity.weight.label')"
                 :placeholder="t('workload.scheduling.affinity.weight.placeholder')"
                 :data-testid="`node-affinity-weight-index${props.i}`"
+                @update:value="update"
               />
             </div>
           </div>
