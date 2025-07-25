@@ -51,7 +51,7 @@ export default {
 
     const generateBashScript = () => {
       const sourceParam = isFolder.value ? '--source-dir [sourceDir]' : '--source-file [sourceFile]';
-      const script = `python <(curl -sk https://raw.githubusercontent.com/llmos-ai/llmos-operator/4c7405593ec82c88d7041eba6056c0a7248b1e89/tools/upload_to_model.py) \\
+      const script = `python <(curl -sk https://raw.githubusercontent.com/llmos-ai/llmos-operator/refs/heads/main/tools/upload_to_model.py) \\
    ${ sourceParam } \\
    --namespace ${ namespace.value } \\
    --model-name ${ modelName.value } \\
@@ -83,14 +83,7 @@ export default {
 
         const res = await tokenResource.save();
 
-        // 获取完整的token信息
-        const tokenDetail = await store.dispatch(`${ inStore }/find`, {
-          type: MANAGEMENT.TOKEN,
-          id:   res.id,
-          opt:  { force: true }
-        }, { root: true });
-
-        bearerToken.value = tokenDetail.spec.token;
+        bearerToken.value = res.spec.token;
         generateBashScript();
       } catch (error) {
         errors.value = [error.message || 'Failed to create token'];
