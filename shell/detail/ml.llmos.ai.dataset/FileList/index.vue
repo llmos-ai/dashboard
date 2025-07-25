@@ -60,6 +60,18 @@ const datesetVersionOptions = computed(() => {
   });
 });
 
+const isPublished = computed(() => {
+  const phase = props.datasetVersion.status?.publishStatus?.phase;
+
+  return phase === 'SnapshotReady';
+});
+
+const isPublishing = computed(() => {
+  const publish = props.datasetVersion.spec?.publish;
+
+  return publish && !isPublished.value;
+});
+
 selectedVersion.value = (datesetVersionOptions.value[0] || {}).value;
 
 const onDownload = async() => {
@@ -95,8 +107,6 @@ const onPublish = async() => {
       true,
       true
     );
-
-    message.success('发布操作成功');
   } catch (error) {
     message.error('发布操作失败');
   } finally {
@@ -167,11 +177,11 @@ const close = () => {
       </div>
       <div class="pull-right">
         <a-button
-          :type="datasetVersion.spec?.publish ? 'default' : 'primary'"
-          :loading="publishing"
+          :type="isPublished ? 'default' : 'primary'"
+          :loading="isPublishing"
           @click="onPublish"
         >
-          {{ datasetVersion.spec?.publish ? '取消发布' : '发布' }}
+          {{ isPublished ? '取消发布' : '发布' }}
         </a-button>
         <a-space>
           <a-button
