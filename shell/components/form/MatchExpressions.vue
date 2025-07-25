@@ -8,6 +8,7 @@ import { convert, simplify } from '@shell/utils/selector';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 
 export default {
+  emits:      ['update:value', 'add', 'remove'],
   components: { Select, LabeledSelect },
   props:      {
     // Array of actual match expressions
@@ -203,6 +204,12 @@ export default {
       }
 
       this.rules.push(newRule);
+
+      this.$nextTick(() => {
+        this.focus(this.rules.length - 1);
+
+        this.$emit('add');
+      });
     },
 
     update() {
@@ -228,11 +235,14 @@ export default {
         }).filter((x) => !!x);
 
         if ( isArray(this.value) || this.matchingSelectorDisplay ) {
-          this.$emit('input', out);
+          this.$emit('update:value', out);
         } else {
-          this.$emit('input', simplify(out));
+          this.$emit('update:value', simplify(out));
         }
       });
+    },
+    focus(index = 0) {
+      this.$refs[`input-match-expression-key-${ index }`]?.[0]?.focus();
     }
   }
 };
@@ -344,14 +354,14 @@ export default {
         <div v-if="isView">
           {{ row.values }}
         </div>
-        <input
+        <a-input
           v-else
-          v-model="row.values"
+          v-model:value="row.values"
           :mode="mode"
           :disabled="row.operator==='Exists' || row.operator==='DoesNotExist'"
           :data-testid="`input-match-expression-values-control-${index}`"
           @update:value="update"
-        >
+        />
       </div>
       <div
         v-if="showRemoveButton"

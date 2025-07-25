@@ -35,8 +35,9 @@ import { FlatResources, NVIDIA, VolcanoScheduler } from '@shell/utils/container-
 import { PullPolicyOptions, SvcOptions } from '@shell/config/constants';
 
 const TAB_WEIGHT_MAP = {
-  general:        99,
-  resources:      98,
+  general:        199,
+  resources:      198,
+  dataset:        197,
   volumes:        97,
   labels:         96,
   nodeScheduling: 90,

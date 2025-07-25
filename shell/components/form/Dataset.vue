@@ -64,7 +64,8 @@ const onDatasetChange = (index, datasetName) => {
   updated[index] = {
     ...updated[index],
     datasetName,
-    version: '' // Reset version when dataset changes
+    version:   '', // Reset version when dataset changes
+    mountPath: `/home/jovyan/datasets/${ datasetName }` // Update mountPath with datasetName
   };
   datasetMountings.value = updated;
 };
