@@ -13,10 +13,9 @@ export const useFileList = ({ props = {}, emit }) => {
   const showModal = ref(false);
   const uploading = ref(false);
   const currentPath = ref('');
+  const currentResource = ref(props.resource);
   // const maxConcurrent = ref(1);
 
-  const prefixPath =
-    props.resource?.rootPath || props.resource?.status?.path;
   const csrf = store.$cookies.get(CSRF, { parseJSON: false });
 
   const generatePresignedURL = async({
@@ -26,7 +25,7 @@ export const useFileList = ({ props = {}, emit }) => {
   }) => {
     const objectName = targetDirectory ? `${ targetDirectory }/${ fileName }` : fileName;
 
-    return await props.resource.doAction('generatePresignedURL', {
+    return await currentResource.value.doAction('generatePresignedURL', {
       objectName,
       operation,
     });
@@ -133,7 +132,7 @@ export const useFileList = ({ props = {}, emit }) => {
         try {
           const csrf = store.$cookies.get(CSRF, { parseJSON: false });
 
-          const res = await fetch(props.resource.actions.upload, {
+          const res = await fetch(currentResource.value.actions.upload, {
             method:  'POST',
             headers: {
               Accept:       'text/event-stream',
@@ -199,7 +198,8 @@ export const useFileList = ({ props = {}, emit }) => {
     const { webkitRelativePath = '' } = file;
     const relativePath = webkitRelativePath.replace(file.name, '');
 
-    const destPath = currentPath.value ? `${ prefixPath }/${ currentPath.value }/${ file.name }` : `${ prefixPath }/${ file.name }`;
+    const currentPrefixPath = currentResource.value?.rootPath || currentResource.value?.status?.path;
+    const destPath = currentPath.value ? `${ currentPrefixPath }/${ currentPath.value }/${ file.name }` : `${ currentPrefixPath }/${ file.name }`;
 
     const fileInfo = {
       destPath,
@@ -268,6 +268,10 @@ export const useFileList = ({ props = {}, emit }) => {
     }
   };
 
+  const updateResource = (newResource) => {
+    currentResource.value = newResource;
+  };
+
   return {
     uploadFile,
     fileList,
@@ -276,5 +280,6 @@ export const useFileList = ({ props = {}, emit }) => {
     uploading,
     onUpload,
     generatePresignedURL,
+    updateResource,
   };
 };
