@@ -46,6 +46,7 @@ const {
   showModal,
   currentPath,
   onUpload,
+  updateResource,
 } = useFileList({
   props: { resource: props.datasetVersion },
   emit,
@@ -145,6 +146,11 @@ const onBack = () => {
 };
 
 const switchVersion = () => {
+  const targetVersion = props.datasetVersions.find((v) => v.spec.version === selectedVersion.value);
+
+  if (targetVersion && updateResource) {
+    updateResource(targetVersion);
+  }
   emit('fetchFiles', '', selectedVersion.value);
 };
 
