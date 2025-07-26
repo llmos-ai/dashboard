@@ -95,7 +95,7 @@ export default {
           view: () => {
             this.$store.dispatch('cluster/promptModal', {
               component:      'TextViewerModal',
-              modalWidth:     '1000px',
+              modalWidth:     '1200px',
               componentProps: { content: item.content }
             });
           },

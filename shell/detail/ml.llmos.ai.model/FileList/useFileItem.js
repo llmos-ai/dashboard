@@ -38,7 +38,7 @@ export const useFileItem = ({ props = {}, emit }) => {
 
       store.dispatch('cluster/promptModal', {
         component:      'TextViewerModal',
-        modalWidth:     '1000px',
+        modalWidth:     '1200px',
         componentProps: {
           contentFunc: async() => {
             const res = await props.resource.doAction('download', { targetFilePath: currentPath.value }, { responseType: 'blob' });

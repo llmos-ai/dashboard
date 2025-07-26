@@ -30,7 +30,7 @@ const props = defineProps({
 
   maxHeight: {
     type:    String,
-    default: '400px',
+    default: '700px',
   },
 
   beforeClose: {
@@ -147,7 +147,7 @@ const downloadFile = async() => {
   >
     <div class="text-viewer-content">
       <div
-        class="text-viewer-body"
+        class="text-viewer-body bg-[#151515]"
         :style="{ maxHeight: maxHeight }"
       >
         <pre
@@ -165,6 +165,7 @@ const downloadFile = async() => {
             lineNumbers: false,
             readOnly,
             lineWrapping: true,
+            theme: 'base16-dark',
           }"
           :mode="mode"
         />
