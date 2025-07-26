@@ -12,12 +12,13 @@ import LocalModelList from '@shell/edit/ml.llmos.ai.modelservice/LocalModelList'
 import { _CREATE } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import ArgumentVars from './components/ArgumentVars.vue';
+import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 
 export default {
   name:       'EditModelService',
   mixins:     [CreateEditView, FormValidation, LLMOSWorkload, LabeledSelect],
   components: {
-    RemoteModelList, ArgumentVars, LocalModelList
+    RemoteModelList, ArgumentVars, LocalModelList, QuestionCircleOutlined
   },
   props: {
     value: {
@@ -107,19 +108,29 @@ export default {
         name:      'HUGGING_FACE_HUB_TOKEN',
         valueFrom: { secretKeyRef: { name: '', key: '' } },
       },
-      hfEndpoint:    { name: 'HF_ENDPOINT', value: '' },
+      hfEndpoint:      { name: 'HF_ENDPOINT', value: '' },
       excludeEnvs,
-      events:        [],
-      sourceOptions: [
+      events:          [],
+      enableReasoning: false,
+      enableTools:     false,
+      sourceOptions:   [
         { label: 'HuggingFace', value: 'huggingface' },
         { label: 'ModelScope', value: 'modelscope' },
         { label: 'Local', value: 'local' },
+      ],
+      vllmTaskOptions: [
+        { label: '文本生成', value: 'generate' },
+        { label: '文本嵌入(Text Embedding)', value: 'embedding' },
+        { label: '重排序', value: 'score' },
       ],
     };
   },
 
   created() {
     this.registerBeforeHook(this.willSave, 'willSave');
+    
+    // 初始化复选框状态
+    this.initCheckboxState();
   },
 
   computed: {
@@ -143,6 +154,134 @@ export default {
         !!this.value.metadata.name &&
         !!this.spec.model
       );
+    },
+
+    // 获取和设置容器参数中的--task值
+    vllmTask: {
+      get() {
+        if (!Array.isArray(this.container.args)) {
+          // 初始化container.args并添加推荐的任务类型
+          this.container.args = [];
+          const suggestedTask = this.suggestedVllmTask;
+
+          if (suggestedTask) {
+            this.container.args.push(`--task=${ suggestedTask }`);
+          }
+
+          return suggestedTask;
+        }
+
+        // 检查是否有--task=xxx格式的参数
+        const taskEqualArgIndex = this.container.args.findIndex((arg) => arg.startsWith('--task='));
+
+        if (taskEqualArgIndex >= 0) {
+          const value = this.container.args[taskEqualArgIndex].split('=')[1];
+
+          // 如果值为auto，则根据模型特性自动设置任务类型
+          return value === 'auto' ? this.suggestedVllmTask : value;
+        }
+
+        // 检查是否有--task xxx格式的参数
+        const taskArgIndex = this.container.args.findIndex((arg) => arg === '--task');
+
+        if (taskArgIndex >= 0 && taskArgIndex < this.container.args.length - 1) {
+          const value = this.container.args[taskArgIndex + 1];
+
+          // 如果值为auto，则根据模型特性自动设置任务类型
+          return value === 'auto' ? this.suggestedVllmTask : value;
+        }
+
+        // 如果没有设置--task参数，则添加推荐的任务类型
+        const suggestedTask = this.suggestedVllmTask;
+
+        if (suggestedTask) {
+          this.container.args.push(`--task=${ suggestedTask }`);
+        }
+
+        return suggestedTask;
+      },
+      set(value) {
+        if (!Array.isArray(this.container.args)) {
+          this.container.args = [];
+        }
+
+        // 检查是否有--task=xxx格式的参数
+        const taskEqualArgIndex = this.container.args.findIndex((arg) => arg.startsWith('--task='));
+        // 检查是否有--task xxx格式的参数
+        const taskArgIndex = this.container.args.findIndex((arg) => arg === '--task');
+
+        // 移除所有现有的task参数
+        if (taskEqualArgIndex >= 0) {
+          this.container.args.splice(taskEqualArgIndex, 1);
+        }
+        if (taskArgIndex >= 0 && taskArgIndex < this.container.args.length - 1) {
+          this.container.args.splice(taskArgIndex, 2);
+        }
+
+        // 添加新的task参数
+        if (value) {
+          // 使用--task=value格式
+          this.container.args.push(`--task=${ value }`);
+        }
+      }
+    },
+
+    // 判断模型是否为embedding模型
+    isEmbeddingModel() {
+      const modelName = this.spec.model?.toLowerCase() || '';
+      const tags = this.spec.tags || [];
+
+      // 通用：名字中包含embedding
+      if (modelName.includes('embedding')) {
+        return true;
+      }
+
+      // 根据标签判断
+      if (tags.some((tag) => [
+        'text-embeddings-inference',
+        'sentence-similarity',
+        'sentence-transformers'
+      ].includes(tag))) {
+        return true;
+      }
+
+      return false;
+    },
+
+    // 判断模型是否为rerank模型
+    isRerankModel() {
+      const modelName = this.spec.model?.toLowerCase() || '';
+      const tags = this.spec.tags || [];
+
+      // 通用：名字中包含rerank或特定模型名
+      if (modelName.includes('rerank') || [
+        'jinaai/jina-reranker-m0',
+        'bge-reranker-v2-m3',
+        'gte-multilingual-reranker-base'
+      ].includes(modelName)) {
+        return true;
+      }
+
+      // 根据标签判断
+      if (tags.some((tag) => [
+        'text-ranking',
+        'text-classification'
+      ].includes(tag))) {
+        return true;
+      }
+
+      return false;
+    },
+
+    // 推荐的VLLM任务类型
+    suggestedVllmTask() {
+      if (this.isEmbeddingModel) {
+        return 'embedding';
+      } else if (this.isRerankModel) {
+        return 'score';
+      } else {
+        return 'generate';
+      }
     },
 
     // page show logic
@@ -233,11 +372,63 @@ export default {
       this.current--;
     },
 
+    // 初始化复选框状态
+    initCheckboxState() {
+      if (!Array.isArray(this.container.args)) {
+        return;
+      }
+
+      // 检查参数确定复选框状态
+      this.enableReasoning = this.container.args.includes('--enable-reasoning');
+      this.enableTools = this.container.args.includes('--enable-auto-tool-choice');
+    },
+
+    // 更新推理思考参数
+    updateReasoningArgs() {
+      if (!Array.isArray(this.container.args)) {
+        this.container.args = [];
+      }
+
+      // 移除推理相关参数
+      this.container.args = this.container.args.filter((arg) => arg !== '--enable-reasoning' &&
+        !arg.startsWith('--reasoning-parser='));
+
+      // 如果启用推理思考，添加相应参数
+      if (this.enableReasoning) {
+        this.container.args.push('--enable-reasoning');
+        this.container.args.push('--reasoning-parser=deepseek_r1');
+      }
+    },
+
+    // 更新工具调用参数
+    updateToolsArgs() {
+      if (!Array.isArray(this.container.args)) {
+        this.container.args = [];
+      }
+
+      // 移除工具调用相关参数
+      this.container.args = this.container.args.filter((arg) => arg !== '--enable-auto-tool-choice' &&
+        !arg.startsWith('--tool-call-parser='));
+
+      // 如果启用工具调用，添加相应参数
+      if (this.enableTools) {
+        this.container.args.push('--enable-auto-tool-choice');
+        this.container.args.push('--tool-call-parser=hermes');
+      }
+    },
+
     updateModelInfo(item) {
       this.spec.tags = item.tags || [];
       this.spec.pipelineTag = item.pipelineTag || '';
       this.spec.libraryName = item.libraryName || '';
       this.spec.model = item.id;
+
+      // 根据模型信息自动设置VLLM任务类型
+      this.$nextTick(() => {
+        if (this.vllmTask === 'auto') {
+          this.vllmTask = this.suggestedVllmTask;
+        }
+      });
     },
 
     async updateLocalModelInfo(localModelVersion = {}) {
@@ -312,6 +503,26 @@ export default {
       }
 
       this.$router.replace({ query });
+
+      // 当模型变化时，根据模型特性自动更新VLLM任务类型
+      this.$nextTick(() => {
+        // 始终根据模型特性自动设置任务类型
+        // 这将确保container.args中包含正确的--task参数
+        this.vllmTask = this.suggestedVllmTask;
+      });
+    },
+
+    // 监听container.args的变化，更新复选框状态
+    'container.args': {
+      handler() {
+        // 只有当container.args存在时才更新
+        if (Array.isArray(this.container.args)) {
+          // 更新复选框状态
+          this.enableReasoning = this.container.args.includes('--enable-reasoning');
+          this.enableTools = this.container.args.includes('--enable-auto-tool-choice');
+        }
+      },
+      deep: true
     }
   },
 };
@@ -361,6 +572,29 @@ export default {
             :gutter="[16]"
             class="mb-[16px]"
           >
+            <a-col :span="24">
+              <div class="mb-[8px]">
+                <label>Model Task</label>
+              </div>
+              <a-radio-group
+                v-model:value="vllmTask"
+                :disabled="mode === 'view'"
+              >
+                <a-radio
+                  v-for="option in vllmTaskOptions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </a-radio>
+              </a-radio-group>
+            </a-col>
+          </a-row>
+
+          <a-row
+            :gutter="[16]"
+            class="mb-[16px]"
+          >
             <a-col :span="12">
               <LabeledSelect
                 v-model:value="spec.modelRegistry"
@@ -398,6 +632,30 @@ export default {
                 :label="t('modelService.modelName')"
                 :tooltip="t('modelService.modelNamePlaceholder')"
               />
+            </a-col>
+          </a-row>
+
+          <a-row
+            :gutter="[16]"
+            class="mb-[16px]"
+          >
+            <a-col :span="24">
+              <a-space direction="vertical">
+                <a-checkbox
+                  v-model:checked="enableReasoning"
+                  :disabled="isView"
+                  @change="updateReasoningArgs"
+                >
+                  <span class="mr-2">启用推理思考</span>
+                </a-checkbox>
+                <a-checkbox
+                  v-model:checked="enableTools"
+                  :disabled="isView"
+                  @change="updateToolsArgs"
+                >
+                  <span class="mr-2">启用工具调用</span>
+                </a-checkbox>
+              </a-space>
             </a-col>
           </a-row>
 
