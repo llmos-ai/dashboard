@@ -12,7 +12,6 @@
         <a-auto-complete
           v-model:value="model[idx]"
           class="w-full "
-          size="large"
           :placeholder="t('generic.placeholder', { text: '--dtype=half' }, true)"
           :label="t('workload.container.command.args')"
           :options="vllmOptions(idx)"

@@ -23,7 +23,7 @@ const isChatType = computed(() => store.getters['chat/isChatType']);
 
 const updateActiveConfig = (config) => {
   store.commit('chat/UPDATE_CHAT_CONFIG', {
-    ...config,
+    config,
     uuid: activeUUID.value
   });
 };

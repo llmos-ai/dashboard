@@ -40,6 +40,7 @@ const actions = [
 ];
 const config = ref({});
 
+// 监听 UUID 变化，更新配置
 watch(() => props.uuid, () => {
   config.value = store.state.chat.chatsConfig[props.uuid];
 }, { immediate: true });

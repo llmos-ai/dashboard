@@ -1,7 +1,7 @@
 <script setup>
 import { useStore } from 'vuex';
 import {
-  ref, computed, useTemplateRef, watch, toValue
+  ref, computed, useTemplateRef, watch, toValue, onBeforeUnmount
 } from 'vue';
 
 import { ML_WORKLOAD_TYPES } from '@shell/config/types';
@@ -118,6 +118,23 @@ const updateModel = (resource) => {
   url.value = resource.modelApi;
   model.value = resource;
 };
+
+// 在页面加载时清空model值和历史聊天记录
+onBeforeUnmount(() => {
+  // 清空所有配置中的model值
+  Object.keys(chatsConfig.value).forEach((uuid) => {
+    const config = { ...chatsConfig.value[uuid] };
+
+    config.model = '';
+    store.commit('chat/UPDATE_CHAT_CONFIG', { config, key: uuid });
+
+    // 清空所有聊天记录
+    store.commit('chat/CLEAR_CHAT_MESSAGES', uuid);
+  });
+
+  // 更新 activeConfig，确保它获取到最新的空数据
+  activeConfig.value = chatsConfig.value[activeUUID.value];
+});
 
 const icon = ref('');
 const modelDisplayName = ref('');
@@ -294,8 +311,8 @@ export default { setup() {} };
           v-if="isChatType"
           :md="22"
           :lg="22"
-          :xl="18"
-          :xxl="12"
+          :xl="22"
+          :xxl="18"
           class="h-full"
         >
           <div class="overflow-y-scroll hide-scrollbar h-full">
