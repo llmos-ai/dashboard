@@ -26,7 +26,7 @@ const props = defineProps({
 
   showHeader: {
     type:    Boolean,
-    default: false,
+    default: true,
   },
 
   mode: {
@@ -226,67 +226,67 @@ const close = () => {
       </div>
     </div>
   </div>
-  <div
-    v-if="showHeader"
-    class="file-item"
-  >
-    <a-row class="file-info pl-45">
-      <a-col
-        class="file-name"
-        :span="12"
-      >
-        <span>
-          文件名称
-        </span>
-      </a-col>
-      <a-col
-        class="file-size"
-        :span="4"
-      >
-        文件大小
-      </a-col>
-      <a-col
-        class="file-date"
-        :span="isView ? 8 : 4"
-      >
-        上传时间
-      </a-col>
-      <a-col
-        v-if="!isView"
-        :span="4"
-        class="file-action"
-      >
-        <span
-          class="hand text-error"
-          @click="removeFile(file)"
-        >
-          {{ t('fileItem.remove') }}
-        </span>
-      </a-col>
-    </a-row>
-  </div>
-  <div class="file-list mt-10">
+  <div class="mt-10">
     <div
-      v-if="files.length === 0"
-      class="file-empty"
+      class="border border-gray-300 rounded-lg overflow-hidden"
+      style="min-height: 50vh; max-height: 58vh; overflow-y: auto;"
     >
-      <a-empty
-        :imageStyle="{
-          'min-height': '50vh',
-        }"
-        :description="null"
-      />
-    </div>
-    <div v-else>
-      <FileItem
-        v-for="file in files"
-        :key="file.Name"
-        :file="file"
-        :resource="resource"
-        :mode="mode"
-        @fetchFiles="fetchFiles"
-        @checked="onChecked"
-      />
+      <table class="table-auto w-full border-collapse">
+        <thead
+          v-if="showHeader"
+          class="bg-gray-50 sticky top-0 z-10"
+        >
+          <tr>
+            <th
+              v-if="isView"
+              class="border-b border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 w-12"
+            >
+              选择
+            </th>
+            <th class="border-b border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900">
+              文件名称
+            </th>
+            <th class="border-b border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 w-32">
+              文件大小
+            </th>
+            <th class="border-b border-gray-300 px-4 py-3 text-right text-sm font-semibold text-gray-900 w-40">
+              上传时间
+            </th>
+            <th
+              v-if="!isView"
+              class="border-b border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-900 w-20"
+            >
+              操作
+            </th>
+          </tr>
+        </thead>
+
+        <div
+          v-if="files.length === 0"
+          class="file-empty"
+        >
+          <a-empty
+            :imageStyle="{
+              'min-height': '50vh',
+            }"
+            :description="null"
+          />
+        </div>
+        <tbody
+          v-else
+          class="bg-white"
+        >
+          <FileItem
+            v-for="file in files"
+            :key="file.Name"
+            :file="file"
+            :resource="resource"
+            :mode="mode"
+            @fetchFiles="fetchFiles"
+            @checked="onChecked"
+          />
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -314,39 +314,14 @@ const close = () => {
 </template>
 
 <style lang="scss" scoped>
-.file-list {
-  border: 1px solid var(--border);
-  border-radius: var(--border-radius);
-  min-height: 50vh;
-  max-height: 58vh;
-  overflow-y: auto;
-}
-
 .btn-text {
   color: #fff;
 }
 
-.file-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.file-meta {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-
-  .file-size {
-    margin-right: 16px;
-  }
-}
-
-.file-date {
-  text-align: end;
-}
-
-.file-size {
-  text-align: left;
+.file-empty {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>

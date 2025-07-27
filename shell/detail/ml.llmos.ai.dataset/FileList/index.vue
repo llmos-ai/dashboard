@@ -253,26 +253,54 @@ const close = () => {
       </div>
     </div>
   </div>
-  <div class="file-list mt-10">
+  <div class="mt-10">
     <div
-      v-if="files.length === 0"
-      class="file-empty"
+      class="border border-gray-300 rounded-lg overflow-hidden"
+      style="min-height: 50vh; max-height: 58vh; overflow-y: auto;"
     >
-      <a-empty
-        :imageStyle="{
-          'min-height': '50vh',
-        }"
-        :description="null"
-      />
+      <table class="table-auto w-full border-collapse">
+        <thead class="bg-gray-50 sticky top-0 z-10">
+          <tr>
+            <th class="border-b border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900">
+              文件名称
+            </th>
+            <th class="border-b border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-900 w-32">
+              文件大小
+            </th>
+            <th class="border-b border-gray-300 px-4 py-3 text-right text-sm font-semibold text-gray-900 w-40">
+              上传时间
+            </th>
+            <th class="border-b border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-900 w-20">
+              操作
+            </th>
+          </tr>
+        </thead>
+
+        <div
+          v-if="files.length === 0"
+          class="empty-image"
+        >
+          <a-empty
+            :imageStyle="{
+              'min-height': '50vh',
+            }"
+            :description="null"
+          />
+        </div>
+        <tbody
+          v-else
+          class="bg-white"
+        >
+          <FileItem
+            v-for="file in files"
+            :key="file.Name"
+            :file="file"
+            :resource="datasetVersion"
+            @fetchFiles="fetchFiles"
+          />
+        </tbody>
+      </table>
     </div>
-    <FileItem
-      v-for="file in files"
-      v-else
-      :key="file.Name"
-      :file="file"
-      :resource="datasetVersion"
-      @fetchFiles="fetchFiles"
-    />
   </div>
 
   <a-modal
@@ -299,13 +327,14 @@ const close = () => {
 </template>
 
 <style lang="scss" scoped>
-.file-list {
-  border: 1px solid var(--border);
-  border-radius: var(--border-radius);
-  min-height: 50vh;
-}
-
 .btn-text {
   color: #fff;
+}
+
+.empty-image {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
