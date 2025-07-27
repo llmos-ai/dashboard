@@ -321,7 +321,7 @@ export default {
             <LabeledInput
               v-model:value="resource.spec.datasetCard.description"
               :mode="mode"
-              :label="t('datasetCard.description.label')"
+              :label="t('datasetCard.datasetDescription.label')"
               :placeholder="t('nameNsDescription.description.placeholder')"
               type="multiline"
             >
