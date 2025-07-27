@@ -78,99 +78,49 @@ const removeFile = async(file) => {
 </script>
 
 <template>
-  <div class="file-item">
-    <div class="file-icon">
-      <FileTextTwoTone v-if="isFile" />
-      <FolderTwoTone v-else />
-    </div>
-
-    <a-row class="file-info">
-      <a-col
-        class="file-name"
-        :span="12"
-      >
+  <tr class="hover:bg-gray-50 transition-colors duration-200 border-b border-gray-200">
+    <td class="px-4 py-3">
+      <div class="flex items-center space-x-3">
+        <div class="file-icon">
+          <FileTextTwoTone
+            v-if="isFile"
+            class="text-lg"
+          />
+          <FolderTwoTone
+            v-else
+            class="text-lg"
+          />
+        </div>
         <span
-          class="hand"
+          class="text-(--link) cursor-pointer font-medium truncate"
           @click="onRowClick"
         >
           {{ file.Name }}
         </span>
-      </a-col>
-      <a-col
-        class="file-size"
-        :span="4"
+      </div>
+    </td>
+    <td class="px-4 py-3 text-sm text-gray-600">
+      {{ fileSize }}
+    </td>
+    <td class="px-4 py-3 text-sm text-gray-600 text-right">
+      {{ lastModified }}
+    </td>
+    <td class="px-4 py-3 text-center">
+      <span
+        class="text-red-600 hover:text-red-800 cursor-pointer text-sm font-medium"
+        @click="removeFile(file)"
       >
-        {{ fileSize }}
-      </a-col>
-      <a-col
-        class="file-date"
-        :span="4"
-      >
-        {{ lastModified }}
-      </a-col>
-      <a-col
-        :span="4"
-        class="file-action"
-      >
-        <span
-          class="hand text-error"
-          @click="removeFile(file)"
-        >
-          {{ t('fileItem.remove') }}
-        </span>
-      </a-col>
-    </a-row>
-  </div>
+        {{ t('fileItem.remove') }}
+      </span>
+    </td>
+  </tr>
 </template>
 
 <style lang="scss" scoped>
-.file-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-
-  &:hover {
-    background-color: var(--hover-bg);
-  }
-}
-
+/* 保留必要的图标样式 */
 .file-icon {
-  margin-right: 8px;
-
   .anticon {
     font-size: 20px;
   }
-}
-
-.file-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.file-name {
-  font-weight: 500;
-  color: var(--link);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.file-meta {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-
-  .file-size {
-    margin-right: 16px;
-  }
-}
-
-.file-date {
-  text-align: end;
-}
-
-.file-action {
-  text-align: end;
 }
 </style>
