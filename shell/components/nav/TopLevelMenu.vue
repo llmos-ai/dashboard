@@ -17,6 +17,7 @@ import { NAME as EXPLORER } from '@shell/config/product/explorer';
 import {
   HomeOutlined, SettingOutlined, UsergroupAddOutlined, ControlOutlined, AppstoreOutlined
 } from '@ant-design/icons-vue';
+import { Tag } from 'ant-design-vue';
 
 export default {
   data() {
@@ -91,8 +92,14 @@ export default {
         {
           key:   'llmos-apps',
           icon:  () => h(AppstoreOutlined),
-          label: this.t('product.apps'),
-          to:    {
+          label: h('span', [
+            h('span', this.t('product.apps')),
+            h(Tag, {
+              color: 'warning',
+              class: 'ml-5',
+            }, () => this.t('generic.alpha'))
+          ]),
+          to: {
             name:   'c-cluster-apps-manage',
             params: { cluster: 'local' }
           },

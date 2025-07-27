@@ -180,8 +180,7 @@ export default class ManagedAddon extends SteveModel {
 
   get isAlpha() {
     return (
-      this.metadata.labels['llmos.ai/alpha'] === 'true' ||
-      this.metadata.name === 'llmos-agents'
+      this.metadata.labels['llmos.ai/alpha'] === 'true'
     );
   }
 }
