@@ -130,7 +130,7 @@ export const mutations = {
     }
   },
 
-  UPDATE_CHAT_CONFIG(state, config, key = 'single') {
+  UPDATE_CHAT_CONFIG(state, { config, key = 'single' }) {
     state.chatsConfig[key] = config;
   },
 

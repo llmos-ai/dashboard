@@ -92,7 +92,6 @@ export default {
 
   methods: {
     update() {
-      console.log('----11111 更新了');
       const out = {};
       const requiredDuringSchedulingIgnoredDuringExecution = { nodeSelectorTerms: [] };
       const preferredDuringSchedulingIgnoredDuringExecution = [] ;

@@ -128,7 +128,7 @@ export default {
 
   created() {
     this.registerBeforeHook(this.willSave, 'willSave');
-    
+
     // 初始化复选框状态
     this.initCheckboxState();
   },
@@ -254,11 +254,7 @@ export default {
       const tags = this.spec.tags || [];
 
       // 通用：名字中包含rerank或特定模型名
-      if (modelName.includes('rerank') || [
-        'jinaai/jina-reranker-m0',
-        'bge-reranker-v2-m3',
-        'gte-multilingual-reranker-base'
-      ].includes(modelName)) {
+      if (modelName.includes('rerank')) {
         return true;
       }
 

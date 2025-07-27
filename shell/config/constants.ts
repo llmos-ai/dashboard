@@ -45,5 +45,9 @@ export const SYSTEM_PROMPT_TEMPLATE = [
   "time": <新闻时间，格式为 YYYY-mm-dd HH:MM:SS，没有请填 null>,
   "summary": <新闻内容总结>
 }`
+  }, {
+    role:    'system',
+    label:   '自定义提示词',
+    content: ''
   }
 ];
