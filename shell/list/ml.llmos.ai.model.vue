@@ -1,8 +1,6 @@
 <script>
 import Loading from '@shell/components/Loading';
-import BadgeStateFormatter from '@shell/components/formatter/BadgeStateFormatter';
-import LiveDate from '@shell/components/formatter/LiveDate.vue';
-import ActionMenu from '@shell/components/ActionMenuShell.vue';
+import ModelGrid from '@shell/components/llmos/ModelGrid.vue';
 
 import ResourceFetch from '@shell/mixins/resource-fetch';
 
@@ -14,9 +12,7 @@ export default {
 
   components: {
     Loading,
-    BadgeStateFormatter,
-    LiveDate,
-    ActionMenu,
+    ModelGrid,
   },
 
   mixins: [
@@ -53,16 +49,6 @@ export default {
   },
 
   computed: {
-    splitDataSource() {
-      const rows = this.filteredRows || [];
-
-      if (rows.length > (this.currentPageNumber - 1) * this.pageSize) {
-        return rows.slice((this.currentPageNumber - 1) * this.pageSize, this.currentPageNumber * this.pageSize);
-      } else {
-        return rows;
-      }
-    },
-
     filteredRows() {
       const rows = this.filterTagRows || [];
 
@@ -177,6 +163,18 @@ export default {
     onDeleteModel(row) {
       row.promptRemove();
     },
+
+    onShowModelDetail(row) {
+      this.$router.push(row.detailLocation);
+    },
+
+    onGenerateUploadCommand(row) {
+      row.generateUploadScript();
+    },
+
+    onCreateLocalModel(row) {
+      row.cache();
+    },
   },
 };
 </script>
@@ -199,74 +197,51 @@ export default {
       </a-flex>
     </div>
 
-    <div class="grid">
-      <template v-if="splitDataSource.length === 0">
-        <a-empty />
-      </template>
-      <template v-else>
-        <div
-          v-for="(row, i) in splitDataSource"
-          :key="i"
-          class="item"
-          :data-testid="`cluster-tools-app-${row.id}`"
-        >
-          <div class="logo">
-            <img
-              class="size-[20px] mr-2"
-              :src="row.iconUrl"
-            >
-          </div>
-          <div class="name-version">
-            <div class="d-flex">
-              <router-link :to="row.detailLocation">
-                <h3 class="name">
-                  {{ row.id }}
-                </h3>
-              </router-link>
-              <div class="state">
-                <BadgeStateFormatter :row="row" />
-              </div>
-            </div>
-            <div class="text-muted">
-              <LiveDate
-                :value="row.creationTimestamp"
-                :add-suffix="true"
-                :show-tooltip="false"
-              />
-            </div>
-          </div>
-          <div class="action">
-            <ActionMenu
-              :resource="row"
-            />
-          </div>
-          <div class="description mt-10">
-            {{ row.spec.modelCard?.description }}
-          </div>
+    <ModelGrid
+      v-model:current-page="currentPageNumber"
+      :items="filteredRows"
+      :page-size="pageSize"
+      :total="filteredRows.length"
+      test-id-prefix="cluster-tools-app"
+      description-field="spec.modelCard.description"
+      :show-actions="true"
+    >
+      <template #actions="{ row }">
+        <div class="action-item">
+          <a-button
+            type="link"
+            class="action-btn"
+            @click="onShowModelDetail(row)"
+          >
+            查看模型
+          </a-button>
+        </div>
+        <div class="action-item">
+          <a-button
+            type="link"
+            class="action-btn"
+            @click="onGenerateUploadCommand(row)"
+          >
+            生成上传指令
+          </a-button>
+        </div>
+        <div class="action-item">
+          <a-button
+            type="link"
+            class="action-btn"
+            @click="onCreateLocalModel(row)"
+          >
+            创建本地模型
+          </a-button>
         </div>
       </template>
-    </div>
+    </ModelGrid>
   </div>
-
-  <a-pagination
-    v-model:current="currentPageNumber"
-    :defaultPageSize="pageSize"
-    :total="splitDataSource.length"
-    show-less-items
-    hideOnSinglePage
-  />
 </template>
 
 <style lang="scss" scoped>
-$margin: 10px;
-$logo: 50px;
-
 .model-list {
   min-height: 80vh;
-}
-
-.ant-pagination {
-  text-align: end;
 }
 
 .ant-radio-group {
@@ -282,136 +257,6 @@ $logo: 50px;
   min-width: 60px;
   font-size: 14px;
   color: var(--input-label);
-}
-
-.grid {
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  margin: 0 -1 * $margin;
-
-  :deep(.ant-empty) {
-    margin: auto;  // 让空状态组件居中显示
-  }
-
-  @media only screen and (min-width: map-get($breakpoints, '--viewport-4')) {
-    .item {
-      width: 100%;
-    }
-  }
-  @media only screen and (min-width: map-get($breakpoints, '--viewport-7')) {
-    .item {
-      width: 100%;
-    }
-  }
-  @media only screen and (min-width: map-get($breakpoints, '--viewport-9')) {
-    .item {
-      width: calc(50% - 2 * #{$margin});
-    }
-  }
-  @media only screen and (min-width: map-get($breakpoints, '--viewport-12')) {
-    .item {
-      width: calc(33.33333% - 2 * #{$margin});
-    }
-  }
-
-  .item {
-    display: grid;
-    grid-template-areas:
-      'logo name-version action'
-      'description description description';
-    grid-template-columns: $logo auto min-content;
-    grid-template-rows: 50px 115px;
-    row-gap: 5px;
-    column-gap: $margin;
-
-    margin: $margin;
-    padding: $margin;
-    position: relative;
-    border: 1px solid var(--border);
-    border-radius: calc(1.5 * var(--border-radius));
-
-    .logo {
-      grid-area: logo;
-      text-align: center;
-      width: $logo;
-      height: $logo;
-      border-radius: calc(2 * var(--border-radius));
-      overflow: hidden;
-      background-color: white;
-
-      img {
-        width: $logo - 4px;
-        height: $logo - 4px;
-        object-fit: contain;
-        position: relative;
-        top: 2px;
-      }
-
-      > i {
-        background-color: var(--box-bg);
-        border-radius: 50%;
-        font-size: 32px;
-        line-height: 50px;
-        width: 50px;
-      }
-    }
-
-    .name-version {
-      grid-area: name-version;
-      padding: 5px 0 0 0;
-
-      .d-flex {
-        display: flex;
-        align-items: center;
-      }
-    }
-
-    .name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin: 0;
-      padding: 0 10px 0 0;  // Increased right padding
-    }
-
-    .state {
-      display: flex;
-      align-items: center;
-    }
-
-    .description {
-      padding-left: 10px;
-      padding-right: 10px;
-      grid-area: description;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 5;  // Reduced from 4 to 3 lines
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: var(--text-muted);  // Changed to use design system color
-      line-height: 1.5;  // Added line height for better readability
-    }
-
-    .description-content {
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
-      line-clamp: 3;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: var(--text-muted);
-    }
-
-    .action {
-      grid-area: action;
-      white-space: nowrap;
-
-      button {
-        height: 30px;
-      }
-    }
-  }
 }
 
 .fixed-header-actions {
@@ -476,5 +321,35 @@ $logo: 50px;
   font-size: 14px;
   color: var(--input-label);
   line-height: 32px;
+}
+
+.action-item {
+  flex: 1;
+  position: relative;
+  text-align: center;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 1px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, 0.55);
+    transform: translateY(-50%);
+  }
+
+  .action-btn {
+    width: 100%;
+    height: 40px;
+    font-size: 12px;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
 }
 </style>
