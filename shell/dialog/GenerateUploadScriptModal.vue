@@ -1,12 +1,13 @@
 <script>
 import { computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { message, Switch } from 'ant-design-vue';
+import { message, Switch, Alert } from 'ant-design-vue';
 
 import Banner from '@shell/components/Banner/Banner.vue';
 import { MANAGEMENT } from '@shell/config/types';
 import { useI18n } from '@shell/composables/useI18n';
 import CopyToClipboard from '@shell/components/CopyToClipboard';
+import CodeMirror from '@shell/components/CodeMirror';
 
 export default {
   name: 'GenerateUploadScriptModal',
@@ -14,7 +15,9 @@ export default {
   components: {
     Banner,
     CopyToClipboard,
-    'a-switch': Switch
+    CodeMirror,
+    'a-switch': Switch,
+    'a-alert':  Alert
   },
 
   props: {
@@ -104,6 +107,10 @@ export default {
       emit('close');
     };
 
+    const navigateToAccount = () => {
+      close();
+    };
+
     onMounted(() => {
       createToken();
     });
@@ -120,6 +127,7 @@ export default {
       bashScriptDisplay,
       isFolder,
       generateBashScript,
+      navigateToAccount,
     };
   }
 };
@@ -179,8 +187,36 @@ export default {
               class="copy-button"
             />
           </div>
-          <pre class="script-content">{{ bashScriptDisplay }}</pre>
+          <CodeMirror
+            :value="bashScriptDisplay"
+            :options="{
+              mode: 'shell',
+              theme: 'base16-dark',
+              readOnly: true,
+              lineNumbers: true,
+            }"
+            mode="view"
+            class="bg-[#151515] mb-0"
+          />
         </div>
+
+        <a-alert
+          type="info"
+          show-icon
+          class="mt-10"
+        >
+          <template #message>
+            {{ t('generateUploadScript.apiKeyWarning') }}
+            <router-link
+              :to="{name: 'account',}"
+              class="font-medium underline hover:text-blue-600"
+              @click="navigateToAccount"
+            >
+              {{ t('generateUploadScript.here') }}
+            </router-link>
+            {{ t('generateUploadScript.apiKeyWarningEnd') }}
+          </template>
+        </a-alert>
       </div>
     </div>
 
