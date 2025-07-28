@@ -2,6 +2,7 @@
 import { ML_LIST_WORKLOAD_TYPES, NODE, POD, SERVICE } from '@shell/config/types';
 import ResourceTable from '@shell/components/ResourceTable.vue';
 import ResourceFetch from '@shell/mixins/resource-fetch';
+import Tag from '@shell/components/Tag.vue';
 
 const $loadingResources = ($route, $store) => {
   const allowedResources = [];
@@ -18,7 +19,7 @@ const $loadingResources = ($route, $store) => {
 
 export default {
   name:       'LLMOSWorkloadList',
-  components: { ResourceTable },
+  components: { ResourceTable, Tag },
   mixins:     [ResourceFetch],
 
   props: {
@@ -110,6 +111,15 @@ export default {
     :use-query-params-for-simple-filtering="useQueryParamsForSimpleFiltering"
     :force-update-live-and-delayed="forceUpdateLiveAndDelayed"
   >
+    <template #cell:name="{row}">
+      <span class="flex items-center">
+        <span>{{ row.nameDisplay }}</span>
+        <Tag
+          v-if="row.modelTaskType"
+          class="ml-2 bg-info-subtle text-info inline-block whitespace-nowrap"
+        >{{ row.modelTaskLabel }}</Tag>
+      </span>
+    </template>
     <template #col:access="{row}">
       <td>
         <router-link
