@@ -182,14 +182,14 @@ const close = () => {
         {{ '/' + currentPath }}
       </div>
       <div class="pull-right">
-        <a-button
-          :type="isPublished ? 'default' : 'primary'"
-          :loading="isPublishing"
-          @click="onPublish"
-        >
-          {{ isPublished ? '取消发布' : '发布' }}
-        </a-button>
         <a-space>
+          <a-button
+            :type="isPublished ? 'default' : 'primary'"
+            :loading="isPublishing"
+            @click="onPublish"
+          >
+            {{ isPublished ? '取消发布' : '发布' }}
+          </a-button>
           <a-button
             type="primary"
             @click="onCreateFolder"
