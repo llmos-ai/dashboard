@@ -121,7 +121,7 @@ export default {
       vllmTaskOptions: [
         { label: '文本生成', value: 'generate' },
         { label: '文本嵌入(Text Embedding)', value: 'embedding' },
-        { label: '重排序', value: 'score' },
+        { label: '重排序(Rerank)', value: 'score' },
       ],
     };
   },
@@ -300,6 +300,12 @@ export default {
   methods: {
     willSave() {
       this.errors = [];
+
+      // 同步 vllmTask 到 metadata.labels，符合 k8s label 规范
+      if (!this.value.metadata.labels) {
+        this.value.metadata.labels = {};
+      }
+      this.value.metadata.labels['ai.llmos/model-task'] = this.vllmTask || '';
 
       if (Array.isArray(this.container.args)) {
         this.container.args = this.container.args.filter((arg) => !!arg && arg.trim() !== '');
