@@ -113,7 +113,9 @@ export default {
   >
     <template #cell:name="{row}">
       <span class="flex items-center">
-        <span>{{ row.nameDisplay }}</span>
+        <router-link :to="row.detailLocation">
+          <span>{{ row.nameDisplay }}</span>
+        </router-link>
         <Tag
           v-if="row.modelTaskType"
           class="ml-2 bg-info-subtle text-info inline-block whitespace-nowrap"
