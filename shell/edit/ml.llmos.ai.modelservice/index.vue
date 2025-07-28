@@ -12,13 +12,12 @@ import LocalModelList from '@shell/edit/ml.llmos.ai.modelservice/LocalModelList'
 import { _CREATE } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import ArgumentVars from './components/ArgumentVars.vue';
-import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 
 export default {
   name:       'EditModelService',
   mixins:     [CreateEditView, FormValidation, LLMOSWorkload, LabeledSelect],
   components: {
-    RemoteModelList, ArgumentVars, LocalModelList, QuestionCircleOutlined
+    RemoteModelList, ArgumentVars, LocalModelList
   },
   props: {
     value: {

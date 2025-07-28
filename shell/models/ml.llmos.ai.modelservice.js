@@ -127,17 +127,17 @@ export default class ModelService extends MlWorkload {
 
   get modelTaskLabel() {
     const taskValue = this.metadata?.labels?.['ai.llmos/model-task'] || '';
-    
+
     // 根据任务类型返回对应的中文标签
     switch (taskValue) {
-      case 'generate':
-        return '文本生成';
-      case 'embedding':
-        return '文本嵌入';
-      case 'score':
-        return '重排序';
-      default:
-        return '';
+    case 'generate':
+      return '文本生成';
+    case 'embedding':
+      return '文本嵌入';
+    case 'score':
+      return '重排序';
+    default:
+      return '';
     }
   }
 

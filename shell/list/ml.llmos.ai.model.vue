@@ -335,7 +335,7 @@ export default {
     right: 0;
     width: 1px;
     height: 24px;
-    background-color: rgba(0, 0, 0, 0.55);
+    background-color: #f0f0f0;
     transform: translateY(-50%);
   }
 
