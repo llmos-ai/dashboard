@@ -255,7 +255,7 @@ product:
   uiplugins: Extensions
   elemental: OS Management
   plugins: Plugins
-  llmos: LLMOS Management
+  llmos: AI Infrastructure Management
   globalSettings: Global Settings
 
 suffix:
