@@ -51,6 +51,7 @@ export default {
       :auto-size="{ minRows: 2, maxRows: 6 }"
       :label="t('chat.label.systemPrompt')"
       type="multiline"
+      :resizable="true"
       @update:value="update"
     />
   </div>
