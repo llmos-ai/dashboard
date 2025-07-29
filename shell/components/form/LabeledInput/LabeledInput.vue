@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, inject } from 'vue';
+import { defineComponent, inject, PropType } from 'vue';
 import TextAreaAutoGrow from '@shell/components/form/TextArea/TextAreaAutoGrow.vue';
 import LabeledTooltip from '@shell/components/LabeledTooltip/LabeledTooltip.vue';
 import { escapeHtml, generateRandomAlphaString } from '@shell/utils/string';
@@ -105,6 +105,14 @@ export default defineComponent({
     class: {
       type:    String,
       default: ''
+    },
+
+    /**
+     * Allows the Text Area to be manually resized by the user when type is multiline.
+     */
+    resizable: {
+      type:    Boolean as PropType<boolean>,
+      default: false
     },
 
     /**
@@ -378,6 +386,7 @@ export default defineComponent({
         :disabled="isDisabled"
         :value="value || ''"
         :placeholder="_placeholder"
+        :resizable="resizable"
         autocapitalize="off"
         :class="{ conceal: type === 'multiline-password' }"
         @update:value="onInput"

@@ -77,6 +77,14 @@ export default defineComponent({
     disabled: {
       type:    Boolean,
       default: false
+    },
+
+    /**
+     * Allows the Text Area to be manually resized by the user.
+     */
+    resizable: {
+      type:    Boolean,
+      default: false
     }
   },
 
@@ -187,8 +195,7 @@ export default defineComponent({
     :disabled="isDisabled"
     :style="style"
     :placeholder="placeholder"
-    :class="className"
-    class="no-resize no-ease"
+    :class="[className, {'no-resize': !resizable, 'no-ease': true}]"
     v-bind="$attrs"
     :spellcheck="spellcheck"
     @paste="$emit('paste', $event)"

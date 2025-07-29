@@ -34,6 +34,7 @@ export default {
       searchActive:           false,
       viewContainerDashboard: false,
       selectedKeys:           [],
+      showAppsMenu:           true, // 默认显示Apps菜单
     };
   },
 
@@ -41,6 +42,9 @@ export default {
     this.viewContainerDashboard = this.$store.getters['prefs/get'](
       VIEW_CONTAINER_DASHBOARD
     );
+
+    // 检查llmos-agent插件状态
+    await this.checkAgentAddonStatus();
   },
 
   computed: {
@@ -89,7 +93,11 @@ export default {
             }
           },
         },
-        {
+      ];
+
+      // 只有当llmos-agent插件存在且启用时才显示Apps菜单
+      if (this.showAppsMenu) {
+        items.push({
           key:   'llmos-apps',
           icon:  () => h(AppstoreOutlined),
           label: h('span', [
@@ -103,7 +111,11 @@ export default {
             name:   'c-cluster-apps-manage',
             params: { cluster: 'local' }
           },
-        },
+        });
+      }
+
+      // 添加剩余的菜单项
+      items.push(
         {
           key:   'user-auth',
           icon:  () => h(UsergroupAddOutlined),
@@ -145,7 +157,7 @@ export default {
             },
           ]
         }
-      ];
+      );
 
       return items;
     },
@@ -359,6 +371,11 @@ export default {
 
     productFromRoute() {
       return getProductFromRoute(this.$route);
+    },
+
+    // 获取所有managedaddon
+    managedAddons() {
+      return this.$store.getters['management/all'](MANAGEMENT.MANAGED_ADDON) || [];
     }
   },
 
@@ -375,9 +392,39 @@ export default {
       },
       immediate: true,
     },
+
+    // 监听managedAddons的变化
+    managedAddons: {
+      handler() {
+        // 当managedAddons变化时，重新检查agent插件状态
+        this.checkAgentAddonStatus();
+      },
+      deep: true, // 深度监听对象内部变化
+    },
   },
 
   methods: {
+    // 检查llmos-agent插件状态
+    async checkAgentAddonStatus() {
+      try {
+        // 首次加载时获取所有managedaddon
+        if (!this.managedAddons.length) {
+          await this.$store.dispatch('management/findAll', { type: MANAGEMENT.MANAGED_ADDON });
+        }
+
+        // 使用计算属性获取addons
+        const addons = this.managedAddons;
+
+        // 查找llmos-agent插件
+        const agentAddon = addons.find((addon) => addon.metadata?.name === 'llmos-agents');
+
+        // 如果插件不存在或未启用，不显示Apps菜单
+        this.showAppsMenu = agentAddon && agentAddon.spec?.enabled;
+      } catch (error) {
+        this.showAppsMenu = false;
+      }
+    },
+
     onMenuClick({ item }) {
       if (item && item.to) {
         this.$router.push(item.to);
