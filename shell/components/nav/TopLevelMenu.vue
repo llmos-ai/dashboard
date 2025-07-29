@@ -104,7 +104,7 @@ export default {
             h('span', this.t('product.apps')),
             h(Tag, {
               color: 'warning',
-              class: 'ml-5',
+              class: 'me-0!',
             }, () => this.t('generic.alpha'))
           ]),
           to: {
