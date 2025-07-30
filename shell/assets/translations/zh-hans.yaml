@@ -6520,6 +6520,13 @@ modelCard:
     cache: 
       label: 创建本地模型
       success: 本地模型创建成功
+      modalTitle: 创建本地模型
+      currentVersion: 新版本号
+      registry: 模型仓库
+      namespace: 命名空间
+      confirmMessage: 确定要创建本地模型吗？这将基于当前模型创建一个新版本。
+      successMessage: "本地模型 {name} 版本 {version} 创建成功"
+      errorMessage: "创建本地模型失败：{error}"
     generateUploadScript:
       label: 生成上传命令
 
