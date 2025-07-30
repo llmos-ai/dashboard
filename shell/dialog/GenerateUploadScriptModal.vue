@@ -108,7 +108,7 @@ export default {
 
         serverUrlSetting.value = serverUrlSettingResource?.value;
       } catch (error) {
-        console.error('Failed to get server URL setting:', error);
+        message.error('Failed to get server URL setting:', error);
         // 如果获取失败
         serverUrlSetting.value = '';
       }

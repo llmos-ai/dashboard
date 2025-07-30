@@ -97,7 +97,7 @@ export default {
       :total="filteredRows.length"
       test-id-prefix="local-model"
       default-icon="/img/generic-catalog.svg"
-      description-field="spec.modelCard.description"
+      description-field="model.spec.modelCard.description"
       fallback-description-field="spec.registry"
     />
   </div>

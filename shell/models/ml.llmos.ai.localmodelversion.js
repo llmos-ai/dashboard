@@ -8,6 +8,57 @@ export default class LocalModelVersion extends SteveModel {
     return this.localModel?.spec?.defaultVersion === this.metadata.name;
   }
 
+  get stateDisplay() {
+    const phase = this.status?.snapshottingStatus?.phase;
+
+    if (phase) {
+      switch (phase) {
+      case 'SnapshotReady':
+        return this.t('localModelVersion.state.ready');
+      case 'Snapshotting':
+        return this.t('localModelVersion.state.creating');
+      case 'SnapshotFailed':
+        return this.t('localModelVersion.state.failed');
+      default:
+        return phase;
+      }
+    }
+
+    return super.stateDisplay;
+  }
+
+  get state() {
+    const phase = this.status?.snapshottingStatus?.phase;
+
+    if (phase) {
+      switch (phase) {
+      case 'SnapshotReady':
+        return 'active';
+      case 'Snapshotting':
+        return 'in-progress';
+      case 'SnapshotFailed':
+        return 'error';
+      default:
+        return 'unknown';
+      }
+    }
+
+    return super.state;
+  }
+
+  get snapshottingProgress() {
+    const phase = this.status?.snapshottingStatus?.phase;
+    const message = this.status?.snapshottingStatus?.message;
+
+    return {
+      phase,
+      message,
+      isReady:    phase === 'SnapshotReady',
+      isCreating: phase === 'Snapshotting',
+      isFailed:   phase === 'SnapshotFailed'
+    };
+  }
+
   setDefault() {
     const data = { spec: { defaultVersion: this.metadata.name } };
 

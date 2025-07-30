@@ -6926,6 +6926,8 @@ localModel:
     label: Source Model
   volumeSnapshot:
     label: Volume Snapshot
+  snapshottingStatus:
+    label: Creation Status
   modelName:
     label: Model Name
   actions:
@@ -6933,6 +6935,17 @@ localModel:
       label: Fetch Origin Model
     createVersion:
       success: "Local Model {localModelName} Version {version} created successfully"
+
+localModelVersion:
+  state:
+    ready: Ready
+    creating: Creating
+    failed: Failed
+  snapshottingStatus:
+    ready: Snapshot Ready
+    creating: Creating Snapshot
+    failed: Snapshot Failed
+    pending: Pending
 
 createLocalModelVersionModal:
   title: Cache Model
