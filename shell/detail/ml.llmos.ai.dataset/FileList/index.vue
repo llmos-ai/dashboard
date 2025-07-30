@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useI18n } from '@shell/composables/useI18n';
 import { DownOutlined, SwapOutlined } from '@ant-design/icons-vue';
@@ -51,6 +51,12 @@ const {
   props: { resource: props.datasetVersion },
   emit,
 });
+
+watch(() => props.datasetVersion, (newVersion) => {
+  if (newVersion && updateResource) {
+    updateResource(newVersion);
+  }
+}, { immediate: true });
 
 const datesetVersionOptions = computed(() => {
   return props.resource.datasetVersions.map((version) => {
@@ -150,6 +156,8 @@ const switchVersion = () => {
 
   if (targetVersion && updateResource) {
     updateResource(targetVersion);
+
+    currentPath.value = '';
   }
   emit('fetchFiles', '', selectedVersion.value);
 };
