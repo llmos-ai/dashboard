@@ -2,17 +2,17 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 
 import { _VIEW } from '@shell/config/query-params';
-// import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
+import { useFileList } from '@shell/detail/ml.llmos.ai.model/FileList/useFileList';
 
 export const useFileItem = ({ props = {}, emit }) => {
   const store = useStore();
 
   const { isFile, currentPath, file = {} } = props;
 
-  // const { generatePresignedURL } = useFileList({
-  //   props: { resource: props.resource },
-  //   emit,
-  // });
+  const { generatePresignedURL } = useFileList({
+    props: { resource: props.resource },
+    emit,
+  });
 
   const currentFolder = computed(() => {
     if (isFile.value) {
@@ -32,18 +32,19 @@ export const useFileItem = ({ props = {}, emit }) => {
 
   const onRowClick = async() => {
     if (isFile.value) {
-      if (!props.resource.actions.download) {
-        return;
-      }
-
       store.dispatch('cluster/promptModal', {
         component:      'TextViewerModal',
         modalWidth:     '85%',
         componentProps: {
           contentFunc: async() => {
-            const res = await props.resource.doAction('download', { targetFilePath: currentPath.value }, { responseType: 'blob' });
+            const previewUrl = await generatePresignedURL({
+              operation:      'download',
+              targetFilePath: currentPath.value,
+              fileName:       fileName.value,
+            });
 
-            const out = await res.data.text();
+            const res = await fetch(previewUrl.presignedURL);
+            const out = await res.text();
 
             return out;
           },
