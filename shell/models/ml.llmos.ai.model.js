@@ -119,9 +119,7 @@ export default class ModelRegistry extends SteveModel {
     this.$dispatch('promptModal', {
       component:      'CreateLocalModelModal',
       modalWidth:     '500px',
-      componentProps: {
-        modelResource: this
-      },
+      componentProps: { modelResource: this },
     });
   }
 

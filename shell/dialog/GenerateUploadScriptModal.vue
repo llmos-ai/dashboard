@@ -5,6 +5,7 @@ import { message, Switch, Alert } from 'ant-design-vue';
 
 import Banner from '@shell/components/Banner/Banner.vue';
 import { MANAGEMENT } from '@shell/config/types';
+import { SETTING } from '@shell/config/settings';
 import { useI18n } from '@shell/composables/useI18n';
 import CopyToClipboard from '@shell/components/CopyToClipboard';
 import CodeMirror from '@shell/components/CodeMirror';
@@ -44,6 +45,7 @@ export default {
     const displayToken = ref('');
     const bashScript = ref('');
     const isFolder = ref(true); // true for folder, false for file
+    const serverUrlSetting = ref('');
 
     const namespace = computed(() => props?.namespace || 'default');
     const modelName = computed(() => props?.name || 'model-name');
@@ -58,7 +60,9 @@ export default {
    ${ sourceParam } \\
    --namespace ${ namespace.value } \\
    --model-name ${ modelName.value } \\
-   --bearer-token ${ bearerToken.value }`;
+   --api-server ${ serverUrlSetting.value } \\
+   --bearer-token ${ bearerToken.value }
+   `;
 
       bashScript.value = script;
     };
@@ -95,6 +99,21 @@ export default {
       }
     };
 
+    const getServerUrlSetting = async() => {
+      try {
+        const serverUrlSettingResource = await store.dispatch('management/find', {
+          type: MANAGEMENT.SETTING,
+          id:   SETTING.SERVER_URL,
+        });
+
+        serverUrlSetting.value = serverUrlSettingResource?.value;
+      } catch (error) {
+        console.error('Failed to get server URL setting:', error);
+        // 如果获取失败
+        serverUrlSetting.value = '';
+      }
+    };
+
     const copyScript = () => {
       navigator.clipboard.writeText(bashScript.value).then(() => {
         message.success(t('generic.copied'));
@@ -111,7 +130,8 @@ export default {
       close();
     };
 
-    onMounted(() => {
+    onMounted(async() => {
+      await getServerUrlSetting();
       createToken();
     });
 

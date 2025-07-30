@@ -192,6 +192,7 @@ const close = () => {
           </a-button>
           <a-button
             type="primary"
+            :disabled="isPublished"
             @click="onCreateFolder"
           >
             {{ t('fileList.createFolder') }}
@@ -205,6 +206,7 @@ const close = () => {
           </a-button>
           <a-dropdown-button
             type="primary"
+            :disabled="isPublished"
           >
             <a-upload
               :customRequest="onUpload"

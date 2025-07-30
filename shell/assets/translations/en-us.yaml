@@ -7008,7 +7008,7 @@ generateUploadScript:
     steps:
       title: "Steps to use:"
       step1: "1. Copy and run the script below in your notebook terminal"
-      step2: "2. Run the script in your notebook terminal"
+      step2: "2. Run the script in your terminal"
       step3: "3. The script will upload your folder or file to the model"
   script:
     title: Upload Script

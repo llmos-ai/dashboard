@@ -7,7 +7,7 @@ export const VLLM_CONFIG = [
   {
     label:   '--tool-call-parser',
     value:   '--tool-call-parser',
-    options: ['hermes', 'mistral', 'llama3_json', 'internlm', 'pythonic']
+    options: ['deepseek_v3', 'glm4_moe', 'granite-20b-fc', 'granite', 'hermes', 'hunyuan_a13b', 'internlm', 'jamba', 'kimi_k2', 'llama4_pythonic', 'llama4_json', 'llama3_json', 'minimax', 'mistral', 'phi4_mini_json', 'pythonic', 'qwen3_coder', 'xlam']
   },
   {
     label:   '--tokenizer',
@@ -557,7 +557,7 @@ export const VLLM_CONFIG = [
   {
     label:   '--reasoning-parser',
     value:   '--reasoning-parser',
-    options: ['deepseek_r1', 'granite']
+    options: ['deepseek_r1', 'granite', 'glm4_moe', 'hunyuan_a13b', 'mistral', 'qwen3']
   },
   {
     label:   '--disable-cascade-attn',
