@@ -116,25 +116,13 @@ export default class ModelRegistry extends SteveModel {
   }
 
   async cache() {
-    try {
-      const newLocalModel = await this.createLocalModel();
-      const localModelName = newLocalModel?.metadata?.name;
-
-      const localModelVersion = await this.$dispatch(`create`, {
-        type:     LLMOS_TYPES.LOCAL_MODEL_VERSION,
-        metadata: {
-          name:      `${ localModelName }-${ newLocalModel.nextVersion }`,
-          namespace: this.metadata?.namespace,
-        },
-        spec: { localModel: localModelName },
-      });
-
-      await localModelVersion.save();
-
-      message.success(`Local Model ${ localModelName } Version ${ newLocalModel.nextVersion } created successfully`);
-    } catch (err) {
-      message.error(`${ err.message || err }`);
-    }
+    this.$dispatch('promptModal', {
+      component:      'CreateLocalModelModal',
+      modalWidth:     '500px',
+      componentProps: {
+        modelResource: this
+      },
+    });
   }
 
   async generateUploadScript() {
