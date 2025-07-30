@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
+import { useRoute } from 'vue-router';
 import {
   FolderOutlined,
   MenuUnfoldOutlined,
@@ -12,6 +13,7 @@ import { allHash } from '@shell/utils/promise';
 import { LLMOS } from '@shell/config/types';
 
 const store = useStore();
+const route = useRoute();
 
 const emits = defineEmits(['update:item']);
 const props = defineProps({
@@ -42,17 +44,61 @@ onMounted(async() => {
     localModelVersions: await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
   });
 
-  const localModel = res.localModels[0] || {};
+  // 检查路由参数中是否有modelname，如果有则尝试选中对应的模型
+  const routeModelName = route.query.modelname;
+  let selectedModel = null;
 
-  activeItem.value = localModel;
+  if (routeModelName && typeof routeModelName === 'string') {
+    // modelname格式通常是 "namespace/localModel"
+    const [namespace, localModelName] = routeModelName.split('/');
+    if (namespace && localModelName) {
+      // 查找匹配的本地模型
+      selectedModel = res.localModels.find(model => {
+        const modelNamespace = model.metadata?.namespace;
+        const modelName = model.metadata?.name;
+        return modelNamespace === namespace && modelName === localModelName;
+      });
+    }
+  }
 
-  const defaultVersion = localModel.defaultLocalModelVersion;
+  // 如果没有找到匹配的模型或没有路由参数，则选择第一个模型
+  if (!selectedModel) {
+    selectedModel = res.localModels[0] || {};
+  }
 
-  emits('update:item', defaultVersion);
-  activeVersion.value = defaultVersion.id;
+  if (selectedModel.id) {
+    handleItemClick(selectedModel);
+  }
 
   loading.value = false;
 });
+
+// 监听路由参数变化，当modelname改变时自动选中对应模型
+watch(
+  () => route.query.modelname,
+  (newModelName) => {
+    if (!newModelName || typeof newModelName !== 'string') {
+      return;
+    }
+
+    const [namespace, localModelName] = newModelName.split('/');
+    if (!namespace || !localModelName) {
+      return;
+    }
+
+    // 查找匹配的本地模型
+    const targetModel = listData.value.find(model => {
+      const modelNamespace = model.metadata?.namespace;
+      const modelName = model.metadata?.name;
+      return modelNamespace === namespace && modelName === localModelName;
+    });
+
+    // 如果找到匹配的模型且不是当前选中的模型，则选中它
+    if (targetModel && targetModel.id !== activeItem.value?.id) {
+      handleItemClick(targetModel);
+    }
+  }
+);
 
 const listData = computed(() => {
   return store.getters[`cluster/all`](LLMOS.LOCAL_MODEL) || [];
@@ -66,25 +112,22 @@ const formatDataSource = computed(() => {
 
 // click choose logic
 
-const handleItemClick = (item) => {
-  if (activeItem.value?.id !== item.id) {
-    expandedItems.value.clear();
-  }
-
-  activeItem.value = item;
-
-  const version = item.defaultLocalModelVersion || {};
-
-  emits('update:item', version);
-  activeVersion.value = version.id;
-};
 
 const onVersionClick = (version) => {
+  if (!version || !version.value) {
+    console.warn('Invalid version object:', version);
+    return;
+  }
+
   activeVersion.value = version.value;
 
-  const selectedVersion = store.getters[`cluster/byId`](LLMOS.LOCAL_MODEL_VERSION, version.value) || {};
+  const selectedVersion = store.getters[`cluster/byId`](LLMOS.LOCAL_MODEL_VERSION, version.value);
 
-  emits('update:item', selectedVersion);
+  if (selectedVersion && selectedVersion.metadata && selectedVersion.spec) {
+    emits('update:item', selectedVersion);
+  } else {
+    console.warn('Selected version not found in store:', version.value);
+  }
 };
 
 const formatReadme = computed(() => {
@@ -111,6 +154,37 @@ const toggleExpand = (itemId) => {
     expandedItems.value.delete(itemId);
   } else {
     expandedItems.value.add(itemId);
+  }
+};
+
+const handleItemClick = (item) => {
+  if (activeItem.value?.id !== item.id) {
+    expandedItems.value.clear();
+  }
+
+  activeItem.value = item;
+
+  toggleExpand(item.id);
+
+  // 选择最新的版本（第一个版本通常是最新的）
+  const latestVersionOption = item.localModelVersionOptions?.[0];
+  
+  if (latestVersionOption) {
+    // 如果有版本选项，使用版本选项
+    onVersionClick(latestVersionOption);
+    activeVersion.value = latestVersionOption.value;
+  } else {
+    // 如果没有版本选项，尝试使用默认版本
+    const defaultVersion = item.defaultLocalModelVersion;
+    if (defaultVersion && defaultVersion.id) {
+      const versionOption = {
+        label: defaultVersion.metadata?.name || 'default',
+        value: defaultVersion.id,
+        age: defaultVersion.creationTimestamp
+      };
+      onVersionClick(versionOption);
+      activeVersion.value = versionOption.value;
+    }
   }
 };
 </script>
@@ -144,8 +218,9 @@ const toggleExpand = (itemId) => {
                     :key="item._id"
                     class="border-gray-200 border mb-2 p-2 cursor-pointer rounded-lg pr-2"
                     :class="{ 'bg-gray-200': activeItem.id === item.id }"
+                    @click="handleItemClick(item)"
                   >
-                    <a-list-item-meta @click="handleItemClick(item)">
+                    <a-list-item-meta>
                       <template #description>
                         <div class="title flex items-center mb-2">
                           <FolderOutlined class="mr-2" />
