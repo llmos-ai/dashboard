@@ -6,6 +6,7 @@ import {
   FolderOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
 import LiveDate from '@shell/components/formatter/LiveDate.vue';
 import MarkedView from '@shell/components/MarkedView';
 
@@ -51,11 +52,13 @@ onMounted(async() => {
   if (routeModelName && typeof routeModelName === 'string') {
     // modelname格式通常是 "namespace/localModel"
     const [namespace, localModelName] = routeModelName.split('/');
+
     if (namespace && localModelName) {
       // 查找匹配的本地模型
-      selectedModel = res.localModels.find(model => {
+      selectedModel = res.localModels.find((model) => {
         const modelNamespace = model.metadata?.namespace;
         const modelName = model.metadata?.name;
+
         return modelNamespace === namespace && modelName === localModelName;
       });
     }
@@ -82,14 +85,16 @@ watch(
     }
 
     const [namespace, localModelName] = newModelName.split('/');
+
     if (!namespace || !localModelName) {
       return;
     }
 
     // 查找匹配的本地模型
-    const targetModel = listData.value.find(model => {
+    const targetModel = listData.value.find((model) => {
       const modelNamespace = model.metadata?.namespace;
       const modelName = model.metadata?.name;
+
       return modelNamespace === namespace && modelName === localModelName;
     });
 
@@ -112,10 +117,10 @@ const formatDataSource = computed(() => {
 
 // click choose logic
 
-
 const onVersionClick = (version) => {
   if (!version || !version.value) {
-    console.warn('Invalid version object:', version);
+    message.warning('Invalid version object:', version);
+
     return;
   }
 
@@ -126,7 +131,7 @@ const onVersionClick = (version) => {
   if (selectedVersion && selectedVersion.metadata && selectedVersion.spec) {
     emits('update:item', selectedVersion);
   } else {
-    console.warn('Selected version not found in store:', version.value);
+    message.warning('Selected version not found in store:', version.value);
   }
 };
 
@@ -168,7 +173,7 @@ const handleItemClick = (item) => {
 
   // 选择最新的版本（第一个版本通常是最新的）
   const latestVersionOption = item.localModelVersionOptions?.[0];
-  
+
   if (latestVersionOption) {
     // 如果有版本选项，使用版本选项
     onVersionClick(latestVersionOption);
@@ -176,12 +181,14 @@ const handleItemClick = (item) => {
   } else {
     // 如果没有版本选项，尝试使用默认版本
     const defaultVersion = item.defaultLocalModelVersion;
+
     if (defaultVersion && defaultVersion.id) {
       const versionOption = {
         label: defaultVersion.metadata?.name || 'default',
         value: defaultVersion.id,
-        age: defaultVersion.creationTimestamp
+        age:   defaultVersion.creationTimestamp
       };
+
       onVersionClick(versionOption);
       activeVersion.value = versionOption.value;
     }

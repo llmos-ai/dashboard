@@ -1,5 +1,3 @@
-import { message } from 'ant-design-vue';
-
 import SteveModel from '@shell/plugins/steve/steve-class';
 import { set } from '@shell/utils/object';
 import { matchModelString } from '@shell/utils/ai-model';
@@ -119,9 +117,7 @@ export default class ModelRegistry extends SteveModel {
     this.$dispatch('promptModal', {
       component:      'CreateLocalModelModal',
       modalWidth:     '500px',
-      componentProps: {
-        modelResource: this
-      },
+      componentProps: { modelResource: this },
     });
   }
 
