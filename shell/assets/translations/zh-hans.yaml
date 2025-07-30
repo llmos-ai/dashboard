@@ -6702,7 +6702,7 @@ generateUploadScript:
     steps:
       title: "使用步骤："
       step1: "1. 复制并替换[sourceDir]或[sourceFile]为您要上传的文件夹或文件"
-      step2: "2. 在您的 notebook 终端中运行下面的脚本"
+      step2: "2. 在您的终端中运行下面的脚本"
       step3: "3. 脚本将把您指定的文件夹或文件上传到模型中"
   script:
     title: 上传脚本
