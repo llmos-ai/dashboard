@@ -75,11 +75,12 @@ export default class LocalModelVersion extends SteveModel {
     try {
       const newLocalModel = this;
       const localModelName = newLocalModel?.metadata?.name;
+      const versionToCreate = newLocalModel.nextVersion;
 
       const localModelVersion = await this.$dispatch(`create`, {
         type:     LLMOS.LOCAL_MODEL_VERSION,
         metadata: {
-          name:      `${ localModelName }-${ newLocalModel.nextVersion }`,
+          name:      `${ localModelName }-${ versionToCreate }`,
           namespace: this.metadata?.namespace,
         },
         spec: { localModel: localModelName },
@@ -90,7 +91,7 @@ export default class LocalModelVersion extends SteveModel {
       message.success(
         this.t('localModel.actions.createVersion.success', {
           localModelName,
-          version: newLocalModel.nextVersion,
+          version: versionToCreate,
         })
       );
     } catch (err) {
