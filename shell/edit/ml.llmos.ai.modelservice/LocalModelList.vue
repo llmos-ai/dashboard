@@ -42,6 +42,7 @@ onMounted(async() => {
 
   const res = await allHash({
     localModels:        await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL }),
+    models:             await store.dispatch(`cluster/findAll`, { type: LLMOS.MODEL }),
     localModelVersions: await store.dispatch(`cluster/findAll`, { type: LLMOS.LOCAL_MODEL_VERSION }),
   });
 
@@ -136,15 +137,15 @@ const onVersionClick = (version) => {
 };
 
 const formatReadme = computed(() => {
-  const readmeJson = '';
+  let readmeContent = '';
 
-  // try {
-  //   readmeJson = JSON.parse(readme.value);
-  // } catch (err) {
-  //   return '';
-  // }
+  const modelDescription = activeItem.value.model?.spec?.modelCard?.description;
 
-  return readmeJson?.Data?.ReadMeContent;
+  if (modelDescription) {
+    readmeContent = modelDescription;
+  }
+
+  return readmeContent;
 });
 
 const canShowVersions = computed(() => {

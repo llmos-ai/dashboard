@@ -6620,6 +6620,8 @@ localModel:
     label: 模型
   volumeSnapshot:
     label: 卷快照
+  snapshottingStatus:
+    label: 创建状态
   modelName:
     label: 模型名称
   actions:
@@ -6627,6 +6629,17 @@ localModel:
       label: 同步模型
     createVersion:
       success: "本地模型 {localModelName} 版本 {version} 创建成功"
+
+localModelVersion:
+  state:
+    ready: 就绪
+    creating: 创建中
+    failed: 失败
+  snapshottingStatus:
+    ready: 快照就绪
+    creating: 创建快照中
+    failed: 快照失败
+    pending: 等待中
 
 createLocalModelVersionModal:
   title: 缓存模型
