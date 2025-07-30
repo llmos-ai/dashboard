@@ -136,17 +136,54 @@ const onVersionClick = (version) => {
   }
 };
 
-const formatReadme = computed(() => {
-  let readmeContent = '';
+const formatReadme = ref('');
+const readmeLoading = ref(false);
 
-  const modelDescription = activeItem.value.model?.spec?.modelCard?.description;
+// 监听 activeItem 变化，优先查询 README.md 文件
+watch(
+  () => activeItem.value,
+  async(newActiveItem) => {
+    if (!newActiveItem || !newActiveItem.id) {
+      formatReadme.value = '';
+      readmeLoading.value = false;
 
-  if (modelDescription) {
-    readmeContent = modelDescription;
-  }
+      return;
+    }
 
-  return readmeContent;
-});
+    readmeLoading.value = true;
+
+    try {
+      // 尝试获取 README.md 文件
+      const previewUrl = await newActiveItem.model.doAction('generatePresignedURL', {
+        operation:  'download',
+        objectName: 'README.md',
+      });
+
+      if (previewUrl && previewUrl.presignedURL) {
+        const res = await fetch(previewUrl.presignedURL);
+
+        if (res.ok) {
+          const readmeContent = await res.text();
+
+          formatReadme.value = readmeContent;
+          readmeLoading.value = false;
+
+          return;
+        }
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    }
+
+    // 如果 README.md 不存在或获取失败，使用 description
+    const modelDescription = newActiveItem.model?.spec?.modelCard?.description;
+
+    formatReadme.value = modelDescription || '';
+    readmeLoading.value = false;
+  },
+  { immediate: true }
+);
 
 const canShowVersions = computed(() => {
   return activeItem.value?.id || '';
@@ -305,14 +342,31 @@ const handleItemClick = (item) => {
       class="p-[10px]"
     >
       <div class="flex flex-col h-full">
-        <div class="h-[0] grow-1">
+        <div class="h-[0] grow-1 relative">
           <simplebar class="h-full">
             <MarkedView
               v-if="formatReadme"
               :content="formatReadme"
               :clearHtml="false"
             />
+            <div
+              v-else-if="!readmeLoading && !formatReadme"
+              class="text-gray-500 text-center p-4"
+            >
+              No README or description available
+            </div>
           </simplebar>
+
+          <!-- 绝对定位的loading遮罩 -->
+          <div
+            v-if="readmeLoading"
+            class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10"
+          >
+            <a-spin
+              size="large"
+              tip="Loading README..."
+            />
+          </div>
         </div>
       </div>
     </a-col>
