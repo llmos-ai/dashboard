@@ -39,6 +39,7 @@ export const NETWORK_ATTACHMENT = 'k8s.cni.cncf.io.networkattachmentdefinition';
 export const USER = 'user';
 export const GROUP = 'group';
 export const RUNTIME_CLASS = 'node.k8s.io.runtimeclass';
+export const VOLUME_SNAPSHOT = 'snapshot.storage.k8s.io.volumesnapshot';
 
 export const RBAC_GROUP = 'rbac.authorization.k8s.io';
 export const RBAC = {

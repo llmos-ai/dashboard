@@ -25,9 +25,10 @@ export default {
   },
 
   data() {
+    // 深拷贝匹配当前名称的挂载点，确保响应式追踪
     const volumeMounts = (this.container.volumeMounts || []).filter(
       (mount) => mount.name === this.name
-    );
+    ).map((mount) => ({ ...mount }));
 
     return { volumeMounts };
   },
@@ -35,11 +36,17 @@ export default {
   computed: { ...mapGetters({ t: 'i18n/t' }) },
 
   watch: {
-    volumeMounts(neu) {
-      this.container.volumeMounts = (this.container.volumeMounts || []).filter(
-        (mount) => mount.name && mount.name !== this.name
-      );
-      this.container.volumeMounts.push(...neu);
+    volumeMounts: {
+      handler(neu) {
+        // 创建一个新数组，保留不匹配当前名称的挂载点
+        const filtered = (this.container.volumeMounts || []).filter(
+          (mount) => mount.name && mount.name !== this.name
+        );
+
+        // 使用 Vue 可以检测到的方式更新数组
+        this.container.volumeMounts = [...filtered, ...neu];
+      },
+      deep: true
     },
 
     name(neu) {
@@ -49,23 +56,30 @@ export default {
 
   created() {
     if (!this.volumeMounts.length) {
+      // 添加一个新的挂载点对象
       this.volumeMounts.push({ name: this.name });
     }
   },
 
   methods: {
     add() {
+      // 添加一个新的挂载点对象
       this.volumeMounts.push({ name: this.name });
     },
 
     remove(volumeMount) {
+      // 使用 removeObject 工具函数移除对象
       removeObject(this.volumeMounts, volumeMount);
+      // 确保触发 volumeMounts 的 watch 处理器
+      this.$forceUpdate();
     },
 
     updateMountNames(name) {
-      this.volumeMounts.forEach((mount) => {
-        mount.name = name;
-      });
+      // 创建新的对象数组以确保响应式更新
+      this.volumeMounts = this.volumeMounts.map((mount) => ({
+        ...mount,
+        name
+      }));
     },
   },
 };

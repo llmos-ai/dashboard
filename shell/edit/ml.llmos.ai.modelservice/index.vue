@@ -2,7 +2,7 @@
 import CreateEditView from '@shell/mixins/create-edit-view';
 import FormValidation from '@shell/mixins/form-validation';
 import LLMOSWorkload from '@shell/mixins/llmos/ml-workload';
-import { MANAGEMENT, PVC } from '@shell/config/types';
+import { MANAGEMENT, PVC, VOLUME_SNAPSHOT } from '@shell/config/types';
 import { mergeEnvs } from '@shell/utils/merge';
 import { REGISTRY as REGISTRY_ANNOTATIONS } from '@shell/config/labels-annotations';
 import { SETTING } from '@shell/config/settings';
@@ -46,8 +46,9 @@ export default {
         MANAGEMENT.SETTING,
         SETTING.MODEL_SERVICE_DEFAULT_IMAGE
       ),
-      settings:     this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }),
-      volumeClaims: this.$store.dispatch(`${ inStore }/findAll`, { type: PVC }),
+      settings:        this.$store.dispatch(`${ inStore }/findAll`, { type: MANAGEMENT.SETTING }),
+      volumeClaims:    this.$store.dispatch(`${ inStore }/findAll`, { type: PVC }),
+      volumeSnapshots: this.$store.dispatch(`${ inStore }/findAll`, { type: VOLUME_SNAPSHOT }),
     });
 
     await this.resourceManagerFetchSecondaryResources(this.secondaryResourceData);
@@ -430,7 +431,7 @@ export default {
     },
 
     async updateLocalModelInfo(localModelVersion = {}) {
-      const volumeClaims = localModelVersion.volumeClaims;
+      const volumeClaims = await localModelVersion.volumeClaims;
 
       const namespace = localModelVersion?.metadata?.namespace;
       const localModel = localModelVersion?.spec?.localModel;
@@ -439,25 +440,35 @@ export default {
       this.spec.model = `${ namespace }/${ localModel }`;
 
       const volumeClaimTemplate = this.spec.volumeClaimTemplates[0];
+
       const containerTemplate = this.spec.template.spec.containers[0];
 
       Object.assign(containerTemplate, {
         volumeMounts: [{
-          name:      volumeClaims?.spec?.volumeName,
-          mountPath: '/root/.cache',
+          name:      'model-dir',
+          mountPath: '/root/.cache/huggingface/hub/models',
+        }, {
+          mountPath: '/dev/shm',
+          name:      'dshm',
         }]
       });
 
       const pvc = await this.$store.dispatch('cluster/create', {
         metadata: {
-          name:        volumeSnapshotName,
+          name:        'model-dir',
           namespace:   volumeClaims?.metadata?.namespace,
           annotations: { [REGISTRY_ANNOTATIONS.IS_LOCAL_MODEL]: 'true' },
         },
         spec: {
-          storageClassName: volumeClaims?.spec?.storageClassName,
-          resources:        { requests: { storage: volumeClaims?.spec?.resources?.requests?.storage } },
+          storageClassName: '',
+          resources:        { requests: { storage: volumeClaims?.status?.restoreSize } },
           accessModes:      ['ReadWriteOnce'],
+          dataSource:       {
+            apiGroup: 'snapshot.storage.k8s.io',
+            kind:     'VolumeSnapshot',
+            name:     volumeSnapshotName
+          }
+
         },
         type: PVC,
       });
@@ -596,7 +607,7 @@ export default {
             <a-col :span="12">
               <LabeledSelect
                 v-model:value="spec.modelRegistry"
-                label="Source"
+                :label="t('modelService.source')"
                 :options="sourceOptions"
                 :mode="mode"
                 required
