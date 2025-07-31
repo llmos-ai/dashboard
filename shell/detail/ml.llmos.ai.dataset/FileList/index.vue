@@ -306,6 +306,7 @@ const close = () => {
             :key="file.Name"
             :file="file"
             :resource="datasetVersion"
+            :is-published="isPublished"
             @fetchFiles="fetchFiles"
           />
         </tbody>

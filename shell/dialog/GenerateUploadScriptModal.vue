@@ -56,7 +56,7 @@ export default {
 
     const generateBashScript = () => {
       const sourceParam = isFolder.value ? '--source-dir [sourceDir]' : '--source-file [sourceFile]';
-      const script = `python <(curl -sk https://raw.githubusercontent.com/llmos-ai/llmos-operator/refs/heads/main/tools/upload_to_model.py) \\
+      const script = `python <(curl -sk https://get-llmos.1block.ai/upload_to_model.py) \\
    ${ sourceParam } \\
    --namespace ${ namespace.value } \\
    --model-name ${ modelName.value } \\
