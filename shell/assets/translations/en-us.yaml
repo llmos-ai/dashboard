@@ -6613,6 +6613,9 @@ modelService:
   huggingFaceToken: Hugging Face Hub Token
   hf:
     endpoint: Hugging Face Mirror Endpoint
+  enableReasoning: Enable Reasoning
+  enableTools: Enable Tool Calling
+  modelTask: Model Task
 
 volume:
   add:

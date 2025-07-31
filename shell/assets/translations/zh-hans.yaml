@@ -6462,6 +6462,9 @@ modelService:
   huggingFaceToken: Hugging Face Hub Token
   hf:
     endpoint: Hugging Face Mirror Endpoint
+  enableReasoning: 启用推理思考
+  enableTools: 启用工具调用
+  modelTask: 模型任务
 
 modelRegistry:
   tabs:
