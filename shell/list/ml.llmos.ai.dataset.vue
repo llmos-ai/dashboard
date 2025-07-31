@@ -39,10 +39,44 @@ export default {
   },
 
   computed: {
+    datasetVersions() {
+      const inStore = this.$store.getters['currentProduct'].inStore;
+
+      return this.$store.getters[`${ inStore }/all`](LLMOS.DATASET_VERSION) || [];
+    },
+
     headers() {
       const REGISTRY = {
         name:  'spec.registry',
         label: this.t('datasetCard.registry.label')
+      };
+
+      const PUBLISHED_VERSION = {
+        name:  'publishedVersion',
+        label: this.t('datasetList.publishedVersion'),
+        value: (row) => {
+          const versions = this.datasetVersions.filter((v) => {
+            const rootPath = v?.status?.rootPath || '';
+            const expectedPath = `datasets/${ row.id }`;
+
+            return (rootPath === expectedPath || rootPath.startsWith(`${ expectedPath }/`)) &&
+                   v.status?.publishStatus?.phase === 'SnapshotReady';
+          });
+
+          if (versions.length === 0) {
+            return '-';
+          }
+
+          // Sort by version number and format as tags
+          return versions
+            .map((v) => {
+              const versionNumber = v.spec?.version || '';
+
+              return `${ versionNumber }`;
+            })
+            .sort();
+        },
+        formatter: 'VersionTags'
       };
 
       const headers = [
@@ -50,6 +84,7 @@ export default {
         NAME,
         NAMESPACE,
         REGISTRY,
+        PUBLISHED_VERSION,
         AGE,
       ];
 

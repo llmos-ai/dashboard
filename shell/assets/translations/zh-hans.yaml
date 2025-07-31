@@ -6728,3 +6728,6 @@ generateUploadScript:
   apiKeyWarning: "API 密钥将会在30分钟后过期，可以访问"
   here: "这里"
   apiKeyWarningEnd: "来管理您自己的 API 密钥以获得更好的安全性。"
+
+datasetList:
+  publishedVersion: 已发布版本
