@@ -6288,17 +6288,6 @@ ray:
     allowScheduling: Allow Scheduling on the Head Node
     enableGCS: Enable Global Control Service(GCS) fault tolerance
 
-modelservice:
-  model: Name
-  modelTooltip: Name or path of the huggingface model
-  modelPlaceholder: e.g., facebook/opt-125m
-  modelName: Served Model Name
-  modelNamePlaceholder: The model name to use in the API
-  image: Image
-  volumes: Volumes
-  hf:
-    endpoint: Hugging Face Mirror Endpoint
-
 volume:
   add:
     label: Add Volume
@@ -6451,12 +6440,13 @@ chat:
     stop: 停止序列是一个预定义或用户指定的文本字符串，当这些序列出现时，它会提示 AI 停止生成后续的 token。
 
 modelService:
+  modelName: 模型别名
+  source: 模型来源
+  modelNamePlaceholder: 在 API 中使用的模型名称
   model: 模型名称
   searchPlaceholder: '从 { source } 搜索模型'
   modelTooltip: Name or path of the huggingface model
   modelPlaceholder: e.g., facebook/opt-125m
-  modelName: Served Model Name
-  modelNamePlaceholder: The model name to use in the API
   image: Image
   volumes: Volumes
   huggingFaceToken: Hugging Face Hub Token

@@ -6609,6 +6609,7 @@ modelService:
   modelName: Served Model Name
   modelNamePlaceholder: The model name to use in the API
   image: Image
+  source: Source
   volumes: Volumes
   huggingFaceToken: Hugging Face Hub Token
   hf:

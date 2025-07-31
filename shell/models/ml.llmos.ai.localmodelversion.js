@@ -1,6 +1,6 @@
 import SteveModel from '@shell/plugins/steve/steve-class';
 
-import { LLMOS, PVC } from '@shell/config/types';
+import { LLMOS, VOLUME_SNAPSHOT } from '@shell/config/types';
 import { escapeHtml } from '@shell/utils/string';
 
 export default class LocalModelVersion extends SteveModel {
@@ -100,7 +100,7 @@ export default class LocalModelVersion extends SteveModel {
   }
 
   get volumeClaims() {
-    return this.$getters['byId'](PVC, this.id) || {};
+    return this.$getters['byId'](VOLUME_SNAPSHOT, this.id) || {};
   }
 
   get groupByModel() {
