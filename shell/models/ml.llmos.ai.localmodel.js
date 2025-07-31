@@ -29,6 +29,7 @@ export default class LocalModelVersion extends SteveModel {
 
   get localModelVersionOptions() {
     return this.localModelVersions
+      .filter((version) => version.isReady)
       .map((version) => ({
         label: version.metadata.name.replace(`${ this.metadata.name }-`, ''),
         value: version.id,
