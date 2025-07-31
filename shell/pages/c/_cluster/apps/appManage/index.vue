@@ -302,6 +302,7 @@ import { Banner } from '@shell/components/Banner';
 import { MANAGEMENT } from '@shell/config/types';
 import { _EDIT, ENABLED, MODE } from '@shell/config/query-params';
 import { NAME as LLMOS } from '@shell/config/product/llmos';
+import { SETTING } from '@shell/config/settings';
 import { useI18n } from '@shell/composables/useI18n';
 
 const store = useStore();
@@ -419,7 +420,7 @@ const loadProjectFlows = async(projectId) => {
   }
 };
 
-const { data: loading, execute: refetchProjects } = useFetch('/proxy/apps/api/v1/projects/', {
+const { data, loading, execute: refetchProjects } = useFetch('/proxy/apps/api/v1/projects/', {
   immediate:  true,
   afterFetch: async(data) => {
     if (Array.isArray(data.data)) {
@@ -487,16 +488,47 @@ const refreshProjects = async() => {
   await refetchProjects();
 };
 
-const handleEdit = (projectId, flowId) => {
-  const currentHost = window.location.hostname;
-  const editUrl = `http://${ currentHost }:8080/flow/${ flowId }/folder/${ projectId }`;
+// 获取服务器主机名的通用函数
+const getServerHostname = async() => {
+  // 从server-url设置中获取URL
+  const serverUrlSettingResource = await store.dispatch('management/find', {
+    type: MANAGEMENT.SETTING,
+    id:   SETTING.SERVER_URL,
+  });
+
+  // 获取服务器URL或使用当前主机名作为后备
+  const serverUrl = serverUrlSettingResource?.value || window.location.origin;
+
+  // 解析URL以获取主机名
+  let hostname;
+
+  try {
+    // 尝试解析完整URL
+    const url = new URL(serverUrl);
+
+    hostname = url.hostname;
+  } catch (e) {
+    // 如果解析失败，可能是因为没有协议，使用原始值
+    hostname = serverUrl;
+  }
+
+  return hostname;
+};
+
+const handleEdit = async(projectId, flowId) => {
+  const hostname = await getServerHostname();
+
+  // 构建编辑URL
+  const editUrl = `http://${ hostname }:8080/flow/${ flowId }/folder/${ projectId }`;
 
   window.open(editUrl, '_blank');
 };
 
-const handleCreate = () => {
-  const currentHost = window.location.hostname;
-  const editUrl = `http://${ currentHost }:8080/flows`;
+const handleCreate = async() => {
+  const hostname = await getServerHostname();
+
+  // 构建创建URL
+  const editUrl = `http://${ hostname }:8080/flows`;
 
   window.open(editUrl, '_blank');
 };
