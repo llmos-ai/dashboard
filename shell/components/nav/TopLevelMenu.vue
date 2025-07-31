@@ -101,7 +101,7 @@ export default {
           key:   'llmos-apps',
           icon:  () => h(AppstoreOutlined),
           label: h('span', [
-            h('span', this.t('product.apps')),
+            h('span', { class: 'mr-1' }, this.t('product.apps')),
             h(Tag, {
               color: 'warning',
               class: 'me-0!',
