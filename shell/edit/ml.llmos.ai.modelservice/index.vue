@@ -380,7 +380,7 @@ export default {
       }
 
       // 检查参数确定复选框状态
-      this.enableReasoning = this.container.args.includes('--enable-reasoning');
+      this.enableReasoning = this.container.args.some(arg => arg.startsWith('--reasoning-parser='));
       this.enableTools = this.container.args.includes('--enable-auto-tool-choice');
     },
 
@@ -391,12 +391,11 @@ export default {
       }
 
       // 移除推理相关参数
-      this.container.args = this.container.args.filter((arg) => arg !== '--enable-reasoning' &&
+      this.container.args = this.container.args.filter((arg) => 
         !arg.startsWith('--reasoning-parser='));
 
       // 如果启用推理思考，添加相应参数
       if (this.enableReasoning) {
-        this.container.args.push('--enable-reasoning');
         this.container.args.push('--reasoning-parser=deepseek_r1');
       }
     },
@@ -519,7 +518,7 @@ export default {
         // 只有当container.args存在时才更新
         if (Array.isArray(this.container.args)) {
           // 更新复选框状态
-          this.enableReasoning = this.container.args.includes('--enable-reasoning');
+          this.enableReasoning = this.container.args.some(arg => arg.startsWith('--reasoning-parser='));
           this.enableTools = this.container.args.includes('--enable-auto-tool-choice');
         }
       },
