@@ -8,6 +8,7 @@ import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
 import Tab from '@shell/components/Tabbed/Tab';
 import ResourceTabs from '@shell/components/form/ResourceTabs';
+import Loading from '@shell/components/Loading';
 
 import { LLMOS } from '@shell/config/types';
 
@@ -26,6 +27,7 @@ export default {
     LabeledSelect,
     LabeledInput,
     ResourceTabs,
+    Loading,
   },
 
   mixins: [CreateEditView, FormValidation],
@@ -43,10 +45,9 @@ export default {
   },
 
   async fetch() {
-    const inStore = this.$store.getters['currentProduct'].inStore;
+    const hash = await allHash({ registries: this.$store.dispatch(`cluster/findAll`, { type: LLMOS.REGISTRY }) });
 
-    const hash = await allHash({ registries: this.$store.dispatch(`${ inStore }/findAll`, { type: LLMOS.REGISTRY }) });
-
+    this.value.spec.registry = this.value.hasDefaultRegistry ? this.t('modelRegistry.useDefault') : '';
     this.registries = hash.registries || [];
   },
 
@@ -59,6 +60,7 @@ export default {
       errors:     [],
       registries: [],
       resource,
+      loading:    false,
     };
   },
 
@@ -83,12 +85,14 @@ export default {
     },
 
     registryOptions() {
-      const out = (this.registries || []).map((registry) => ({
+      const registries = this.$store.getters[`cluster/all`](LLMOS.REGISTRY) || [];
+
+      const out = registries.map((registry) => ({
         label: registry.id,
         value: registry.id,
       }));
 
-      const defaultRegistry = this.registries.find((registry) => registry.isDefault) || {};
+      const defaultRegistry = registries.find((registry) => registry.isDefault) || {};
 
       if (defaultRegistry?.id) {
         out.unshift({
@@ -161,7 +165,7 @@ export default {
 
         const model = await this.$store.dispatch(`${ this.inStore }/create`, {
           metadata: {
-            generateName: 'v1-',
+            generateName: `${ this.value.metadata.name }-v1-`,
             namespace:    this.value.metadata.namespace,
           },
           spec: {
@@ -187,7 +191,9 @@ export default {
 </script>
 
 <template>
+  <Loading v-if="$fetchState.pending" />
   <CruResource
+    v-else
     :done-route="doneRoute"
     :resource="value"
     :mode="mode"

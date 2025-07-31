@@ -9,4 +9,5 @@
 - CSS
   - 尽量使用tailwindcss
 - 国际化
-  
+- 在下列情况中使用<script setup>语法
+  - 没有使用mixins

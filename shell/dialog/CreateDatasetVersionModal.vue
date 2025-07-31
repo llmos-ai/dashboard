@@ -102,7 +102,7 @@ export default {
         const names = (version.metadata.name || '').split('-');
 
         return {
-          label: names[0],
+          label: names[1],
           value: version.spec.version,
         };
       });
@@ -114,7 +114,7 @@ export default {
 
     const latestVersion = computed(() => {
       const versionStr = latestDatasetVersion.value?.metadata?.name || '';
-      const match = versionStr.match(/^v(\d+)/);
+      const match = versionStr.match(/-v(\d+)-/);
       const currentMax = match ? parseInt(match[1]) : 0;
 
       return `v${ currentMax + 1 }`;
@@ -139,7 +139,7 @@ export default {
 
         const model = await store.dispatch(`${ inStore.value }/create`, {
           metadata: {
-            generateName: `${ latestVersion.value }-${ latestDatasetVersion.value.spec.dataset }-`,
+            generateName: `${ latestDatasetVersion.value.spec.dataset }-${ latestVersion.value }-`,
             namespace:    latestDatasetVersion.value.metadata.namespace,
           },
           spec: {
