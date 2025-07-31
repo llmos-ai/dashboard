@@ -167,7 +167,7 @@ export function init(store) {
     weight: 89,
   });
 
-  configureType(LLMOS.LOCAL_MODEL, { isEditable: false });
+  configureType(LLMOS.LOCAL_MODEL, { isEditable: false, isCreatable: false });
 
   configureType(LLMOS.LOCAL_MODEL_VERSION, {
     isCreatable: false,
