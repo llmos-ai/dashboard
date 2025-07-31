@@ -572,7 +572,7 @@ export default {
           >
             <a-col :span="24">
               <div class="mb-[8px]">
-                <label>Model Task</label>
+                <h3>{{ t('modelService.modelTask') }}</h3>
               </div>
               <a-radio-group
                 v-model:value="vllmTask"
@@ -644,14 +644,14 @@ export default {
                   :disabled="isView"
                   @change="updateReasoningArgs"
                 >
-                  <span class="mr-2">启用推理思考</span>
+                  <span class="mr-2">{{ t('modelService.enableReasoning') }}</span>
                 </a-checkbox>
                 <a-checkbox
                   v-model:checked="enableTools"
                   :disabled="isView"
                   @change="updateToolsArgs"
                 >
-                  <span class="mr-2">启用工具调用</span>
+                  <span class="mr-2">{{ t('modelService.enableTools') }}</span>
                 </a-checkbox>
               </a-space>
             </a-col>
