@@ -550,11 +550,6 @@ export const VLLM_CONFIG = [
     options: []
   },
   {
-    label:   '--enable-reasoning',
-    value:   '--enable-reasoning',
-    options: []
-  },
-  {
     label:   '--reasoning-parser',
     value:   '--reasoning-parser',
     options: ['deepseek_r1', 'granite', 'glm4_moe', 'hunyuan_a13b', 'mistral', 'qwen3']
