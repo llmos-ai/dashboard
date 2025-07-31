@@ -7034,3 +7034,6 @@ generateUploadScript:
   apiKeyWarning: "The API key will be expired in 30 minutes. You can visit"
   here: "here"
   apiKeyWarningEnd: "to manage your own API key for better security."
+
+datasetList:
+  publishedVersion: Published Version
