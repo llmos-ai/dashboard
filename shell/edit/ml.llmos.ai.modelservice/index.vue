@@ -283,7 +283,6 @@ export default {
     disableModelInput() {
       if (
         (this.spec.modelRegistry &&
-        this.spec.modelRegistry !== 'local' &&
         this.mode === _CREATE) || this.isEdit
       ) {
         return true;
@@ -380,7 +379,7 @@ export default {
       }
 
       // 检查参数确定复选框状态
-      this.enableReasoning = this.container.args.some(arg => arg.startsWith('--reasoning-parser='));
+      this.enableReasoning = this.container.args.some((arg) => arg.startsWith('--reasoning-parser='));
       this.enableTools = this.container.args.includes('--enable-auto-tool-choice');
     },
 
@@ -391,8 +390,7 @@ export default {
       }
 
       // 移除推理相关参数
-      this.container.args = this.container.args.filter((arg) => 
-        !arg.startsWith('--reasoning-parser='));
+      this.container.args = this.container.args.filter((arg) => !arg.startsWith('--reasoning-parser='));
 
       // 如果启用推理思考，添加相应参数
       if (this.enableReasoning) {
@@ -518,7 +516,7 @@ export default {
         // 只有当container.args存在时才更新
         if (Array.isArray(this.container.args)) {
           // 更新复选框状态
-          this.enableReasoning = this.container.args.some(arg => arg.startsWith('--reasoning-parser='));
+          this.enableReasoning = this.container.args.some((arg) => arg.startsWith('--reasoning-parser='));
           this.enableTools = this.container.args.includes('--enable-auto-tool-choice');
         }
       },

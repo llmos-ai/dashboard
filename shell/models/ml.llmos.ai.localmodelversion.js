@@ -59,6 +59,10 @@ export default class LocalModelVersion extends SteveModel {
     };
   }
 
+  get isReady() {
+    return this.state === 'active';
+  }
+
   setDefault() {
     const data = { spec: { defaultVersion: this.metadata.name } };
 
