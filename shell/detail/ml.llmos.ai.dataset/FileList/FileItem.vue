@@ -19,6 +19,11 @@ const props = defineProps({
     type:     Object,
     required: true,
   },
+
+  isPublished: {
+    type:    Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['fetchFiles']);
@@ -107,8 +112,12 @@ const removeFile = async(file) => {
     </td>
     <td class="px-4 py-3 text-center">
       <span
-        class="text-red-600 hover:text-red-800 cursor-pointer text-sm font-medium"
-        @click="removeFile(file)"
+        :class="{
+          'text-red-600 hover:text-red-800 cursor-pointer': !isPublished,
+          'text-gray-400 cursor-not-allowed': isPublished
+        }"
+        class="text-sm font-medium"
+        @click="!isPublished && removeFile(file)"
       >
         {{ t('fileItem.remove') }}
       </span>
