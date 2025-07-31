@@ -139,7 +139,7 @@ export default {
 
         const model = await store.dispatch(`${ inStore.value }/create`, {
           metadata: {
-            generateName: `${ latestVersion.value }-`,
+            generateName: `${ latestVersion.value }-${ latestDatasetVersion.value.spec.dataset }-`,
             namespace:    latestDatasetVersion.value.metadata.namespace,
           },
           spec: {
