@@ -91,8 +91,8 @@ const getVersionOptions = (datasetName) => {
     value: version.spec.version
   })).sort((a, b) => {
     // Sort versions in descending order (newest first)
-    const matchA = (a.value || '').match(/^v(\d+)/);
-    const matchB = (b.value || '').match(/^v(\d+)/);
+    const matchA = (a.value || '').match(/-v(\d+)-/);
+    const matchB = (b.value || '').match(/-v(\d+)-/);
 
     const versionA = matchA ? parseInt(matchA[1]) : 0;
     const versionB = matchB ? parseInt(matchB[1]) : 0;

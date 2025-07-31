@@ -73,8 +73,8 @@ export default class Dataset extends SteveModel {
         return rootPath === expectedPath || rootPath.startsWith(`${ expectedPath }/`);
       })
       .sort((a, b) => {
-        const matchA = (a.metadata.name || '').match(/^v(\d+)/);
-        const matchB = (b.metadata.name || '').match(/^v(\d+)/);
+        const matchA = (a.metadata.name || '').match(/-v(\d+)-/);
+        const matchB = (b.metadata.name || '').match(/-v(\d+)-/);
 
         const versionA = matchA ? parseInt(matchA[1]) : 0;
         const versionB = matchB ? parseInt(matchB[1]) : 0;

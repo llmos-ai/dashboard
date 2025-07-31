@@ -62,7 +62,7 @@ const datesetVersionOptions = computed(() => {
   return props.resource.datasetVersions.map((version) => {
     return {
       value: version.spec.version,
-      label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
+      label: ((version.metadata.name || '').split('-') || [])?.[1] || {},
     };
   });
 });
