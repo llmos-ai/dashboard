@@ -1,11 +1,8 @@
 <template>
-  <a-modal
-    v-model:open="visible"
+  <a-Card
     :title="t('modelCard.actions.cache.modalTitle')"
-    :width="500"
-    :confirm-loading="loading"
-    @ok="handleOk"
-    @cancel="handleCancel"
+    :show-highlight-border="true"
+    :sticky="true"
   >
     <div class="create-local-model-content">
       <div class="model-info">
@@ -48,7 +45,22 @@
         class="mt-4"
       />
     </div>
-  </a-modal>
+    <template #actions>
+      <a-button
+        @click="handleCancel"
+      >
+        {{ t('generic.cancel') }}
+      </a-button>
+
+      <a-button
+        type="primary"
+        :loading="loading"
+        @click="handleOk"
+      >
+        {{ t('generic.create') }}
+      </a-button>
+    </template>
+  </a-Card>
 </template>
 
 <script>
@@ -68,10 +80,7 @@ export default {
   emits: ['close'],
 
   data() {
-    return {
-      visible: true,
-      loading: false
-    };
+    return { loading: false };
   },
 
   computed: {
@@ -122,7 +131,6 @@ export default {
     },
 
     handleCancel() {
-      this.visible = false;
       this.$emit('close');
     },
 
