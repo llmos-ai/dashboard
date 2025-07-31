@@ -20,9 +20,6 @@
           <h3 class="model-name">
             {{ modelName }}
           </h3>
-          <p class="model-description">
-            {{ description }}
-          </p>
         </div>
       </div>
 
@@ -200,6 +197,8 @@ export default {
         color: #8c8c8c;
         font-size: 14px;
         line-height: 1.4;
+        max-width: 100%;
+        overflow: hidden;
       }
     }
   }
