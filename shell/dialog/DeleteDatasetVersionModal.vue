@@ -77,10 +77,10 @@ const datasetVersions = computed(() => {
 
 const datasetVersionOptions = computed(() => {
   return datasetVersions.value.map((version) => {
-    const names = (version.metadata.name || '').split('-');
+    const label = version.metadata.name.replace(`${ version.spec.dataset }-`, '').split('-')[0];
 
     return {
-      label: names[0],
+      label,
       value: version.spec.version,
     };
   });
