@@ -254,7 +254,7 @@ export const useFileList = ({ props = {}, emit }) => {
         try {
           await currentResource.value.doAction('syncFiles', {});
         } catch (syncError) {
-          console.error('Failed to sync files:', syncError);
+          message.error('Failed to sync files:', syncError);
         }
       }
     } catch (err) {

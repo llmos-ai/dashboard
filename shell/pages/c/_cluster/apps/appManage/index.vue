@@ -420,7 +420,7 @@ const loadProjectFlows = async(projectId) => {
   }
 };
 
-const { data, loading, execute: refetchProjects } = useFetch('/proxy/apps/api/v1/projects/', {
+const { loading, execute: refetchProjects } = useFetch('/proxy/apps/api/v1/projects/', {
   immediate:  true,
   afterFetch: async(data) => {
     if (Array.isArray(data.data)) {
