@@ -193,7 +193,7 @@ export const useFileList = ({ props = {}, emit }) => {
   const onUpload = async(options) => {
     showModal.value = true;
 
-    const { file = {} } = options;
+    const { file = {}, needSyncFiles = false } = options;
 
     const { webkitRelativePath = '' } = file;
     const relativePath = webkitRelativePath.replace(file.name, '');
@@ -248,6 +248,15 @@ export const useFileList = ({ props = {}, emit }) => {
         file,
         destPath,
       });
+
+      // 如果需要同步文件，则调用syncFiles
+      if (needSyncFiles && currentResource.value?.doAction) {
+        try {
+          await currentResource.value.doAction('syncFiles', {});
+        } catch (syncError) {
+          console.error('Failed to sync files:', syncError);
+        }
+      }
     } catch (err) {
       message.error(`Upload Fail: ${ err }`);
 

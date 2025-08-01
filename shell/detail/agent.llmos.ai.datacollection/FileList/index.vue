@@ -53,11 +53,19 @@ const {
   fileList,
   showModal,
   currentPath,
-  onUpload,
+  onUpload: originalOnUpload,
 } = useFileList({
   props: { resource: props.resource },
   emit,
 });
+
+// 包装onUpload函数，为datacollection添加needSyncFiles参数
+const onUpload = async(options) => {
+  return await originalOnUpload({
+    ...options,
+    needSyncFiles: true
+  });
+};
 
 const isView = computed(() => {
   return props.mode === 'view';
