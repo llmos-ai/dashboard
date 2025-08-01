@@ -6874,6 +6874,7 @@ datasetCard:
   version:
     label: Version
     placeholder: Select version
+    tooltip: Only published datasets can be selected
   datasetName:
     label: Dataset Name
     placeholder: Select dataset

@@ -87,7 +87,7 @@ const getVersionOptions = (datasetName) => {
   });
 
   return versions.filter((v) => v.spec.publish).map((version) => ({
-    label: ((version.metadata.name || '').split('-') || [])?.[0] || {},
+    label: ((version.metadata.name || '').split('-') || [])?.[1] || {},
     value: version.spec.version
   })).sort((a, b) => {
     // Sort versions in descending order (newest first)
@@ -148,6 +148,7 @@ fetchData();
             :mode="mode"
             :required="true"
             :disabled="!row.value.datasetName"
+            :tooltip="t('datasetCard.version.tooltip')"
           />
         </div>
         <div class="col span-4">

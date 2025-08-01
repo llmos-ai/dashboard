@@ -6557,6 +6557,7 @@ datasetCard:
   version:
     label: 版本
     placeholder: 选择版本
+    tooltip: 只有发布后的数据集可以选择
   datasetName:
     label: 数据集名称
     placeholder: 选择数据集
