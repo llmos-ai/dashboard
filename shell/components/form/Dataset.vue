@@ -86,19 +86,21 @@ const getVersionOptions = (datasetName) => {
     return (version?.status?.rootPath || '').includes(`datasets/${ dataset.id }`);
   });
 
-  return versions.filter((v) => v.spec.publish).map((version) => ({
-    label: ((version.metadata.name || '').split('-') || [])?.[1] || {},
+  const out = versions.filter((v) => v.spec.publish).map((version) => ({
+    label: version.metadata.name.replace(`${ version.spec.dataset }-`, '').split('-')[0],
     value: version.spec.version
   })).sort((a, b) => {
     // Sort versions in descending order (newest first)
-    const matchA = (a.value || '').match(/-v(\d+)-/);
-    const matchB = (b.value || '').match(/-v(\d+)-/);
+    const matchA = (a.value || '').match(/v(\d+)/);
+    const matchB = (b.value || '').match(/v(\d+)/);
 
     const versionA = matchA ? parseInt(matchA[1]) : 0;
     const versionB = matchB ? parseInt(matchB[1]) : 0;
 
     return versionB - versionA;
   });
+
+  return out;
 };
 
 // Fetch data on component mount
