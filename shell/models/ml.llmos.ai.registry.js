@@ -18,7 +18,7 @@ export default class ModelRegistry extends SteveModel {
           endpoint:                   '',
           bucket:                     '',
           accessCredentialSecretName: '',
-          useSSL:                     false,
+          useSSL:                     true,
         },
       },
     };

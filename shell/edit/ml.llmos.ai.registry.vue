@@ -56,7 +56,7 @@ export default {
         endpoint:                   this.value.spec?.s3Config?.endpoint || '',
         bucket:                     this.value.spec?.s3Config?.bucket || '',
         accessCredentialSecretName: this.value.spec?.s3Config?.accessCredentialSecretName || '',
-        useSSL:                     this.value.spec?.s3Config?.useSSL || false,
+        useSSL:                     this.value.spec?.s3Config?.useSSL ?? true,
       },
     };
 
