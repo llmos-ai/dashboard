@@ -49,6 +49,11 @@ export default {
       default: 'B',
     },
 
+    hideUnit: {
+      type:    Boolean,
+      default: false,
+    },
+
     /**
      * Hide arrows on number input when it overlaps with the unit
      */
@@ -240,7 +245,7 @@ export default {
   >
     <template #suffix>
       <div
-        v-if="displayUnit"
+        v-if="displayUnit && !hideUnit"
         class="addon"
         :class="{'with-tooltip': tooltip || tooltipKey}"
       >
