@@ -310,6 +310,11 @@ export default {
         this.container.args = this.container.args.filter((arg) => !!arg && arg.trim() !== '');
       }
 
+      // 当模型来源为本地模型时，如果用户没有填写servedModelName，则使用spec.model的值
+      if (this.spec.modelRegistry === 'local' && !this.spec.servedModelName && this.spec.model) {
+        this.spec.servedModelName = this.spec.model;
+      }
+
       this.update();
 
       if (this.container.image === '') {
