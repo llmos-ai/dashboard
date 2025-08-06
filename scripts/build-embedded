@@ -13,9 +13,6 @@ cd $(dirname $0)/..
 echo "Bootstrapping..."
 yarn --pure-lockfile install
 
-echo "Installing shell dependencies..."
-cd shell && yarn --pure-lockfile install && cd ..
-
 source scripts/version
 echo "BRANCH: ${COMMIT_BRANCH:-<none>}"
 echo "TAG: ${GIT_TAG:-<none>}"
