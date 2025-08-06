@@ -11,6 +11,10 @@ export default class LocalModelVersion extends SteveModel {
   get stateDisplay() {
     const phase = this.status?.snapshottingStatus?.phase;
 
+    if (phase === undefined) {
+      return 'Not Ready';
+    }
+
     if (phase) {
       switch (phase) {
       case 'SnapshotReady':
@@ -30,6 +34,9 @@ export default class LocalModelVersion extends SteveModel {
   get state() {
     const phase = this.status?.snapshottingStatus?.phase;
 
+    if (phase === undefined) {
+      return 'Not Ready';
+    }
     if (phase) {
       switch (phase) {
       case 'SnapshotReady':
