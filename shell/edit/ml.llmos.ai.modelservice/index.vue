@@ -12,12 +12,13 @@ import LocalModelList from '@shell/edit/ml.llmos.ai.modelservice/LocalModelList'
 import { _CREATE } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect.vue';
 import ArgumentVars from './components/ArgumentVars.vue';
+import HealthCheck from '@shell/components/form/HealthCheck';
 
 export default {
   name:       'EditModelService',
   mixins:     [CreateEditView, FormValidation, LLMOSWorkload, LabeledSelect],
   components: {
-    RemoteModelList, ArgumentVars, LocalModelList
+    RemoteModelList, ArgumentVars, LocalModelList, HealthCheck
   },
   props: {
     value: {
@@ -805,6 +806,17 @@ export default {
             :value="podTemplateSpec"
             :nodes="allNodes"
             :loading="isLoadingSecondaryResources"
+          />
+        </Tab>
+
+        <Tab
+          :label="t('workload.container.titles.healthCheck')"
+          name="healthCheck"
+        >
+          <HealthCheck
+            :value="container"
+            :mode="mode"
+            @update:value="Object.assign(container, $event)"
           />
         </Tab>
       </ResourceTabs>

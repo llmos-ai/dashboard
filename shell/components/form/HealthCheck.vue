@@ -3,6 +3,8 @@ import Probe from '@shell/components/form/Probe';
 import { _VIEW } from '@shell/config/query-params';
 
 export default {
+  emits: ['update:value'],
+
   components: { Probe },
   props:      {
     value: {
@@ -16,10 +18,10 @@ export default {
   },
 
   data() {
-    const { readinessProbe, livenessProbe, startupProbe } = this.value;
-
     return {
-      readinessProbe, livenessProbe, startupProbe
+      readinessProbe: this.value.readinessProbe,
+      livenessProbe:  this.value.livenessProbe,
+      startupProbe:   this.value.startupProbe,
     };
   },
 
@@ -32,7 +34,7 @@ export default {
     update() {
       const { readinessProbe, livenessProbe, startupProbe } = this;
 
-      this.$emit('input', {
+      this.$emit('update:value', {
         readinessProbe, livenessProbe, startupProbe
       } );
     }
@@ -50,7 +52,7 @@ export default {
           :mode="mode"
           :label="t('workload.container.healthCheck.readinessProbe')"
           :description="t('workload.container.healthCheck.readinessTip')"
-          @input="update"
+          @update:value="update"
         />
       </div>
     </div>
@@ -64,7 +66,7 @@ export default {
           :mode="mode"
           :label="t('workload.container.healthCheck.livenessProbe')"
           :description="t('workload.container.healthCheck.livenessTip')"
-          @input="update"
+          @update:value="update"
         />
       </div>
     </div>
@@ -77,7 +79,7 @@ export default {
         :mode="mode"
         :label="t('workload.container.healthCheck.startupProbe')"
         :description="t('workload.container.healthCheck.startupTip')"
-        @input="update"
+        @update:value="update"
       />
     </div>
   </div>
