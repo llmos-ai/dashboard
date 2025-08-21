@@ -4,8 +4,11 @@ import { get } from '@shell/utils/object';
 import { _VIEW } from '@shell/config/query-params';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import { LabeledInput } from '@shell/components/form/LabeledInput';
+import { ref, watch } from 'vue';
 
 export default {
+  emits: ['update:value', 'remove'],
+
   components: {
     LabeledSelect,
     LabeledInput
@@ -21,6 +24,20 @@ export default {
       default: () => {
         return { valueFrom: {} };
       }
+    },
+    options: {
+      type:    Array,
+      default: () => {
+        return [
+          { value: 'simple', label: 'Key/Value Pair' },
+          { value: 'resourceFieldRef', label: 'Resource' },
+          { value: 'configMapKeyRef', label: 'ConfigMap Key' },
+          { value: 'secretKeyRef', label: 'Secret Key' },
+          { value: 'fieldRef', label: 'Pod Field' },
+          { value: 'secretRef', label: 'Secret' },
+          { value: 'configMapRef', label: 'ConfigMap' },
+        ];
+      },
     },
     allConfigMaps: {
       type:    Array,
@@ -39,109 +56,158 @@ export default {
       default: false,
       type:    Boolean
     },
-    defaultType: {
-      type:    String,
-      default: ''
-    },
   },
 
   data() {
-    const typeOpts = [
-      { value: 'simple', label: 'Key/Value Pair' },
-      { value: 'resourceFieldRef', label: 'Resource' },
-      { value: 'configMapKeyRef', label: 'ConfigMap Key' },
-      { value: 'secretKeyRef', label: 'Secret key' },
-      { value: 'fieldRef', label: 'Pod Field' },
-      { value: 'secretRef', label: 'Secret' },
-      { value: 'configMapRef', label: 'ConfigMap' },
-    ];
+    return {
+      secrets:         this.allSecrets,
+      resourceKeyOpts: ['limits.cpu', 'limits.ephemeral-storage', 'limits.memory', 'requests.cpu', 'requests.ephemeral-storage', 'requests.memory'],
+    };
+  },
 
-    const resourceKeyOpts = ['limits.cpu', 'limits.ephemeral-storage', 'limits.memory', 'requests.cpu', 'requests.ephemeral-storage', 'requests.memory'];
-    let type;
-    let hasDefaultType = false;
-    let rowClass = 'var-row';
+  setup(props, { emit }) {
+    const type = ref(null);
 
-    if (this.defaultType) {
-      type = this.defaultType;
-      hasDefaultType = true;
-      rowClass = 'var-row default-row';
-    } else if (this.value.secretRef) {
-      type = 'secretRef';
-    } else if (this.value.configMapRef) {
-      type = 'configMapRef';
-    } else if (this.value.value) {
-      type = 'simple';
-    } else if (this.value.valueFrom) {
-      type = Object.keys((this.value.valueFrom))[0] || 'simple';
+    if (props.value.secretRef) {
+      type.value = 'secretRef';
+    } else if (props.value.configMapRef) {
+      type.value = 'configMapRef';
+    } else if (props.value.value) {
+      type.value = 'simple';
+    } else if (props.value.valueFrom) {
+      type.value = Object.keys((props.value.valueFrom))[0] || props.options[0].value || 'simple';
     }
 
-    let refName;
-    let name;
-    let fieldPath;
-    let referenced;
-    let key;
-    let valStr;
-    const keys = [];
+    const refName = ref('');
+    const name = ref('');
+    const fieldPath = ref('');
+    const referenced = ref(null);
+    const key = ref(null);
+    const valStr = ref('');
+    const keys = ref([]);
 
-    switch (type) {
+    switch (type.value) {
     case 'resourceFieldRef':
-      name = this.value.name;
-      refName = this.value.valueFrom[type].containerName;
-      key = this.value.valueFrom[type].resource || '';
+      name.value = props.value.name;
+      refName.value = props.value.valueFrom?.[type.value]?.containerName;
+      key.value = props.value.valueFrom?.[type.value]?.resource || '';
       break;
     case 'configMapKeyRef':
-      name = this.value.name;
-      key = this.value.valueFrom[type].key || '';
-      refName = this.value.valueFrom[type].name;
-      referenced = this.allConfigMaps.filter((resource) => {
-        return resource.metadata.name === refName;
+      name.value = props.value.name;
+      key.value = props.value.valueFrom?.[type.value]?.key || '';
+      refName.value = props.value.valueFrom?.[type.value]?.name;
+      referenced.value = props.allConfigMaps.filter((resource) => {
+        return resource.metadata.name === refName.value;
       })[0];
-      if (referenced && referenced.data) {
-        keys.push(...Object.keys(referenced.data));
+      if (referenced.value && referenced.value.data) {
+        keys.value.push(...Object.keys(referenced.value.data));
       }
       break;
     case 'secretRef':
     case 'configMapRef':
-      name = this.value.prefix;
-      refName = this.value[type].name;
+      name.value = props.value.prefix;
+      refName.value = props.value[type.value]?.name;
       break;
     case 'secretKeyRef':
-      name = this.value.name;
-      key = this.value.valueFrom[type].key || '';
-      refName = this.value.valueFrom[type].name;
-      referenced = this.allSecrets.filter((resource) => {
-        return resource.metadata.name === refName;
+      name.value = props.value.name;
+      key.value = props.value.valueFrom?.[type.value]?.key || '';
+      refName.value = props.value.valueFrom?.[type.value]?.name;
+      referenced.value = props.allSecrets.filter((resource) => {
+        return resource.metadata.name === refName.value;
       })[0];
-      if (referenced && referenced.data) {
-        keys.push(...Object.keys(referenced.data));
+      if (referenced.value && referenced.value.data) {
+        keys.value.push(...Object.keys(referenced.value.data));
       }
       break;
     case 'fieldRef':
-      fieldPath = get(this.value.valueFrom, `${ type }.fieldPath`) || '';
-      name = this.value.name;
+      fieldPath.value = get(props.value.valueFrom, `${ type.value }.fieldPath`) || '';
+      name.value = props.value.name;
       break;
     default:
-      name = this.value.name;
-      valStr = this.value.value;
+      name.value = props.value.name;
+      valStr.value = props.value.value;
       break;
     }
 
+    referenced.value = refName.value;
+
+    const updateRow = () => {
+      if (!name.value?.length && !refName.value?.length) {
+        if (type.value !== 'fieldRef') {
+          emit('update:value', null);
+
+          return;
+        }
+      }
+      let out = { name: name.value || refName.value };
+
+      switch (type.value) {
+      case 'configMapKeyRef':
+      case 'secretKeyRef':
+        out.valueFrom = {
+          [type.value]: {
+            key: key.value, name: refName.value, optional: false
+          }
+        };
+        break;
+      case 'resourceFieldRef':
+        out.valueFrom = {
+          [type.value]: {
+            containerName: refName.value, divisor: 1, resource: key.value
+          }
+        };
+        break;
+      case 'fieldRef':
+        if (!fieldPath.value || !fieldPath.value.length) {
+          out = null; break;
+        }
+        out.valueFrom = { [type.value]: { apiVersion: 'v1', fieldPath: fieldPath.value } };
+        break;
+      case 'simple':
+        out.value = valStr.value;
+        break;
+      default:
+        delete out.name;
+        out.prefix = name.value;
+        out[type.value] = { name: refName.value, optional: false };
+      }
+      emit('update:value', out);
+    };
+
+    watch(type, () => {
+      referenced.value = null;
+      key.value = '';
+      refName.value = '';
+      keys.value = [];
+      key.value = '';
+      valStr.value = '';
+      fieldPath.value = '';
+    });
+
+    watch(referenced, (neu, old) => {
+      if (neu) {
+        if ((neu.type === SECRET || neu.type === CONFIG_MAP) && neu.data) {
+          keys.value = Object.keys(neu.data);
+        }
+        refName.value = neu?.metadata?.name;
+      }
+      updateRow();
+    });
+
     return {
-      referenced: refName,
-      secrets:    this.allSecrets,
-      typeOpts,
       type,
       refName,
+      referenced,
       keys,
       key,
       fieldPath,
       name,
-      resourceKeyOpts,
       valStr,
-      hasDefaultType,
-      rowClass,
+      updateRow,
+      get,
     };
   },
+
   computed: {
     isView() {
       return this.mode === _VIEW;
@@ -208,114 +274,22 @@ export default {
     extraColumn() {
       return ['resourceFieldRef', 'configMapKeyRef', 'secretKeyRef'].includes(this.type);
     },
+
+    hideVariableName() {
+      return this.options?.find((opt) => opt.value === this.type)?.hideVariableName || false;
+    }
   },
-
-  watch: {
-    type() {
-      this.referenced = null;
-      this.key = '';
-      this.refName = '';
-      this.keys = [];
-      this.key = '';
-      this.valStr = '';
-      this.fieldPath = '';
-    },
-
-    referenced(neu, old) {
-      if (neu) {
-        if ((neu.type === SECRET || neu.type === CONFIG_MAP) && neu.data) {
-          this.keys = Object.keys(neu.data);
-        }
-        this.refName = neu?.metadata?.name;
-      }
-      this.updateRow();
-    },
-  },
-
-  methods: {
-    reset() {
-      const out = { name: this.name || this.refName };
-      const type = this.type || this.defaultType;
-
-      switch (type) {
-      case 'configMapKeyRef':
-      case 'secretKeyRef':
-        this.value.valueFrom[type].key = '';
-        this.value.valueFrom[type].name = '';
-        this.referenced = '';
-        this.key = '';
-        out.valueFrom = {
-          [this.type]: {
-            key: '', name: '', optional: false
-          }
-        };
-        break;
-      default:
-        this.value = '';
-        out.name = '';
-        out.prefix = '';
-        out[this.type] = { name: '', optional: false };
-      }
-      this.$emit('input', out);
-    },
-    updateRow() {
-      if (!this.name?.length && !this.refName?.length) {
-        if (this.type !== 'fieldRef') {
-          this.$emit('input', null);
-
-          return;
-        }
-      }
-      let out = { name: this.name || this.refName };
-
-      switch (this.type) {
-      case 'configMapKeyRef':
-      case 'secretKeyRef':
-        out.valueFrom = {
-          [this.type]: {
-            key: this.key, name: this.refName, optional: false
-          }
-        };
-        break;
-      case 'resourceFieldRef':
-        out.valueFrom = {
-          [this.type]: {
-            containerName: this.refName, divisor: 1, resource: this.key
-          }
-        };
-        break;
-      case 'fieldRef':
-        if (!this.fieldPath || !this.fieldPath.length) {
-          out = null; break;
-        }
-        out.valueFrom = { [this.type]: { apiVersion: 'v1', fieldPath: this.fieldPath } };
-        break;
-      case 'simple':
-        out.value = this.valStr;
-        break;
-      default:
-        delete out.name;
-        out.prefix = this.name;
-        out[this.type] = { name: this.refName, optional: false };
-      }
-      this.$emit('input', out);
-    },
-    get
-  }
 };
 </script>
 
 <template>
-  <div :class="rowClass">
-    <div
-      v-if="!hasDefaultType"
-      class="type"
-    >
+  <div class="var-row">
+    <div class="type">
       <LabeledSelect
         v-model:value="type"
         :mode="mode"
         :multiple="false"
-        :options="typeOpts"
+        :options="options"
         option-label="label"
         :searchable="false"
         :reduce="e=>e.value"
@@ -325,7 +299,7 @@ export default {
     </div>
 
     <div
-      v-if="!hasDefaultType"
+      v-if="!hideVariableName"
       class="name"
     >
       <LabeledInput
@@ -413,24 +387,14 @@ export default {
       </div>
     </template>
     <div class="remove">
-      <div v-if="!hasDefaultType">
-        <a-button
-          v-if="!isView"
-          type="link"
-          @click.stop="$emit('remove')"
-        >
-          {{ t('generic.remove') }}
-        </a-button>
-      </div>
-      <div v-else>
-        <a-button
-          v-if="!isView"
-          type="link"
-          @click="reset"
-        >
-          {{ t('generic.reset') }}
-        </a-button>
-      </div>
+      <button
+        v-if="!isView"
+        type="button"
+        class="btn role-link"
+        @click.stop="$emit('remove')"
+      >
+        {{ t('generic.remove') }}
+      </button>
     </div>
   </div>
 </template>
@@ -438,7 +402,7 @@ export default {
 <style lang='scss' scoped>
 .var-row{
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 80px;
+  grid-template-columns: 1fr 1fr 1fr 1fr 100px;
   grid-column-gap: 20px;
   margin-bottom: 10px;
   align-items: center;
@@ -450,10 +414,6 @@ export default {
   .remove BUTTON {
     padding: 0px;
   }
-}
-
-.default-row{
-  grid-template-columns: 1fr 1fr !important;
 }
 
 </style>

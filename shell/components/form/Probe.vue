@@ -6,6 +6,7 @@ import { LabeledInput } from '@shell/components/form/LabeledInput';
 import LabeledSelect from '@shell/components/form/LabeledSelect';
 import ShellInput from '@shell/components/form/ShellInput';
 import KeyValue from '@shell/components/form/KeyValue';
+import { computed, ref, watch } from 'vue';
 
 const KINDS = [
   'none',
@@ -16,6 +17,8 @@ const KINDS = [
 ];
 
 export default {
+  emits: ['update:value'],
+
   components: {
     LabeledInput, LabeledSelect, UnitInput, ShellInput, KeyValue,
   },
@@ -41,29 +44,29 @@ export default {
     },
   },
 
-  data() {
-    let kind = 'none';
-    let probe = null;
-    let exec = null;
-    let httpGet = null;
-    let tcpSocket = null;
+  setup(props, { emit }) {
+    const kind = ref('none');
+    const probe = ref(null);
+    const exec = ref(null);
+    const httpGet = ref(null);
+    const tcpSocket = ref(null);
 
-    if ( this.value ) {
-      probe = clone(this.value);
+    if ( props.value ) {
+      probe.value = clone(props.value);
 
-      if ( probe.exec ) {
-        kind = 'exec';
-      } else if ( probe.httpGet ) {
-        if ( (probe.httpGet.scheme || '').toLowerCase() === 'https' ) {
-          kind = 'HTTPS';
+      if ( probe.value.exec ) {
+        kind.value = 'exec';
+      } else if ( probe.value.httpGet ) {
+        if ( (probe.value.httpGet.scheme || '').toLowerCase() === 'https' ) {
+          kind.value = 'HTTPS';
         } else {
-          kind = 'HTTP';
+          kind.value = 'HTTP';
         }
-      } else if ( probe.tcpSocket ) {
-        kind = 'tcp';
+      } else if ( probe.value.tcpSocket ) {
+        kind.value = 'tcp';
       }
     } else {
-      probe = {
+      probe.value = {
         failureThreshold:    3,
         successThreshold:    1,
         initialDelaySeconds: 0,
@@ -75,12 +78,56 @@ export default {
       };
     }
 
-    exec = probe.exec || {};
-    httpGet = probe.httpGet || {};
-    tcpSocket = probe.tcpSocket || {};
+    exec.value = probe.value.exec || {};
+    httpGet.value = probe.value.httpGet || {};
+    tcpSocket.value = probe.value.tcpSocket || {};
+
+    const isNone = computed(() => {
+      return kind.value === 'none';
+    });
+
+    const update = () => {
+      if ( isNone.value ) {
+        emit('update:value', null);
+
+        return;
+      }
+
+      switch ( kind.value ) {
+      case 'HTTP':
+      case 'HTTPS':
+        httpGet.value.scheme = kind.value;
+        probe.value.httpGet = httpGet.value;
+        probe.value.tcpSocket = null;
+        probe.value.exec = null;
+        break;
+      case 'tcp':
+        probe.value.httpGet = null;
+        probe.value.tcpSocket = tcpSocket.value;
+        probe.value.exec = null;
+        break;
+      case 'exec':
+        probe.value.httpGet = null;
+        probe.value.tcpSocket = null;
+        probe.value.exec = exec.value;
+        break;
+      }
+
+      emit('update:value', probe.value);
+    };
+
+    watch(kind, () => {
+      update();
+    });
 
     return {
-      probe, kind, exec, httpGet, tcpSocket
+      probe,
+      kind,
+      exec,
+      httpGet,
+      tcpSocket,
+      update,
+      isNone,
     };
   },
 
@@ -89,54 +136,10 @@ export default {
       return this.mode === _VIEW;
     },
 
-    isNone() {
-      return this.kind === 'none';
-    },
-
     kindOptions() {
       return KINDS.map((k) => {
         return { label: this.t(`workload.container.healthCheck.kind.${ k }`), value: k };
       });
-    }
-  },
-
-  watch: {
-    kind() {
-      this.update();
-    }
-  },
-
-  methods: {
-    update() {
-      const probe = this.probe;
-
-      if ( this.isNone ) {
-        this.$emit('input', null);
-
-        return;
-      }
-
-      switch ( this.kind ) {
-      case 'HTTP':
-      case 'HTTPS':
-        this.httpGet.scheme = this.kind;
-        probe.httpGet = this.httpGet;
-        probe.tcpSocket = null;
-        probe.exec = null;
-        break;
-      case 'tcp':
-        probe.httpGet = null;
-        probe.tcpSocket = this.tcpSocket;
-        probe.exec = null;
-        break;
-      case 'exec':
-        probe.httpGet = null;
-        probe.tcpSocket = null;
-        probe.exec = this.exec;
-        break;
-      }
-
-      this.$emit('input', probe);
     }
   },
 };
@@ -179,7 +182,7 @@ export default {
           data-testid="input-probe-port"
         >
           <LabeledInput
-            v-model.number="httpGet.port"
+            v-model:value.number="httpGet.port"
             type="number"
             min="1"
             max="65535"
@@ -208,7 +211,7 @@ export default {
           data-testid="input-probe-socket"
         >
           <LabeledInput
-            v-model.number="tcpSocket.port"
+            v-model:value.number="tcpSocket.port"
             type="number"
             min="1"
             max="65535"
@@ -242,6 +245,7 @@ export default {
           v-if="kind && kind!=='none'"
           :style="{'position':'relative', 'margin':'0px'}"
           class="vertical"
+          role="none"
         >
       </div>
 
@@ -303,7 +307,7 @@ export default {
             class="col span-6"
           >
             <LabeledInput
-              v-model.number="probe.successThreshold"
+              v-model:value.number="probe.successThreshold"
               type="number"
               min="1"
               :mode="mode"
@@ -317,7 +321,7 @@ export default {
             class="col span-6"
           >
             <LabeledInput
-              v-model.number="probe.failureThreshold"
+              v-model:value.number="probe.failureThreshold"
               type="number"
               min="1"
               :mode="mode"
@@ -335,6 +339,7 @@ export default {
             <div class="col span-12">
               <KeyValue
                 v-model:value="httpGet.httpHeaders"
+                data-testid="input-probe-http-headers"
                 key-name="name"
                 :mode="mode"
                 :as-map="false"
@@ -343,6 +348,7 @@ export default {
                 :key-label="t('generic.name')"
                 :value-label="t('generic.value')"
                 :add-label="t('generic.add')"
+                @update:value="update"
               >
                 <template #title>
                   <h3>
