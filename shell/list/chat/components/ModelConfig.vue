@@ -60,14 +60,14 @@ const clearMessages = () => {
 
 const cancel = () => {
   visible.value = false;
-  _config.value.model = previousModelResource.value.spec.model;
+  _config.value.model = previousModelResource.value.modelName;
   currentModelResource.value = previousModelResource.value;
 
   preventChangeModel.value = false;
 };
 
 const changeModel = (value) => {
-  _config.value.model = value.spec.model;
+  _config.value.model = value.modelName;
 
   previousModelResource.value = currentModelResource.value;
   currentModelResource.value = value;

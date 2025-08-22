@@ -137,7 +137,8 @@ export default class ClusterNode extends SteveModel {
       for (const k in this.labels) {
         const [prefix] = k.split('/');
 
-        if (!SYSTEM_LABELS.includes(prefix)) {
+        // 过滤掉以 plan.upgrade.cattle.io/ 开头的标签和系统标签
+        if (!SYSTEM_LABELS.includes(prefix) && !k.startsWith('plan.upgrade.cattle.io/')) {
           parsedLabels.push(`${ k }=${ this.labels[k] }`);
         }
       }

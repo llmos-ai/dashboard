@@ -123,14 +123,14 @@ const modelDisplayName = computed(() => {
 // TODO: high,  url save to vuex
 const modelResource = ref(null);
 const changeModel = (resource) => {
-  config.value.model = resource.spec.model;
+  config.value.model = resource.modelName;
   modelResource.value = resource;
   url.value = resource.modelApi;
   store.commit('chat/UPDATE_COMPARE_MODEL_CONFIG', {
     uuid:   props.uuid,
     config: {
       ...config.value,
-      model: resource.spec.model
+      model: resource.modelName
     }
   });
 };

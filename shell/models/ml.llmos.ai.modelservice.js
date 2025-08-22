@@ -91,8 +91,10 @@ export default class ModelService extends MlWorkload {
 
   get modelApi() {
     const namespace = this.namespace;
+    // 将名称中的点号替换为连字符，例如 qwen3-0.6b 变为 qwen3-0-6b
+    const name = this.metadata.name.replace(/\./g, '-');
 
-    return `/api/v1/namespaces/${ namespace }/services/modelservice-${ this.metadata.name }:http/proxy/v1/chat/completions`;
+    return `/api/v1/namespaces/${ namespace }/services/modelservice-${ name }:http/proxy/v1/chat/completions`;
   }
 
   get readyReplicas() {
