@@ -45,8 +45,8 @@ export default class ModelService extends MlWorkload {
                     memory: '10Gi',
                   },
                   limits: {
-                    cpu:           '4',
-                    memory:        '10Gi',
+                    cpu:           '8',
+                    memory:        '16Gi',
                     [NVIDIA.vGPU]: '1',
                   },
                 },
